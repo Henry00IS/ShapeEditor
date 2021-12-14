@@ -11,7 +11,8 @@ namespace AeternumGames.ShapeEditor
     /// </summary>
     public partial class ShapeEditorWindow : EditorWindow
     {
-        private float2 viewportOffset;
+        private float2 gridOffset;
+        private float gridScale = 16f;
 
         [MenuItem("Window/2D Shape Editor")]
         public static void Init()
@@ -33,8 +34,9 @@ namespace AeternumGames.ShapeEditor
         private void DrawGrid()
         {
             var gridMaterial = ShapeEditorResources.temporaryGridMaterial;
-            gridMaterial.SetFloat("_offsetX", viewportOffset.x + (docked ? -1f : 0f));
-            gridMaterial.SetFloat("_offsetY", viewportOffset.y + (docked ? 13f : 11f));
+            gridMaterial.SetFloat("_offsetX", gridOffset.x + (docked ? 1f : 0f));
+            gridMaterial.SetFloat("_offsetY", gridOffset.y + (docked ? 3f : 5f));// + (docked ? 13f : 11f));
+            gridMaterial.SetFloat("_scale", gridScale);
             gridMaterial.SetPass(0);
 
             GL.Begin(GL.QUADS);
@@ -63,10 +65,33 @@ namespace AeternumGames.ShapeEditor
             // pan the viewport around with the right mouse button.
             if (isRightMousePressed)
             {
-                viewportOffset += delta;
-                Debug.Log(viewportOffset);
+                gridOffset += delta;
                 Repaint();
             }
+        }
+
+        private void OnMouseScroll(float delta)
+        {
+            gridScale -= delta;
+            Repaint();
+        }
+
+        private bool OnKeyDown(KeyCode keyCode)
+        {
+            switch (keyCode)
+            {
+                case KeyCode.H:
+                    gridOffset = new float2(0f, 0f);
+                    gridScale = 16f;
+                    Repaint();
+                    return true;
+            }
+            return false;
+        }
+
+        private bool OnKeyUp(KeyCode keyCode)
+        {
+            return false;
         }
     }
 }

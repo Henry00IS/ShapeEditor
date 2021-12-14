@@ -33,9 +33,26 @@ namespace AeternumGames.ShapeEditor
                 OnMouseUp(e.button);
             }
 
-            if (Event.current.type == EventType.MouseDrag)
+            if (e.type == EventType.MouseDrag)
             {
                 OnMouseDrag(e.button, e.delta);
+            }
+
+            if (e.type == EventType.ScrollWheel)
+            {
+                OnMouseScroll(e.delta.y);
+            }
+
+            if (e.type == EventType.KeyDown)
+            {
+                if (OnKeyDown(e.keyCode))
+                    e.Use();
+            }
+
+            if (e.type == EventType.KeyUp)
+            {
+                if (OnKeyUp(e.keyCode))
+                    e.Use();
             }
         }
 

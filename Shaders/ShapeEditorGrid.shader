@@ -4,6 +4,7 @@ Shader "Aeternum Games/Shape Editor Grid"
     {
         _offsetX("Offset X", Float) = 0.0
         _offsetY("Offset Y", Float) = 0.0
+        _scale("Scale", Float) = 16.0
     }
     SubShader
     {
@@ -23,6 +24,7 @@ Shader "Aeternum Games/Shape Editor Grid"
 
                 float _offsetX;
                 float _offsetY;
+                float _scale;
 
                 int mod(fixed x, fixed m)
                 {
@@ -60,8 +62,8 @@ Shader "Aeternum Games/Shape Editor Grid"
                     // draw the background grid.
                     fixed4 col = fixed4(0.0, 0.0, 0.0, 1.0);
                     // draw horizontal and vertical grid lines on top of the background color.
-                    fixed3 horizontalGridLines = lerp(colorGridLines, colorGridBackground, saturate(floor(mod(pos.x, 16.0))));
-                    fixed3 verticalGridLines = lerp(colorGridLines, colorGridBackground, saturate(floor(mod(pos.y, 16.0))));
+                    fixed3 horizontalGridLines = lerp(colorGridLines, colorGridBackground, saturate(floor(mod(pos.x, _scale))));
+                    fixed3 verticalGridLines = lerp(colorGridLines, colorGridBackground, saturate(floor(mod(pos.y, _scale))));
                     // take the brightest pixels (i.e. the lines merge at the intersections).
                     col = fixed4(max(horizontalGridLines, verticalGridLines), 1.0);
                     
