@@ -63,5 +63,20 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorShapeDuplicate;
         public Texture2D shapeEditorZoomIn;
         public Texture2D shapeEditorZoomOut;
+
+        public Shader shapeEditorGridShader;
+        public Material shapeEditorGridMaterial;
+
+        private static Material _temporaryGridMaterial;
+
+        public static Material temporaryGridMaterial
+        {
+            get
+            {
+                if (!_temporaryGridMaterial)
+                    _temporaryGridMaterial = new Material(Instance.shapeEditorGridMaterial);
+                return _temporaryGridMaterial;
+            }
+        }
     }
 }
