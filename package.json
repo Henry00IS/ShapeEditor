@@ -1,0 +1,20 @@
+{
+  "description": "2D Shape Editor for Unity",
+  "displayName": "2D Shape Editor",
+  "name": "com.aeternumgames.shapeeditor",
+  "keywords": [
+    "level design",
+    "world building",
+    "CSG",
+    "BSP",
+    "Boolean",
+	"2D",
+	"Shape",
+	"CAD"
+  ],
+  "unity": "2018.3",
+  "version": "1.0.1",
+  "dependencies": {
+    "com.unity.mathematics": "1.1.0"
+  }
+}
