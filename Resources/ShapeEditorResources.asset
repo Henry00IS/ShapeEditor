@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5be76bbcec1465043abd6b54adffc54a, type: 3}
+  m_Name: ShapeEditorResources
+  m_EditorClassIdentifier: 
+  shapeEditorCreatePolygon: {fileID: 2800000, guid: 2e7ea28a97ddc00478361b08f10aecc5, type: 3}
+  shapeEditorDelete: {fileID: 2800000, guid: 5efe46f796cdc1b438c1a2b21d3ea154, type: 3}
+  shapeEditorExtrudeBevel: {fileID: 2800000, guid: 83f4159c0236d0e4a9c4615884a4c7f4, type: 3}
+  shapeEditorExtrudePoint: {fileID: 2800000, guid: 8d61963e1a756f748aac6c2d773ad121, type: 3}
+  shapeEditorExtrudeRevolve: {fileID: 2800000, guid: 9ce7aa50860214e4da8999216b99bb8a, type: 3}
+  shapeEditorExtrudeShape: {fileID: 2800000, guid: 857ef677c5d21454fb5587a2d5ec394f, type: 3}
+  shapeEditorFlipHorizontally: {fileID: 2800000, guid: f3869c58b7571c04bb3d92c15d2b6881, type: 3}
+  shapeEditorFlipVertically: {fileID: 2800000, guid: 620c7febb2a0936488a0f70141a5ecb8, type: 3}
+  shapeEditorHome: {fileID: 2800000, guid: fc1b94e293a80fc4e9a2dee33d4f727b, type: 3}
+  shapeEditorIcon: {fileID: 2800000, guid: e26ddf28b90139547be10d543d9da1d7, type: 3}
+  shapeEditorNew: {fileID: 2800000, guid: 51111d3247a51d64286cbfa64489563c, type: 3}
+  shapeEditorOpen: {fileID: 2800000, guid: 21d0e83e6a438714fa73bd61e90a2ee2, type: 3}
+  shapeEditorRestore: {fileID: 2800000, guid: e4b5adeda9495e940a387040aa1c2dad, type: 3}
+  shapeEditorRotate90Left: {fileID: 2800000, guid: e3e7fff439b0c0844b7341489bccd181, type: 3}
+  shapeEditorRotate90Right: {fileID: 2800000, guid: afa384404a420d94f9d0f2a62bb51451, type: 3}
+  shapeEditorSave: {fileID: 2800000, guid: 76adb6eb78c8f42438808b9ee4f5b194, type: 3}
+  shapeEditorSegmentBezier: {fileID: 2800000, guid: da9b944f960933a40826cee738d26de9, type: 3}
+  shapeEditorSegmentBezierDetail: {fileID: 2800000, guid: 71ed1a9056d0c5a488787b5de3727ec4, type: 3}
+  shapeEditorSegmentExtrude: {fileID: 2800000, guid: 46170e4cb750c394e9358362c37029db, type: 3}
+  shapeEditorSegmentInsert: {fileID: 2800000, guid: c224c044a8d3ae84699909162c1c4362, type: 3}
+  shapeEditorSegmentLinear: {fileID: 2800000, guid: 511e0ee48308b1b40a0e2910b7715686, type: 3}
+  shapeEditorShapeCreate: {fileID: 2800000, guid: e4c14eb60e41b5047914244525a107fa, type: 3}
+  shapeEditorShapeDuplicate: {fileID: 2800000, guid: 88f6d48a2764a9d42b790eae3790de86, type: 3}
+  shapeEditorZoomIn: {fileID: 2800000, guid: 4680d936fb0455f4f99c0d94155d38df, type: 3}
+  shapeEditorZoomOut: {fileID: 2800000, guid: 62299d3e26649b442aed157a222ab744, type: 3}

@@ -18,7 +18,7 @@ namespace AeternumGames.ShapeEditor
             ShapeEditorWindow window = GetWindow<ShapeEditorWindow>();
             window.minSize = new float2(800, 600);
             window.Show();
-            window.titleContent = new GUIContent("Shape Editor");
+            window.titleContent = new GUIContent("Shape Editor", ShapeEditorResources.Instance.shapeEditorIcon);
             window.minSize = new float2(128, 128);
         }
 
