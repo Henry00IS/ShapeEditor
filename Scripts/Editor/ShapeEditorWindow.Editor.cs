@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ namespace AeternumGames.ShapeEditor
     {
         private bool isLeftMousePressed;
         private bool isRightMousePressed;
+        private float2 mousePosition;
 
         /// <summary>Called by the Unity Editor to process events.</summary>
         private void OnGUI()
@@ -36,6 +38,7 @@ namespace AeternumGames.ShapeEditor
 
             if (e.type == EventType.MouseDrag)
             {
+                mousePosition = e.mousePosition;
                 OnMouseDrag(e.button, e.delta);
             }
 
@@ -70,7 +73,7 @@ namespace AeternumGames.ShapeEditor
 
         private Rect GetViewportRect()
         {
-            return new Rect(0, 0, position.width, position.height);
+            return new Rect(0, 21, position.width, position.height);
         }
     }
 }

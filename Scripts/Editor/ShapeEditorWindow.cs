@@ -11,8 +11,8 @@ namespace AeternumGames.ShapeEditor
     /// </summary>
     public partial class ShapeEditorWindow : EditorWindow
     {
-        private float2 gridOffset;
-        private float gridScale = 16f;
+        private const float pivotScale = 9f;
+        private const float halfPivotScale = pivotScale / 2f;
 
         [MenuItem("Window/2D Shape Editor")]
         public static void Init()
@@ -29,46 +29,6 @@ namespace AeternumGames.ShapeEditor
         {
             Init();
             return GetWindow<ShapeEditorWindow>();
-        }
-
-        private void DrawGrid()
-        {
-            Rect viewportRect = GetViewportRect();
-
-            var renderTexture = RenderTexture.GetTemporary(Mathf.CeilToInt(viewportRect.width), Mathf.CeilToInt(viewportRect.height));
-            Graphics.SetRenderTarget(renderTexture);
-
-            var gridMaterial = ShapeEditorResources.temporaryGridMaterial;
-            gridMaterial.SetFloat("_offsetX", gridOffset.x);
-            gridMaterial.SetFloat("_offsetY", gridOffset.y);
-            gridMaterial.SetFloat("_viewportWidth", viewportRect.width);
-            gridMaterial.SetFloat("_viewportHeight", viewportRect.height);
-            gridMaterial.SetFloat("_scale", gridScale);
-            gridMaterial.SetPass(0);
-
-            GL.PushMatrix();
-            GL.Begin(GL.QUADS);
-            GL.LoadIdentity();
-            GL.Color(Color.red);
-            GLUtilities.DrawRectangle(0, 0, viewportRect.width, viewportRect.height);
-            GL.End();
-            GL.PopMatrix();
-
-            Graphics.SetRenderTarget(null);
-
-            var drawTextureMaterial = ShapeEditorResources.temporaryDrawTextureMaterial;
-            drawTextureMaterial.mainTexture = renderTexture;
-            drawTextureMaterial.SetPass(0);
-
-            GL.PushMatrix();
-            GL.Begin(GL.QUADS);
-            GL.LoadIdentity();
-            GL.Color(Color.red);
-            GLUtilities.DrawRectangle(0, 21, viewportRect.width, viewportRect.height);
-            GL.End();
-            GL.PopMatrix();
-
-            renderTexture.Release();
         }
 
         private void OnRepaint()
@@ -90,8 +50,9 @@ namespace AeternumGames.ShapeEditor
             if (isRightMousePressed)
             {
                 gridOffset += delta;
-                Repaint();
             }
+
+            Repaint();
         }
 
         private void OnMouseScroll(float delta)
@@ -105,8 +66,8 @@ namespace AeternumGames.ShapeEditor
             switch (keyCode)
             {
                 case KeyCode.H:
-                    gridOffset = new float2(0f, 0f);
-                    gridScale = 16f;
+                    GridResetOffset();
+                    GridResetZoom();
                     Repaint();
                     return true;
             }
