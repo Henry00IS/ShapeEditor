@@ -11,8 +11,10 @@ namespace AeternumGames.ShapeEditor
     /// </summary>
     public partial class ShapeEditorWindow : EditorWindow
     {
-        private const float pivotScale = 9f;
-        private const float halfPivotScale = pivotScale / 2f;
+        /// <summary>
+        /// The currently loaded project.
+        /// </summary>
+        private Project project = new Project();
 
         [MenuItem("Window/2D Shape Editor")]
         public static void Init()
@@ -34,6 +36,16 @@ namespace AeternumGames.ShapeEditor
         private void OnRepaint()
         {
             DrawGrid();
+
+            foreach (Shape shape in project.shapes)
+            {
+                foreach (Segment segment in shape.segments)
+                {
+                    // draw pivots of the segments.
+                    var segmentScreenPosition = GridPointToScreen(segment.position);
+                    Handles.DrawSolidRectangleWithOutline(new Rect(segmentScreenPosition - halfPivotScale, new float2(pivotScale)), Color.white, Color.black);
+                }
+            }
         }
 
         private void OnMouseDown(int button)
@@ -77,6 +89,20 @@ namespace AeternumGames.ShapeEditor
         private bool OnKeyUp(KeyCode keyCode)
         {
             return false;
+        }
+
+        /// <summary>
+        /// Gets the next segment.
+        /// </summary>
+        /// <param name="segment">The segment to find the next segment for.</param>
+        /// <returns>The next segment (wraps around).</returns>
+        private Segment GetNextSegment(Segment segment)
+        {
+            Shape parent = segment.shape;
+            int index = parent.segments.IndexOf(segment);
+            if (index + 1 > parent.segments.Count - 1)
+                return parent.segments[0];
+            return parent.segments[index + 1];
         }
     }
 }

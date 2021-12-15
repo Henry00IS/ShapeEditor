@@ -8,6 +8,8 @@ namespace AeternumGames.ShapeEditor
 {
     public partial class ShapeEditorWindow
     {
+        private const float pivotScale = 9f;
+        private const float halfPivotScale = pivotScale / 2f;
         private float2 gridOffset;
         private float gridScale = 16f;
 
@@ -63,7 +65,7 @@ namespace AeternumGames.ShapeEditor
             GL.PushMatrix();
             GL.Begin(GL.QUADS);
             GL.LoadIdentity();
-            GL.Color(Color.red);
+            GL.Color(Color.black);
             GLUtilities.DrawRectangle(0, 0, viewportRect.width, viewportRect.height);
             GL.End();
             GL.PopMatrix();
@@ -83,6 +85,31 @@ namespace AeternumGames.ShapeEditor
             GL.PopMatrix();
 
             renderTexture.Release();
+
+            var lineMaterial = ShapeEditorResources.temporaryLineMaterial;
+            lineMaterial.SetPass(0);
+
+            GL.PushMatrix();
+            GL.Begin(GL.QUADS);
+            GL.LoadIdentity();
+
+            foreach (Shape shape in project.shapes)
+            {
+                foreach (Segment segment in shape.segments)
+                {
+                    Segment next = GetNextSegment(segment);
+                    if (segment.type == SegmentType.Linear)
+                    {
+                        Vector2 p1 = GridPointToScreen(segment.position);
+                        Vector2 p2 = GridPointToScreen(next.position);
+                        GL.Color(new Color(0.502f, 0.502f, 0.502f));
+                        GLUtilities.DrawLine(1.0f, p1.x, p1.y, p2.x, p2.y);
+                    }
+                }
+            }
+
+            GL.End();
+            GL.PopMatrix();
 
             Handles.DrawSolidRectangleWithOutline(new Rect(GridPointToScreen(new float2(0f, 0f)) - halfPivotScale, new float2(pivotScale)), Color.white, Color.black);
 
