@@ -35,7 +35,7 @@ namespace AeternumGames.ShapeEditor
 
         private void OnRepaint()
         {
-            DrawGrid();
+            DrawViewport();
 
             foreach (Shape shape in project.shapes)
             {
@@ -78,7 +78,8 @@ namespace AeternumGames.ShapeEditor
             switch (keyCode)
             {
                 case KeyCode.H:
-                    GridResetOffset();
+                    gridOffset = new float2(0f, 0f);
+                    //GridResetOffset();
                     GridResetZoom();
                     Repaint();
                     return true;

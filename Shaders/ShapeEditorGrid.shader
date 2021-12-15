@@ -4,6 +4,8 @@ Shader "Aeternum Games/Shape Editor Grid"
 	{
 		_offsetX("Offset X", Float) = 0.0
 		_offsetY("Offset Y", Float) = 0.0
+		_viewportWidth("Viewport Width", Float) = 800.0
+		_viewportHeight("Viewport Height", Float) = 600.0
 		_scale("Scale", Float) = 16.0
 	}
 		SubShader
@@ -24,6 +26,8 @@ Shader "Aeternum Games/Shape Editor Grid"
 
 				float _offsetX;
 				float _offsetY;
+				float _viewportWidth;
+				float _viewportHeight;
 				float _scale;
 
 				int mod(fixed x, fixed m)
@@ -35,12 +39,14 @@ Shader "Aeternum Games/Shape Editor Grid"
 				struct appdata
 				{
 					float3 pos : POSITION;
+					float2 uv0 : TEXCOORD0;
 				};
 
 				// vertex-to-fragment interpolators
 				struct v2f
 				{
 					float4 pos : SV_POSITION;
+					float2 uv0 : TEXCOORD0;
 				};
 
 				// vertex shader
@@ -48,6 +54,7 @@ Shader "Aeternum Games/Shape Editor Grid"
 				{
 					v2f o;
 					o.pos = UnityObjectToClipPos(float4(IN.pos, 1.0));
+					o.uv0 = IN.uv0;
 					return o;
 				}
 
@@ -55,7 +62,8 @@ Shader "Aeternum Games/Shape Editor Grid"
 				fixed4 frag(v2f IN) : SV_Target
 				{
 					// calculate the grid offset.
-					float4 pos = IN.pos;
+					//float4 pos = IN.pos;
+					float2 pos = IN.uv0 * float2(_viewportWidth, _viewportHeight);
 					pos.x -= _offsetX;
 					pos.y -= _offsetY;
 
