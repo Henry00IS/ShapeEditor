@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using UnityEditor;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -54,6 +55,17 @@ namespace AeternumGames.ShapeEditor
                 if (OnKeyUp(e.keyCode))
                     e.Use();
             }
+
+            GUILayout.BeginHorizontal(ShapeEditorResources.toolbarStyle);
+
+            GUIStyle createBrushStyle = new GUIStyle(EditorStyles.toolbarButton);
+            if (GUILayout.Button(new GUIContent(ShapeEditorResources.Instance.shapeEditorNew, "New Project (N)"), createBrushStyle))
+            {
+            }
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.EndHorizontal();
         }
 
         private Rect GetViewportRect()

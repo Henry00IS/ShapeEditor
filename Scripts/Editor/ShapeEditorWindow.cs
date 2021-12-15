@@ -33,18 +33,42 @@ namespace AeternumGames.ShapeEditor
 
         private void DrawGrid()
         {
+            Rect viewportRect = GetViewportRect();
+
+            var renderTexture = RenderTexture.GetTemporary(Mathf.CeilToInt(viewportRect.width), Mathf.CeilToInt(viewportRect.height));
+            Graphics.SetRenderTarget(renderTexture);
+
             var gridMaterial = ShapeEditorResources.temporaryGridMaterial;
-            gridMaterial.SetFloat("_offsetX", gridOffset.x + (docked ? 1f : 0f));
-            gridMaterial.SetFloat("_offsetY", gridOffset.y + (docked ? 3f : 5f));// + (docked ? 13f : 11f));
+            gridMaterial.SetFloat("_offsetX", gridOffset.x);
+            gridMaterial.SetFloat("_offsetY", gridOffset.y);
+            gridMaterial.SetFloat("_viewportWidth", viewportRect.width);
+            gridMaterial.SetFloat("_viewportHeight", viewportRect.height);
             gridMaterial.SetFloat("_scale", gridScale);
             gridMaterial.SetPass(0);
 
+            GL.PushMatrix();
             GL.Begin(GL.QUADS);
             GL.LoadIdentity();
-            Rect viewportRect = GetViewportRect();
             GL.Color(Color.red);
-            GLUtilities.DrawRectangle(viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height);
+            GLUtilities.DrawRectangle(0, 0, viewportRect.width, viewportRect.height);
             GL.End();
+            GL.PopMatrix();
+
+            Graphics.SetRenderTarget(null);
+
+            var drawTextureMaterial = ShapeEditorResources.temporaryDrawTextureMaterial;
+            drawTextureMaterial.mainTexture = renderTexture;
+            drawTextureMaterial.SetPass(0);
+
+            GL.PushMatrix();
+            GL.Begin(GL.QUADS);
+            GL.LoadIdentity();
+            GL.Color(Color.red);
+            GLUtilities.DrawRectangle(0, 21, viewportRect.width, viewportRect.height);
+            GL.End();
+            GL.PopMatrix();
+
+            renderTexture.Release();
         }
 
         private void OnRepaint()

@@ -39,3 +39,4 @@ MonoBehaviour:
   shapeEditorZoomOut: {fileID: 2800000, guid: 62299d3e26649b442aed157a222ab744, type: 3}
   shapeEditorGridShader: {fileID: 4800000, guid: 0baf6fb156a9c66459dc6503c24ced2c, type: 3}
   shapeEditorGridMaterial: {fileID: 2100000, guid: 021e83c5ba89e754d8fb2194fde8819e, type: 2}
+  shapeEditorDrawTextureMaterial: {fileID: 2100000, guid: 1a84d53e1a380f043b96bbfe5b90e2fa, type: 2}

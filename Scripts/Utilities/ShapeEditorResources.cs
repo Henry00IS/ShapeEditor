@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -66,6 +67,7 @@ namespace AeternumGames.ShapeEditor
 
         public Shader shapeEditorGridShader;
         public Material shapeEditorGridMaterial;
+        public Material shapeEditorDrawTextureMaterial;
 
         private static Material _temporaryGridMaterial;
 
@@ -76,6 +78,30 @@ namespace AeternumGames.ShapeEditor
                 if (!_temporaryGridMaterial)
                     _temporaryGridMaterial = new Material(Instance.shapeEditorGridMaterial);
                 return _temporaryGridMaterial;
+            }
+        }
+
+        private static Material _temporaryDrawTextureMaterial;
+
+        public static Material temporaryDrawTextureMaterial
+        {
+            get
+            {
+                if (!_temporaryDrawTextureMaterial)
+                    _temporaryDrawTextureMaterial = new Material(Instance.shapeEditorDrawTextureMaterial);
+                return _temporaryDrawTextureMaterial;
+            }
+        }
+
+        private static GUIStyle _toolbarStyle;
+
+        public static GUIStyle toolbarStyle
+        {
+            get
+            {
+                if (_toolbarStyle == null)
+                    _toolbarStyle = new GUIStyle(EditorStyles.toolbar);
+                return _toolbarStyle;
             }
         }
     }
