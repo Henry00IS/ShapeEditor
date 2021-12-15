@@ -78,8 +78,7 @@ namespace AeternumGames.ShapeEditor
             switch (keyCode)
             {
                 case KeyCode.H:
-                    gridOffset = new float2(0f, 0f);
-                    //GridResetOffset();
+                    GridResetOffset();
                     GridResetZoom();
                     Repaint();
                     return true;

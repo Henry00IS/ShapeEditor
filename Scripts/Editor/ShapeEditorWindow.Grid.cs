@@ -65,7 +65,7 @@ namespace AeternumGames.ShapeEditor
             GL.PushMatrix();
             GL.Begin(GL.QUADS);
             GL.LoadIdentity();
-            GLUtilities.DrawRectangle(0, 0, renderTexture.width, renderTexture.height);
+            GLUtilities.DrawRectangle(docked ? - 1 : 0, 0, renderTexture.width + (docked ? 2 : 0), renderTexture.height);
             GL.End();
             GL.PopMatrix();
         }
@@ -105,8 +105,6 @@ namespace AeternumGames.ShapeEditor
             GL.PushMatrix();
             GL.Begin(GL.QUADS);
             GL.LoadIdentity();
-            //GLUtilities.DrawRectangle(0, 0, renderTexture.width, renderTexture.height);
-            //GLUtilities.DrawRectangle2(0, 0, renderTexture.width, renderTexture.height);
             GLUtilities.DrawFlippedRectangle(0, 0, renderTexture.width, renderTexture.height);
             GL.End();
             GL.PopMatrix();
@@ -136,58 +134,6 @@ namespace AeternumGames.ShapeEditor
             DrawRenderTexture(renderTexture);
             renderTexture.Release();
 
-            /*
-            GL.PushMatrix();
-            GL.Begin(GL.QUADS);
-            GL.LoadIdentity();
-            GL.Color(Color.black);
-            GLUtilities.DrawRectangle(0, 0, viewportRect.width, viewportRect.height);
-            GL.End();
-            GL.PopMatrix();
-
-            var lineMaterial = ShapeEditorResources.temporaryLineMaterial;
-            lineMaterial.SetPass(0);
-
-            GL.PushMatrix();
-            GL.Begin(GL.QUADS);
-            GL.LoadIdentity();
-            foreach (Shape shape in project.shapes)
-            {
-                foreach (Segment segment in shape.segments)
-                {
-                    Segment next = GetNextSegment(segment);
-                    if (segment.type == SegmentType.Linear)
-                    {
-                        Vector2 p1 = GridPointToScreen(segment.position);
-                        Vector2 p2 = GridPointToScreen(next.position);
-                        GL.Color(new Color(0.502f, 0.502f, 0.502f));
-                        GLUtilities.DrawLine(1.0f, p1.x, p1.y + viewportRect.y, p2.x, p2.y + viewportRect.y);
-                    }
-                }
-            }
-            GL.End();
-            GL.PopMatrix();
-
-            Graphics.SetRenderTarget(null);
-
-            var drawTextureMaterial = ShapeEditorResources.temporaryDrawTextureMaterial;
-            drawTextureMaterial.mainTexture = renderTexture;
-            drawTextureMaterial.SetPass(0);
-
-            GL.PushMatrix();
-            GL.Begin(GL.QUADS);
-            GL.LoadIdentity();
-            GL.Color(Color.red);
-            GLUtilities.DrawRectangle(viewportRect.x, 0, viewportRect.width, viewportRect.height);
-            GL.End();
-            GL.PopMatrix();
-
-            renderTexture.Release();
-
-            Handles.DrawSolidRectangleWithOutline(new Rect(GridPointToScreen(new float2(0f, 0f)) - halfPivotScale, new float2(pivotScale)), Color.white, Color.black);
-
-            Handles.DrawSolidRectangleWithOutline(new Rect(GridPointToScreen(ScreenPointToGrid(mousePosition)) - halfPivotScale, new float2(pivotScale)), Color.white, Color.black);
-            */
             Handles.DrawSolidRectangleWithOutline(new Rect(GridPointToScreen(ScreenPointToGrid(mousePosition)) - halfPivotScale, new float2(pivotScale)), Color.white, Color.black);
         }
 
@@ -195,7 +141,7 @@ namespace AeternumGames.ShapeEditor
         private void GridResetOffset()
         {
             var viewportRect = GetViewportRect();
-            gridOffset = new float2(viewportRect.width / 2f, (viewportRect.height - viewportRect.y) / 2f);
+            gridOffset = new float2(Mathf.RoundToInt(viewportRect.width / 2f), Mathf.RoundToInt((viewportRect.height - viewportRect.y) / 2f));
         }
 
         /// <summary>Will reset the camera zoom of the viewport.</summary>
