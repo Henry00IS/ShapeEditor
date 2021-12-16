@@ -71,7 +71,14 @@ namespace AeternumGames.ShapeEditor
 
         private void OnMouseScroll(float delta)
         {
-            gridZoom *= math.pow(2, -delta / 24.0f);
+            var mouseBeforeZoom = ScreenPointToGrid(mousePosition);
+
+            gridZoom *= math.pow(2, -delta / 24.0f); // what about math.exp(-delta / 24.0f); ?
+
+            // recalculate the grid offset to zoom into whatever is under the mouse cursor.
+            var mouseAfterZoom = ScreenPointToGrid(mousePosition);
+            var mouseDifference = mouseAfterZoom - mouseBeforeZoom;
+            gridOffset = RenderTextureGridPointToScreen(mouseDifference);
 
             Repaint();
         }
