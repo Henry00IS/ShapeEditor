@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using Unity.Mathematics;
+using UnityEditor;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -10,6 +11,21 @@ namespace AeternumGames.ShapeEditor
         private bool isLeftMousePressed;
         private bool isRightMousePressed;
         private float2 mousePosition;
+
+        /// <summary>Called by the Unity Editor whenever an undo/redo was performed.</summary>
+        private static void OnUndoRedoPerformed()
+        {
+            // unsubscribe if the shape editor window is not open.
+            if (!HasOpenInstances<ShapeEditorWindow>())
+            {
+                Undo.undoRedoPerformed -= OnUndoRedoPerformed;
+                return;
+            }
+
+            // repaint the window.
+            var window = GetWindow<ShapeEditorWindow>();
+            window.Repaint();
+        }
 
         /// <summary>Called by the Unity Editor to process events.</summary>
         private void OnGUI()
@@ -82,14 +98,6 @@ namespace AeternumGames.ShapeEditor
             {
                 if (OnKeyUp(e.keyCode))
                     e.Use();
-            }
-
-            if (e.type == EventType.ValidateCommand)
-            {
-                if (e.commandName == "UndoRedoPerformed")
-                {
-                    Repaint();
-                }
             }
 
             // top toolbar:

@@ -26,12 +26,25 @@ namespace AeternumGames.ShapeEditor
             window.Show();
             window.titleContent = new GUIContent("Shape Editor", ShapeEditorResources.Instance.shapeEditorIcon);
             window.minSize = new float2(128, 128);
+
+            // ensure that we are subscribed to undo/redo notifications.
+            Undo.undoRedoPerformed -= OnUndoRedoPerformed;
+            Undo.undoRedoPerformed += OnUndoRedoPerformed;
         }
 
         public static ShapeEditorWindow InitAndGetHandle()
         {
             Init();
             return GetWindow<ShapeEditorWindow>();
+        }
+
+        /// <summary>
+        /// We use the static constructor to subscribe to undo/redo so that C# reloads don't interfere.
+        /// </summary>
+        static ShapeEditorWindow()
+        {
+            Undo.undoRedoPerformed -= OnUndoRedoPerformed;
+            Undo.undoRedoPerformed += OnUndoRedoPerformed;
         }
 
         private void OnRepaint()
@@ -53,6 +66,7 @@ namespace AeternumGames.ShapeEditor
         {
             Undo.RecordObject(this, "Move Pivot");
             project.shapes[0].segments[0].position += new float2(0.1f, 0.0f);
+
             Repaint();
         }
 
