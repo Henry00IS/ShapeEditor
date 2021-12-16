@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 
 using Unity.Mathematics;
-using UnityEditor;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -11,6 +10,7 @@ namespace AeternumGames.ShapeEditor
         private const float screenScale = 200f;
         private const float pivotScale = 9f;
         private const float halfPivotScale = pivotScale / 2f;
+        private static readonly Color segmentColor = new Color(0.7f, 0.7f, 0.7f);
         private float2 gridOffset;
         private float gridZoom = 1f;
         private float gridSnap = 0.125f;
@@ -68,7 +68,7 @@ namespace AeternumGames.ShapeEditor
             GL.PushMatrix();
             GL.Begin(GL.QUADS);
             GL.LoadIdentity();
-            GLUtilities.DrawRectangle(docked ? -1 : 0, 0, renderTexture.width + (docked ? 2 : 0), renderTexture.height);
+            GLUtilities.DrawUvRectangle(docked ? -1 : 0, 0, renderTexture.width + (docked ? 2 : 0), renderTexture.height);
             GL.End();
             GL.PopMatrix();
         }
@@ -90,9 +90,29 @@ namespace AeternumGames.ShapeEditor
                     {
                         Vector2 p1 = RenderTextureGridPointToScreen(segment.position);
                         Vector2 p2 = RenderTextureGridPointToScreen(next.position);
-                        GL.Color(new Color(0.502f, 0.502f, 0.502f));
+                        GL.Color(segmentColor);
                         GLUtilities.DrawLine(1.0f, p1.x, p1.y, p2.x, p2.y);
                     }
+                }
+            }
+            GL.End();
+            GL.PopMatrix();
+        }
+
+        private void DrawPivots()
+        {
+            var lineMaterial = ShapeEditorResources.temporaryLineMaterial;
+            lineMaterial.SetPass(0);
+
+            GL.PushMatrix();
+            GL.Begin(GL.QUADS);
+            GL.LoadIdentity();
+            foreach (Shape shape in project.shapes)
+            {
+                foreach (Segment segment in shape.segments)
+                {
+                    float2 pos = RenderTextureGridPointToScreen(segment.position);
+                    GLUtilities.DrawSolidRectangleWithOutline(pos.x - halfPivotScale, pos.y - halfPivotScale, pivotScale, pivotScale, Color.white, Color.black);
                 }
             }
             GL.End();
@@ -108,7 +128,7 @@ namespace AeternumGames.ShapeEditor
             GL.PushMatrix();
             GL.Begin(GL.QUADS);
             GL.LoadIdentity();
-            GLUtilities.DrawFlippedRectangle(0, 0, renderTexture.width, renderTexture.height);
+            GLUtilities.DrawFlippedUvRectangle(0, 0, renderTexture.width, renderTexture.height);
             GL.End();
             GL.PopMatrix();
         }
@@ -131,13 +151,12 @@ namespace AeternumGames.ShapeEditor
             GL.Clear(true, true, Color.red);
             DrawGrid(renderTexture);
             DrawSegments();
+            DrawPivots();
 
             // finish up and draw the render texture.
             Graphics.SetRenderTarget(null);
             DrawRenderTexture(renderTexture);
             renderTexture.Release();
-
-            Handles.DrawSolidRectangleWithOutline(new Rect(GridPointToScreen(ScreenPointToGrid(mousePosition)) - halfPivotScale, new float2(pivotScale)), Color.white, Color.black);
         }
 
         /// <summary>Will reset the grid offset to the center of the viewport.</summary>

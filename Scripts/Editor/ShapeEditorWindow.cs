@@ -50,16 +50,6 @@ namespace AeternumGames.ShapeEditor
         private void OnRepaint()
         {
             DrawViewport();
-
-            foreach (Shape shape in project.shapes)
-            {
-                foreach (Segment segment in shape.segments)
-                {
-                    // draw pivots of the segments.
-                    var segmentScreenPosition = GridPointToScreen(segment.position);
-                    Handles.DrawSolidRectangleWithOutline(new Rect(segmentScreenPosition - halfPivotScale, new float2(pivotScale)), Color.white, Color.black);
-                }
-            }
         }
 
         private void OnMouseDown(int button)
