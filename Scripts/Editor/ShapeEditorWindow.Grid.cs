@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -112,7 +113,7 @@ namespace AeternumGames.ShapeEditor
                 foreach (Segment segment in shape.segments)
                 {
                     float2 pos = RenderTextureGridPointToScreen(segment.position);
-                    GLUtilities.DrawSolidRectangleWithOutline(pos.x - halfPivotScale, pos.y - halfPivotScale, pivotScale, pivotScale, Color.white, Color.black);
+                    GLUtilities.DrawSolidRectangleWithOutline(pos.x - halfPivotScale, pos.y - halfPivotScale, pivotScale, pivotScale, Color.white, segment.selected ? Color.red : Color.black);
                 }
             }
             GL.End();
@@ -170,6 +171,67 @@ namespace AeternumGames.ShapeEditor
         private void GridResetZoom()
         {
             gridZoom = 1f;
+        }
+
+        /// <summary>Attempts to find the closest segment at the specified grid position.</summary>
+        /// <param name="position">The grid position to search at.</param>
+        /// <returns>The segment if found or null.</returns>
+        private Segment FindSegmentAtGridPosition(float2 position, float maxDistance)
+        {
+            float closestDistance = float.MaxValue;
+            Segment result = null;
+
+            foreach (Shape shape in project.shapes)
+            {
+                foreach (Segment segment in shape.segments)
+                {
+                    var distance = math.distance(position, segment.position);
+                    if (distance < maxDistance && distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        result = segment;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>Attempts to find the closest segment at the specified screen position.</summary>
+        /// <param name="position">The screen position to search at.</param>
+        /// <returns>The segment if found or null.</returns>
+        private Segment FindSegmentAtScreenPosition(float2 position, float maxDistance)
+        {
+            float closestDistance = float.MaxValue;
+            Segment result = null;
+
+            foreach (Shape shape in project.shapes)
+            {
+                foreach (Segment segment in shape.segments)
+                {
+                    var distance = math.distance(position, GridPointToScreen(segment.position));
+                    if (distance < maxDistance && distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        result = segment;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>Iterates over all of the selected segments.</summary>
+        private IEnumerable<Segment> ForEachSelectedSegment()
+        {
+            foreach (Shape shape in project.shapes)
+            {
+                foreach (Segment segment in shape.segments)
+                {
+                    if (segment.selected)
+                        yield return segment;
+                }
+            }
         }
     }
 }

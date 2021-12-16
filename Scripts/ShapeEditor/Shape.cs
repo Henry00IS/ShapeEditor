@@ -35,6 +35,14 @@ namespace AeternumGames.ShapeEditor
             segments.Add(new Segment(this, -0.5f, 0.5f));
         }
 
+        /// <summary>Clears the selection of all selectable objects in the shape.</summary>
+        public void ClearSelection()
+        {
+            var segmentsCount = segments.Count;
+            for (int i = 0; i < segmentsCount; i++)
+                segments[i].selected = false;
+        }
+
         /// <summary>Calculates the pivot position so that it's centered on the shape.</summary>
         public void CalculatePivotPosition()
         {

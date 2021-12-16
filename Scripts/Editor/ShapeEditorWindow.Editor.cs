@@ -11,6 +11,9 @@ namespace AeternumGames.ShapeEditor
         private bool isLeftMousePressed;
         private bool isRightMousePressed;
         private float2 mousePosition;
+        private float2 mouseGridPosition;
+        private bool isCtrlPressed;
+        private bool isShiftPressed;
 
         /// <summary>Called by the Unity Editor whenever an undo/redo was performed.</summary>
         private static void OnUndoRedoPerformed()
@@ -45,6 +48,7 @@ namespace AeternumGames.ShapeEditor
                     GUI.FocusControl(null);
 
                     mousePosition = e.mousePosition;
+                    mouseGridPosition = ScreenPointToGrid(mousePosition);
                     if (e.button == 0) isLeftMousePressed = true;
                     if (e.button == 1) isRightMousePressed = true;
                     OnMouseDown(e.button);
@@ -58,6 +62,7 @@ namespace AeternumGames.ShapeEditor
                 if (IsMousePositionInViewport(e.mousePosition))
                 {
                     mousePosition = e.mousePosition;
+                    mouseGridPosition = ScreenPointToGrid(mousePosition);
                     if (e.button == 0) isLeftMousePressed = false;
                     if (e.button == 1) isRightMousePressed = false;
                     OnMouseUp(e.button);
@@ -70,8 +75,10 @@ namespace AeternumGames.ShapeEditor
             {
                 if (IsMousePositionInViewport(e.mousePosition))
                 {
+                    var previousMouseGridPosition = mouseGridPosition;
                     mousePosition = e.mousePosition;
-                    OnMouseDrag(e.button, e.delta);
+                    mouseGridPosition = ScreenPointToGrid(mousePosition);
+                    OnMouseDrag(e.button, e.delta, mouseGridPosition - previousMouseGridPosition);
 
                     e.Use();
                 }
@@ -82,6 +89,7 @@ namespace AeternumGames.ShapeEditor
                 if (IsMousePositionInViewport(e.mousePosition))
                 {
                     mousePosition = e.mousePosition;
+                    mouseGridPosition = ScreenPointToGrid(mousePosition);
                     OnMouseScroll(e.delta.y);
 
                     e.Use();
@@ -90,12 +98,18 @@ namespace AeternumGames.ShapeEditor
 
             if (e.type == EventType.KeyDown)
             {
+                isCtrlPressed = e.modifiers.HasFlag(EventModifiers.Control);
+                isShiftPressed = e.modifiers.HasFlag(EventModifiers.Shift);
+
                 if (OnKeyDown(e.keyCode))
                     e.Use();
             }
 
             if (e.type == EventType.KeyUp)
             {
+                isCtrlPressed = e.modifiers.HasFlag(EventModifiers.Control);
+                isShiftPressed = e.modifiers.HasFlag(EventModifiers.Shift);
+
                 if (OnKeyUp(e.keyCode))
                     e.Use();
             }

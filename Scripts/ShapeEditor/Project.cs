@@ -32,6 +32,14 @@ namespace AeternumGames.ShapeEditor
             // create a copy of the given project using JSON.
             return JsonUtility.FromJson<Project>(JsonUtility.ToJson(this));
         }
+
+        /// <summary>Clears the selection of all selectable objects in the project.</summary>
+        public void ClearSelection()
+        {
+            var shapesCount = shapes.Count;
+            for (int i = 0; i < shapesCount; i++)
+                shapes[i].ClearSelection();
+        }
     }
 }
 

@@ -14,22 +14,22 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         private float2 _position;
 
-        /// <summary>The parent shape of this segment.</summary>
+        /// <summary>Whether the segment is selected.</summary>
+        [NonSerialized]
+        private bool _selected;
+
+        /// <summary>The parent shape of the segment.</summary>
         [NonSerialized]
         private Shape _shape;
 
-        /// <summary>The position of the segment on the grid.</summary>
-        public float2 position
-        {
-            get { return _position; }
-            set { _position = value; }
-        }
+        /// <summary>Gets or sets the position of the segment on the grid.</summary>
+        public float2 position { get => _position; set => _position = value; }
 
-        /// <summary>The parent shape of this segment.</summary>
-        public Shape shape
-        {
-            get { return _shape; }
-        }
+        /// <summary>Gets the parent shape of the segment.</summary>
+        public Shape shape { get => _shape; }
+
+        /// <summary>Gets or sets whether the segment is selected.</summary>
+        public bool selected { get => _selected; set => _selected = value; }
 
         /// <summary>The segment type.</summary>
         [SerializeField]

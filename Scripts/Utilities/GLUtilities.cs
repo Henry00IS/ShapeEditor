@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -50,6 +51,11 @@ namespace AeternumGames.ShapeEditor
             DrawRectangle(x, y, w, h);
             GL.Color(faceColor);
             DrawRectangle(x + 1, y + 1, w - 2, h - 2);
+        }
+
+        public static void DrawLine(float thickness, float2 from, float2 to)
+        {
+            DrawLine(thickness, from.x, from.y, to.x, to.y);
         }
 
         public static void DrawLine(float thickness, float x1, float y1, float x2, float y2)
@@ -121,6 +127,29 @@ namespace AeternumGames.ShapeEditor
             GL.Vertex3(p2.x, p2.y, 0);
             GL.Vertex3(p3.x, p3.y, 0);
             GL.Vertex3(p4.x, p4.y, 0);
+        }
+
+        public static void DrawCircle(float thickness, float2 position, float radius, Color color)
+        {
+            const int segments = 32;
+            float angle = 0f;
+            float2 lastPoint = float2.zero;
+            float2 thisPoint = float2.zero;
+
+            GL.Color(color);
+            for (int i = 0; i < segments + 1; i++)
+            {
+                thisPoint.x = Mathf.Sin(Mathf.Deg2Rad * angle) * radius;
+                thisPoint.y = Mathf.Cos(Mathf.Deg2Rad * angle) * radius;
+
+                if (i > 0)
+                {
+                    DrawLine(thickness, lastPoint + position, thisPoint + position);
+                }
+
+                lastPoint = thisPoint;
+                angle += 360f / segments;
+            }
         }
     }
 }

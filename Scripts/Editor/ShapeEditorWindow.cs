@@ -11,9 +11,7 @@ namespace AeternumGames.ShapeEditor
     /// </summary>
     public partial class ShapeEditorWindow : EditorWindow
     {
-        /// <summary>
-        /// The currently loaded project.
-        /// </summary>
+        /// <summary>The currently loaded project.</summary>
         [SerializeField]
         private Project project = new Project();
 
@@ -54,8 +52,14 @@ namespace AeternumGames.ShapeEditor
 
         private void OnMouseDown(int button)
         {
-            Undo.RecordObject(this, "Move Pivot");
-            project.shapes[0].segments[0].position += new float2(0.1f, 0.0f);
+            // unless the shift key is held down we clear the selection.
+            if (!isShiftPressed)
+                project.ClearSelection();
+
+            // find the closest segment to the click position.
+            var segment = FindSegmentAtScreenPosition(mousePosition, 60.0f);
+            if (segment != null)
+                segment.selected = !segment.selected;
 
             Repaint();
         }
@@ -65,12 +69,20 @@ namespace AeternumGames.ShapeEditor
             Repaint();
         }
 
-        private void OnMouseDrag(int button, float2 delta)
+        private void OnMouseDrag(int button, float2 screenDelta, float2 gridDelta)
         {
             // pan the viewport around with the right mouse button.
             if (isRightMousePressed)
             {
-                gridOffset += delta;
+                gridOffset += screenDelta;
+            }
+
+            if (isLeftMousePressed)
+            {
+                foreach (var segment in ForEachSelectedSegment())
+                {
+                    segment.position += gridDelta;
+                }
             }
 
             Repaint();
@@ -99,6 +111,10 @@ namespace AeternumGames.ShapeEditor
                     GridResetZoom();
                     Repaint();
                     return true;
+
+                case KeyCode.W:
+
+                    return true;
             }
             return false;
         }
@@ -112,6 +128,9 @@ namespace AeternumGames.ShapeEditor
         {
             if (GUILayout.Button(new GUIContent(ShapeEditorResources.Instance.shapeEditorNew, "New Project (N)"), ShapeEditorResources.toolbarButtonStyle))
             {
+                Undo.RecordObject(this, "New Project");
+                project = new Project();
+                Repaint();
             }
 
             GUILayout.FlexibleSpace();
