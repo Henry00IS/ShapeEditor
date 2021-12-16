@@ -71,14 +71,8 @@ namespace AeternumGames.ShapeEditor
 
         private void OnMouseScroll(float delta)
         {
-            if (delta < 0.0f)
-            {
-                gridZoom += 0.125f;
-            }
-            else
-            {
-                gridZoom -= 0.125f;
-            }
+            gridZoom *= math.pow(2, -delta / 24.0f);
+
             Repaint();
         }
 

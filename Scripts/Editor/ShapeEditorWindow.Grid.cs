@@ -50,7 +50,7 @@ namespace AeternumGames.ShapeEditor
         {
             Rect viewportRect = GetViewportRect();
             point -= new float2(viewportRect.x, viewportRect.y);
-            float2 result = (point / screenScale / gridZoom) - (gridOffset / screenScale / gridZoom);//(point * screenScale / gridZoom) - (gridOffset / gridZoom);
+            float2 result = (point / screenScale / gridZoom) - (gridOffset / screenScale / gridZoom);
             return new float2(result.x, result.y);
         }
 
