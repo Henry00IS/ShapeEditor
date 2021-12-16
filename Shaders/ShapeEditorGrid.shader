@@ -6,7 +6,8 @@ Shader "Aeternum Games/Shape Editor Grid"
 		_offsetY("Offset Y", Float) = 0.0
 		_viewportWidth("Viewport Width", Float) = 800.0
 		_viewportHeight("Viewport Height", Float) = 600.0
-		_scale("Scale", Float) = 16.0
+		_zoom("Zoom", Float) = 1.0
+		_snap("Snap", Float) = 0.125
 	}
 		SubShader
 	{
@@ -21,6 +22,7 @@ Shader "Aeternum Games/Shape Editor Grid"
 				#include "UnityCG.cginc"
 				#include "UnityShaderVariables.cginc"
 
+				static const float screenScale = 200.0;
 				static const fixed3 colorGridBackground = fixed3(0.118, 0.118, 0.118);
 				static const fixed3 colorGridLines = fixed3(0.206, 0.206, 0.206);
 
@@ -28,7 +30,8 @@ Shader "Aeternum Games/Shape Editor Grid"
 				float _offsetY;
 				float _viewportWidth;
 				float _viewportHeight;
-				float _scale;
+				float _zoom;
+				float _snap;
 
 				int mod(fixed x, fixed m)
 				{
@@ -70,8 +73,8 @@ Shader "Aeternum Games/Shape Editor Grid"
 					// draw the background grid.
 					fixed4 col = fixed4(0.0, 0.0, 0.0, 1.0);
 					// draw horizontal and vertical grid lines on top of the background color.
-					fixed3 horizontalGridLines = lerp(colorGridLines, colorGridBackground, saturate(floor(mod(pos.x, _scale))));
-					fixed3 verticalGridLines = lerp(colorGridLines, colorGridBackground, saturate(floor(mod(pos.y, _scale))));
+					fixed3 horizontalGridLines = lerp(colorGridLines, colorGridBackground, saturate(floor(mod(pos.x, _snap * screenScale * _zoom))));
+					fixed3 verticalGridLines = lerp(colorGridLines, colorGridBackground, saturate(floor(mod(pos.y, _snap * screenScale * _zoom))));
 					// take the brightest pixels (i.e. the lines merge at the intersections).
 					col = fixed4(max(horizontalGridLines, verticalGridLines), 1.0);
 

@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 
 using Unity.Mathematics;
-using UnityEditor;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -24,27 +23,53 @@ namespace AeternumGames.ShapeEditor
 
             if (e.type == EventType.MouseDown)
             {
-                if (e.button == 0) isLeftMousePressed = true;
-                if (e.button == 1) isRightMousePressed = true;
-                OnMouseDown(e.button);
+                if (IsMousePositionInViewport(e.mousePosition))
+                {
+                    // ensure we have input focus.
+                    GUI.FocusControl(null);
+
+                    mousePosition = e.mousePosition;
+                    if (e.button == 0) isLeftMousePressed = true;
+                    if (e.button == 1) isRightMousePressed = true;
+                    OnMouseDown(e.button);
+
+                    e.Use();
+                }
             }
 
             if (e.type == EventType.MouseUp)
             {
-                if (e.button == 0) isLeftMousePressed = false;
-                if (e.button == 1) isRightMousePressed = false;
-                OnMouseUp(e.button);
+                if (IsMousePositionInViewport(e.mousePosition))
+                {
+                    mousePosition = e.mousePosition;
+                    if (e.button == 0) isLeftMousePressed = false;
+                    if (e.button == 1) isRightMousePressed = false;
+                    OnMouseUp(e.button);
+
+                    e.Use();
+                }
             }
 
             if (e.type == EventType.MouseDrag)
             {
-                mousePosition = e.mousePosition;
-                OnMouseDrag(e.button, e.delta);
+                if (IsMousePositionInViewport(e.mousePosition))
+                {
+                    mousePosition = e.mousePosition;
+                    OnMouseDrag(e.button, e.delta);
+
+                    e.Use();
+                }
             }
 
             if (e.type == EventType.ScrollWheel)
             {
-                OnMouseScroll(e.delta.y);
+                if (IsMousePositionInViewport(e.mousePosition))
+                {
+                    mousePosition = e.mousePosition;
+                    OnMouseScroll(e.delta.y);
+
+                    e.Use();
+                }
             }
 
             if (e.type == EventType.KeyDown)
@@ -59,21 +84,28 @@ namespace AeternumGames.ShapeEditor
                     e.Use();
             }
 
+            // top toolbar:
             GUILayout.BeginHorizontal(ShapeEditorResources.toolbarStyle);
+            OnTopToolbarGUI();
+            GUILayout.EndHorizontal();
 
-            GUIStyle createBrushStyle = new GUIStyle(EditorStyles.toolbarButton);
-            if (GUILayout.Button(new GUIContent(ShapeEditorResources.Instance.shapeEditorNew, "New Project (N)"), createBrushStyle))
-            {
-            }
-
+            // skip vertical viewport area.
             GUILayout.FlexibleSpace();
 
+            // bottom toolbar:
+            GUILayout.BeginHorizontal(ShapeEditorResources.toolbarStyle);
+            OnBottomToolbarGUI();
             GUILayout.EndHorizontal();
         }
 
         private Rect GetViewportRect()
         {
             return new Rect(0, 21, position.width, position.height);
+        }
+
+        private bool IsMousePositionInViewport(float2 mousePosition)
+        {
+            return new Rect(0, 21, position.width, position.height - (21 * 2)).Contains(mousePosition);
         }
     }
 }

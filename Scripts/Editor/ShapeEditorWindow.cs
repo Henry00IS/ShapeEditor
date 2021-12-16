@@ -50,10 +50,12 @@ namespace AeternumGames.ShapeEditor
 
         private void OnMouseDown(int button)
         {
+            Repaint();
         }
 
         private void OnMouseUp(int button)
         {
+            Repaint();
         }
 
         private void OnMouseDrag(int button, float2 delta)
@@ -69,7 +71,14 @@ namespace AeternumGames.ShapeEditor
 
         private void OnMouseScroll(float delta)
         {
-            gridScale -= delta;
+            if (delta < 0.0f)
+            {
+                gridZoom += 0.125f;
+            }
+            else
+            {
+                gridZoom -= 0.125f;
+            }
             Repaint();
         }
 
@@ -89,6 +98,28 @@ namespace AeternumGames.ShapeEditor
         private bool OnKeyUp(KeyCode keyCode)
         {
             return false;
+        }
+
+        private void OnTopToolbarGUI()
+        {
+            if (GUILayout.Button(new GUIContent(ShapeEditorResources.Instance.shapeEditorNew, "New Project (N)"), ShapeEditorResources.toolbarButtonStyle))
+            {
+            }
+
+            GUILayout.FlexibleSpace();
+        }
+
+        private void OnBottomToolbarGUI()
+        {
+            GUILayout.Label("2D Shape Editor");
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.Label("Snap");
+            gridSnap = EditorGUILayout.FloatField(gridSnap, GUILayout.Width(64f));
+
+            GUILayout.Label("Zoom");
+            gridZoom = EditorGUILayout.FloatField(gridZoom, GUILayout.Width(64f));
         }
 
         /// <summary>

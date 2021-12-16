@@ -116,5 +116,17 @@ namespace AeternumGames.ShapeEditor
                 return _toolbarStyle;
             }
         }
+
+        private static GUIStyle _toolbarButtonStyle;
+
+        public static GUIStyle toolbarButtonStyle
+        {
+            get
+            {
+                if (_toolbarButtonStyle == null)
+                    _toolbarButtonStyle = new GUIStyle(EditorStyles.toolbarButton);
+                return _toolbarButtonStyle;
+            }
+        }
     }
 }

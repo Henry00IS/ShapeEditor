@@ -50,7 +50,7 @@ namespace AeternumGames.ShapeEditor
         /// <param name="shape">The parent shape of this segment.</param>
         /// <param name="x">The x-coordinate on the grid.</param>
         /// <param name="y">The y-coordinate on the grid.</param>
-        public Segment(Shape shape, int x, int y)
+        public Segment(Shape shape, float x, float y)
         {
             _shape = shape;
             _position = new float2(x, y);

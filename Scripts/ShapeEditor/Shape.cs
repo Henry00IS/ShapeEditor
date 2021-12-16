@@ -29,10 +29,10 @@ namespace AeternumGames.ShapeEditor
         public void ResetToBox()
         {
             segments.Clear();
-            segments.Add(new Segment(this, -8, -8));
-            segments.Add(new Segment(this, 8, -8));
-            segments.Add(new Segment(this, 8, 8));
-            segments.Add(new Segment(this, -8, 8));
+            segments.Add(new Segment(this, -0.5f, -0.5f));
+            segments.Add(new Segment(this, 0.5f, -0.5f));
+            segments.Add(new Segment(this, 0.5f, 0.5f));
+            segments.Add(new Segment(this, -0.5f, 0.5f));
         }
 
         /// <summary>Calculates the pivot position so that it's centered on the shape.</summary>

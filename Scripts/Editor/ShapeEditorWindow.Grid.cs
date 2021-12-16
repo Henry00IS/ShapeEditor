@@ -8,10 +8,12 @@ namespace AeternumGames.ShapeEditor
 {
     public partial class ShapeEditorWindow
     {
+        private const float screenScale = 200f;
         private const float pivotScale = 9f;
         private const float halfPivotScale = pivotScale / 2f;
         private float2 gridOffset;
-        private float gridScale = 16f;
+        private float gridZoom = 1f;
+        private float gridSnap = 0.125f;
 
         /// <summary>
         /// The initialized flag, used to scroll the project into the center of the window.
@@ -26,7 +28,7 @@ namespace AeternumGames.ShapeEditor
         private float2 GridPointToScreen(float2 point)
         {
             Rect viewportRect = GetViewportRect();
-            return (point * gridScale) + gridOffset + new float2(viewportRect.x, viewportRect.y);
+            return (point * screenScale * gridZoom) + gridOffset + new float2(viewportRect.x, viewportRect.y);
         }
 
         /// <summary>
@@ -36,7 +38,7 @@ namespace AeternumGames.ShapeEditor
         /// <returns>The point on the screen.</returns>
         private float2 RenderTextureGridPointToScreen(float2 point)
         {
-            return (point * gridScale) + gridOffset;
+            return (point * screenScale * gridZoom) + gridOffset;
         }
 
         /// <summary>
@@ -48,7 +50,7 @@ namespace AeternumGames.ShapeEditor
         {
             Rect viewportRect = GetViewportRect();
             point -= new float2(viewportRect.x, viewportRect.y);
-            float2 result = (point / gridScale) - (gridOffset / gridScale);
+            float2 result = (point / screenScale / gridZoom) - (gridOffset / screenScale / gridZoom);//(point * screenScale / gridZoom) - (gridOffset / gridZoom);
             return new float2(result.x, result.y);
         }
 
@@ -59,13 +61,14 @@ namespace AeternumGames.ShapeEditor
             gridMaterial.SetFloat("_offsetY", gridOffset.y);
             gridMaterial.SetFloat("_viewportWidth", renderTexture.width);
             gridMaterial.SetFloat("_viewportHeight", renderTexture.height);
-            gridMaterial.SetFloat("_scale", gridScale);
+            gridMaterial.SetFloat("_zoom", gridZoom);
+            gridMaterial.SetFloat("_snap", gridSnap);
             gridMaterial.SetPass(0);
 
             GL.PushMatrix();
             GL.Begin(GL.QUADS);
             GL.LoadIdentity();
-            GLUtilities.DrawRectangle(docked ? - 1 : 0, 0, renderTexture.width + (docked ? 2 : 0), renderTexture.height);
+            GLUtilities.DrawRectangle(docked ? -1 : 0, 0, renderTexture.width + (docked ? 2 : 0), renderTexture.height);
             GL.End();
             GL.PopMatrix();
         }
@@ -137,17 +140,17 @@ namespace AeternumGames.ShapeEditor
             Handles.DrawSolidRectangleWithOutline(new Rect(GridPointToScreen(ScreenPointToGrid(mousePosition)) - halfPivotScale, new float2(pivotScale)), Color.white, Color.black);
         }
 
-        /// <summary>Will reset the camera offset to the center of the viewport.</summary>
+        /// <summary>Will reset the grid offset to the center of the viewport.</summary>
         private void GridResetOffset()
         {
             var viewportRect = GetViewportRect();
             gridOffset = new float2(Mathf.RoundToInt(viewportRect.width / 2f), Mathf.RoundToInt((viewportRect.height - viewportRect.y) / 2f));
         }
 
-        /// <summary>Will reset the camera zoom of the viewport.</summary>
+        /// <summary>Will reset the grid zoom.</summary>
         private void GridResetZoom()
         {
-            gridScale = 16f;
+            gridZoom = 1f;
         }
     }
 }
