@@ -25,6 +25,7 @@ Shader "Aeternum Games/Shape Editor Grid"
 				static const float screenScale = 200.0;
 				static const fixed3 colorGridBackground = fixed3(0.118, 0.118, 0.118);
 				static const fixed3 colorGridLines = fixed3(0.206, 0.206, 0.206);
+				static const fixed3 colorGridCenterLines = fixed3(0.218, 0.218, 0.218);
 
 				float _offsetX;
 				float _offsetY;
@@ -77,6 +78,10 @@ Shader "Aeternum Games/Shape Editor Grid"
 					fixed3 verticalGridLines = lerp(colorGridLines, colorGridBackground, saturate(floor(mod(pos.y, _snap * screenScale * _zoom))));
 					// take the brightest pixels (i.e. the lines merge at the intersections).
 					col = fixed4(max(horizontalGridLines, verticalGridLines), 1.0);
+
+					// highlight the center lines by making them thicker.
+					if ((pos.x >= -1 && pos.x <= 2) || (pos.y >= -1 && pos.y <= 2))
+						col.rgb = colorGridCenterLines.rgb;
 
 					return col;
 				}
