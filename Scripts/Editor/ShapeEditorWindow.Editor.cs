@@ -84,6 +84,14 @@ namespace AeternumGames.ShapeEditor
                     e.Use();
             }
 
+            if (e.type == EventType.ValidateCommand)
+            {
+                if (e.commandName == "UndoRedoPerformed")
+                {
+                    Repaint();
+                }
+            }
+
             // top toolbar:
             GUILayout.BeginHorizontal(ShapeEditorResources.toolbarStyle);
             OnTopToolbarGUI();

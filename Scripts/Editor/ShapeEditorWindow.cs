@@ -14,6 +14,7 @@ namespace AeternumGames.ShapeEditor
         /// <summary>
         /// The currently loaded project.
         /// </summary>
+        [SerializeField]
         private Project project = new Project();
 
         [MenuItem("Window/2D Shape Editor")]
@@ -50,6 +51,8 @@ namespace AeternumGames.ShapeEditor
 
         private void OnMouseDown(int button)
         {
+            Undo.RecordObject(this, "Move Pivot");
+            project.shapes[0].segments[0].position += new float2(0.1f, 0.0f);
             Repaint();
         }
 
