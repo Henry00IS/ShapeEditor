@@ -16,6 +16,7 @@ namespace AeternumGames.ShapeEditor
         internal float2 mouseGridInitialPosition;
         internal bool isCtrlPressed;
         internal bool isShiftPressed;
+        private MouseCursor desiredMouseCursor;
 
         /// <summary>Called by the Unity Editor whenever an undo/redo was performed.</summary>
         private static void OnUndoRedoPerformed()
@@ -43,6 +44,16 @@ namespace AeternumGames.ShapeEditor
             if (e.type == EventType.Repaint)
             {
                 OnRepaint();
+
+                // set the desired mouse cursor.
+                if (desiredMouseCursor != MouseCursor.Arrow)
+                {
+                    EditorGUIUtility.AddCursorRect(GetViewportRect(), desiredMouseCursor);
+
+                    // only reset the mouse cursor here, when the user isn't holding the left mouse button.
+                    if (!isLeftMousePressed)
+                        desiredMouseCursor = MouseCursor.Arrow;
+                }
             }
 
             // recalculate the mouse position.
@@ -183,6 +194,13 @@ namespace AeternumGames.ShapeEditor
         private bool IsMousePositionInViewport(float2 mousePosition)
         {
             return new Rect(0, 0, position.width, position.height - (21 * 2)).Contains(mousePosition);
+        }
+
+        /// <summary>While this function is called every repaint, it will set the mouse cursor.</summary>
+        /// <param name="cursor">The mouse cursor to use.</param>
+        internal void SetMouseCursor(MouseCursor cursor)
+        {
+            desiredMouseCursor = cursor;
         }
     }
 }

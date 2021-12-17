@@ -277,31 +277,57 @@ namespace AeternumGames.ShapeEditor
             GL.Vertex3(a.x, a.y, 0);
         }
 
-        private static readonly Color translationGizmoGreen = new Color(0.475f, 0.710f, 0.231f);
-        private static readonly Color translationGizmoRed = new Color(0.796f, 0.310f, 0.357f);
+        private static readonly Color translationGizmoColorCircle = new Color(0.5f, 0.5f, 0.5f);
+        private static readonly Color translationGizmoColorCircleActive = new Color(0.75f, 0.75f, 0.75f);
+        private static readonly Color translationGizmoColorGreen = new Color(0.475f, 0.710f, 0.231f);
+        private static readonly Color translationGizmoColorGreenActive = new Color(0.575f, 0.810f, 0.331f);
+        private static readonly Color translationGizmoColorRed = new Color(0.796f, 0.310f, 0.357f);
+        private static readonly Color translationGizmoColorRedActive = new Color(0.896f, 0.410f, 0.457f);
 
-        public static void DrawTranslationGizmo(float2 position, float innerRadius = 16.0f, float arrowLength = 70.0f)
+        public struct TranslationGizmoState
         {
-            DrawCircle(3.0f, position, innerRadius, Color.gray, 15);
-            DrawCircle(3.0f, position, innerRadius, Color.gray, 16);
+            public bool isMouseOverInnerCircle;
+            public bool isMouseOverX;
+            public bool isMouseOverY;
+        }
+
+        public static void DrawTranslationGizmo(float2 position, float2 mousePosition, ref TranslationGizmoState state, float innerRadius = 16.0f, float arrowLength = 70.0f)
+        {
+            state.isMouseOverInnerCircle = (math.distance(position, mousePosition) <= innerRadius);
+
+            DrawCircle(3.0f, position, innerRadius, state.isMouseOverInnerCircle ? translationGizmoColorCircleActive : translationGizmoColorCircle, 15);
+            DrawCircle(3.0f, position, innerRadius, state.isMouseOverInnerCircle ? translationGizmoColorCircleActive : translationGizmoColorCircle, 16);
 
             position.x += 1f;
 
-            GL.Color(translationGizmoGreen);
             var triangleBottom = position + new float2(0.0f, -arrowLength);
-            DrawLine(3.0f, position + new float2(0.0f, -innerRadius - 1f), triangleBottom);
-
             var triangleLeft = triangleBottom + new float2(-8.0f, 0.0f);
             var triangleRight = triangleBottom + new float2(8.0f, 0.0f);
             var triangleTop = triangleBottom + new float2(0.0f, -16.0f);
+            var lineBegin = position + new float2(0.0f, -innerRadius - 1f);
+
+            var bounds = new Bounds(new Vector3(lineBegin.x, lineBegin.y), Vector3.zero);
+            bounds.Encapsulate(new Vector3(triangleLeft.x, triangleLeft.y));
+            bounds.Encapsulate(new Vector3(triangleRight.x, triangleRight.y));
+            bounds.Encapsulate(new Vector3(triangleTop.x, triangleTop.y));
+            state.isMouseOverY = bounds.Contains(new Vector3(mousePosition.x, mousePosition.y));
+            GL.Color(state.isMouseOverY ? translationGizmoColorGreenActive : translationGizmoColorGreen);
+            DrawLine(3.0f, lineBegin, triangleBottom);
             DrawTriangle(triangleLeft, triangleRight, triangleTop);
 
-            GL.Color(translationGizmoRed);
             triangleLeft = position + new float2(arrowLength, 0.0f);
-            DrawLine(3.0f, position + new float2(innerRadius, 0.0f), triangleLeft);
             triangleTop = triangleLeft + new float2(0.0f, -8.0f);
             triangleBottom = triangleLeft + new float2(0.0f, 8.0f);
             triangleRight = triangleLeft + new float2(16.0f, 0.0f);
+            lineBegin = position + new float2(innerRadius, 0.0f);
+
+            bounds = new Bounds(new Vector3(lineBegin.x, lineBegin.y), Vector3.zero);
+            bounds.Encapsulate(new Vector3(triangleBottom.x, triangleBottom.y));
+            bounds.Encapsulate(new Vector3(triangleRight.x, triangleRight.y));
+            bounds.Encapsulate(new Vector3(triangleTop.x, triangleTop.y));
+            state.isMouseOverX = bounds.Contains(new Vector3(mousePosition.x, mousePosition.y));
+            GL.Color(state.isMouseOverX ? translationGizmoColorRedActive : translationGizmoColorRed);
+            DrawLine(3.0f, lineBegin, triangleLeft);
             DrawTriangle(triangleRight, triangleTop, triangleBottom);
         }
     }
