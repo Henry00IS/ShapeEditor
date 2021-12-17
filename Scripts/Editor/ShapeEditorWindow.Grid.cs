@@ -114,6 +114,9 @@ namespace AeternumGames.ShapeEditor
                 GridResetOffset();
             }
 
+            // when no tool is active we fallback to the box select tool.
+            ValidateTools();
+
             // create a render texture for the viewport.
             Rect viewportRect = GetViewportRect();
             var renderTexture = RenderTexture.GetTemporary(Mathf.FloorToInt(viewportRect.width), Mathf.FloorToInt(viewportRect.height + viewportRect.y));
@@ -124,6 +127,7 @@ namespace AeternumGames.ShapeEditor
             DrawGrid(renderTexture);
             DrawSegments();
             DrawPivots();
+            DrawTool();
             DrawWindows();
 
             // finish up and draw the render texture.
@@ -172,7 +176,7 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Attempts to find the closest segment at the specified screen position.</summary>
         /// <param name="position">The screen position to search at.</param>
         /// <returns>The segment if found or null.</returns>
-        private Segment FindSegmentAtScreenPosition(float2 position, float maxDistance)
+        internal Segment FindSegmentAtScreenPosition(float2 position, float maxDistance)
         {
             float closestDistance = float.MaxValue;
             Segment result = null;
@@ -194,7 +198,7 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Iterates over all of the selected segments.</summary>
-        private IEnumerable<Segment> ForEachSelectedSegment()
+        internal IEnumerable<Segment> ForEachSelectedSegment()
         {
             foreach (Shape shape in project.shapes)
             {

@@ -22,7 +22,6 @@ namespace AeternumGames.ShapeEditor
 
         private static readonly Color colorWindowBackground = new Color(0.192f, 0.192f, 0.192f, 0.5f);
         private static readonly Color colorWindowBorder = new Color(0.1f, 0.1f, 0.1f);
-        private static readonly Color colorWindowActiveBorder = new Color(0.5f, 0.25f, 0.0f);
 
         /// <summary>Creates a new window at the specified position of the specified size.</summary>
         /// <param name="parent">The parent window that this window resides in.</param>
@@ -49,7 +48,7 @@ namespace AeternumGames.ShapeEditor
             // render the window.
             GLUtilities.DrawGui(() =>
             {
-                GLUtilities.DrawTransparentRectangleWithOutline(position.x, position.y, size.x, size.y, colorWindowBackground, isActive ? colorWindowActiveBorder : colorWindowBorder);
+                GLUtilities.DrawTransparentRectangleWithOutline(position.x, position.y, size.x, size.y, colorWindowBackground, colorWindowBorder);
             });
 
             // render every child control.

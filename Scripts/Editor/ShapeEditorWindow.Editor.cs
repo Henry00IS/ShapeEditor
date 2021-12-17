@@ -8,12 +8,12 @@ namespace AeternumGames.ShapeEditor
 {
     public partial class ShapeEditorWindow
     {
-        private bool isLeftMousePressed;
+        internal bool isLeftMousePressed;
         private bool isRightMousePressed;
         internal float2 mousePosition;
         private float2 mouseGridPosition;
         private bool isCtrlPressed;
-        private bool isShiftPressed;
+        internal bool isShiftPressed;
 
         /// <summary>Called by the Unity Editor whenever an undo/redo was performed.</summary>
         private static void OnUndoRedoPerformed()

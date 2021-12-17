@@ -13,7 +13,7 @@ namespace AeternumGames.ShapeEditor
     {
         /// <summary>The currently loaded project.</summary>
         [SerializeField]
-        private Project project = new Project();
+        internal Project project = new Project();
 
         [MenuItem("Window/2D Shape Editor")]
         public static void Init()
@@ -59,14 +59,7 @@ namespace AeternumGames.ShapeEditor
             }
             else
             {
-                // unless the shift key is held down we clear the selection.
-                if (!isShiftPressed)
-                    project.ClearSelection();
-
-                // find the closest segment to the click position.
-                var segment = FindSegmentAtScreenPosition(mousePosition, 60.0f);
-                if (segment != null)
-                    segment.selected = !segment.selected;
+                activeTool.OnMouseDown(button);
             }
             Repaint();
         }
@@ -77,6 +70,10 @@ namespace AeternumGames.ShapeEditor
             {
                 activeWindow.OnMouseUp(button);
             }
+            else
+            {
+                activeTool.OnMouseUp(button);
+            }
 
             Repaint();
         }
@@ -86,6 +83,10 @@ namespace AeternumGames.ShapeEditor
             if (activeWindow != null)
             {
                 activeWindow.OnGlobalMouseUp(button);
+            }
+            else
+            {
+                activeTool.OnGlobalMouseUp(button);
             }
 
             Repaint();
@@ -99,18 +100,12 @@ namespace AeternumGames.ShapeEditor
             }
             else
             {
+                activeTool.OnMouseDrag(button, screenDelta, gridDelta);
+
                 // pan the viewport around with the right mouse button.
                 if (isRightMousePressed)
                 {
                     gridOffset += screenDelta;
-                }
-
-                if (isLeftMousePressed)
-                {
-                    foreach (var segment in ForEachSelectedSegment())
-                    {
-                        segment.position += gridDelta;
-                    }
                 }
             }
 
@@ -122,7 +117,13 @@ namespace AeternumGames.ShapeEditor
             // forward this event to the topmost window under the mouse position.
             var window = FindWindowAtPosition(mousePosition);
             if (window != null)
+            {
                 window.OnMouseMove(screenDelta);
+            }
+            else
+            {
+                activeTool.OnMouseMove(screenDelta);
+            }
 
             Repaint();
         }
@@ -151,8 +152,16 @@ namespace AeternumGames.ShapeEditor
                     Repaint();
                     return true;
 
-                case KeyCode.W:
+                case KeyCode.Q:
+                    SwitchToBoxSelectTool();
+                    return true;
 
+                case KeyCode.W:
+                    SwitchToTranslateTool();
+                    return true;
+
+                case KeyCode.E:
+                    SwitchToRotateTool();
                     return true;
             }
             return false;

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace AeternumGames.ShapeEditor
 {
     /// <summary>Represents a control inside of a window.</summary>
-    public class GuiControl
+    public abstract class GuiControl
     {
         /// <summary>The parent window that this control resides in.</summary>
         public GuiWindow parent;
