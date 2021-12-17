@@ -47,7 +47,7 @@ namespace AeternumGames.ShapeEditor
             {
                 if (IsMousePositionInViewport(e.mousePosition))
                 {
-                    // ensure we have input focus.
+                    // ensure we have input focus (e.g. not some imgui textbox).
                     GUI.FocusControl(null);
 
                     mousePosition = e.mousePosition;
@@ -92,7 +92,7 @@ namespace AeternumGames.ShapeEditor
                 var previousMouseGridPosition = mouseGridPosition;
                 mousePosition = e.mousePosition;
                 mouseGridPosition = ScreenPointToGrid(mousePosition);
-                OnMouseMove(e.button, e.delta, mouseGridPosition - previousMouseGridPosition);
+                OnMouseMove(e.delta, mouseGridPosition - previousMouseGridPosition);
             }
 
             if (e.type == EventType.ScrollWheel)

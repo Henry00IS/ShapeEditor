@@ -51,44 +51,68 @@ namespace AeternumGames.ShapeEditor
 
         private void OnMouseDown(int button)
         {
-            // unless the shift key is held down we clear the selection.
-            if (!isShiftPressed)
-                project.ClearSelection();
+            // possibly forward the event to a window.
+            activeWindow = FindWindowAtPosition(mousePosition);
+            if (activeWindow != null)
+            {
+                activeWindow.OnMouseDown(button);
+            }
+            else
+            {
+                // unless the shift key is held down we clear the selection.
+                if (!isShiftPressed)
+                    project.ClearSelection();
 
-            // find the closest segment to the click position.
-            var segment = FindSegmentAtScreenPosition(mousePosition, 60.0f);
-            if (segment != null)
-                segment.selected = !segment.selected;
-
+                // find the closest segment to the click position.
+                var segment = FindSegmentAtScreenPosition(mousePosition, 60.0f);
+                if (segment != null)
+                    segment.selected = !segment.selected;
+            }
             Repaint();
         }
 
         private void OnMouseUp(int button)
         {
+            if (activeWindow != null)
+            {
+                activeWindow.OnMouseUp(button);
+            }
+
             Repaint();
         }
 
         private void OnMouseDrag(int button, float2 screenDelta, float2 gridDelta)
         {
-            // pan the viewport around with the right mouse button.
-            if (isRightMousePressed)
+            if (activeWindow != null)
             {
-                gridOffset += screenDelta;
+                activeWindow.OnMouseDrag(button, screenDelta);
             }
-
-            if (isLeftMousePressed)
+            else
             {
-                foreach (var segment in ForEachSelectedSegment())
+                // pan the viewport around with the right mouse button.
+                if (isRightMousePressed)
                 {
-                    segment.position += gridDelta;
+                    gridOffset += screenDelta;
+                }
+
+                if (isLeftMousePressed)
+                {
+                    foreach (var segment in ForEachSelectedSegment())
+                    {
+                        segment.position += gridDelta;
+                    }
                 }
             }
 
             Repaint();
         }
 
-        private void OnMouseMove(int button, float2 screenDelta, float2 gridDelta)
+        private void OnMouseMove(float2 screenDelta, float2 gridDelta)
         {
+            // forward this event to the topmost window under the mouse position.
+            var window = FindWindowAtPosition(mousePosition);
+            if (window != null)
+                window.OnMouseMove(screenDelta);
         }
 
         private void OnMouseScroll(float delta)

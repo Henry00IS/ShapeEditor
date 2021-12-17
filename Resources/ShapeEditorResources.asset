@@ -25,6 +25,7 @@ MonoBehaviour:
   shapeEditorNew: {fileID: 2800000, guid: 51111d3247a51d64286cbfa64489563c, type: 3}
   shapeEditorOpen: {fileID: 2800000, guid: 21d0e83e6a438714fa73bd61e90a2ee2, type: 3}
   shapeEditorRestore: {fileID: 2800000, guid: e4b5adeda9495e940a387040aa1c2dad, type: 3}
+  shapeEditorRotate: {fileID: 2800000, guid: 5e56852579595da459d090f423cd9b60, type: 3}
   shapeEditorRotate90Left: {fileID: 2800000, guid: e3e7fff439b0c0844b7341489bccd181, type: 3}
   shapeEditorRotate90Right: {fileID: 2800000, guid: afa384404a420d94f9d0f2a62bb51451, type: 3}
   shapeEditorSave: {fileID: 2800000, guid: 76adb6eb78c8f42438808b9ee4f5b194, type: 3}
@@ -36,8 +37,8 @@ MonoBehaviour:
   shapeEditorSelectBox: {fileID: 2800000, guid: 11bd4eebd3f0df646899c8a9671d559f, type: 3}
   shapeEditorShapeCreate: {fileID: 2800000, guid: e4c14eb60e41b5047914244525a107fa, type: 3}
   shapeEditorShapeDuplicate: {fileID: 2800000, guid: 88f6d48a2764a9d42b790eae3790de86, type: 3}
+  shapeEditorTranslate: {fileID: 2800000, guid: 29ace29ff0a46a94fbdcf2d319acd416, type: 3}
   shapeEditorZoomIn: {fileID: 2800000, guid: 4680d936fb0455f4f99c0d94155d38df, type: 3}
   shapeEditorZoomOut: {fileID: 2800000, guid: 62299d3e26649b442aed157a222ab744, type: 3}
   shapeEditorGridMaterial: {fileID: 2100000, guid: 021e83c5ba89e754d8fb2194fde8819e, type: 2}
-  shapeEditorLineMaterial: {fileID: 2100000, guid: d1dffd627a249ca498ba91dd9d46daf2, type: 2}
-  shapeEditorDrawTextureMaterial: {fileID: 2100000, guid: 1a84d53e1a380f043b96bbfe5b90e2fa, type: 2}
+  shapeEditorGuiMaterial: {fileID: 2100000, guid: d1dffd627a249ca498ba91dd9d46daf2, type: 2}

@@ -52,6 +52,7 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorNew;
         public Texture2D shapeEditorOpen;
         public Texture2D shapeEditorRestore;
+        public Texture2D shapeEditorRotate;
         public Texture2D shapeEditorRotate90Left;
         public Texture2D shapeEditorRotate90Right;
         public Texture2D shapeEditorSave;
@@ -63,6 +64,7 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorSelectBox;
         public Texture2D shapeEditorShapeCreate;
         public Texture2D shapeEditorShapeDuplicate;
+        public Texture2D shapeEditorTranslate;
         public Texture2D shapeEditorZoomIn;
         public Texture2D shapeEditorZoomOut;
 
