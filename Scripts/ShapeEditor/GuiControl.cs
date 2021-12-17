@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
@@ -30,6 +31,43 @@ namespace AeternumGames.ShapeEditor
         public virtual void OnRender()
         {
         }
+
+        /// <summary>Called when the control receives a mouse down event.</summary>
+        public virtual void OnMouseDown(int button)
+        {
+        }
+
+        /// <summary>Called when the control receives a mouse up event.</summary>
+        public virtual void OnMouseUp(int button)
+        {
+        }
+
+        /// <summary>Called when the control receives a global mouse up event.</summary>
+        public virtual void OnGlobalMouseUp(int button)
+        {
+        }
+
+        /// <summary>Called when the control receives a mouse drag event.</summary>
+        public virtual void OnMouseDrag(int button)
+        {
+        }
+
+        /// <summary>Called when the control receives a mouse move event.</summary>
+        public virtual void OnMouseMove(float2 screenDelta)
+        {
+        }
+
+        /// <summary>Gets whether the control currently has input focus.</summary>
+        public bool isActive => parent.isActive && this == parent.activeControl;
+
+        /// <summary>Gets whether the mouse is hovering over the control.</summary>
+        public bool isMouseOver => new Rect(float2.zero, size).Contains(mousePosition);
+
+        /// <summary>Gets the rectangle of the control.</summary>
+        public Rect rect => new Rect(position, size);
+
+        /// <summary>Gets the relative mouse position inside of the control.</summary>
+        public float2 mousePosition => parent.mousePosition - position;
     }
 }
 

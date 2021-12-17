@@ -28,17 +28,6 @@ namespace AeternumGames.ShapeEditor
         /// <returns>The point on the screen.</returns>
         private float2 GridPointToScreen(float2 point)
         {
-            Rect viewportRect = GetViewportRect();
-            return (point * screenScale * gridZoom) + gridOffset + new float2(viewportRect.x, viewportRect.y);
-        }
-
-        /// <summary>
-        /// Converts a point on the grid to the point on the screen.
-        /// </summary>
-        /// <param name="point">The point to convert.</param>
-        /// <returns>The point on the screen.</returns>
-        private float2 RenderTextureGridPointToScreen(float2 point)
-        {
             return (point * screenScale * gridZoom) + gridOffset;
         }
 
@@ -49,8 +38,6 @@ namespace AeternumGames.ShapeEditor
         /// <returns>The point on the grid.</returns>
         private float2 ScreenPointToGrid(float2 point)
         {
-            Rect viewportRect = GetViewportRect();
-            point -= new float2(viewportRect.x, viewportRect.y);
             float2 result = (point / screenScale / gridZoom) - (gridOffset / screenScale / gridZoom);
             return new float2(result.x, result.y);
         }
@@ -85,8 +72,8 @@ namespace AeternumGames.ShapeEditor
                         Segment next = GetNextSegment(segment);
                         if (segment.type == SegmentType.Linear)
                         {
-                            Vector2 p1 = RenderTextureGridPointToScreen(segment.position);
-                            Vector2 p2 = RenderTextureGridPointToScreen(next.position);
+                            Vector2 p1 = GridPointToScreen(segment.position);
+                            Vector2 p2 = GridPointToScreen(next.position);
                             GL.Color(segmentColor);
                             GLUtilities.DrawLine(1.0f, p1.x, p1.y, p2.x, p2.y);
                         }
@@ -103,7 +90,7 @@ namespace AeternumGames.ShapeEditor
                 {
                     foreach (Segment segment in shape.segments)
                     {
-                        float2 pos = RenderTextureGridPointToScreen(segment.position);
+                        float2 pos = GridPointToScreen(segment.position);
                         GLUtilities.DrawSolidRectangleWithOutline(pos.x - halfPivotScale, pos.y - halfPivotScale, pivotScale, pivotScale, Color.white, segment.selected ? Color.red : Color.black);
                     }
                 }

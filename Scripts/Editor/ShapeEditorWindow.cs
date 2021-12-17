@@ -81,6 +81,16 @@ namespace AeternumGames.ShapeEditor
             Repaint();
         }
 
+        private void OnGlobalMouseUp(int button)
+        {
+            if (activeWindow != null)
+            {
+                activeWindow.OnGlobalMouseUp(button);
+            }
+
+            Repaint();
+        }
+
         private void OnMouseDrag(int button, float2 screenDelta, float2 gridDelta)
         {
             if (activeWindow != null)
@@ -113,6 +123,8 @@ namespace AeternumGames.ShapeEditor
             var window = FindWindowAtPosition(mousePosition);
             if (window != null)
                 window.OnMouseMove(screenDelta);
+
+            Repaint();
         }
 
         private void OnMouseScroll(float delta)
@@ -124,7 +136,7 @@ namespace AeternumGames.ShapeEditor
             // recalculate the grid offset to zoom into whatever is under the mouse cursor.
             var mouseAfterZoom = ScreenPointToGrid(mousePosition);
             var mouseDifference = mouseAfterZoom - mouseBeforeZoom;
-            gridOffset = RenderTextureGridPointToScreen(mouseDifference);
+            gridOffset = GridPointToScreen(mouseDifference);
 
             Repaint();
         }

@@ -10,7 +10,7 @@ namespace AeternumGames.ShapeEditor
     {
         private bool isLeftMousePressed;
         private bool isRightMousePressed;
-        private float2 mousePosition;
+        internal float2 mousePosition;
         private float2 mouseGridPosition;
         private bool isCtrlPressed;
         private bool isShiftPressed;
@@ -43,14 +43,25 @@ namespace AeternumGames.ShapeEditor
                 OnRepaint();
             }
 
+            // recalculate the mouse position.
+            float2 eMousePosition = e.mousePosition;
+            Rect viewportRect = GetViewportRect();
+            eMousePosition -= new float2(viewportRect.x, viewportRect.y);
+
+            // use a passive hot control to detect mouse up outside of the editor window.
+            int hotControlId = GUIUtility.GetControlID(FocusType.Passive);
+
             if (e.type == EventType.MouseDown)
             {
-                if (IsMousePositionInViewport(e.mousePosition))
+                if (IsMousePositionInViewport(eMousePosition))
                 {
                     // ensure we have input focus (e.g. not some imgui textbox).
                     GUI.FocusControl(null);
 
-                    mousePosition = e.mousePosition;
+                    // set a hot control to detect mouse up outside of the editor window.
+                    GUIUtility.hotControl = hotControlId;
+
+                    mousePosition = eMousePosition;
                     mouseGridPosition = ScreenPointToGrid(mousePosition);
                     if (e.button == 0) isLeftMousePressed = true;
                     if (e.button == 1) isRightMousePressed = true;
@@ -62,9 +73,14 @@ namespace AeternumGames.ShapeEditor
 
             if (e.type == EventType.MouseUp)
             {
-                if (IsMousePositionInViewport(e.mousePosition))
+                OnGlobalMouseUp(e.button);
+
+                if (IsMousePositionInViewport(eMousePosition))
                 {
-                    mousePosition = e.mousePosition;
+                    // reset the hot control.
+                    GUIUtility.hotControl = 0;
+
+                    mousePosition = eMousePosition;
                     mouseGridPosition = ScreenPointToGrid(mousePosition);
                     if (e.button == 0) isLeftMousePressed = false;
                     if (e.button == 1) isRightMousePressed = false;
@@ -74,12 +90,24 @@ namespace AeternumGames.ShapeEditor
                 }
             }
 
+            if (e.type != EventType.MouseUp && e.rawType == EventType.MouseUp)
+            {
+                // reset the hot control.
+                GUIUtility.hotControl = 0;
+
+                mousePosition = eMousePosition;
+                mouseGridPosition = ScreenPointToGrid(mousePosition);
+                if (e.button == 0) isLeftMousePressed = false;
+                if (e.button == 1) isRightMousePressed = false;
+                OnGlobalMouseUp(e.button);
+            }
+
             if (e.type == EventType.MouseDrag)
             {
-                if (IsMousePositionInViewport(e.mousePosition))
+                if (IsMousePositionInViewport(eMousePosition))
                 {
                     var previousMouseGridPosition = mouseGridPosition;
-                    mousePosition = e.mousePosition;
+                    mousePosition = eMousePosition;
                     mouseGridPosition = ScreenPointToGrid(mousePosition);
                     OnMouseDrag(e.button, e.delta, mouseGridPosition - previousMouseGridPosition);
 
@@ -90,16 +118,16 @@ namespace AeternumGames.ShapeEditor
             if (e.type == EventType.MouseMove)
             {
                 var previousMouseGridPosition = mouseGridPosition;
-                mousePosition = e.mousePosition;
+                mousePosition = eMousePosition;
                 mouseGridPosition = ScreenPointToGrid(mousePosition);
                 OnMouseMove(e.delta, mouseGridPosition - previousMouseGridPosition);
             }
 
             if (e.type == EventType.ScrollWheel)
             {
-                if (IsMousePositionInViewport(e.mousePosition))
+                if (IsMousePositionInViewport(eMousePosition))
                 {
-                    mousePosition = e.mousePosition;
+                    mousePosition = eMousePosition;
                     mouseGridPosition = ScreenPointToGrid(mousePosition);
                     OnMouseScroll(e.delta.y);
 
@@ -146,7 +174,7 @@ namespace AeternumGames.ShapeEditor
 
         private bool IsMousePositionInViewport(float2 mousePosition)
         {
-            return new Rect(0, 21, position.width, position.height - (21 * 2)).Contains(mousePosition);
+            return new Rect(0, 0, position.width, position.height - (21 * 2)).Contains(mousePosition);
         }
     }
 }
