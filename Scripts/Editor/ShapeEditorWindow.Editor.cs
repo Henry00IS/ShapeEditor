@@ -33,6 +33,9 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Called by the Unity Editor to process events.</summary>
         private void OnGUI()
         {
+            // continue to request mouse move events, as this flag can get reset upon c# reloads.
+            wantsMouseMove = true;
+
             var e = Event.current;
 
             if (e.type == EventType.Repaint)
@@ -82,6 +85,14 @@ namespace AeternumGames.ShapeEditor
 
                     e.Use();
                 }
+            }
+
+            if (e.type == EventType.MouseMove)
+            {
+                var previousMouseGridPosition = mouseGridPosition;
+                mousePosition = e.mousePosition;
+                mouseGridPosition = ScreenPointToGrid(mousePosition);
+                OnMouseMove(e.button, e.delta, mouseGridPosition - previousMouseGridPosition);
             }
 
             if (e.type == EventType.ScrollWheel)

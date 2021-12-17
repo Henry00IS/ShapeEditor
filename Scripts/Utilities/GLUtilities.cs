@@ -19,6 +19,7 @@ namespace AeternumGames.ShapeEditor
 
         public static void DrawUvRectangle(float x, float y, float w, float h)
         {
+            GL.Color(Color.white);
             w += x;
             h += y;
             GL.TexCoord2(0, 0);
@@ -33,6 +34,7 @@ namespace AeternumGames.ShapeEditor
 
         public static void DrawFlippedUvRectangle(float x, float y, float w, float h)
         {
+            GL.Color(Color.white);
             w += x;
             h += y;
             GL.TexCoord2(0, 1);

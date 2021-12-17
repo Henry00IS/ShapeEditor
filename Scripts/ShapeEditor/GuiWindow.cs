@@ -40,8 +40,9 @@ namespace AeternumGames.ShapeEditor
         public void OnRender()
         {
             // render the window.
-            var lineMaterial = ShapeEditorResources.temporaryLineMaterial;
-            lineMaterial.SetPass(0);
+            var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
+            guiMaterial.mainTexture = null;
+            guiMaterial.SetPass(0);
 
             GL.PushMatrix();
             GL.Begin(GL.QUADS);

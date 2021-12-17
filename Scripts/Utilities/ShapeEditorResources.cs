@@ -67,8 +67,7 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorZoomOut;
 
         public Material shapeEditorGridMaterial;
-        public Material shapeEditorLineMaterial;
-        public Material shapeEditorDrawTextureMaterial;
+        public Material shapeEditorGuiMaterial;
 
         private static Material _temporaryGridMaterial;
 
@@ -82,27 +81,15 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        private static Material _temporaryLineMaterial;
+        private static Material _temporaryGuiMaterial;
 
-        public static Material temporaryLineMaterial
+        public static Material temporaryGuiMaterial
         {
             get
             {
-                if (!_temporaryLineMaterial)
-                    _temporaryLineMaterial = new Material(Instance.shapeEditorLineMaterial);
-                return _temporaryLineMaterial;
-            }
-        }
-
-        private static Material _temporaryDrawTextureMaterial;
-
-        public static Material temporaryDrawTextureMaterial
-        {
-            get
-            {
-                if (!_temporaryDrawTextureMaterial)
-                    _temporaryDrawTextureMaterial = new Material(Instance.shapeEditorDrawTextureMaterial);
-                return _temporaryDrawTextureMaterial;
+                if (!_temporaryGuiMaterial)
+                    _temporaryGuiMaterial = new Material(Instance.shapeEditorGuiMaterial);
+                return _temporaryGuiMaterial;
             }
         }
 

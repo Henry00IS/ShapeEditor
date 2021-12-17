@@ -76,8 +76,9 @@ namespace AeternumGames.ShapeEditor
 
         private void DrawSegments()
         {
-            var lineMaterial = ShapeEditorResources.temporaryLineMaterial;
-            lineMaterial.SetPass(0);
+            var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
+            guiMaterial.mainTexture = null;
+            guiMaterial.SetPass(0);
 
             GL.PushMatrix();
             GL.Begin(GL.QUADS);
@@ -102,8 +103,9 @@ namespace AeternumGames.ShapeEditor
 
         private void DrawPivots()
         {
-            var lineMaterial = ShapeEditorResources.temporaryLineMaterial;
-            lineMaterial.SetPass(0);
+            var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
+            guiMaterial.mainTexture = null;
+            guiMaterial.SetPass(0);
 
             GL.PushMatrix();
             GL.Begin(GL.QUADS);
@@ -122,7 +124,7 @@ namespace AeternumGames.ShapeEditor
 
         private void DrawRenderTexture(RenderTexture renderTexture)
         {
-            var drawTextureMaterial = ShapeEditorResources.temporaryDrawTextureMaterial;
+            var drawTextureMaterial = ShapeEditorResources.temporaryGuiMaterial;
             drawTextureMaterial.mainTexture = renderTexture;
             drawTextureMaterial.SetPass(0);
 

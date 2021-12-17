@@ -1,10 +1,10 @@
-Shader "Aeternum Games/Shape Editor Line"
+Shader "Aeternum Games/Shape Editor Gui"
 {
 	Properties
 	{
-		_CutoffY("Cutoff Y", Float) = 0.0
+		_MainTex("Base (RGB)", 2D) = "white"
 	}
-		SubShader
+	SubShader
 	{
 		Pass
 		{
@@ -17,14 +17,14 @@ Shader "Aeternum Games/Shape Editor Line"
 				#include "UnityCG.cginc"
 				#include "UnityShaderVariables.cginc"
 
-				float _CutoffY;
-				float _Height;
+				sampler2D _MainTex;
 
 				// vertex shader input data
 				struct appdata
 				{
 					float3 pos : POSITION;
 					half4 color : COLOR;
+					float2 uv0 : TEXCOORD0;
 				};
 
 				// vertex-to-fragment interpolators
@@ -32,6 +32,7 @@ Shader "Aeternum Games/Shape Editor Line"
 				{
 					fixed4 color : COLOR0;
 					float4 pos : SV_POSITION;
+					float2 uv0 : TEXCOORD0;
 				};
 
 				// vertex shader
@@ -40,6 +41,7 @@ Shader "Aeternum Games/Shape Editor Line"
 					v2f o;
 					o.color = IN.color;
 					o.pos = UnityObjectToClipPos(float4(IN.pos, 1.0));
+					o.uv0 = IN.uv0;
 					return o;
 				}
 
@@ -47,15 +49,7 @@ Shader "Aeternum Games/Shape Editor Line"
 				fixed4 frag(v2f IN) : SV_Target
 				{
 					fixed4 col;
-					col = IN.color;
-					//#if UNITY_UV_STARTS_AT_TOP
-					//					if (IN.pos.y < _CutoffY)
-					//						discard;
-					//#else
-					//					if (IN.pos.y > _Height)
-					//						discard;
-					//#endif
-
+					col = tex2D(_MainTex, IN.uv0) * IN.color;
 					return col;
 				}
 			ENDCG

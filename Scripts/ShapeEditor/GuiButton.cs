@@ -22,15 +22,16 @@ namespace AeternumGames.ShapeEditor
         public override void OnRender()
         {
             // draw the button outline.
-            ShapeEditorResources.temporaryLineMaterial.SetPass(0);
+            var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
+            guiMaterial.mainTexture = null;
+            guiMaterial.SetPass(0);
+
             GL.Begin(GL.QUADS);
             GLUtilities.DrawTransparentRectangleWithOutline(drawPosition.x, drawPosition.y, size.x, size.y, colorButtonBackground, colorButtonBorder);
-            //GLUtilities.DrawRectangleOutline(drawPosition.x, drawPosition.y, size.x, size.y, Color.white);
             GL.End();
 
-            var drawTextureMaterial = ShapeEditorResources.temporaryDrawTextureMaterial;
-            drawTextureMaterial.mainTexture = icon;
-            drawTextureMaterial.SetPass(0);
+            guiMaterial.mainTexture = icon;
+            guiMaterial.SetPass(0);
 
             // draw the button icon.
             GL.Begin(GL.QUADS);

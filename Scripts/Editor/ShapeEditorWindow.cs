@@ -36,11 +36,10 @@ namespace AeternumGames.ShapeEditor
             return GetWindow<ShapeEditorWindow>();
         }
 
-        /// <summary>
-        /// We use the static constructor to subscribe to undo/redo so that C# reloads don't interfere.
-        /// </summary>
+        /// <summary>We use the static constructor to handle C# reloads.</summary>
         static ShapeEditorWindow()
         {
+            // re-subscribe to undo/redo.
             Undo.undoRedoPerformed -= OnUndoRedoPerformed;
             Undo.undoRedoPerformed += OnUndoRedoPerformed;
         }
@@ -86,6 +85,10 @@ namespace AeternumGames.ShapeEditor
             }
 
             Repaint();
+        }
+
+        private void OnMouseMove(int button, float2 screenDelta, float2 gridDelta)
+        {
         }
 
         private void OnMouseScroll(float delta)
