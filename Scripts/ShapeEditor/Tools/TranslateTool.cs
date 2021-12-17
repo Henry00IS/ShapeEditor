@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 
 using Unity.Mathematics;
-using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
@@ -11,7 +10,10 @@ namespace AeternumGames.ShapeEditor
         {
             GLUtilities.DrawGui(() =>
             {
-                GLUtilities.DrawCircle(1.0f, editor.mousePosition, 8.0f, Color.blue);
+                if (editor.selectedSegmentsCount > 0)
+                {
+                    GLUtilities.DrawTranslationGizmo(editor.selectedSegmentsAveragePosition);
+                }
             });
         }
 

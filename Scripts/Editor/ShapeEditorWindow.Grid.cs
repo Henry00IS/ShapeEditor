@@ -18,6 +18,14 @@ namespace AeternumGames.ShapeEditor
         private float gridZoom = 1f;
         private float gridSnap = 0.125f;
 
+        /// <summary>After rendering the pivots this variable holds the number of selected segments.</summary>
+        internal int selectedSegmentsCount;
+        /// <summary>
+        /// After rendering the pivots this variable holds the average position of all selected
+        /// segments. Only available when the selected segments count is greater than 0.
+        /// </summary>
+        internal float2 selectedSegmentsAveragePosition;
+
         /// <summary>
         /// The initialized flag, used to scroll the project into the center of the window.
         /// </summary>
@@ -76,8 +84,7 @@ namespace AeternumGames.ShapeEditor
                         {
                             Vector2 p1 = GridPointToScreen(segment.position);
                             Vector2 p2 = GridPointToScreen(next.position);
-                            GL.Color(segmentColor);
-                            GLUtilities.DrawLine(1.0f, p1.x, p1.y, p2.x, p2.y);
+                            GLUtilities.DrawLine(1.0f, p1.x, p1.y, p2.x, p2.y, segment.selected ? segmentPivotOutlineColor : segmentColor, next.selected ? segmentPivotOutlineColor : segmentColor);
                         }
                     }
                 }
@@ -86,6 +93,9 @@ namespace AeternumGames.ShapeEditor
 
         private void DrawPivots()
         {
+            selectedSegmentsCount = 0;
+            selectedSegmentsAveragePosition = float2.zero;
+
             GLUtilities.DrawGui(() =>
             {
                 foreach (Shape shape in project.shapes)
@@ -94,9 +104,18 @@ namespace AeternumGames.ShapeEditor
                     {
                         float2 pos = GridPointToScreen(segment.position);
                         GLUtilities.DrawSolidRectangleWithOutline(pos.x - halfPivotScale, pos.y - halfPivotScale, pivotScale, pivotScale, segment.selected ? segmentPivotSelectedColor : Color.white, segment.selected ? segmentPivotOutlineColor : Color.black);
+
+                        if (segment.selected)
+                        {
+                            selectedSegmentsCount++;
+                            selectedSegmentsAveragePosition += pos;
+                        }
                     }
                 }
             });
+
+            if (selectedSegmentsCount != 0)
+                selectedSegmentsAveragePosition /= selectedSegmentsCount;
         }
 
         private void DrawRenderTexture(RenderTexture renderTexture)
