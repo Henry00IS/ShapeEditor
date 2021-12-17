@@ -53,6 +53,22 @@ namespace AeternumGames.ShapeEditor
             DrawRectangle(x + 1, y + 1, w - 2, h - 2);
         }
 
+        public static void DrawTransparentRectangleWithOutline(float x, float y, float w, float h, Color faceColor, Color outlineColor)
+        {
+            DrawRectangleOutline(x, y, w, h, outlineColor);
+            GL.Color(faceColor);
+            DrawRectangle(x + 1, y + 1, w - 2, h - 2);
+        }
+
+        public static void DrawRectangleOutline(float x, float y, float w, float h, Color outlineColor)
+        {
+            GL.Color(outlineColor);
+            DrawRectangle(x, y, w, 1);
+            DrawRectangle(x, y, 1, h);
+            DrawRectangle(x + w - 1, y, 1, h);
+            DrawRectangle(x, y + h - 1, w, 1);
+        }
+
         public static void DrawLine(float thickness, float2 from, float2 to)
         {
             DrawLine(thickness, from.x, from.y, to.x, to.y);

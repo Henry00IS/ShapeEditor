@@ -12,7 +12,7 @@ namespace AeternumGames.ShapeEditor
     {
         /// <summary>The project version, in case of 'severe' future updates.</summary>
         [SerializeField]
-        public int version = 1;
+        public int version = 2; // 1 is SabreCSG's 2D Shape Editor.
 
         /// <summary>The shapes in the project.</summary>
         [SerializeField]

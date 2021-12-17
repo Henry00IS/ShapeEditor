@@ -60,6 +60,7 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorSegmentExtrude;
         public Texture2D shapeEditorSegmentInsert;
         public Texture2D shapeEditorSegmentLinear;
+        public Texture2D shapeEditorSelectBox;
         public Texture2D shapeEditorShapeCreate;
         public Texture2D shapeEditorShapeDuplicate;
         public Texture2D shapeEditorZoomIn;

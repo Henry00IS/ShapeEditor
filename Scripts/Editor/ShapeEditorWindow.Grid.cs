@@ -153,6 +153,7 @@ namespace AeternumGames.ShapeEditor
             DrawGrid(renderTexture);
             DrawSegments();
             DrawPivots();
+            DrawWindows();
 
             // finish up and draw the render texture.
             Graphics.SetRenderTarget(null);
