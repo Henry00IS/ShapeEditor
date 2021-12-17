@@ -12,6 +12,8 @@ namespace AeternumGames.ShapeEditor
         private const float pivotScale = 9f;
         private const float halfPivotScale = pivotScale / 2f;
         private static readonly Color segmentColor = new Color(0.7f, 0.7f, 0.7f);
+        private static readonly Color segmentPivotSelectedColor = new Color(0.9f, 0.45f, 0.0f);
+        private static readonly Color segmentPivotOutlineColor = new Color(1.0f, 0.5f, 0.0f);
         private float2 gridOffset;
         private float gridZoom = 1f;
         private float gridSnap = 0.125f;
@@ -26,7 +28,7 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         /// <param name="point">The point to convert.</param>
         /// <returns>The point on the screen.</returns>
-        private float2 GridPointToScreen(float2 point)
+        internal float2 GridPointToScreen(float2 point)
         {
             return (point * screenScale * gridZoom) + gridOffset;
         }
@@ -36,7 +38,7 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         /// <param name="point">The point to convert.</param>
         /// <returns>The point on the grid.</returns>
-        private float2 ScreenPointToGrid(float2 point)
+        internal float2 ScreenPointToGrid(float2 point)
         {
             float2 result = (point / screenScale / gridZoom) - (gridOffset / screenScale / gridZoom);
             return new float2(result.x, result.y);
@@ -91,7 +93,7 @@ namespace AeternumGames.ShapeEditor
                     foreach (Segment segment in shape.segments)
                     {
                         float2 pos = GridPointToScreen(segment.position);
-                        GLUtilities.DrawSolidRectangleWithOutline(pos.x - halfPivotScale, pos.y - halfPivotScale, pivotScale, pivotScale, Color.white, segment.selected ? Color.red : Color.black);
+                        GLUtilities.DrawSolidRectangleWithOutline(pos.x - halfPivotScale, pos.y - halfPivotScale, pivotScale, pivotScale, segment.selected ? segmentPivotSelectedColor : Color.white, segment.selected ? segmentPivotOutlineColor : Color.black);
                     }
                 }
             });
@@ -205,6 +207,19 @@ namespace AeternumGames.ShapeEditor
                 foreach (Segment segment in shape.segments)
                 {
                     if (segment.selected)
+                        yield return segment;
+                }
+            }
+        }
+
+        /// <summary>Iterates over all of the segments within the given rectangle.</summary>
+        internal IEnumerable<Segment> ForEachSegmentInGridRect(Rect rect)
+        {
+            foreach (Shape shape in project.shapes)
+            {
+                foreach (Segment segment in shape.segments)
+                {
+                    if (rect.Contains(segment.position))
                         yield return segment;
                 }
             }

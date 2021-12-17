@@ -11,7 +11,9 @@ namespace AeternumGames.ShapeEditor
         internal bool isLeftMousePressed;
         private bool isRightMousePressed;
         internal float2 mousePosition;
-        private float2 mouseGridPosition;
+        internal float2 mouseGridPosition;
+        internal float2 mouseInitialPosition;
+        internal float2 mouseGridInitialPosition;
         private bool isCtrlPressed;
         internal bool isShiftPressed;
 
@@ -63,7 +65,13 @@ namespace AeternumGames.ShapeEditor
 
                     mousePosition = eMousePosition;
                     mouseGridPosition = ScreenPointToGrid(mousePosition);
-                    if (e.button == 0) isLeftMousePressed = true;
+                    if (e.button == 0)
+                    {
+                        // keep a copy of the initial click positions.
+                        mouseInitialPosition = mousePosition;
+                        mouseGridInitialPosition = mouseGridPosition;
+                        isLeftMousePressed = true;
+                    }
                     if (e.button == 1) isRightMousePressed = true;
                     OnMouseDown(e.button);
 
