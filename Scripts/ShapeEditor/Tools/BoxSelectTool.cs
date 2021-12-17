@@ -8,6 +8,7 @@ namespace AeternumGames.ShapeEditor
     public class BoxSelectTool : Tool
     {
         private bool isMarqueeActive;
+        private bool isMarqueeSubtractive;
         private static readonly Color marqueeColor = new Color(1.0f, 0.5f, 0.0f);
 
         public override void OnActivate()
@@ -36,7 +37,7 @@ namespace AeternumGames.ShapeEditor
             if (button == 0)
             {
                 // unless the shift key is held down we clear the selection.
-                if (!editor.isShiftPressed)
+                if (!editor.isShiftPressed && !isMarqueeSubtractive)
                     editor.project.ClearSelection();
 
                 if (isMarqueeActive)
@@ -44,7 +45,7 @@ namespace AeternumGames.ShapeEditor
                     // iterate over all segments within the marquee.
                     var marqueeRect = MathEx.RectXYXY(editor.mouseGridInitialPosition, editor.mouseGridPosition);
                     foreach (var segment in editor.ForEachSegmentInGridRect(marqueeRect))
-                        segment.selected = true;
+                        segment.selected = !isMarqueeSubtractive;
                 }
                 else
                 {
@@ -64,7 +65,10 @@ namespace AeternumGames.ShapeEditor
             {
                 // once the mouse moves a bit from the initial position the marquee activates.
                 if (!isMarqueeActive)
+                {
                     isMarqueeActive = (math.distance(editor.mouseInitialPosition, editor.mousePosition) > 3.0f);
+                    isMarqueeSubtractive = editor.isCtrlPressed;
+                }
             }
         }
     }

@@ -14,7 +14,7 @@ namespace AeternumGames.ShapeEditor
         internal float2 mouseGridPosition;
         internal float2 mouseInitialPosition;
         internal float2 mouseGridInitialPosition;
-        private bool isCtrlPressed;
+        internal bool isCtrlPressed;
         internal bool isShiftPressed;
 
         /// <summary>Called by the Unity Editor whenever an undo/redo was performed.</summary>
