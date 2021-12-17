@@ -22,21 +22,16 @@ namespace AeternumGames.ShapeEditor
         public override void OnRender()
         {
             // draw the button outline.
-            var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
-            guiMaterial.mainTexture = null;
-            guiMaterial.SetPass(0);
-
-            GL.Begin(GL.QUADS);
-            GLUtilities.DrawTransparentRectangleWithOutline(drawPosition.x, drawPosition.y, size.x, size.y, colorButtonBackground, colorButtonBorder);
-            GL.End();
-
-            guiMaterial.mainTexture = icon;
-            guiMaterial.SetPass(0);
+            GLUtilities.DrawGui(() =>
+            {
+                GLUtilities.DrawTransparentRectangleWithOutline(drawPosition.x, drawPosition.y, size.x, size.y, colorButtonBackground, colorButtonBorder);
+            });
 
             // draw the button icon.
-            GL.Begin(GL.QUADS);
-            GLUtilities.DrawFlippedUvRectangle(drawPosition.x + (size.x / 2f) - (icon.width / 2f), drawPosition.y + (size.y / 2f) - (icon.height / 2f), icon.width, icon.height);
-            GL.End();
+            GLUtilities.DrawGuiTextured(icon, () =>
+            {
+                GLUtilities.DrawFlippedUvRectangle(drawPosition.x + (size.x / 2f) - (icon.width / 2f), drawPosition.y + (size.y / 2f) - (icon.height / 2f), icon.width, icon.height);
+            });
         }
     }
 }

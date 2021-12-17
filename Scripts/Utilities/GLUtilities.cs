@@ -7,6 +7,32 @@ namespace AeternumGames.ShapeEditor
 {
     public static class GLUtilities
     {
+        /// <summary>Calls the specified action with the GUI shader between GL begin and GL end.</summary>
+        /// <param name="action">The action be called to draw primitives.</param>
+        public static void DrawGui(System.Action action)
+        {
+            var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
+            guiMaterial.mainTexture = null;
+            guiMaterial.SetPass(0);
+
+            GL.Begin(GL.QUADS);
+            action();
+            GL.End();
+        }
+
+        /// <summary>Calls the specified action with the textured GUI shader between GL begin and GL end.</summary>
+        /// <param name="action">The action be called to draw primitives.</param>
+        public static void DrawGuiTextured(Texture texture, System.Action action)
+        {
+            var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
+            guiMaterial.mainTexture = texture;
+            guiMaterial.SetPass(0);
+
+            GL.Begin(GL.QUADS);
+            action();
+            GL.End();
+        }
+
         public static void DrawRectangle(float x, float y, float w, float h)
         {
             w += x;

@@ -76,64 +76,46 @@ namespace AeternumGames.ShapeEditor
 
         private void DrawSegments()
         {
-            var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
-            guiMaterial.mainTexture = null;
-            guiMaterial.SetPass(0);
-
-            GL.PushMatrix();
-            GL.Begin(GL.QUADS);
-            GL.LoadIdentity();
-            foreach (Shape shape in project.shapes)
+            GLUtilities.DrawGui(() =>
             {
-                foreach (Segment segment in shape.segments)
+                foreach (Shape shape in project.shapes)
                 {
-                    Segment next = GetNextSegment(segment);
-                    if (segment.type == SegmentType.Linear)
+                    foreach (Segment segment in shape.segments)
                     {
-                        Vector2 p1 = RenderTextureGridPointToScreen(segment.position);
-                        Vector2 p2 = RenderTextureGridPointToScreen(next.position);
-                        GL.Color(segmentColor);
-                        GLUtilities.DrawLine(1.0f, p1.x, p1.y, p2.x, p2.y);
+                        Segment next = GetNextSegment(segment);
+                        if (segment.type == SegmentType.Linear)
+                        {
+                            Vector2 p1 = RenderTextureGridPointToScreen(segment.position);
+                            Vector2 p2 = RenderTextureGridPointToScreen(next.position);
+                            GL.Color(segmentColor);
+                            GLUtilities.DrawLine(1.0f, p1.x, p1.y, p2.x, p2.y);
+                        }
                     }
                 }
-            }
-            GL.End();
-            GL.PopMatrix();
+            });
         }
 
         private void DrawPivots()
         {
-            var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
-            guiMaterial.mainTexture = null;
-            guiMaterial.SetPass(0);
-
-            GL.PushMatrix();
-            GL.Begin(GL.QUADS);
-            GL.LoadIdentity();
-            foreach (Shape shape in project.shapes)
+            GLUtilities.DrawGui(() =>
             {
-                foreach (Segment segment in shape.segments)
+                foreach (Shape shape in project.shapes)
                 {
-                    float2 pos = RenderTextureGridPointToScreen(segment.position);
-                    GLUtilities.DrawSolidRectangleWithOutline(pos.x - halfPivotScale, pos.y - halfPivotScale, pivotScale, pivotScale, Color.white, segment.selected ? Color.red : Color.black);
+                    foreach (Segment segment in shape.segments)
+                    {
+                        float2 pos = RenderTextureGridPointToScreen(segment.position);
+                        GLUtilities.DrawSolidRectangleWithOutline(pos.x - halfPivotScale, pos.y - halfPivotScale, pivotScale, pivotScale, Color.white, segment.selected ? Color.red : Color.black);
+                    }
                 }
-            }
-            GL.End();
-            GL.PopMatrix();
+            });
         }
 
         private void DrawRenderTexture(RenderTexture renderTexture)
         {
-            var drawTextureMaterial = ShapeEditorResources.temporaryGuiMaterial;
-            drawTextureMaterial.mainTexture = renderTexture;
-            drawTextureMaterial.SetPass(0);
-
-            GL.PushMatrix();
-            GL.Begin(GL.QUADS);
-            GL.LoadIdentity();
-            GLUtilities.DrawFlippedUvRectangle(0, 0, renderTexture.width, renderTexture.height);
-            GL.End();
-            GL.PopMatrix();
+            GLUtilities.DrawGuiTextured(renderTexture, () =>
+            {
+                GLUtilities.DrawFlippedUvRectangle(0, 0, renderTexture.width, renderTexture.height);
+            });
         }
 
         private void DrawViewport()

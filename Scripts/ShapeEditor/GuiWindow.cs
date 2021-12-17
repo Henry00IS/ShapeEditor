@@ -40,16 +40,10 @@ namespace AeternumGames.ShapeEditor
         public void OnRender()
         {
             // render the window.
-            var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
-            guiMaterial.mainTexture = null;
-            guiMaterial.SetPass(0);
-
-            GL.PushMatrix();
-            GL.Begin(GL.QUADS);
-            GL.LoadIdentity();
-            GLUtilities.DrawTransparentRectangleWithOutline(position.x, position.y, size.x, size.y, colorWindowBackground, colorWindowBorder);
-            GL.End();
-            GL.PopMatrix();
+            GLUtilities.DrawGui(() =>
+            {
+                GLUtilities.DrawTransparentRectangleWithOutline(position.x, position.y, size.x, size.y, colorWindowBackground, colorWindowBorder);
+            });
 
             // render every child control.
             var controlsCount = controls.Count;
