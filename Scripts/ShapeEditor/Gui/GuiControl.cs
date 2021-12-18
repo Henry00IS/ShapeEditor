@@ -57,6 +57,18 @@ namespace AeternumGames.ShapeEditor
         {
         }
 
+        /// <summary>Called when the control receives a key down event.</summary>
+        public virtual bool OnKeyDown(KeyCode keyCode)
+        {
+            return false;
+        }
+
+        /// <summary>Called when the control receives a key up event.</summary>
+        public virtual bool OnKeyUp(KeyCode keyCode)
+        {
+            return false;
+        }
+
         /// <summary>Gets whether the control currently has input focus.</summary>
         public bool isActive => parent.isActive && this == parent.activeControl;
 

@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
@@ -60,6 +61,18 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Called when the widget receives a mouse move event.</summary>
         public virtual void OnMouseMove(float2 screenDelta, float2 gridDelta)
         {
+        }
+
+        /// <summary>Called when the widget receives a key down event.</summary>
+        public virtual bool OnKeyDown(KeyCode keyCode)
+        {
+            return false;
+        }
+
+        /// <summary>Called when the widget receives a key up event.</summary>
+        public virtual bool OnKeyUp(KeyCode keyCode)
+        {
+            return false;
         }
     }
 }

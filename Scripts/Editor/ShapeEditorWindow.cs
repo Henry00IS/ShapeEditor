@@ -207,35 +207,64 @@ namespace AeternumGames.ShapeEditor
 
         private bool OnKeyDown(KeyCode keyCode)
         {
-            switch (keyCode)
+            // possibly forward the event to a window.
+            if (activeWindow != null)
             {
-                case KeyCode.H:
-                    GridResetOffset();
-                    GridResetZoom();
-                    Repaint();
-                    return true;
+                return activeWindow.OnKeyDown(keyCode);
+            }
+            else
+            {
+                // possibly forward the event to a widget.
+                if (activeWidget != null)
+                {
+                    return activeWidget.OnKeyDown(keyCode);
+                }
+                else
+                {
+                    switch (keyCode)
+                    {
+                        case KeyCode.H:
+                            GridResetOffset();
+                            GridResetZoom();
+                            Repaint();
+                            return true;
 
-                case KeyCode.Q:
-                    SwitchToBoxSelectTool();
-                    return true;
+                        case KeyCode.Q:
+                            SwitchToBoxSelectTool();
+                            return true;
 
-                case KeyCode.W:
-                    SwitchToTranslateTool();
-                    return true;
+                        case KeyCode.W:
+                            SwitchToTranslateTool();
+                            return true;
 
-                case KeyCode.E:
-                    SwitchToRotateTool();
-                    return true;
+                        case KeyCode.E:
+                            SwitchToRotateTool();
+                            return true;
 
-                case KeyCode.R:
-                    SwitchToScaleTool();
-                    return true;
+                        case KeyCode.R:
+                            SwitchToScaleTool();
+                            return true;
+                    }
+                }
             }
             return false;
         }
 
         private bool OnKeyUp(KeyCode keyCode)
         {
+            // possibly forward the event to a window.
+            if (activeWindow != null)
+            {
+                return activeWindow.OnKeyUp(keyCode);
+            }
+            else
+            {
+                // possibly forward the event to a widget.
+                if (activeWidget != null)
+                {
+                    return activeWidget.OnKeyUp(keyCode);
+                }
+            }
             return false;
         }
 

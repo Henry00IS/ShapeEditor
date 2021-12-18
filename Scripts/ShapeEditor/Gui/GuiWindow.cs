@@ -104,6 +104,26 @@ namespace AeternumGames.ShapeEditor
                 control.OnMouseMove(screenDelta);
         }
 
+        /// <summary>Called when the window receives a key down event.</summary>
+        public virtual bool OnKeyDown(KeyCode keyCode)
+        {
+            if (activeControl != null)
+            {
+                return activeControl.OnKeyDown(keyCode);
+            }
+            return false;
+        }
+
+        /// <summary>Called when the window receives a key up event.</summary>
+        public virtual bool OnKeyUp(KeyCode keyCode)
+        {
+            if (activeControl != null)
+            {
+                return activeControl.OnKeyUp(keyCode);
+            }
+            return false;
+        }
+
         /// <summary>Gets whether the window currently has input focus.</summary>
         public bool isActive => this == parent.activeWindow;
 
