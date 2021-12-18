@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using Unity.Mathematics;
-using TranslationGizmoState = AeternumGames.ShapeEditor.GLUtilities.TranslationGizmoState;
+using ScaleGizmoState = AeternumGames.ShapeEditor.GLUtilities.ScaleGizmoState;
 
 namespace AeternumGames.ShapeEditor
 {
@@ -17,8 +17,8 @@ namespace AeternumGames.ShapeEditor
     public class ScaleWidget : Widget
     {
         private bool _wantsActive;
-        private TranslationGizmoState activeTranslationGizmoState;
-        private TranslationGizmoState currentTranslationGizmoState;
+        private ScaleGizmoState activeScaleGizmoState;
+        private ScaleGizmoState currentScaleGizmoState;
         private float2 initialGridPosition;
         private float initialDistance;
 
@@ -45,12 +45,12 @@ namespace AeternumGames.ShapeEditor
                 if (isActive)
                     drawPosition = editor.GridPointToScreen(initialGridPosition);
 
-                GLUtilities.DrawTranslationGizmo(drawPosition, editor.mousePosition, ref currentTranslationGizmoState);
+                GLUtilities.DrawScaleGizmo(drawPosition, editor.mousePosition, ref currentScaleGizmoState);
             });
 
             if (isActive)
             {
-                currentTranslationGizmoState.UpdateMouseCursor(editor);
+                activeScaleGizmoState.UpdateMouseCursor(editor);
             }
         }
 
@@ -60,8 +60,8 @@ namespace AeternumGames.ShapeEditor
 
             if (button == 0)
             {
-                activeTranslationGizmoState = currentTranslationGizmoState;
-                _wantsActive = activeTranslationGizmoState.isActive;
+                activeScaleGizmoState = currentScaleGizmoState;
+                _wantsActive = activeScaleGizmoState.isActive;
 
                 // on mouse down is called twice.
                 if (isActive)
@@ -88,6 +88,16 @@ namespace AeternumGames.ShapeEditor
                 {
                     scale /= initialDistance;
                 }
+
+                if (activeScaleGizmoState.isMouseOverY)
+                {
+                    scale.x = 1.0f;
+                }
+                else if (activeScaleGizmoState.isMouseOverX)
+                {
+                    scale.y = 1.0f;
+                }
+
                 onMouseDrag?.Invoke(initialGridPosition, scale);
             }
         }

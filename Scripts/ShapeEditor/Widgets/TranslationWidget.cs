@@ -31,7 +31,7 @@ namespace AeternumGames.ShapeEditor
 
             if (isActive)
             {
-                currentTranslationGizmoState.UpdateMouseCursor(editor);
+                activeTranslationGizmoState.UpdateMouseCursor(editor);
             }
         }
 

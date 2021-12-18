@@ -377,6 +377,61 @@ namespace AeternumGames.ShapeEditor
             DrawLine(3.0f, lineBegin, triangleLeft);
             DrawTriangle(triangleRight, triangleTop, triangleBottom);
         }
+
+        public struct ScaleGizmoState
+        {
+            public bool isMouseOverInnerCircle;
+            public bool isMouseOverX;
+            public bool isMouseOverY;
+
+            /// <summary>Sets the mouse cursor to the appropriate state for the scale gizmo.</summary>
+            /// <param name="editor">A reference to the shape editor window.</param>
+            public void UpdateMouseCursor(ShapeEditorWindow editor)
+            {
+                if (isMouseOverY)
+                {
+                    editor.SetMouseCursor(MouseCursor.ResizeVertical);
+                }
+                else if (isMouseOverX)
+                {
+                    editor.SetMouseCursor(MouseCursor.ResizeHorizontal);
+                }
+                else if (isMouseOverInnerCircle)
+                {
+                    editor.SetMouseCursor(MouseCursor.MoveArrow);
+                }
+            }
+
+            /// <summary>Returns whether this state would be active if the mouse is pressed.</summary>
+            public bool isActive => (isMouseOverInnerCircle || isMouseOverX || isMouseOverY);
+        }
+
+        private static readonly Color scaleGizmoColorCircle = new Color(0.5f, 0.5f, 0.5f);
+        private static readonly Color scaleGizmoColorCircleActive = new Color(0.75f, 0.75f, 0.75f);
+        private static readonly Color scaleGizmoColorGreen = new Color(0.475f, 0.710f, 0.231f);
+        private static readonly Color scaleGizmoColorGreenActive = new Color(0.575f, 0.810f, 0.331f);
+        private static readonly Color scaleGizmoColorRed = new Color(0.796f, 0.310f, 0.357f);
+        private static readonly Color scaleGizmoColorRedActive = new Color(0.896f, 0.410f, 0.457f);
+
+        public static void DrawScaleGizmo(float2 position, float2 mousePosition, ref ScaleGizmoState state, float radius = 64.0f)
+        {
+            const float distanceFromRadius = 10f;
+            state.isMouseOverInnerCircle = (math.distance(position, mousePosition) <= radius);
+
+            DrawCircle(1.0f, position, radius, state.isMouseOverInnerCircle ? scaleGizmoColorCircleActive : scaleGizmoColorCircle);
+
+            var top = position - new float2(0.0f, radius - distanceFromRadius);
+            state.isMouseOverY = MathEx.RectXYXY(position.x - 5f, position.y, position.x + 4f, top.y - 1f).Contains(mousePosition);
+            GL.Color(state.isMouseOverY ? scaleGizmoColorGreenActive : scaleGizmoColorGreen);
+            DrawLine(3.0f, position, top);
+            DrawRectangle(top.x - 5f, top.y, 9f, 9f);
+
+            var right = position + new float2(radius - distanceFromRadius, 0.0f);
+            state.isMouseOverX = MathEx.RectXYXY(position.x, position.y - 4f, right.x, right.y + 5f).Contains(mousePosition);
+            GL.Color(state.isMouseOverX ? scaleGizmoColorRedActive : scaleGizmoColorRed);
+            DrawLine(3.0f, position, right);
+            DrawRectangle(right.x - distanceFromRadius + 1f, right.y - 4f, 9f, 9f);
+        }
     }
 }
 

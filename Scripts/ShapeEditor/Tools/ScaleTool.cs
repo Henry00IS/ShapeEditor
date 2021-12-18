@@ -24,7 +24,7 @@ namespace AeternumGames.ShapeEditor
                 // scale the selected segments using their initial position.
                 foreach (var segment in editor.ForEachSelectedSegment())
                 {
-                    segment.position = MathEx.ScaleAroundPivot(segment.scaleToolInitialPosition, pivot, scale); //MathEx.RotatePointAroundPivot(segment.rotateToolInitialPosition, pivot, degrees);
+                    segment.position = MathEx.ScaleAroundPivot(segment.scaleToolInitialPosition, pivot, scale);
                 }
             };
         }
