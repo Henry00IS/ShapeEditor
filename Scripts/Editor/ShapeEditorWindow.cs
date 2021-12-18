@@ -225,6 +225,7 @@ namespace AeternumGames.ShapeEditor
                     // possibly forward the event to the tool.
                     if (activeTool.OnKeyDown(keyCode))
                     {
+                        return true;
                     }
                     else
                     {
@@ -276,6 +277,7 @@ namespace AeternumGames.ShapeEditor
                     // possibly forward the event to the tool.
                     if (activeTool.OnKeyUp(keyCode))
                     {
+                        return true;
                     }
                 }
             }
