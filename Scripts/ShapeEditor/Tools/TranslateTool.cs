@@ -12,11 +12,7 @@ namespace AeternumGames.ShapeEditor
 
             editor.AddWidget(translationWidget);
 
-            translationWidget.onMouseDrag = (screenDelta, gridDelta) =>
-            {
-                foreach (var segment in editor.ForEachSelectedSegment())
-                    segment.position += gridDelta;
-            };
+            translationWidget.onMouseDrag = (screenDelta, gridDelta) => CommonAction_TranslateSelectedSegmentsByGridDelta(gridDelta);
         }
 
         public override void OnRender()

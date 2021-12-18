@@ -10,10 +10,14 @@ namespace AeternumGames.ShapeEditor
         private bool isMarqueeActive;
         private bool isMarqueeSubtractive;
         private static readonly Color marqueeColor = new Color(1.0f, 0.5f, 0.0f);
+        private QuickTranslationWidget quickTranslationWidget = new QuickTranslationWidget();
 
         public override void OnActivate()
         {
             isMarqueeActive = false;
+
+            editor.AddWidget(quickTranslationWidget);
+            quickTranslationWidget.onMouseDrag = (screenDelta, gridDelta) => CommonAction_TranslateSelectedSegmentsByGridDelta(gridDelta);
         }
 
         public override void OnRender()
@@ -70,6 +74,17 @@ namespace AeternumGames.ShapeEditor
                     isMarqueeSubtractive = editor.isCtrlPressed;
                 }
             }
+        }
+
+        public override bool OnKeyDown(KeyCode keyCode)
+        {
+            switch (keyCode)
+            {
+                case KeyCode.G:
+                    quickTranslationWidget.Activate();
+                    break;
+            }
+            return false;
         }
     }
 }

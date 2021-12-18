@@ -232,7 +232,6 @@ namespace AeternumGames.ShapeEditor
                             case KeyCode.H:
                                 GridResetOffset();
                                 GridResetZoom();
-                                Repaint();
                                 return true;
 
                             case KeyCode.Q:

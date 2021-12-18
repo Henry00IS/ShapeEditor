@@ -62,6 +62,16 @@ namespace AeternumGames.ShapeEditor
         {
             return false;
         }
+
+        /// <summary>
+        /// A common action. Each selected segment will be moved by the specified grid delta amount.
+        /// </summary>
+        /// <param name="gridDelta">The grid delta (e.g. mouse position in grid coordinates).</param>
+        public void CommonAction_TranslateSelectedSegmentsByGridDelta(float2 gridDelta)
+        {
+            foreach (var segment in editor.ForEachSelectedSegment())
+                segment.position += gridDelta;
+        }
     }
 }
 
