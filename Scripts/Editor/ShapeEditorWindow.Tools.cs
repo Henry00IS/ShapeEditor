@@ -10,6 +10,7 @@ namespace AeternumGames.ShapeEditor
         private BoxSelectTool boxSelectTool;
         private TranslateTool translateTool;
         private RotateTool rotateTool;
+        private ScaleTool scaleTool;
 
         /// <summary>Ensures that a valid tools always exists, to handle C# reloads.</summary>
         private void ValidateTools()
@@ -19,6 +20,7 @@ namespace AeternumGames.ShapeEditor
                 boxSelectTool = new BoxSelectTool();
                 translateTool = new TranslateTool();
                 rotateTool = new RotateTool();
+                scaleTool = new ScaleTool();
             }
 
             if (activeTool == null)
@@ -53,6 +55,9 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Switches to the rotate tool unless already active.</summary>
         internal void SwitchToRotateTool() => SwitchTool(rotateTool);
+
+        /// <summary>Switches to the scale tool unless already active.</summary>
+        internal void SwitchToScaleTool() => SwitchTool(scaleTool);
 
         /// <summary>Draws the active tool.</summary>
         private void DrawTool()

@@ -57,7 +57,7 @@ namespace AeternumGames.ShapeEditor
                 // on mouse down is called twice.
                 if (isActive)
                 {
-                    onBeginRotating();
+                    onBeginRotating?.Invoke();
                 }
             }
         }

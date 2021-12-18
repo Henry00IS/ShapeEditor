@@ -39,6 +39,16 @@ namespace AeternumGames.ShapeEditor
             point += pivot;
             return point;
         }
+
+        public static float2 ScaleAroundPivot(float2 point, float2 pivot, float2 scale)
+        {
+            point -= pivot;
+
+            point *= scale;
+
+            point += pivot;
+            return point;
+        }
     }
 }
 
