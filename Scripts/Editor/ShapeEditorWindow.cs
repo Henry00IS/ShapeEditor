@@ -292,20 +292,6 @@ namespace AeternumGames.ShapeEditor
             GUILayout.Label("Zoom");
             gridZoom = EditorGUILayout.FloatField(gridZoom, GUILayout.Width(64f));
         }
-
-        /// <summary>
-        /// Gets the next segment.
-        /// </summary>
-        /// <param name="segment">The segment to find the next segment for.</param>
-        /// <returns>The next segment (wraps around).</returns>
-        private Segment GetNextSegment(Segment segment)
-        {
-            Shape parent = segment.shape;
-            int index = parent.segments.IndexOf(segment);
-            if (index + 1 > parent.segments.Count - 1)
-                return parent.segments[0];
-            return parent.segments[index + 1];
-        }
     }
 }
 

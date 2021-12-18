@@ -75,11 +75,20 @@ namespace AeternumGames.ShapeEditor
         {
             GLUtilities.DrawGui(() =>
             {
-                foreach (Shape shape in project.shapes)
+                // for every shape in the project:
+                var shapesCount = project.shapes.Count;
+                for (int i = 0; i < shapesCount; i++)
                 {
-                    foreach (Segment segment in shape.segments)
+                    var shape = project.shapes[i];
+
+                    // for every segment in the project:
+                    var segmentsCount = shape.segments.Count;
+                    for (int j = 0; j < segmentsCount; j++)
                     {
-                        Segment next = GetNextSegment(segment);
+                        // get the current segment and the next segment (wrapping around).
+                        var segment = shape.segments[j];
+                        var next = shape.segments[j + 1 >= segmentsCount ? 0 : j + 1];
+
                         if (segment.type == SegmentType.Linear)
                         {
                             Vector2 p1 = GridPointToScreen(segment.position);
