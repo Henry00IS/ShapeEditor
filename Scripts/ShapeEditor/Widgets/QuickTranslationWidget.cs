@@ -9,6 +9,7 @@ namespace AeternumGames.ShapeEditor
     public class QuickTranslationWidget : Widget
     {
         private bool _wantsActive;
+        private bool isDone;
 
         /// <summary>
         /// Called whenever this translation widget is moved by the mouse and provides the screen
@@ -23,11 +24,12 @@ namespace AeternumGames.ShapeEditor
         {
             editor.activeWidget = this;
             _wantsActive = true;
+            isDone = false;
         }
 
         public override void OnRender()
         {
-            if (!isActive) return;
+            if (!isActive || isDone) return;
 
             editor.SetMouseCursor(MouseCursor.MoveArrow);
         }
@@ -38,15 +40,23 @@ namespace AeternumGames.ShapeEditor
 
             if (button == 0)
             {
-                _wantsActive = false;
+                isDone = true;
             }
         }
 
         public override void OnMouseMove(float2 screenDelta, float2 gridDelta)
         {
-            if (!isActive) return;
+            if (!isActive || isDone) return;
 
             onMouseDrag?.Invoke(screenDelta, gridDelta);
+        }
+
+        public override void OnGlobalMouseUp(int button)
+        {
+            if (button == 0)
+            {
+                _wantsActive = false;
+            }
         }
     }
 }
