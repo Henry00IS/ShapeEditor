@@ -52,8 +52,9 @@ namespace AeternumGames.ShapeEditor
         private void OnMouseDown(int button)
         {
             // possibly forward the event to a window.
+            // we can not click on windows while a widget is active.
             activeWindow = FindWindowAtPosition(mousePosition);
-            if (activeWindow != null)
+            if (activeWindow != null && activeWidget == null)
             {
                 activeWindow.OnMouseDown(button);
             }
@@ -81,7 +82,7 @@ namespace AeternumGames.ShapeEditor
 
         private void OnMouseUp(int button)
         {
-            if (activeWindow != null)
+            if (activeWindow != null && activeWidget == null)
             {
                 activeWindow.OnMouseUp(button);
             }
@@ -107,7 +108,7 @@ namespace AeternumGames.ShapeEditor
 
         private void OnGlobalMouseUp(int button)
         {
-            if (activeWindow != null)
+            if (activeWindow != null && activeWidget == null)
             {
                 activeWindow.OnGlobalMouseUp(button);
             }
@@ -133,7 +134,7 @@ namespace AeternumGames.ShapeEditor
 
         private void OnMouseDrag(int button, float2 screenDelta, float2 gridDelta)
         {
-            if (activeWindow != null)
+            if (activeWindow != null && activeWidget == null)
             {
                 activeWindow.OnMouseDrag(button, screenDelta);
             }
@@ -167,7 +168,7 @@ namespace AeternumGames.ShapeEditor
         {
             // forward this event to the topmost window under the mouse position.
             var window = FindWindowAtPosition(mousePosition);
-            if (window != null)
+            if (window != null && activeWidget == null)
             {
                 window.OnMouseMove(screenDelta);
             }
@@ -208,7 +209,7 @@ namespace AeternumGames.ShapeEditor
         private bool OnKeyDown(KeyCode keyCode)
         {
             // possibly forward the event to a window.
-            if (activeWindow != null)
+            if (activeWindow != null && activeWidget == null)
             {
                 return activeWindow.OnKeyDown(keyCode);
             }
@@ -259,7 +260,7 @@ namespace AeternumGames.ShapeEditor
         private bool OnKeyUp(KeyCode keyCode)
         {
             // possibly forward the event to a window.
-            if (activeWindow != null)
+            if (activeWindow != null && activeWidget == null)
             {
                 return activeWindow.OnKeyUp(keyCode);
             }
