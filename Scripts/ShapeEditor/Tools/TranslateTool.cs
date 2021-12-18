@@ -2,12 +2,14 @@
 
 namespace AeternumGames.ShapeEditor
 {
-    public class TranslateTool : Tool
+    public class TranslateTool : BoxSelectTool
     {
         private TranslationWidget translationWidget = new TranslationWidget();
 
         public override void OnActivate()
         {
+            base.OnActivate();
+
             editor.AddWidget(translationWidget);
 
             translationWidget.onMouseDrag = (screenDelta, gridDelta) =>
@@ -19,6 +21,8 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnRender()
         {
+            base.OnRender();
+
             if (editor.selectedSegmentsCount > 0)
             {
                 translationWidget.position = editor.selectedSegmentsAveragePosition;
