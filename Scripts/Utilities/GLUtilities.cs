@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using Unity.Mathematics;
+using UnityEditor;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -289,6 +290,49 @@ namespace AeternumGames.ShapeEditor
             public bool isMouseOverInnerCircle;
             public bool isMouseOverX;
             public bool isMouseOverY;
+
+            /// <summary>Sets the mouse cursor to the appropriate state for the translation gizmo.</summary>
+            /// <param name="editor">A reference to the shape editor window.</param>
+            public void UpdateMouseCursor(ShapeEditorWindow editor)
+            {
+                if (isMouseOverInnerCircle)
+                {
+                    editor.SetMouseCursor(MouseCursor.MoveArrow);
+                }
+                else if (isMouseOverY)
+                {
+                    editor.SetMouseCursor(MouseCursor.ResizeVertical);
+                }
+                else if (isMouseOverX)
+                {
+                    editor.SetMouseCursor(MouseCursor.ResizeHorizontal);
+                }
+            }
+
+            /// <summary>
+            /// Assuming this is a copy of the state of when the mouse got pressed (and is still
+            /// pressed), takes in a mouse movement delta and modifies it accordingly, potentially
+            /// dragging this gizmo around. For example only moving on the X or Y axis or not moving
+            /// it at all.
+            /// </summary>
+            /// <param name="delta">The movement delta to be modified (e.g. mouse delta movement).</param>
+            /// <returns>The modified movement delta.</returns>
+            public float2 ModifyDeltaMovement(float2 delta)
+            {
+                if (isMouseOverInnerCircle)
+                {
+                    return delta;
+                }
+                else if (isMouseOverY)
+                {
+                    return new float2(0f, delta.y);
+                }
+                else if (isMouseOverX)
+                {
+                    return new float2(delta.x, 0f);
+                }
+                return new float2(0.0f, 0.0f);
+            }
         }
 
         public static void DrawTranslationGizmo(float2 position, float2 mousePosition, ref TranslationGizmoState state, float innerRadius = 16.0f, float arrowLength = 70.0f)

@@ -1,15 +1,14 @@
 ﻿#if UNITY_EDITOR
 
 using Unity.Mathematics;
-using UnityEditor;
 using TranslationGizmoState = AeternumGames.ShapeEditor.GLUtilities.TranslationGizmoState;
 
 namespace AeternumGames.ShapeEditor
 {
     public class TranslateTool : Tool
     {
-        private TranslationGizmoState initialTranslationGizmoState;
-        private TranslationGizmoState translationGizmoState;
+        private TranslationGizmoState activeTranslationGizmoState;
+        private TranslationGizmoState currentTranslationGizmoState;
 
         public override void OnRender()
         {
@@ -17,20 +16,8 @@ namespace AeternumGames.ShapeEditor
             {
                 if (editor.selectedSegmentsCount > 0)
                 {
-                    GLUtilities.DrawTranslationGizmo(editor.selectedSegmentsAveragePosition, editor.mousePosition, ref translationGizmoState);
-
-                    if (translationGizmoState.isMouseOverInnerCircle)
-                    {
-                        editor.SetMouseCursor(MouseCursor.MoveArrow);
-                    }
-                    else if (translationGizmoState.isMouseOverY)
-                    {
-                        editor.SetMouseCursor(MouseCursor.ResizeVertical);
-                    }
-                    else if (translationGizmoState.isMouseOverX)
-                    {
-                        editor.SetMouseCursor(MouseCursor.ResizeHorizontal);
-                    }
+                    GLUtilities.DrawTranslationGizmo(editor.selectedSegmentsAveragePosition, editor.mousePosition, ref currentTranslationGizmoState);
+                    currentTranslationGizmoState.UpdateMouseCursor(editor);
                 }
             });
         }
@@ -39,7 +26,7 @@ namespace AeternumGames.ShapeEditor
         {
             if (button == 0)
             {
-                initialTranslationGizmoState = translationGizmoState;
+                activeTranslationGizmoState = currentTranslationGizmoState;
             }
         }
 
@@ -47,21 +34,8 @@ namespace AeternumGames.ShapeEditor
         {
             if (button == 0)
             {
-                if (initialTranslationGizmoState.isMouseOverInnerCircle)
-                {
-                    foreach (var segment in editor.ForEachSelectedSegment())
-                        segment.position += gridDelta;
-                }
-                else if (initialTranslationGizmoState.isMouseOverY)
-                {
-                    foreach (var segment in editor.ForEachSelectedSegment())
-                        segment.position += new float2(0f, gridDelta.y);
-                }
-                else if (initialTranslationGizmoState.isMouseOverX)
-                {
-                    foreach (var segment in editor.ForEachSelectedSegment())
-                        segment.position += new float2(gridDelta.x, 0f);
-                }
+                foreach (var segment in editor.ForEachSelectedSegment())
+                    segment.position += activeTranslationGizmoState.ModifyDeltaMovement(gridDelta);
             }
         }
     }
