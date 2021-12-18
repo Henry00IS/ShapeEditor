@@ -5,14 +5,6 @@ using ScaleGizmoState = AeternumGames.ShapeEditor.GLUtilities.ScaleGizmoState;
 
 namespace AeternumGames.ShapeEditor
 {
-    // add additional fields for this tool to segments.
-    public partial class Segment
-    {
-        /// <summary>Editor variable used by <see cref="ScaleTool"/>.</summary>
-        [System.NonSerialized]
-        public float2 scaleToolInitialPosition;
-    }
-
     /// <summary>Represents a viewport translation widget.</summary>
     public class ScaleWidget : Widget
     {

@@ -1,7 +1,17 @@
 ﻿#if UNITY_EDITOR
 
+using Unity.Mathematics;
+
 namespace AeternumGames.ShapeEditor
 {
+    // add additional fields for this tool to segments.
+    public partial class Segment
+    {
+        /// <summary>Editor variable used by <see cref="ScaleTool"/>.</summary>
+        [System.NonSerialized]
+        public float2 scaleToolInitialPosition;
+    }
+
     public class ScaleTool : BoxSelectTool
     {
         private ScaleWidget scaleWidget = new ScaleWidget();
@@ -11,22 +21,8 @@ namespace AeternumGames.ShapeEditor
             base.OnActivate();
 
             editor.AddWidget(scaleWidget);
-
-            scaleWidget.onBeginScaling = () =>
-            {
-                // store the initial position of all selected segments.
-                foreach (var segment in editor.ForEachSelectedSegment())
-                    segment.scaleToolInitialPosition = segment.position;
-            };
-
-            scaleWidget.onMouseDrag = (pivot, scale) =>
-            {
-                // scale the selected segments using their initial position.
-                foreach (var segment in editor.ForEachSelectedSegment())
-                {
-                    segment.position = MathEx.ScaleAroundPivot(segment.scaleToolInitialPosition, pivot, scale);
-                }
-            };
+            scaleWidget.onBeginScaling = () => CommonAction_OnBeginScaling(editor);
+            scaleWidget.onMouseDrag = (pivot, scale) => CommonAction_OnMouseDrag(editor, pivot, scale);
         }
 
         public override void OnRender()
@@ -42,6 +38,20 @@ namespace AeternumGames.ShapeEditor
             {
                 scaleWidget.visible = false;
             }
+        }
+
+        public static void CommonAction_OnBeginScaling(ShapeEditorWindow editor)
+        {
+            // store the initial position of all selected segments.
+            foreach (var segment in editor.ForEachSelectedSegment())
+                segment.scaleToolInitialPosition = segment.position;
+        }
+
+        public static void CommonAction_OnMouseDrag(ShapeEditorWindow editor, float2 pivot, float2 scale)
+        {
+            // scale the selected segments using their initial position.
+            foreach (var segment in editor.ForEachSelectedSegment())
+                segment.position = MathEx.ScaleAroundPivot(segment.scaleToolInitialPosition, pivot, scale);
         }
     }
 }

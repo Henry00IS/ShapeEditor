@@ -1,5 +1,7 @@
 ﻿#if UNITY_EDITOR
 
+using Unity.Mathematics;
+
 namespace AeternumGames.ShapeEditor
 {
     public class TranslateTool : BoxSelectTool
@@ -12,7 +14,7 @@ namespace AeternumGames.ShapeEditor
 
             editor.AddWidget(translationWidget);
 
-            translationWidget.onMouseDrag = (screenDelta, gridDelta) => CommonAction_TranslateSelectedSegmentsByGridDelta(gridDelta);
+            translationWidget.onMouseDrag = (screenDelta, gridDelta) => CommonAction_OnMouseDrag(editor, gridDelta);
         }
 
         public override void OnRender()
@@ -28,6 +30,12 @@ namespace AeternumGames.ShapeEditor
             {
                 translationWidget.visible = false;
             }
+        }
+
+        public static void CommonAction_OnMouseDrag(ShapeEditorWindow editor, float2 gridDelta)
+        {
+            foreach (var segment in editor.ForEachSelectedSegment())
+                segment.position += gridDelta;
         }
     }
 }
