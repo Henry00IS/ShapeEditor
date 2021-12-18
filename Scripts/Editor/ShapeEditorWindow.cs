@@ -248,7 +248,7 @@ namespace AeternumGames.ShapeEditor
                                 SwitchToRotateTool();
                                 return true;
 
-                            case KeyCode.T:
+                            case KeyCode.R:
                                 SwitchToScaleTool();
                                 return true;
                         }

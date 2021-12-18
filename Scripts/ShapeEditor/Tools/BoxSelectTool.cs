@@ -96,24 +96,27 @@ namespace AeternumGames.ShapeEditor
                     {
                         quickTranslationWidget.position = editor.selectedSegmentsAveragePosition;
                         quickTranslationWidget.Activate();
+                        return true;
                     }
-                    return true;
+                    return false;
 
                 case KeyCode.S:
                     if (editor.selectedSegmentsCount > 1)
                     {
                         quickScaleWidget.position = editor.selectedSegmentsAveragePosition;
                         quickScaleWidget.Activate();
+                        return true;
                     }
-                    return true;
+                    return false;
 
                 case KeyCode.R:
                     if (editor.selectedSegmentsCount > 1)
                     {
                         quickRotationWidget.position = editor.selectedSegmentsAveragePosition;
                         quickRotationWidget.Activate();
+                        return true;
                     }
-                    return true;
+                    return false;
             }
             return false;
         }
