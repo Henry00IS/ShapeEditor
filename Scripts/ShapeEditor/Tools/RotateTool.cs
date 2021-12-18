@@ -21,22 +21,8 @@ namespace AeternumGames.ShapeEditor
             base.OnActivate();
 
             editor.AddWidget(rotationWidget);
-
-            rotationWidget.onBeginRotating = () =>
-            {
-                // store the initial position of all selected segments.
-                foreach (var segment in editor.ForEachSelectedSegment())
-                    segment.rotateToolInitialPosition = segment.position;
-            };
-
-            rotationWidget.onRotation = (pivot, degrees) =>
-            {
-                // rotate the selected segments using their initial position.
-                foreach (var segment in editor.ForEachSelectedSegment())
-                {
-                    segment.position = MathEx.RotatePointAroundPivot(segment.rotateToolInitialPosition, pivot, degrees);
-                }
-            };
+            rotationWidget.onBeginRotating = () => CommonAction_OnBeginRotating(editor);
+            rotationWidget.onRotation = (pivot, degrees) => CommonAction_OnRotation(editor, pivot, degrees);
         }
 
         public override void OnRender()
@@ -52,6 +38,20 @@ namespace AeternumGames.ShapeEditor
             {
                 rotationWidget.visible = false;
             }
+        }
+
+        public static void CommonAction_OnBeginRotating(ShapeEditorWindow editor)
+        {
+            // store the initial position of all selected segments.
+            foreach (var segment in editor.ForEachSelectedSegment())
+                segment.rotateToolInitialPosition = segment.position;
+        }
+
+        public static void CommonAction_OnRotation(ShapeEditorWindow editor, float2 pivot, float degrees)
+        {
+            // rotate the selected segments using their initial position.
+            foreach (var segment in editor.ForEachSelectedSegment())
+                segment.position = MathEx.RotatePointAroundPivot(segment.rotateToolInitialPosition, pivot, degrees);
         }
     }
 }
