@@ -333,6 +333,9 @@ namespace AeternumGames.ShapeEditor
                 }
                 return new float2(0.0f, 0.0f);
             }
+
+            /// <summary>Returns whether this state would be active if the mouse is pressed.</summary>
+            public bool isActive => (isMouseOverInnerCircle || isMouseOverX || isMouseOverY);
         }
 
         public static void DrawTranslationGizmo(float2 position, float2 mousePosition, ref TranslationGizmoState state, float innerRadius = 16.0f, float arrowLength = 70.0f)

@@ -46,7 +46,7 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Called when the tool receives a mouse move event.</summary>
-        public virtual void OnMouseMove(float2 screenDelta)
+        public virtual void OnMouseMove(float2 screenDelta, float2 gridDelta)
         {
         }
     }

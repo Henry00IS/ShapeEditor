@@ -59,7 +59,22 @@ namespace AeternumGames.ShapeEditor
             }
             else
             {
-                activeTool.OnMouseDown(button);
+                // always inform all widgets.
+                var widgetsCount = widgets.Count;
+                for (int i = 0; i < widgetsCount; i++)
+                    widgets[i].OnMouseDown(button);
+
+                // possibly forward the event to a widget.
+                activeWidget = FindActiveWidget();
+                if (activeWidget != null)
+                {
+                    // the active widget will receive the click twice.
+                    activeWidget.OnMouseDown(button);
+                }
+                else
+                {
+                    activeTool.OnMouseDown(button);
+                }
             }
             Repaint();
         }
@@ -72,7 +87,18 @@ namespace AeternumGames.ShapeEditor
             }
             else
             {
-                activeTool.OnMouseUp(button);
+                if (activeWidget != null)
+                {
+                    activeWidget.OnMouseUp(button);
+                }
+                else
+                {
+                    var widgetsCount = widgets.Count;
+                    for (int i = 0; i < widgetsCount; i++)
+                        widgets[i].OnMouseUp(button);
+
+                    activeTool.OnMouseUp(button);
+                }
             }
 
             Repaint();
@@ -86,7 +112,18 @@ namespace AeternumGames.ShapeEditor
             }
             else
             {
-                activeTool.OnGlobalMouseUp(button);
+                if (activeWidget != null)
+                {
+                    activeWidget.OnGlobalMouseUp(button);
+                }
+                else
+                {
+                    var widgetsCount = widgets.Count;
+                    for (int i = 0; i < widgetsCount; i++)
+                        widgets[i].OnGlobalMouseUp(button);
+
+                    activeTool.OnGlobalMouseUp(button);
+                }
             }
 
             Repaint();
@@ -100,7 +137,18 @@ namespace AeternumGames.ShapeEditor
             }
             else
             {
-                activeTool.OnMouseDrag(button, screenDelta, gridDelta);
+                if (activeWidget != null)
+                {
+                    activeWidget.OnMouseDrag(button, screenDelta, gridDelta);
+                }
+                else
+                {
+                    var widgetsCount = widgets.Count;
+                    for (int i = 0; i < widgetsCount; i++)
+                        widgets[i].OnMouseDrag(button, screenDelta, gridDelta);
+
+                    activeTool.OnMouseDrag(button, screenDelta, gridDelta);
+                }
 
                 // pan the viewport around with the right mouse button.
                 if (isRightMousePressed)
@@ -122,7 +170,18 @@ namespace AeternumGames.ShapeEditor
             }
             else
             {
-                activeTool.OnMouseMove(screenDelta);
+                if (activeWidget != null)
+                {
+                    activeWidget.OnMouseMove(screenDelta, gridDelta);
+                }
+                else
+                {
+                    var widgetsCount = widgets.Count;
+                    for (int i = 0; i < widgetsCount; i++)
+                        widgets[i].OnMouseMove(screenDelta, gridDelta);
+
+                    activeTool.OnMouseMove(screenDelta, gridDelta);
+                }
             }
 
             Repaint();

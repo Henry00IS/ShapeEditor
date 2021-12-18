@@ -149,6 +149,7 @@ namespace AeternumGames.ShapeEditor
             DrawSegments();
             DrawPivots();
             DrawTool();
+            DrawWidgets();
             DrawWindows();
 
             // finish up and draw the render texture.

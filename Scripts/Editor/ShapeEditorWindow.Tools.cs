@@ -36,6 +36,9 @@ namespace AeternumGames.ShapeEditor
             if (activeTool != null)
                 activeTool.OnDeactivate();
 
+            // clear any widgets the tool was using.
+            ClearWidgets();
+
             // switch to the new tool and activate it.
             tool.editor = this;
             activeTool = tool;
