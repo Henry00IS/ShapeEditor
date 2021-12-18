@@ -23,6 +23,9 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Gets whether the widget currently has input focus.</summary>
         public bool isActive => this == editor.activeWidget;
 
+        /// <summary>Gets whether some other widget currently has input focus.</summary>
+        public bool isOtherActive => editor.activeWidget != null && editor.activeWidget != this;
+
         /// <summary>Called when the widget is activated.</summary>
         public virtual void OnActivate()
         {

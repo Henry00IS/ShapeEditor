@@ -27,7 +27,7 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnRender()
         {
-            if (!visible) return;
+            if (!visible || isOtherActive) return;
 
             GLUtilities.DrawGui(() =>
             {
