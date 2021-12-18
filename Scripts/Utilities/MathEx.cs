@@ -25,6 +25,20 @@ namespace AeternumGames.ShapeEditor
             var my2 = math.max(a.y, b.y);
             return new Rect(mx1, my1, mx2 - mx1, my2 - my1);
         }
+
+        public static float2 RotatePointAroundPivot(float2 point, float2 pivot, float degrees)
+        {
+            point -= pivot;
+
+            var r = degrees * Mathf.Deg2Rad;
+            var x = point.x * math.cos(r) - point.y * math.sin(r);
+            var y = point.y * math.cos(r) + point.x * math.sin(r);
+            point.x = x;
+            point.y = y;
+
+            point += pivot;
+            return point;
+        }
     }
 }
 

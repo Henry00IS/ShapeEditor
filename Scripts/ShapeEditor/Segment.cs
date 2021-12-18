@@ -8,7 +8,7 @@ namespace AeternumGames.ShapeEditor
 {
     /// <summary>A 2D Shape Editor Segment.</summary>
     [Serializable]
-    public class Segment : ISelectable
+    public partial class Segment : ISelectable
     {
         /// <summary>The position of the segment on the grid.</summary>
         [SerializeField]

@@ -58,7 +58,10 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnGlobalMouseUp(int button)
         {
-            _wantsActive = false;
+            if (button == 0)
+            {
+                _wantsActive = false;
+            }
         }
     }
 }
