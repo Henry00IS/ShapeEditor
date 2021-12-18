@@ -221,29 +221,36 @@ namespace AeternumGames.ShapeEditor
                 }
                 else
                 {
-                    switch (keyCode)
+                    // possibly forward the event to the tool.
+                    if (activeTool.OnKeyDown(keyCode))
                     {
-                        case KeyCode.H:
-                            GridResetOffset();
-                            GridResetZoom();
-                            Repaint();
-                            return true;
+                    }
+                    else
+                    {
+                        switch (keyCode)
+                        {
+                            case KeyCode.H:
+                                GridResetOffset();
+                                GridResetZoom();
+                                Repaint();
+                                return true;
 
-                        case KeyCode.Q:
-                            SwitchToBoxSelectTool();
-                            return true;
+                            case KeyCode.Q:
+                                SwitchToBoxSelectTool();
+                                return true;
 
-                        case KeyCode.W:
-                            SwitchToTranslateTool();
-                            return true;
+                            case KeyCode.W:
+                                SwitchToTranslateTool();
+                                return true;
 
-                        case KeyCode.E:
-                            SwitchToRotateTool();
-                            return true;
+                            case KeyCode.E:
+                                SwitchToRotateTool();
+                                return true;
 
-                        case KeyCode.R:
-                            SwitchToScaleTool();
-                            return true;
+                            case KeyCode.R:
+                                SwitchToScaleTool();
+                                return true;
+                        }
                     }
                 }
             }
@@ -263,6 +270,13 @@ namespace AeternumGames.ShapeEditor
                 if (activeWidget != null)
                 {
                     return activeWidget.OnKeyUp(keyCode);
+                }
+                else
+                {
+                    // possibly forward the event to the tool.
+                    if (activeTool.OnKeyUp(keyCode))
+                    {
+                    }
                 }
             }
             return false;
