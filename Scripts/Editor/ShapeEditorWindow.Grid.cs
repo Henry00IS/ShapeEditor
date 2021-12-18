@@ -155,7 +155,7 @@ namespace AeternumGames.ShapeEditor
             // finish up and draw the render texture.
             Graphics.SetRenderTarget(null);
             DrawRenderTexture(renderTexture);
-            renderTexture.Release();
+            RenderTexture.ReleaseTemporary(renderTexture);
         }
 
         /// <summary>Will reset the grid offset to the center of the viewport.</summary>
