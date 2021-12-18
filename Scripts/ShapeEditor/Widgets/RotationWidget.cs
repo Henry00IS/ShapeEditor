@@ -1,16 +1,16 @@
 ﻿#if UNITY_EDITOR
 
 using Unity.Mathematics;
-using TranslationGizmoState = AeternumGames.ShapeEditor.GLUtilities.TranslationGizmoState;
+using UnityEditor;
+using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
-    /// <summary>Represents a viewport translation widget.</summary>
-    public class TranslationWidget : Widget
+    /// <summary>Represents a viewport rotation widget.</summary>
+    public class RotationWidget : Widget
     {
+        private const float radius = 32f;
         private bool _wantsActive;
-        private TranslationGizmoState activeTranslationGizmoState;
-        private TranslationGizmoState currentTranslationGizmoState;
 
         /// <summary>
         /// Called whenever this translation widget is dragged by the mouse and provides the screen
@@ -26,12 +26,12 @@ namespace AeternumGames.ShapeEditor
 
             GLUtilities.DrawGui(() =>
             {
-                GLUtilities.DrawTranslationGizmo(position, editor.mousePosition, ref currentTranslationGizmoState);
+                GLUtilities.DrawCircle(1.0f, position, radius, Color.white);
             });
 
             if (isActive)
             {
-                currentTranslationGizmoState.UpdateMouseCursor(editor);
+                editor.SetMouseCursor(MouseCursor.RotateArrow);
             }
         }
 
@@ -41,8 +41,10 @@ namespace AeternumGames.ShapeEditor
 
             if (button == 0)
             {
-                activeTranslationGizmoState = currentTranslationGizmoState;
-                _wantsActive = activeTranslationGizmoState.isActive;
+                if (math.distance(position, editor.mousePosition) <= radius)
+                {
+                    _wantsActive = true;
+                }
             }
         }
 
@@ -52,7 +54,7 @@ namespace AeternumGames.ShapeEditor
 
             if (button == 0)
             {
-                onMouseDrag?.Invoke(activeTranslationGizmoState.ModifyDeltaMovement(screenDelta), activeTranslationGizmoState.ModifyDeltaMovement(gridDelta));
+                onMouseDrag?.Invoke(float2.zero, float2.zero);
             }
         }
 

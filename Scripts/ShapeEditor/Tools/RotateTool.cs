@@ -1,17 +1,31 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEngine;
-
 namespace AeternumGames.ShapeEditor
 {
-    public class RotateTool : Tool
+    public class RotateTool : BoxSelectTool
     {
+        private RotationWidget rotationWidget = new RotationWidget();
+
+        public override void OnActivate()
+        {
+            base.OnActivate();
+
+            editor.AddWidget(rotationWidget);
+        }
+
         public override void OnRender()
         {
-            GLUtilities.DrawGui(() =>
+            base.OnRender();
+
+            if (editor.selectedSegmentsCount > 0)
             {
-                GLUtilities.DrawCircle(1.0f, editor.mousePosition, 8.0f, Color.red);
-            });
+                rotationWidget.position = editor.selectedSegmentsAveragePosition;
+                rotationWidget.visible = true;
+            }
+            else
+            {
+                rotationWidget.visible = false;
+            }
         }
     }
 }

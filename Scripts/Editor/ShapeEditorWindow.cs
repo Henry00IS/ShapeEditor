@@ -87,12 +87,13 @@ namespace AeternumGames.ShapeEditor
             }
             else
             {
-                if (activeWidget != null)
+                if (activeWidget != null && activeWidget.wantsActive)
                 {
                     activeWidget.OnMouseUp(button);
                 }
                 else
                 {
+                    activeWidget = null;
                     var widgetsCount = widgets.Count;
                     for (int i = 0; i < widgetsCount; i++)
                         widgets[i].OnMouseUp(button);
@@ -112,12 +113,13 @@ namespace AeternumGames.ShapeEditor
             }
             else
             {
-                if (activeWidget != null)
+                if (activeWidget != null && activeWidget.wantsActive)
                 {
                     activeWidget.OnGlobalMouseUp(button);
                 }
                 else
                 {
+                    activeWidget = null;
                     var widgetsCount = widgets.Count;
                     for (int i = 0; i < widgetsCount; i++)
                         widgets[i].OnGlobalMouseUp(button);
@@ -137,12 +139,13 @@ namespace AeternumGames.ShapeEditor
             }
             else
             {
-                if (activeWidget != null)
+                if (activeWidget != null && activeWidget.wantsActive)
                 {
                     activeWidget.OnMouseDrag(button, screenDelta, gridDelta);
                 }
                 else
                 {
+                    activeWidget = null;
                     var widgetsCount = widgets.Count;
                     for (int i = 0; i < widgetsCount; i++)
                         widgets[i].OnMouseDrag(button, screenDelta, gridDelta);
@@ -170,12 +173,13 @@ namespace AeternumGames.ShapeEditor
             }
             else
             {
-                if (activeWidget != null)
+                if (activeWidget != null && activeWidget.wantsActive)
                 {
                     activeWidget.OnMouseMove(screenDelta, gridDelta);
                 }
                 else
                 {
+                    activeWidget = null;
                     var widgetsCount = widgets.Count;
                     for (int i = 0; i < widgetsCount; i++)
                         widgets[i].OnMouseMove(screenDelta, gridDelta);
