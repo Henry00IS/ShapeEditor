@@ -12,6 +12,9 @@ namespace AeternumGames.ShapeEditor
         private TranslationGizmoState activeTranslationGizmoState;
         private TranslationGizmoState currentTranslationGizmoState;
 
+        /// <summary>Called before this widget begins translating.</summary>
+        public System.Action onBeginTranslating;
+
         /// <summary>
         /// Called whenever this translation widget is dragged by the mouse and provides the screen
         /// delta and grid delta position changes.
@@ -43,6 +46,12 @@ namespace AeternumGames.ShapeEditor
             {
                 activeTranslationGizmoState = currentTranslationGizmoState;
                 _wantsActive = activeTranslationGizmoState.isActive;
+
+                // on mouse down is called twice.
+                if (isActive)
+                {
+                    onBeginTranslating?.Invoke();
+                }
             }
         }
 

@@ -230,6 +230,13 @@ namespace AeternumGames.ShapeEditor
             customMouseHotspot = hotspot;
             desiredMouseCursorTimer = 1;
         }
+
+        /// <summary>Stores a copy of the project on the undo stack.</summary>
+        /// <param name="name">The name of the undo operation.</param>
+        internal void RegisterUndo(string name)
+        {
+            Undo.RegisterCompleteObjectUndo(this, name);
+        }
     }
 }
 

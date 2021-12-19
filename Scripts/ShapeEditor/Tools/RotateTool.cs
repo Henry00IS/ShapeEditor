@@ -42,6 +42,8 @@ namespace AeternumGames.ShapeEditor
 
         public static void CommonAction_OnBeginRotating(ShapeEditorWindow editor)
         {
+            editor.RegisterUndo("Rotate Selection");
+
             // store the initial position of all selected segments.
             foreach (var segment in editor.ForEachSelectedSegment())
                 segment.rotateToolInitialPosition = segment.position;

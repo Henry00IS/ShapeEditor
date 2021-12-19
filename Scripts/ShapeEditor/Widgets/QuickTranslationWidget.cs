@@ -11,6 +11,9 @@ namespace AeternumGames.ShapeEditor
         private bool _wantsActive;
         private bool isDone;
 
+        /// <summary>Called before this widget begins translating.</summary>
+        public System.Action onBeginTranslating;
+
         /// <summary>
         /// Called whenever this translation widget is moved by the mouse and provides the screen
         /// delta and grid delta position changes.
@@ -25,6 +28,8 @@ namespace AeternumGames.ShapeEditor
             editor.activeWidget = this;
             _wantsActive = true;
             isDone = false;
+
+            onBeginTranslating?.Invoke();
         }
 
         public override void OnRender()

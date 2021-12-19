@@ -13,7 +13,7 @@ namespace AeternumGames.ShapeEditor
             base.OnActivate();
 
             editor.AddWidget(translationWidget);
-
+            translationWidget.onBeginTranslating = () => CommonAction_OnBeginTranslating(editor);
             translationWidget.onMouseDrag = (screenDelta, gridDelta) => CommonAction_OnMouseDrag(editor, gridDelta);
         }
 
@@ -30,6 +30,11 @@ namespace AeternumGames.ShapeEditor
             {
                 translationWidget.visible = false;
             }
+        }
+
+        public static void CommonAction_OnBeginTranslating(ShapeEditorWindow editor)
+        {
+            editor.RegisterUndo("Translate Selection");
         }
 
         public static void CommonAction_OnMouseDrag(ShapeEditorWindow editor, float2 gridDelta)

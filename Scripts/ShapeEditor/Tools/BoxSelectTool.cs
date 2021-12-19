@@ -21,6 +21,7 @@ namespace AeternumGames.ShapeEditor
             isMarqueeActive = false;
 
             editor.AddWidget(quickTranslationWidget);
+            quickTranslationWidget.onBeginTranslating = () => TranslateTool.CommonAction_OnBeginTranslating(editor);
             quickTranslationWidget.onMouseDrag = (screenDelta, gridDelta) => TranslateTool.CommonAction_OnMouseDrag(editor, gridDelta);
 
             editor.AddWidget(quickScaleWidget);
@@ -129,6 +130,7 @@ namespace AeternumGames.ShapeEditor
                     return false;
 
                 case KeyCode.C:
+                    editor.RegisterUndo("Quick Cut");
                     quickCutWidget.Activate();
                     return true;
             }

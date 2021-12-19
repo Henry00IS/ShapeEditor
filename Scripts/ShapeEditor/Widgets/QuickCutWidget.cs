@@ -48,8 +48,8 @@ namespace AeternumGames.ShapeEditor
 
                     GL.Color(cutIndicatorColor);
                     GLUtilities.DrawLine(1.0f, top, bottom);
-                    GLUtilities.DrawLine(1.0f, top - normal * 4f, top + (normal * 5f));
-                    GLUtilities.DrawLine(1.0f, bottom - normal * 4f, bottom + (normal * 5f));
+                    GLUtilities.DrawLine(1.0f, top - normal * 4f, top + (normal * 4f));
+                    GLUtilities.DrawLine(1.0f, bottom - normal * 4f, bottom + (normal * 4f));
                 });
             }
 
