@@ -292,7 +292,7 @@ namespace AeternumGames.ShapeEditor
         {
             if (GUILayout.Button(new GUIContent(ShapeEditorResources.Instance.shapeEditorNew, "New Project (N)"), ShapeEditorResources.toolbarButtonStyle))
             {
-                Undo.RecordObject(this, "New Project");
+                RegisterUndo("New Project");
                 project = new Project();
                 Repaint();
             }

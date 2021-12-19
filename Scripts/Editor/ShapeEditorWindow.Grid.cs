@@ -311,6 +311,8 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Deletes the selected objects from the project.</summary>
         public void DeleteSelection()
         {
+            RegisterUndo("Delete Selection");
+
             // for every shape in the project:
             var shapesCount = project.shapes.Count;
             for (int i = shapesCount; i-- > 0;)
