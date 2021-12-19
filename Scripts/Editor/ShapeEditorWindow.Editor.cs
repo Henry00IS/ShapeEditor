@@ -16,7 +16,10 @@ namespace AeternumGames.ShapeEditor
         internal float2 mouseGridInitialPosition;
         internal bool isCtrlPressed;
         internal bool isShiftPressed;
+        private int desiredMouseCursorTimer;
         private MouseCursor desiredMouseCursor;
+        private Texture2D customMouseCursor;
+        private float2 customMouseHotspot;
 
         /// <summary>Called by the Unity Editor whenever an undo/redo was performed.</summary>
         private static void OnUndoRedoPerformed()
@@ -50,9 +53,22 @@ namespace AeternumGames.ShapeEditor
                 {
                     EditorGUIUtility.AddCursorRect(GetViewportRect(), desiredMouseCursor);
 
-                    // only reset the mouse cursor here, when the user isn't holding the left mouse button.
-                    if (!isLeftMousePressed)
-                        desiredMouseCursor = MouseCursor.Arrow;
+                    // set the custom mouse cursor texture.
+                    if (customMouseCursor != null)
+                    {
+                        Cursor.SetCursor(customMouseCursor, customMouseHotspot, CursorMode.Auto);
+                        customMouseCursor = null;
+                    }
+                    else
+                    {
+                        // reset the mouse cursor here, when the function is no longer getting called.
+                        if (--desiredMouseCursorTimer <= 0)
+                        {
+                            customMouseCursor = null;
+                            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+                            desiredMouseCursor = MouseCursor.Arrow;
+                        }
+                    }
                 }
             }
 
@@ -201,6 +217,18 @@ namespace AeternumGames.ShapeEditor
         internal void SetMouseCursor(MouseCursor cursor)
         {
             desiredMouseCursor = cursor;
+            desiredMouseCursorTimer = 1;
+        }
+
+        /// <summary>While this function is called every repaint, it will set the mouse cursor.</summary>
+        /// <param name="cursor">The mouse cursor texture to use.</param>
+        /// <param name="hotspot">The offset from the top left of the texture to use as the target point.</param>
+        internal void SetMouseCursor(Texture2D cursor, float2 hotspot = default)
+        {
+            desiredMouseCursor = MouseCursor.CustomCursor;
+            customMouseCursor = cursor;
+            customMouseHotspot = hotspot;
+            desiredMouseCursorTimer = 1;
         }
     }
 }

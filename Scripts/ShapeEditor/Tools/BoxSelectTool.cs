@@ -14,6 +14,7 @@ namespace AeternumGames.ShapeEditor
         private QuickTranslationWidget quickTranslationWidget = new QuickTranslationWidget();
         private QuickScaleWidget quickScaleWidget = new QuickScaleWidget();
         private QuickRotationWidget quickRotationWidget = new QuickRotationWidget();
+        private QuickCutWidget quickCutWidget = new QuickCutWidget();
 
         public override void OnActivate()
         {
@@ -29,6 +30,8 @@ namespace AeternumGames.ShapeEditor
             editor.AddWidget(quickRotationWidget);
             quickRotationWidget.onBeginRotating = () => RotateTool.CommonAction_OnBeginRotating(editor);
             quickRotationWidget.onRotation = (pivot, degrees) => RotateTool.CommonAction_OnRotation(editor, pivot, degrees);
+
+            editor.AddWidget(quickCutWidget);
         }
 
         public override void OnRender()
@@ -124,6 +127,10 @@ namespace AeternumGames.ShapeEditor
                         return true;
                     }
                     return false;
+
+                case KeyCode.C:
+                    quickCutWidget.Activate();
+                    return true;
             }
             return false;
         }

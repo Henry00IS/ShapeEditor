@@ -220,6 +220,20 @@ namespace AeternumGames.ShapeEditor
         {
             return math.abs(math.distance(from, point) + math.distance(to, point) - math.distance(from, to));
         }
+
+        public static float2 FindNearestPointOnLine(float2 point, float2 origin, float2 end)
+        {
+            // get heading.
+            Vector2 heading = (end - origin);
+            float magnitudeMax = heading.magnitude;
+            heading.Normalize();
+
+            // do projection from the point but clamp it.
+            Vector2 lhs = point - origin;
+            float dotP = Vector2.Dot(lhs, heading);
+            dotP = Mathf.Clamp(dotP, 0f, magnitudeMax);
+            return origin + (float2)heading * dotP;
+        }
     }
 }
 

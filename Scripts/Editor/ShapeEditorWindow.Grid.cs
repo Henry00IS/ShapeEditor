@@ -228,14 +228,22 @@ namespace AeternumGames.ShapeEditor
             return result;
         }
 
+        internal struct FindSegmentLineResult
+        {
+            public Shape shape;
+            public Segment segment1;
+            public Segment segment2;
+            public int segmentIndex1;
+            public int segmentIndex2;
+        }
+
         /// <summary>Attempts to find the closest segment line at the specified screen position.</summary>
         /// <param name="position">The screen position to search at.</param>
         /// <returns>The segments if found or null.</returns>
-        internal bool FindSegmentLineAtScreenPosition(float2 position, float maxDistance, out Segment segment1, out Segment segment2)
+        internal bool FindSegmentLineAtScreenPosition(float2 position, float maxDistance, ref FindSegmentLineResult result)
         {
+            bool found = false;
             float closestDistance = float.MaxValue;
-            segment1 = default;
-            segment2 = default;
 
             // for every shape in the project:
             var shapesCount = project.shapes.Count;
@@ -260,14 +268,18 @@ namespace AeternumGames.ShapeEditor
                         if (distance < maxDistance && distance < closestDistance)
                         {
                             closestDistance = distance;
-                            segment1 = segment;
-                            segment2 = next;
+                            result.shape = shape;
+                            result.segment1 = segment;
+                            result.segment2 = next;
+                            result.segmentIndex1 = j;
+                            result.segmentIndex2 = j + 1 >= segmentsCount ? 0 : j + 1;
+                            found = true;
                         }
                     }
                 }
             }
 
-            return (segment1 != null);
+            return found;
         }
 
         /// <summary>Iterates over all of the selected segments.</summary>
