@@ -7,6 +7,167 @@ namespace AeternumGames.ShapeEditor
 {
     public static class MathEx
     {
+        /// <summary>Since floating-point math is imprecise we use a smaller value of 0.00001 (1e-5f).</summary>
+        public const float EPSILON_5 = 1e-5f;
+        /// <summary>Since floating-point math is imprecise we use a smaller value of 0.0001 (1e-4f).</summary>
+        public const float EPSILON_4 = 1e-4f;
+        /// <summary>Since floating-point math is imprecise we use a smaller value of 0.001 (1e-3f).</summary>
+        public const float EPSILON_3 = 1e-3f;
+        /// <summary>Since floating-point math is imprecise we use a smaller value of 0.01 (1e-2f).</summary>
+        public const float EPSILON_2 = 1e-2f;
+        /// <summary>Since floating-point math is imprecise we use a smaller value of 0.1 (1e-1f).</summary>
+        public const float EPSILON_1 = 1e-1f;
+
+        /// <summary>
+        /// Determines whether two floats are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon5(this float a, float b) => math.abs(a - b) < EPSILON_5;
+
+        /// <summary>
+        /// Determines whether two floats are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon4(this float a, float b) => math.abs(a - b) < EPSILON_4;
+
+        /// <summary>
+        /// Determines whether two floats are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon3(this float a, float b) => math.abs(a - b) < EPSILON_3;
+
+        /// <summary>
+        /// Determines whether two floats are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon2(this float a, float b) => math.abs(a - b) < EPSILON_2;
+
+        /// <summary>
+        /// Determines whether two floats are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon1(this float a, float b) => math.abs(a - b) < EPSILON_1;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon1(this Vector3 a, Vector3 b) => math.abs(a.x - b.x) < EPSILON_1 && math.abs(a.y - b.y) < EPSILON_1 && math.abs(a.z - b.z) < EPSILON_1;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon2(this Vector3 a, Vector3 b) => math.abs(a.x - b.x) < EPSILON_2 && math.abs(a.y - b.y) < EPSILON_2 && math.abs(a.z - b.z) < EPSILON_2;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon3(this Vector3 a, Vector3 b) => math.abs(a.x - b.x) < EPSILON_3 && math.abs(a.y - b.y) < EPSILON_3 && math.abs(a.z - b.z) < EPSILON_3;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon4(this Vector3 a, Vector3 b) => math.abs(a.x - b.x) < EPSILON_4 && math.abs(a.y - b.y) < EPSILON_4 && math.abs(a.z - b.z) < EPSILON_4;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon5(this Vector3 a, Vector3 b) => math.abs(a.x - b.x) < EPSILON_5 && math.abs(a.y - b.y) < EPSILON_5 && math.abs(a.z - b.z) < EPSILON_5;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon1(this Vector2 a, Vector2 b) => math.abs(a.x - b.x) < EPSILON_1 && math.abs(a.y - b.y) < EPSILON_1;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon2(this Vector2 a, Vector2 b) => math.abs(a.x - b.x) < EPSILON_2 && math.abs(a.y - b.y) < EPSILON_2;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon3(this Vector2 a, Vector2 b) => math.abs(a.x - b.x) < EPSILON_3 && math.abs(a.y - b.y) < EPSILON_3;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon4(this Vector2 a, Vector2 b) => math.abs(a.x - b.x) < EPSILON_4 && math.abs(a.y - b.y) < EPSILON_4;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon5(this Vector2 a, Vector2 b) => math.abs(a.x - b.x) < EPSILON_5 && math.abs(a.y - b.y) < EPSILON_5;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon1(this float3 a, float3 b) => math.abs(a.x - b.x) < EPSILON_1 && math.abs(a.y - b.y) < EPSILON_1 && math.abs(a.z - b.z) < EPSILON_1;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon2(this float3 a, float3 b) => math.abs(a.x - b.x) < EPSILON_2 && math.abs(a.y - b.y) < EPSILON_2 && math.abs(a.z - b.z) < EPSILON_2;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon3(this float3 a, float3 b) => math.abs(a.x - b.x) < EPSILON_3 && math.abs(a.y - b.y) < EPSILON_3 && math.abs(a.z - b.z) < EPSILON_3;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon4(this float3 a, float3 b) => math.abs(a.x - b.x) < EPSILON_4 && math.abs(a.y - b.y) < EPSILON_4 && math.abs(a.z - b.z) < EPSILON_4;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon5(this float3 a, float3 b) => math.abs(a.x - b.x) < EPSILON_5 && math.abs(a.y - b.y) < EPSILON_5 && math.abs(a.z - b.z) < EPSILON_5;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon1(this float2 a, float2 b) => math.abs(a.x - b.x) < EPSILON_1 && math.abs(a.y - b.y) < EPSILON_1;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon2(this float2 a, float2 b) => math.abs(a.x - b.x) < EPSILON_2 && math.abs(a.y - b.y) < EPSILON_2;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon3(this float2 a, float2 b) => math.abs(a.x - b.x) < EPSILON_3 && math.abs(a.y - b.y) < EPSILON_3;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon4(this float2 a, float2 b) => math.abs(a.x - b.x) < EPSILON_4 && math.abs(a.y - b.y) < EPSILON_4;
+
+        /// <summary>
+        /// Determines whether two vector's are equal, allowing for floating point differences with
+        /// an Epsilon value taken into account in per component comparisons
+        /// </summary>
+        public static bool EqualsWithEpsilon5(this float2 a, float2 b) => math.abs(a.x - b.x) < EPSILON_5 && math.abs(a.y - b.y) < EPSILON_5;
+
         public static Rect RectXYXY(float x1, float y1, float x2, float y2)
         {
             var mx1 = math.min(x1, x2);
@@ -48,6 +209,16 @@ namespace AeternumGames.ShapeEditor
 
             point += pivot;
             return point;
+        }
+
+        public static bool IsPointOnLine(float2 point, float2 from, float2 to, float maxDistance)
+        {
+            return math.abs(math.distance(from, point) + math.distance(to, point) - math.distance(from, to)) < maxDistance;
+        }
+
+        public static float PointDistanceFromLine(float2 point, float2 from, float2 to)
+        {
+            return math.abs(math.distance(from, point) + math.distance(to, point) - math.distance(from, to));
         }
     }
 }

@@ -68,6 +68,13 @@ namespace AeternumGames.ShapeEditor
                     var segment = editor.FindSegmentAtScreenPosition(editor.mousePosition, 60.0f);
                     if (segment != null)
                         segment.selected = !segment.selected;
+
+                    /* // this works, implement later.
+                    if (editor.FindSegmentLineAtScreenPosition(editor.mousePosition, 60.0f, out var segment1, out var segment2))
+                    {
+                        segment1.selected = true;
+                        segment2.selected = true;
+                    }*/
                 }
 
                 isMarqueeActive = false;

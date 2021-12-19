@@ -228,6 +228,48 @@ namespace AeternumGames.ShapeEditor
             return result;
         }
 
+        /// <summary>Attempts to find the closest segment line at the specified screen position.</summary>
+        /// <param name="position">The screen position to search at.</param>
+        /// <returns>The segments if found or null.</returns>
+        internal bool FindSegmentLineAtScreenPosition(float2 position, float maxDistance, out Segment segment1, out Segment segment2)
+        {
+            float closestDistance = float.MaxValue;
+            segment1 = default;
+            segment2 = default;
+
+            // for every shape in the project:
+            var shapesCount = project.shapes.Count;
+            for (int i = 0; i < shapesCount; i++)
+            {
+                var shape = project.shapes[i];
+
+                // for every segment in the project:
+                var segmentsCount = shape.segments.Count;
+                for (int j = 0; j < segmentsCount; j++)
+                {
+                    // get the current segment and the next segment (wrapping around).
+                    var segment = shape.segments[j];
+                    var next = shape.segments[j + 1 >= segmentsCount ? 0 : j + 1];
+
+                    if (segment.type == SegmentType.Linear)
+                    {
+                        Vector2 p1 = GridPointToScreen(segment.position);
+                        Vector2 p2 = GridPointToScreen(next.position);
+
+                        var distance = MathEx.PointDistanceFromLine(position, p1, p2);
+                        if (distance < maxDistance && distance < closestDistance)
+                        {
+                            closestDistance = distance;
+                            segment1 = segment;
+                            segment2 = next;
+                        }
+                    }
+                }
+            }
+
+            return (segment1 != null);
+        }
+
         /// <summary>Iterates over all of the selected segments.</summary>
         internal IEnumerable<Segment> ForEachSelectedSegment()
         {
