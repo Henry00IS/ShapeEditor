@@ -14,9 +14,7 @@ Shader "Aeternum Games/Shape Editor Gui"
 			CGPROGRAM
 				#pragma vertex vert
 				#pragma fragment frag
-				#include "UnityCG.cginc"
-				#include "UnityShaderVariables.cginc"
-
+				
 				sampler2D _MainTex;
 
 				// vertex shader input data

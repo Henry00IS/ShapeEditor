@@ -42,6 +42,12 @@ namespace AeternumGames.ShapeEditor
         {
             if (!isActive || isDone) return;
 
+            GLUtilities.DrawGui(() =>
+            {
+                GL.Color(Color.gray);
+                GLUtilities.DrawDottedLine(1.0f, editor.mousePosition, editor.GridPointToScreen(initialGridPosition));
+            });
+
             editor.SetMouseCursor(MouseCursor.RotateArrow);
         }
 

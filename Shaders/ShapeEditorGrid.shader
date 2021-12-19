@@ -19,8 +19,6 @@ Shader "Aeternum Games/Shape Editor Grid"
 			CGPROGRAM
 				#pragma vertex vert
 				#pragma fragment frag
-				#include "UnityCG.cginc"
-				#include "UnityShaderVariables.cginc"
 
 				static const float screenScale = 200.0;
 				static const fixed3 colorGridBackground = fixed3(0.118, 0.118, 0.118);

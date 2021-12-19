@@ -248,6 +248,26 @@ namespace AeternumGames.ShapeEditor
             GL.Vertex3(p4.x, p4.y, 0);
         }
 
+        public static void DrawDottedLine(float thickness, float2 from, float2 to, float screenSpaceSize = 4f)
+        {
+            if (screenSpaceSize <= 0f) return; // precaution: prevent infinite loop.
+
+            var distance = math.distance(from, to);
+            var direction = math.normalize(to - from) * screenSpaceSize;
+            var travelled = 0.0f;
+            var lastPosition = from;
+
+            var skip = false;
+            while (travelled < distance)
+            {
+                travelled += screenSpaceSize;
+                var nextPosition = lastPosition + direction;
+                if (skip = !skip)
+                    DrawLine(thickness, lastPosition, travelled > distance ? to : nextPosition);
+                lastPosition = nextPosition;
+            }
+        }
+
         public static void DrawCircle(float thickness, float2 position, float radius, Color color, int segments = 32)
         {
             float angle = 0f;
