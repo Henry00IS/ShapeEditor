@@ -251,6 +251,10 @@ namespace AeternumGames.ShapeEditor
                             case KeyCode.R:
                                 SwitchToScaleTool();
                                 return true;
+
+                            case KeyCode.Delete:
+                                DeleteSelection();
+                                return true;
                         }
                     }
                 }

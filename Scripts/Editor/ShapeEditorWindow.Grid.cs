@@ -307,6 +307,28 @@ namespace AeternumGames.ShapeEditor
                 }
             }
         }
+
+        /// <summary>Deletes the selected objects from the project.</summary>
+        public void DeleteSelection()
+        {
+            // for every shape in the project:
+            var shapesCount = project.shapes.Count;
+            for (int i = shapesCount; i-- > 0;)
+            {
+                var shape = project.shapes[i];
+
+                // for every segment in the project:
+                var segments = shape.segments;
+                var segmentsCount = segments.Count;
+                for (int j = segmentsCount; j-- > 0;)
+                    if (segments[j].selected)
+                        segments.RemoveAt(j);
+
+                // remove the shape if it's empty.
+                if (segments.Count == 0)
+                    project.shapes.RemoveAt(i);
+            }
+        }
     }
 }
 
