@@ -42,5 +42,7 @@ MonoBehaviour:
   shapeEditorTranslate: {fileID: 2800000, guid: 29ace29ff0a46a94fbdcf2d319acd416, type: 3}
   shapeEditorZoomIn: {fileID: 2800000, guid: 4680d936fb0455f4f99c0d94155d38df, type: 3}
   shapeEditorZoomOut: {fileID: 2800000, guid: 62299d3e26649b442aed157a222ab744, type: 3}
+  shapeEditorFontSegoeUI14Xml: {fileID: 4900000, guid: 96c44120173bdb24081e0676c015daee, type: 3}
+  shapeEditorFontSegoeUI14: {fileID: 2800000, guid: 4c29aef198600c443825fa46c0b76761, type: 3}
   shapeEditorGridMaterial: {fileID: 2100000, guid: 021e83c5ba89e754d8fb2194fde8819e, type: 2}
   shapeEditorGuiMaterial: {fileID: 2100000, guid: d1dffd627a249ca498ba91dd9d46daf2, type: 2}

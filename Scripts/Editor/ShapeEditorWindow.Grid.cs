@@ -17,6 +17,8 @@ namespace AeternumGames.ShapeEditor
         private float2 gridOffset;
         private float gridZoom = 1f;
         private float gridSnap = 0.125f;
+        internal int renderTextureWidth = 1;
+        internal int renderTextureHeight = 1;
 
         /// <summary>After rendering the pivots this variable holds the number of selected segments.</summary>
         internal int selectedSegmentsCount;
@@ -52,13 +54,13 @@ namespace AeternumGames.ShapeEditor
             return new float2(result.x, result.y);
         }
 
-        private void DrawGrid(RenderTexture renderTexture)
+        private void DrawGrid()
         {
             var gridMaterial = ShapeEditorResources.temporaryGridMaterial;
             gridMaterial.SetFloat("_offsetX", gridOffset.x);
             gridMaterial.SetFloat("_offsetY", gridOffset.y);
-            gridMaterial.SetFloat("_viewportWidth", renderTexture.width);
-            gridMaterial.SetFloat("_viewportHeight", renderTexture.height);
+            gridMaterial.SetFloat("_viewportWidth", renderTextureWidth);
+            gridMaterial.SetFloat("_viewportHeight", renderTextureHeight);
             gridMaterial.SetFloat("_zoom", gridZoom);
             gridMaterial.SetFloat("_snap", gridSnap);
             gridMaterial.SetPass(0);
@@ -66,7 +68,7 @@ namespace AeternumGames.ShapeEditor
             GL.PushMatrix();
             GL.Begin(GL.QUADS);
             GL.LoadIdentity();
-            GLUtilities.DrawUvRectangle(docked ? -1 : 0, 0, renderTexture.width + (docked ? 2 : 0), renderTexture.height);
+            GLUtilities.DrawUvRectangle(docked ? -1 : 0, 0, renderTextureWidth + (docked ? 2 : 0), renderTextureHeight);
             GL.End();
             GL.PopMatrix();
         }
@@ -149,12 +151,14 @@ namespace AeternumGames.ShapeEditor
 
             // create a render texture for the viewport.
             Rect viewportRect = GetViewportRect();
-            var renderTexture = RenderTexture.GetTemporary(Mathf.FloorToInt(viewportRect.width), Mathf.FloorToInt(viewportRect.height + viewportRect.y));
+            renderTextureWidth = Mathf.FloorToInt(viewportRect.width);
+            renderTextureHeight = Mathf.FloorToInt(viewportRect.height + viewportRect.y);
+            var renderTexture = RenderTexture.GetTemporary(renderTextureWidth, renderTextureHeight, 24);
             Graphics.SetRenderTarget(renderTexture);
 
             // draw everything to the render texture.
             GL.Clear(true, true, Color.red);
-            DrawGrid(renderTexture);
+            DrawGrid();
             DrawSegments();
             DrawPivots();
             DrawTool();

@@ -70,6 +70,9 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorZoomIn;
         public Texture2D shapeEditorZoomOut;
 
+        public TextAsset shapeEditorFontSegoeUI14Xml;
+        public Texture2D shapeEditorFontSegoeUI14;
+
         public Material shapeEditorGridMaterial;
         public Material shapeEditorGuiMaterial;
 
@@ -118,6 +121,18 @@ namespace AeternumGames.ShapeEditor
                 if (_toolbarButtonStyle == null)
                     _toolbarButtonStyle = new GUIStyle(EditorStyles.toolbarButton);
                 return _toolbarButtonStyle;
+            }
+        }
+
+        public static BmFont _fontSegoeUI14;
+
+        public static BmFont fontSegoeUI14
+        {
+            get
+            {
+                if (_fontSegoeUI14 == null)
+                    _fontSegoeUI14 = new BmFont(Instance.shapeEditorFontSegoeUI14Xml, Instance.shapeEditorFontSegoeUI14);
+                return _fontSegoeUI14;
             }
         }
     }
