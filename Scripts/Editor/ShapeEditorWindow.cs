@@ -34,6 +34,9 @@ namespace AeternumGames.ShapeEditor
 
         private void OnRepaint()
         {
+            // check for and delete unused string meshes.
+            BmFontCache.OnRenderFrame();
+
             DrawViewport();
         }
 
@@ -290,6 +293,12 @@ namespace AeternumGames.ShapeEditor
                 }
             }
             return false;
+        }
+
+        internal void OnNewProject()
+        {
+            project = new Project();
+            Repaint();
         }
     }
 }

@@ -41,18 +41,21 @@ namespace AeternumGames.ShapeEditor
         /// <param name="position">The position of the mesh in top left screen coordinates.</param>
         public static void DrawOrthoMeshNow(Mesh mesh, float2 position)
         {
-            DrawOrthoMeshNow(mesh, position, new float2(1.0f, 1.0f));
+            Graphics.DrawMeshNow(mesh, Matrix4x4.Translate(new Vector3(position.x, position.y, 0.0f)));
         }
 
         /// <summary>
-        /// Draws the specified mesh immediately.
+        /// Draws a line of text using the specified font.
         /// </summary>
-        /// <param name="mesh">The mesh to be drawn.</param>
-        /// <param name="position">The position of the mesh in top left screen coordinates.</param>
-        /// <param name="scale">The scale of the mesh.</param>
-        public static void DrawOrthoMeshNow(Mesh mesh, float2 position, float2 scale)
+        /// <param name="font">The font to use for rendering.</param>
+        /// <param name="text">The text to draw.</param>
+        /// <param name="position">The screen position.</param>
+        public static void DrawGuiText(BmFont font, string text, float2 position)
         {
-            Graphics.DrawMeshNow(mesh, Matrix4x4.TRS(new Vector3(position.x, position.y, 0.0f), Quaternion.identity, new Vector3(scale.x, -scale.y, 1.0f)));
+            DrawGuiTextured(font.texture, () =>
+            {
+                DrawOrthoMeshNow(BmFontCache.GetStringMesh(font, text), position);
+            });
         }
 
         public static void DrawRectangle(float x, float y, float w, float h)

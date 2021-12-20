@@ -15,8 +15,8 @@ namespace AeternumGames.ShapeEditor
         private static readonly Color segmentPivotSelectedColor = new Color(0.9f, 0.45f, 0.0f);
         private static readonly Color segmentPivotOutlineColor = new Color(1.0f, 0.5f, 0.0f);
         private float2 gridOffset;
-        private float gridZoom = 1f;
-        private float gridSnap = 0.125f;
+        internal float gridZoom = 1f;
+        internal float gridSnap = 0.125f;
         internal int renderTextureWidth = 1;
         internal int renderTextureHeight = 1;
 

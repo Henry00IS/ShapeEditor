@@ -20,8 +20,8 @@ namespace AeternumGames.ShapeEditor
         /// <summary>The control that currently has input focus or null.</summary>
         internal GuiControl activeControl;
 
-        private static readonly Color colorWindowBackground = new Color(0.192f, 0.192f, 0.192f, 0.5f);
-        private static readonly Color colorWindowBorder = new Color(0.1f, 0.1f, 0.1f);
+        protected Color colorWindowBackground = new Color(0.192f, 0.192f, 0.192f, 0.5f);
+        protected Color colorWindowBorder = new Color(0.1f, 0.1f, 0.1f);
 
         /// <summary>Creates a new window at the specified position of the specified size.</summary>
         /// <param name="parent">The parent window that this window resides in.</param>
