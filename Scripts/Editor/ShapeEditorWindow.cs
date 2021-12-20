@@ -291,31 +291,6 @@ namespace AeternumGames.ShapeEditor
             }
             return false;
         }
-
-        private void OnTopToolbarGUI()
-        {
-            if (GUILayout.Button(new GUIContent(ShapeEditorResources.Instance.shapeEditorNew, "New Project (N)"), ShapeEditorResources.toolbarButtonStyle))
-            {
-                RegisterUndo("New Project");
-                project = new Project();
-                Repaint();
-            }
-
-            GUILayout.FlexibleSpace();
-        }
-
-        private void OnBottomToolbarGUI()
-        {
-            GUILayout.Label("2D Shape Editor");
-
-            GUILayout.FlexibleSpace();
-
-            GUILayout.Label("Snap");
-            gridSnap = EditorGUILayout.FloatField(gridSnap, GUILayout.Width(64f));
-
-            GUILayout.Label("Zoom");
-            gridZoom = EditorGUILayout.FloatField(gridZoom, GUILayout.Width(64f));
-        }
     }
 }
 

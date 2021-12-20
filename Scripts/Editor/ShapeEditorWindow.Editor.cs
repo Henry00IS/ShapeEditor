@@ -57,10 +57,8 @@ namespace AeternumGames.ShapeEditor
                 }
             }
 
-            // recalculate the mouse position.
+            // get the mouse position.
             float2 eMousePosition = e.mousePosition;
-            Rect viewportRect = GetViewportRect();
-            eMousePosition -= new float2(viewportRect.x, viewportRect.y);
 
             // use a passive hot control to detect mouse up outside of the editor window.
             int hotControlId = GUIUtility.GetControlID(FocusType.Passive);
@@ -172,29 +170,16 @@ namespace AeternumGames.ShapeEditor
                 if (OnKeyUp(e.keyCode))
                     e.Use();
             }
-
-            // top toolbar:
-            GUILayout.BeginHorizontal(ShapeEditorResources.toolbarStyle);
-            OnTopToolbarGUI();
-            GUILayout.EndHorizontal();
-
-            // skip vertical viewport area.
-            GUILayout.FlexibleSpace();
-
-            // bottom toolbar:
-            GUILayout.BeginHorizontal(ShapeEditorResources.toolbarStyle);
-            OnBottomToolbarGUI();
-            GUILayout.EndHorizontal();
         }
 
         internal Rect GetViewportRect()
         {
-            return new Rect(0, 21, position.width, position.height);
+            return new Rect(0, 0, position.width, position.height);
         }
 
         private bool IsMousePositionInViewport(float2 mousePosition)
         {
-            return new Rect(0, 0, position.width, position.height - (21 * 2)).Contains(mousePosition);
+            return new Rect(0, 0, position.width, position.height).Contains(mousePosition);
         }
 
         /// <summary>While this function is called every repaint, it will set the mouse cursor.</summary>

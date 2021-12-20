@@ -65,12 +65,9 @@ namespace AeternumGames.ShapeEditor
             gridMaterial.SetFloat("_snap", gridSnap);
             gridMaterial.SetPass(0);
 
-            GL.PushMatrix();
             GL.Begin(GL.QUADS);
-            GL.LoadIdentity();
             GLUtilities.DrawUvRectangle(docked ? -1 : 0, 0, renderTextureWidth + (docked ? 2 : 0), renderTextureHeight);
             GL.End();
-            GL.PopMatrix();
         }
 
         private void DrawSegments()
@@ -150,20 +147,22 @@ namespace AeternumGames.ShapeEditor
             ValidateTools();
 
             // create a render texture for the viewport.
-            Rect viewportRect = GetViewportRect();
-            renderTextureWidth = Mathf.FloorToInt(viewportRect.width);
-            renderTextureHeight = Mathf.FloorToInt(viewportRect.height + viewportRect.y);
+            renderTextureWidth = Mathf.FloorToInt(position.width);
+            renderTextureHeight = Mathf.FloorToInt(position.height);
             var renderTexture = RenderTexture.GetTemporary(renderTextureWidth, renderTextureHeight, 24);
             Graphics.SetRenderTarget(renderTexture);
 
             // draw everything to the render texture.
             GL.Clear(true, true, Color.red);
+            GL.PushMatrix();
+            GL.LoadPixelMatrix(0f, renderTextureWidth, renderTextureHeight, 0f);
             DrawGrid();
             DrawSegments();
             DrawPivots();
             DrawTool();
             DrawWidgets();
             DrawWindows();
+            GL.PopMatrix();
 
             // finish up and draw the render texture.
             Graphics.SetRenderTarget(null);

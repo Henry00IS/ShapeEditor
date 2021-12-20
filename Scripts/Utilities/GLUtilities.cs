@@ -34,58 +34,25 @@ namespace AeternumGames.ShapeEditor
             GL.End();
         }
 
-        /// <summary>Calls the specified action with the textured GUI shader between inverted GL push and GL pop.</summary>
-        /// <param name="action">The action be called to draw meshes.</param>
-        public static void DrawGuiMesh(Texture texture, System.Action action)
-        {
-            var meshMaterial = ShapeEditorResources.temporaryGuiMaterial;
-            meshMaterial.mainTexture = texture;
-            meshMaterial.SetPass(0);
-
-            GL.PushMatrix();
-            GL.invertCulling = true;
-            action();
-            GL.invertCulling = false;
-            GL.PopMatrix();
-        }
-
-        /// <summary>Calls the specified action with the textured mesh shader in an ortho projection.</summary>
-        /// <param name="action">The action be called to draw ortho meshes.</param>
-        public static void DrawGuiMeshOrtho(ShapeEditorWindow editor, Texture texture, System.Action action)
-        {
-            // the worst, we need to get rid of the IMGUI toolbar!
-            var viewportRect = editor.GetViewportRect();
-            var x = viewportRect.x;
-            var y = viewportRect.y;
-            var width = editor.renderTextureWidth - x;
-            var height = editor.renderTextureHeight - y;
-
-            DrawGuiMesh(texture, () =>
-            {
-                GL.LoadProjectionMatrix(Matrix4x4.Ortho(x, width, -height, y, -1.0f, 1.0f));
-                action();
-            });
-        }
-
         /// <summary>
-        /// Draws the specified mesh immediately. Assumes this is used inside of <see cref="DrawGuiMeshOrtho"/>.
+        /// Draws the specified mesh immediately.
         /// </summary>
         /// <param name="mesh">The mesh to be drawn.</param>
         /// <param name="position">The position of the mesh in top left screen coordinates.</param>
         public static void DrawOrthoMeshNow(Mesh mesh, float2 position)
         {
-            Graphics.DrawMeshNow(mesh, Matrix4x4.Translate(new Vector3(position.x, -position.y, 0.0f)));
+            DrawOrthoMeshNow(mesh, position, new float2(1.0f, 1.0f));
         }
 
         /// <summary>
-        /// Draws the specified mesh immediately. Assumes this is used inside of <see cref="DrawGuiMeshOrtho"/>.
+        /// Draws the specified mesh immediately.
         /// </summary>
         /// <param name="mesh">The mesh to be drawn.</param>
         /// <param name="position">The position of the mesh in top left screen coordinates.</param>
         /// <param name="scale">The scale of the mesh.</param>
         public static void DrawOrthoMeshNow(Mesh mesh, float2 position, float2 scale)
         {
-            Graphics.DrawMeshNow(mesh, Matrix4x4.TRS(new Vector3(position.x, -position.y, 0.0f), Quaternion.identity, new Vector3(scale.x, scale.y, 1.0f)));
+            Graphics.DrawMeshNow(mesh, Matrix4x4.TRS(new Vector3(position.x, position.y, 0.0f), Quaternion.identity, new Vector3(scale.x, -scale.y, 1.0f)));
         }
 
         public static void DrawRectangle(float x, float y, float w, float h)
