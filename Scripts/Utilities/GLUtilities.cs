@@ -51,10 +51,15 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Calls the specified action with the textured mesh shader in an ortho projection.</summary>
         /// <param name="action">The action be called to draw ortho meshes.</param>
-        public static void DrawGuiMeshOrtho(float x, float y, float width, float height, Texture texture, System.Action action)
+        public static void DrawGuiMeshOrtho(ShapeEditorWindow editor, Texture texture, System.Action action)
         {
-            width -= x;
-            height -= y;
+            // the worst, we need to get rid of the IMGUI toolbar!
+            var viewportRect = editor.GetViewportRect();
+            var x = viewportRect.x;
+            var y = viewportRect.y;
+            var width = editor.renderTextureWidth - x;
+            var height = editor.renderTextureHeight - y;
+
             DrawGuiMesh(texture, () =>
             {
                 GL.LoadProjectionMatrix(Matrix4x4.Ortho(x, width, -height, y, -1.0f, 1.0f));

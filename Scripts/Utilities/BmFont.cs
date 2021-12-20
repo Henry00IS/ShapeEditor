@@ -126,7 +126,8 @@ namespace AeternumGames.ShapeEditor
         {
             if (characters.TryGetValue(characterCode, out var character))
             {
-                Rect rect = new Rect(offset.x, offset.y - lineHeight, character.width, character.height);
+                // not sure why -8 but that just makes it align better to the top left corner.
+                Rect rect = new Rect(offset.x, offset.y - 8, character.width, character.height);
 
                 vertices.Add(new Vector3(rect.x, rect.y));
                 vertices.Add(new Vector3(rect.x + rect.width, rect.y));

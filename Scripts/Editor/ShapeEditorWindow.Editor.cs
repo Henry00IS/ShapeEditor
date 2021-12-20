@@ -187,7 +187,7 @@ namespace AeternumGames.ShapeEditor
             GUILayout.EndHorizontal();
         }
 
-        private Rect GetViewportRect()
+        internal Rect GetViewportRect()
         {
             return new Rect(0, 21, position.width, position.height);
         }
