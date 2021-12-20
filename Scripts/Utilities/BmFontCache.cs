@@ -44,8 +44,12 @@ namespace AeternumGames.ShapeEditor
             cache = keep;
         }
 
+        private static Mesh emptyMesh;
         public static Mesh GetStringMesh(BmFont font, string text)
         {
+            // we can't handle null strings so return an empty mesh.
+            if (text == null) { if (emptyMesh == null) emptyMesh = new Mesh(); return emptyMesh; };
+
             // find the strings associated with the font.
             Dictionary<string, BmStringData> strings;
             if (!cache.TryGetValue(font, out strings))

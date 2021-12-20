@@ -124,7 +124,7 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        public static BmFont _fontSegoeUI14;
+        private static BmFont _fontSegoeUI14;
 
         public static BmFont fontSegoeUI14
         {

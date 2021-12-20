@@ -19,7 +19,8 @@ namespace AeternumGames.ShapeEditor
                 {
                     new TopToolbarGuiWindow(this, float2.zero, float2.zero),
                     new BottomToolbarGuiWindow(this, float2.zero, float2.zero),
-                    new ToolbarGuiWindow(this, new float2(20, 40), new float2(30, 400))
+                    new ToolbarGuiWindow(this, new float2(20, 40), new float2(30, 400)),
+                    new TextboxTestWindow(this, new float2(300, 100), new float2(220, 80)),
                 };
             }
 

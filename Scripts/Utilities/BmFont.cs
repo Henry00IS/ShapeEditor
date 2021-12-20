@@ -24,7 +24,7 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Collection containing all of the font characters.</summary>
-        public readonly Dictionary<int, BmCharacter> characters = new Dictionary<int, BmCharacter>(255);
+        private readonly Dictionary<int, BmCharacter> characters = new Dictionary<int, BmCharacter>(255);
 
         /// <summary>How far the cursor should be moved vertically when moving to the next line.</summary>
         public readonly int lineHeight;
@@ -163,6 +163,28 @@ namespace AeternumGames.ShapeEditor
             {
                 Debug.Log("Could not find character " + characterCode + " (" + (int)characterCode + ")!");
             }
+        }
+
+        /// <summary>Checks whether the font has the specified character.</summary>
+        /// <param name="character">The character to find in the font.</param>
+        /// <returns>True when the character has been found else false.</returns>
+        public bool HasCharacter(char character)
+        {
+            return characters.ContainsKey(character);
+        }
+
+        /// <summary>Calculates the width of the string using the current font.</summary>
+        /// <param name="text">The text to measure.</param>
+        /// <returns>The width of the string.</returns>
+        public int StringWidth(string text)
+        {
+            int width = 0;
+
+            foreach (var characterCode in text)
+                if (characters.TryGetValue(characterCode, out var character))
+                    width += character.xadvance;
+
+            return width;
         }
     }
 }

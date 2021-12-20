@@ -88,6 +88,54 @@ namespace AeternumGames.ShapeEditor
             });
         }
 
+        /// <summary>
+        /// Draws a line of text in the specified color using the specified font.
+        /// </summary>
+        /// <param name="font">The font to use for rendering.</param>
+        /// <param name="text">The text to draw.</param>
+        /// <param name="position">The screen position.</param>
+        public static void DrawGuiText(BmFont font, string text, float2 position, Color color)
+        {
+            ShapeEditorResources.temporaryGuiMaterial.SetColor("_Color", color);
+            DrawGuiTextured(font.texture, () =>
+            {
+                DrawOrthoMeshNow(BmFontCache.GetStringMesh(font, text), position);
+            });
+            ShapeEditorResources.temporaryGuiMaterial.SetColor("_Color", Color.white);
+        }
+
+        /// <summary>
+        /// Draws a line of text using the specified font.
+        /// </summary>
+        /// <param name="clip">The clipping rectangle, only pixels inside of it will be rendered.</param>
+        /// <param name="font">The font to use for rendering.</param>
+        /// <param name="text">The text to draw.</param>
+        /// <param name="position">The screen position.</param>
+        public static void DrawGuiClippedText(Rect clip, BmFont font, string text, float2 position)
+        {
+            DrawGuiClippedTextured(clip, font.texture, () =>
+            {
+                DrawOrthoMeshNow(BmFontCache.GetStringMesh(font, text), position);
+            });
+        }
+
+        /// <summary>
+        /// Draws a line of text in the specified color using the specified font.
+        /// </summary>
+        /// <param name="clip">The clipping rectangle, only pixels inside of it will be rendered.</param>
+        /// <param name="font">The font to use for rendering.</param>
+        /// <param name="text">The text to draw.</param>
+        /// <param name="position">The screen position.</param>
+        public static void DrawGuiClippedText(Rect clip, BmFont font, string text, float2 position, Color color)
+        {
+            ShapeEditorResources.temporaryGuiMaterial.SetColor("_Color", color);
+            DrawGuiClippedTextured(clip, font.texture, () =>
+            {
+                DrawOrthoMeshNow(BmFontCache.GetStringMesh(font, text), position);
+            });
+            ShapeEditorResources.temporaryGuiMaterial.SetColor("_Color", Color.white);
+        }
+
         public static void DrawRectangle(float x, float y, float w, float h)
         {
             w += x;

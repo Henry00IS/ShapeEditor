@@ -2,6 +2,7 @@ Shader "Aeternum Games/Shape Editor Gui"
 {
 	Properties
 	{
+		_Color("Color", Color) = (1,1,1,1)
 		_MainTex("Base (RGB)", 2D) = "white"
 		_clip("Clip Rectangle", Vector) = (0.0, 0.0, 0.0, 0.0)
 		_viewport("Viewport", Vector) = (0.0, 0.0, 0.0, 0.0)
@@ -18,6 +19,7 @@ Shader "Aeternum Games/Shape Editor Gui"
 				#pragma fragment frag
 				
 				sampler2D _MainTex;
+				float4 _Color;
 
 				// vertex shader input data
 				struct appdata
@@ -49,7 +51,7 @@ Shader "Aeternum Games/Shape Editor Gui"
 				fixed4 frag(v2f IN) : SV_Target
 				{
 					fixed4 col;
-					col = tex2D(_MainTex, IN.uv0) * IN.color;
+					col = tex2D(_MainTex, IN.uv0) * IN.color * _Color;
 					return col;
 				}
 			ENDCG
@@ -65,6 +67,7 @@ Shader "Aeternum Games/Shape Editor Gui"
 				#pragma fragment frag
 
 				sampler2D _MainTex;
+				float4 _Color;
 				float4 _clip;
 				float2 _viewport;
 
@@ -101,7 +104,7 @@ Shader "Aeternum Games/Shape Editor Gui"
 					pos.y = _viewport.y - pos.y;
 					fixed4 col = fixed4(0.0, 0.0, 0.0, 0.0);
 					if (pos.x >= _clip.x && pos.x <= _clip.x + _clip.z && pos.y >= _clip.y && pos.y <= _clip.y + _clip.w)
-						col = tex2D(_MainTex, IN.uv0) * IN.color;
+						col = tex2D(_MainTex, IN.uv0) * IN.color * _Color;
 					return col;
 				}
 			ENDCG
