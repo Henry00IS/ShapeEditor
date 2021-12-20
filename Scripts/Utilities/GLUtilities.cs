@@ -34,6 +34,36 @@ namespace AeternumGames.ShapeEditor
             GL.End();
         }
 
+        /// <summary>Calls the specified action with the GUI shader between GL begin and GL end.</summary>
+        /// <param name="clip">The clipping rectangle, only pixels inside of it will be rendered.</param>
+        /// <param name="action">The action be called to draw primitives.</param>
+        public static void DrawGuiClipped(Rect clip, System.Action action)
+        {
+            var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
+            guiMaterial.mainTexture = null;
+            guiMaterial.SetVector("_clip", new Vector4(clip.x, clip.y, clip.width, clip.height));
+            guiMaterial.SetPass(1);
+
+            GL.Begin(GL.QUADS);
+            action();
+            GL.End();
+        }
+
+        /// <summary>Calls the specified action with the textured GUI shader between GL begin and GL end.</summary>
+        /// <param name="clip">The clipping rectangle, only pixels inside of it will be rendered.</param>
+        /// <param name="action">The action be called to draw primitives.</param>
+        public static void DrawGuiClippedTextured(Rect clip, Texture texture, System.Action action)
+        {
+            var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
+            guiMaterial.mainTexture = texture;
+            guiMaterial.SetVector("_clip", new Vector4(clip.x, clip.y, clip.width, clip.height));
+            guiMaterial.SetPass(1);
+
+            GL.Begin(GL.QUADS);
+            action();
+            GL.End();
+        }
+
         /// <summary>
         /// Draws the specified mesh immediately.
         /// </summary>

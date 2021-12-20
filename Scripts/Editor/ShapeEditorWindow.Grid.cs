@@ -152,6 +152,9 @@ namespace AeternumGames.ShapeEditor
             var renderTexture = RenderTexture.GetTemporary(renderTextureWidth, renderTextureHeight, 24);
             Graphics.SetRenderTarget(renderTexture);
 
+            // prepare the clipping pass in the gui material.
+            ShapeEditorResources.temporaryGuiMaterial.SetVector("_viewport", new Vector2(renderTextureWidth, renderTextureHeight));
+
             // draw everything to the render texture.
             GL.Clear(true, true, Color.red);
             GL.PushMatrix();
