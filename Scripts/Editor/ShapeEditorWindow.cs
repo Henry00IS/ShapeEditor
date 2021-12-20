@@ -24,24 +24,12 @@ namespace AeternumGames.ShapeEditor
             window.Show();
             window.titleContent = new GUIContent("Shape Editor", ShapeEditorResources.Instance.shapeEditorIcon);
             window.minSize = new float2(128, 128);
-
-            // ensure that we are subscribed to undo/redo notifications.
-            Undo.undoRedoPerformed -= OnUndoRedoPerformed;
-            Undo.undoRedoPerformed += OnUndoRedoPerformed;
         }
 
         public static ShapeEditorWindow InitAndGetHandle()
         {
             Init();
             return GetWindow<ShapeEditorWindow>();
-        }
-
-        /// <summary>We use the static constructor to handle C# reloads.</summary>
-        static ShapeEditorWindow()
-        {
-            // re-subscribe to undo/redo.
-            Undo.undoRedoPerformed -= OnUndoRedoPerformed;
-            Undo.undoRedoPerformed += OnUndoRedoPerformed;
         }
 
         private void OnRepaint()
@@ -255,6 +243,22 @@ namespace AeternumGames.ShapeEditor
                             case KeyCode.Delete:
                                 DeleteSelection();
                                 return true;
+
+                            case KeyCode.Y:
+                                if (hasFocus && isCtrlPressed)
+                                {
+                                    OnRedo();
+                                    return true;
+                                }
+                                return false;
+
+                            case KeyCode.Z:
+                                if (hasFocus && isCtrlPressed)
+                                {
+                                    OnUndo();
+                                    return true;
+                                }
+                                return false;
                         }
                     }
                 }

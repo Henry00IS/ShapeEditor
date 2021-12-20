@@ -21,21 +21,6 @@ namespace AeternumGames.ShapeEditor
         private Texture2D customMouseCursor;
         private float2 customMouseHotspot;
 
-        /// <summary>Called by the Unity Editor whenever an undo/redo was performed.</summary>
-        private static void OnUndoRedoPerformed()
-        {
-            // unsubscribe if the shape editor window is not open.
-            if (!HasOpenInstances<ShapeEditorWindow>())
-            {
-                Undo.undoRedoPerformed -= OnUndoRedoPerformed;
-                return;
-            }
-
-            // repaint the window.
-            var window = GetWindow<ShapeEditorWindow>();
-            window.Repaint();
-        }
-
         /// <summary>Called by the Unity Editor to process events.</summary>
         private void OnGUI()
         {
@@ -229,13 +214,6 @@ namespace AeternumGames.ShapeEditor
             customMouseCursor = cursor;
             customMouseHotspot = hotspot;
             desiredMouseCursorTimer = 1;
-        }
-
-        /// <summary>Stores a copy of the project on the undo stack.</summary>
-        /// <param name="name">The name of the undo operation.</param>
-        internal void RegisterUndo(string name)
-        {
-            Undo.RegisterCompleteObjectUndo(this, name);
         }
     }
 }
