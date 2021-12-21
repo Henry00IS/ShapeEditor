@@ -28,17 +28,17 @@ namespace AeternumGames.ShapeEditor
         public override void OnRender()
         {
             // stretch over the width of the window.
-            position = new float2(0f, parent.position.height - 22f);
-            size = new float2(parent.position.width, 22f);
+            position = new float2(0f, editor.position.height - 22f);
+            size = new float2(editor.position.width, 22f);
 
-            statusLabel.text = "2D Shape Editor - Snap: " + parent.gridSnap;
+            statusLabel.text = "2D Shape Editor - Jake Edition";
 
             var xpos = size.x;
 
             // grid zoom textbox:
             xpos -= gridZoomTextbox.size.x + 3f;
             gridZoomTextbox.position = new float2(xpos, 3f);
-            parent.gridZoom = gridZoomTextbox.UpdateValue(parent.gridZoom);
+            editor.gridZoom = gridZoomTextbox.UpdateValue(editor.gridZoom);
 
             // grid zoom label:
             xpos -= gridZoomLabel.size.x + 3f;
@@ -47,7 +47,7 @@ namespace AeternumGames.ShapeEditor
             // grid snap textbox:
             xpos -= gridSnapTextbox.size.x + 3f;
             gridSnapTextbox.position = new float2(xpos, 3f);
-            parent.gridSnap = gridSnapTextbox.UpdateValue(parent.gridSnap);
+            editor.gridSnap = gridSnapTextbox.UpdateValue(editor.gridSnap);
 
             // grid snap label:
             xpos -= gridSnapLabel.size.x + 3f;

@@ -9,8 +9,8 @@ namespace AeternumGames.ShapeEditor
     /// <summary>Represents a floating window inside of the 2D Shape Editor.</summary>
     public class GuiWindow
     {
-        /// <summary>The parent window that this window resides in.</summary>
-        public ShapeEditorWindow parent;
+        /// <summary>The shape editor window.</summary>
+        public ShapeEditorWindow editor;
         /// <summary>The window position in screen coordinates.</summary>
         public float2 position;
         /// <summary>The window size in screen coordinates.</summary>
@@ -50,7 +50,7 @@ namespace AeternumGames.ShapeEditor
         /// <param name="size">The window size in screen coordinates.</param>
         public GuiWindow(ShapeEditorWindow parent, float2 position, float2 size)
         {
-            this.parent = parent;
+            this.editor = parent;
             this.position = position;
             this.size = size;
         }
@@ -178,7 +178,7 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Gets whether the window currently has input focus.</summary>
-        public bool isActive => this == parent.activeWindow;
+        public bool isActive => this == editor.activeWindow;
 
         /// <summary>Gets whether the mouse is hovering over the window.</summary>
         public bool isMouseOver => new Rect(float2.zero, size).Contains(mousePosition);
@@ -187,7 +187,7 @@ namespace AeternumGames.ShapeEditor
         public Rect rect => new Rect(position, size);
 
         /// <summary>Gets the relative mouse position inside of the window.</summary>
-        public float2 mousePosition => parent.mousePosition - position;
+        public float2 mousePosition => editor.mousePosition - position;
 
         /// <summary>Attempts to find the top control at the given relative position.</summary>
         /// <param name="position">The relative position to find the control at.</param>

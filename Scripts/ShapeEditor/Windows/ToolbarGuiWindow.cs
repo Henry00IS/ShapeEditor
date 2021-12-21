@@ -37,7 +37,7 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnRender()
         {
-            Type type = parent.activeTool.GetType();
+            Type type = editor.activeTool.GetType();
             selectBoxButton.isChecked = type == typeof(BoxSelectTool);
             translateButton.isChecked = type == typeof(TranslateTool);
             rotateButton.isChecked = type == typeof(RotateTool);

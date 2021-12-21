@@ -21,7 +21,7 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnRender()
         {
-            size = new float2(parent.position.width, 22f);
+            size = new float2(editor.position.width, 22f);
 
             base.OnRender();
         }

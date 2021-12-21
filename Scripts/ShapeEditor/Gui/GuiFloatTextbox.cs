@@ -59,7 +59,7 @@ namespace AeternumGames.ShapeEditor
             hasNewNumber = false;
             textBeforeEdit = text;
 
-            parent.parent.Repaint();
+            parent.editor.Repaint();
 
             return newNumber;
         }

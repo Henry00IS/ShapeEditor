@@ -77,7 +77,7 @@ namespace AeternumGames.ShapeEditor
             if (button == 0)
             {
                 // set the caret position.
-                caretCharPosition = TextXToCaretCharPosition(Mathf.RoundToInt(parent.parent.mousePosition.x));
+                caretCharPosition = TextXToCaretCharPosition(Mathf.RoundToInt(parent.editor.mousePosition.x));
 
                 // set the selection position.
                 SelectionSet(caretCharPosition, caretCharPosition);
@@ -97,7 +97,7 @@ namespace AeternumGames.ShapeEditor
                 // automatic scrolling when the mouse moves (for the edges on long text).
 
                 // set the caret position.
-                caretCharPosition = TextXToCaretCharPosition(Mathf.RoundToInt(parent.parent.mousePosition.x));
+                caretCharPosition = TextXToCaretCharPosition(Mathf.RoundToInt(parent.editor.mousePosition.x));
 
                 // reset the caret blink timer.
                 CaretResetBlink();
@@ -109,6 +109,10 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnRender()
         {
+            // change the mouse cursor when hovering over this control.
+            if (isMouseOver)
+                parent.editor.SetMouseCursor(MouseCursor.Text);
+
             // process the caret blinking timer.
             timerCaretBlink++;
             timerCaretBlink %= 120;
@@ -128,16 +132,10 @@ namespace AeternumGames.ShapeEditor
 
             var textboxBackgroundColor = isReadonly ? backgroundColorReadonly : backgroundColorDefault;
 
+            // draw textbox background with input focus indicating border.
             GLUtilities.DrawGui(() =>
             {
-                GL.Color(textboxBackgroundColor);
-                GLUtilities.DrawRectangle(drawPosition.x, drawPosition.y, size.x, size.y);
-            });
-
-            // draw outside border that indicates whether the textbox has input focus.
-            GLUtilities.DrawGui(() =>
-            {
-                GLUtilities.DrawRectangleOutline(drawPosition.x, drawPosition.y, size.x, size.y, isActive ? borderColorFocus : borderColorDefault);
+                GLUtilities.DrawSolidRectangleWithOutline(drawPosition.x, drawPosition.y, size.x, size.y, textboxBackgroundColor, isActive ? borderColorFocus : borderColorDefault);
             });
 
             // draw the placeholder inside.
@@ -195,17 +193,17 @@ namespace AeternumGames.ShapeEditor
 
             if (keyCode == KeyCode.Backspace) CaretBackspace();
             if (keyCode == KeyCode.Delete) CaretDelete();
-            if (keyCode == KeyCode.LeftArrow) CaretLeft(parent.parent.isShiftPressed);
-            if (keyCode == KeyCode.RightArrow) CaretRight(parent.parent.isShiftPressed);
-            if (keyCode == KeyCode.Home) CaretFirst(parent.parent.isShiftPressed);
-            if (keyCode == KeyCode.UpArrow) CaretFirst(parent.parent.isShiftPressed);
-            if (keyCode == KeyCode.DownArrow) CaretLast(parent.parent.isShiftPressed);
-            if (keyCode == KeyCode.End) CaretLast(parent.parent.isShiftPressed);
+            if (keyCode == KeyCode.LeftArrow) CaretLeft(parent.editor.isShiftPressed);
+            if (keyCode == KeyCode.RightArrow) CaretRight(parent.editor.isShiftPressed);
+            if (keyCode == KeyCode.Home) CaretFirst(parent.editor.isShiftPressed);
+            if (keyCode == KeyCode.UpArrow) CaretFirst(parent.editor.isShiftPressed);
+            if (keyCode == KeyCode.DownArrow) CaretLast(parent.editor.isShiftPressed);
+            if (keyCode == KeyCode.End) CaretLast(parent.editor.isShiftPressed);
 
-            if (parent.parent.isCtrlPressed && keyCode == KeyCode.A) CaretSelectAll();
-            if (parent.parent.isCtrlPressed && keyCode == KeyCode.C) CaretCopy();
-            if (parent.parent.isCtrlPressed && keyCode == KeyCode.V) CaretPaste();
-            if (parent.parent.isCtrlPressed && keyCode == KeyCode.X) CaretCut();
+            if (parent.editor.isCtrlPressed && keyCode == KeyCode.A) CaretSelectAll();
+            if (parent.editor.isCtrlPressed && keyCode == KeyCode.C) CaretCopy();
+            if (parent.editor.isCtrlPressed && keyCode == KeyCode.V) CaretPaste();
+            if (parent.editor.isCtrlPressed && keyCode == KeyCode.X) CaretCut();
 
             return true; // true everything, we are typing!
         }
