@@ -13,7 +13,7 @@ namespace AeternumGames.ShapeEditor
         {
             colorWindowBackground = new Color(0.192f, 0.192f, 0.192f);
 
-            AddControl(newProjectButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorNew, new float2(0, 0), new float2(20, 20), () =>
+            AddControl(newProjectButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorNew, new float2(1, 1), new float2(20, 20), () =>
             {
                 parent.OnNewProject();
             }));

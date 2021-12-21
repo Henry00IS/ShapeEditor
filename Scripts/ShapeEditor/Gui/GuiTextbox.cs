@@ -50,8 +50,6 @@ namespace AeternumGames.ShapeEditor
         public GuiTextbox(float2 position, float2 size) : base(position, size)
         {
             font = ShapeEditorResources.fontSegoeUI14;
-            text = "";
-            placeholder = "Enter a string...";
         }
 
         public override void OnMouseDown(int button)

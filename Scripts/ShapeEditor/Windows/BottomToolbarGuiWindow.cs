@@ -13,7 +13,7 @@ namespace AeternumGames.ShapeEditor
         {
             colorWindowBackground = new Color(0.192f, 0.192f, 0.192f);
 
-            AddControl(statusLabel = new GuiLabel("", new float2(6f, 3f), new float2(200, 20)));
+            AddControl(statusLabel = new GuiLabel("", new float2(7f, 4f), new float2(200, 20)));
         }
 
         public override void OnRender()

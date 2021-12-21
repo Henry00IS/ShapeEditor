@@ -16,7 +16,7 @@ namespace AeternumGames.ShapeEditor
         public float2 size;
 
         /// <summary>The top left draw position inside of the client area of the window.</summary>
-        public float2 drawPosition => parent.position + position + new float2(1f, 1f);
+        public float2 drawPosition => parent.position + position;
 
         /// <summary>Creates a new control at the specified position of the specified size.</summary>
         /// <param name="position">The relative control position in screen coordinates.</param>
