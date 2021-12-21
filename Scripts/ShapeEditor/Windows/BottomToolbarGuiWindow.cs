@@ -19,9 +19,9 @@ namespace AeternumGames.ShapeEditor
 
             AddControl(statusLabel = new GuiLabel("", new float2(7f, 4f), new float2(200, 20)));
 
-            AddControl(gridZoomTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)));
+            AddControl(gridZoomTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)) { allowNegativeNumbers = false });
             AddControl(gridZoomLabel = new GuiLabel("Zoom:", new float2(0f, 0f), new float2(32, 20)));
-            AddControl(gridSnapTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)));
+            AddControl(gridSnapTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)) { allowNegativeNumbers = false });
             AddControl(gridSnapLabel = new GuiLabel("Snap:", new float2(0f, 0f), new float2(30, 20)));
         }
 
@@ -31,7 +31,7 @@ namespace AeternumGames.ShapeEditor
             position = new float2(0f, editor.position.height - 22f);
             size = new float2(editor.position.width, 22f);
 
-            statusLabel.text = "2D Shape Editor - Jake Edition";
+            statusLabel.text = "2D Shape Editor";
 
             var xpos = size.x;
 

@@ -49,15 +49,16 @@ namespace AeternumGames.ShapeEditor
         /// <summary>The character position where a selection ends.</summary>
         private int selectionEnd = 0;
 
-        private Color backgroundColorDefault = new Color(255 / 255f, 255 / 255f, 255 / 255f);
-        private Color backgroundColorReadonly = new Color(180 / 255f, 180 / 255f, 180 / 255f);
-        private Color borderColorDefault = new Color(122 / 255f, 122 / 255f, 122 / 255f);
-        private Color borderColorFocus = new Color(0 / 255f, 120 / 255f, 215 / 255f);
-        private Color textColorDefault = new Color(0 / 255f, 0 / 255f, 0 / 255f);
+        private Color backgroundColorDefault = new Color(0.165f, 0.165f, 0.165f);
+        private Color backgroundColorReadonly = new Color(0.2f, 0.165f, 0.165f);
+        private Color borderColorDefault = new Color(0.051f, 0.051f, 0.051f);
+        private Color borderColorHover = new Color(0.396f, 0.396f, 0.396f);
+        private Color borderColorFocus = new Color(0.227f, 0.475f, 0.733f);
+        private Color textColorDefault = new Color(1.0f, 1.0f, 1.0f);
         private Color textColorPlaceholder = new Color(167 / 255f, 167 / 255f, 167 / 255f);
         private Color textColorSelected = new Color(255 / 255f, 255 / 255f, 255 / 255f);
-        private Color caretColorDefault = new Color(0 / 255f, 0 / 255f, 0 / 255f);
-        private Color selectionColorDefault = new Color(0 / 255f, 120 / 255f, 215 / 255f);
+        private Color caretColorDefault = new Color(0.706f, 0.706f, 0.706f);
+        private Color selectionColorDefault = new Color(0.212f, 0.384f, 0.627f);
 
         private Rect drawRect => new Rect(drawPosition, size);
 
@@ -133,7 +134,7 @@ namespace AeternumGames.ShapeEditor
             {
                 GLUtilities.DrawSolidRectangleWithOutline(drawRect.x, drawRect.y, drawRect.width, drawRect.height,
                     isReadonly ? backgroundColorReadonly : backgroundColorDefault,
-                    isActive ? borderColorFocus : borderColorDefault
+                    isActive ? borderColorFocus : (isMouseOver ? borderColorHover : borderColorDefault)
                 );
             });
 

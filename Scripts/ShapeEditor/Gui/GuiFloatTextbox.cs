@@ -79,9 +79,11 @@ namespace AeternumGames.ShapeEditor
                 case '7':
                 case '8':
                 case '9':
-                case '-':
                 case '.':
                     return true;
+
+                case '-':
+                    return allowNegativeNumbers;
             }
             return false;
         }
