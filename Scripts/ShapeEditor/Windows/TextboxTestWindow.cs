@@ -10,7 +10,9 @@ namespace AeternumGames.ShapeEditor
 
         public TextboxTestWindow(ShapeEditorWindow parent, float2 position, float2 size) : base(parent, position, size)
         {
-            AddControl(textbox = new GuiFloatTextbox(new float2(10f, 10f), new float2(200, 20))
+            AddControl(new GuiWindowTitle("Textbox Test Window"));
+
+            AddControl(textbox = new GuiFloatTextbox(new float2(10f, 25f), new float2(200, 20))
             {
             });
 

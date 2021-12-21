@@ -95,7 +95,7 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        public override void OnMouseDrag(int button)
+        public override void OnMouseDrag(int button, float2 screenDelta)
         {
             if (button == 0)
             {
@@ -115,7 +115,7 @@ namespace AeternumGames.ShapeEditor
         public override void OnRender()
         {
             // change the mouse cursor when hovering over this control.
-            if (isMouseOver)
+            if (isMouseHoverEffectApplicable)
                 parent.editor.SetMouseCursor(MouseCursor.Text);
 
             // process the caret blinking timer.
@@ -134,7 +134,7 @@ namespace AeternumGames.ShapeEditor
             {
                 GLUtilities.DrawSolidRectangleWithOutline(drawRect.x, drawRect.y, drawRect.width, drawRect.height,
                     isReadonly ? backgroundColorReadonly : backgroundColorDefault,
-                    isActive ? borderColorFocus : (isMouseOver ? borderColorHover : borderColorDefault)
+                    isActive ? borderColorFocus : (isMouseHoverEffectApplicable ? borderColorHover : borderColorDefault)
                 );
             });
 

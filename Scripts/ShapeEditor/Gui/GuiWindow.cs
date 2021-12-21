@@ -15,6 +15,7 @@ namespace AeternumGames.ShapeEditor
         public float2 position;
         /// <summary>The window size in screen coordinates.</summary>
         public float2 size;
+
         /// <summary>The collection of child controls inside of the window.</summary>
         protected List<GuiControl> controls = new List<GuiControl>();
 
@@ -134,7 +135,7 @@ namespace AeternumGames.ShapeEditor
         {
             if (activeControl != null)
             {
-                activeControl.OnMouseDrag(button);
+                activeControl.OnMouseDrag(button, screenDelta);
             }
         }
 
@@ -180,8 +181,14 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Gets whether the window currently has input focus.</summary>
         public bool isActive => this == editor.activeWindow;
 
+        /// <summary>Whether there is an obstruction between the window and the mouse.</summary>
+        public bool isMouseObstructed;
+
         /// <summary>Gets whether the mouse is hovering over the window.</summary>
         public bool isMouseOver => new Rect(float2.zero, size).Contains(mousePosition);
+
+        /// <summary>Gets whether the mouse is hovering over the window and not busy.</summary>
+        public bool isMouseOverNotBusy => isMouseOver && !editor.isMouseBusy;
 
         /// <summary>Gets the rectangle of the window.</summary>
         public Rect rect => new Rect(position, size);

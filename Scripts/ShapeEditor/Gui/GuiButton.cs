@@ -43,7 +43,7 @@ namespace AeternumGames.ShapeEditor
                 {
                     backgroundColor = isChecked ? colorButtonBackgroundCheckedPressed : colorButtonBackgroundPressed;
                 }
-                else if (isMouseOver)
+                else if (isMouseHoverEffectApplicable)
                 {
                     backgroundColor = isChecked ? colorButtonBackgroundCheckedHover : colorButtonBackgroundHover;
                 }

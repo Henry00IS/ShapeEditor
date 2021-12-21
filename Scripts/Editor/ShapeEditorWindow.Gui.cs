@@ -29,6 +29,9 @@ namespace AeternumGames.ShapeEditor
 
                 _activeWindow = value;
                 _activeWindow?.OnFocus();
+
+                // put the active window on top.
+                MoveWindowToFront(_activeWindow);
             }
         }
 
@@ -45,8 +48,12 @@ namespace AeternumGames.ShapeEditor
                 };
             }
 
+            // before we draw the windows we check whether the mouse is obstructed.
+            UpdateWindowMouseObstructionFlags();
+
+            // render windows in reverse.
             var windowsCount = windows.Count;
-            for (int i = 0; i < windowsCount; i++)
+            for (int i = windowsCount; i-- > 0;)
                 windows[i].OnRender();
         }
 
@@ -61,6 +68,38 @@ namespace AeternumGames.ShapeEditor
                 if (windows[i].rect.Contains(position))
                     return windows[i];
             return null;
+        }
+
+        /// <summary>Puts the specified window in front of all other windows.</summary>
+        /// <param name="window">The window to be put in front.</param>
+        private void MoveWindowToFront(GuiWindow window)
+        {
+            windows.MoveItemAtIndexToFront(windows.IndexOf(window));
+        }
+
+        /// <summary>
+        /// Iterates over all windows and tests whether the mouse is obstructed. This is useful for
+        /// hover effects that should not occur when a control is behind another window.
+        /// </summary>
+        private void UpdateWindowMouseObstructionFlags()
+        {
+            bool obstructed = false;
+            var windowsCount = windows.Count;
+            for (int i = 0; i < windowsCount; i++)
+            {
+                if (obstructed)
+                {
+                    windows[i].isMouseObstructed = true;
+                }
+                else
+                {
+                    if (windows[i].isMouseOver)
+                    {
+                        windows[i].isMouseObstructed = false;
+                        obstructed = true;
+                    }
+                }
+            }
         }
     }
 }

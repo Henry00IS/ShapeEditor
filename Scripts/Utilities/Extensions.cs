@@ -41,6 +41,15 @@ namespace AeternumGames.ShapeEditor
             self.RemoveAt(0);
             return last;
         }
+
+        /// <summary>Moves the item at the specified index to the front of the list.</summary>
+        public static void MoveItemAtIndexToFront<T>(this List<T> list, int index)
+        {
+            T item = list[index];
+            for (int i = index; i > 0; i--)
+                list[i] = list[i - 1];
+            list[0] = item;
+        }
     }
 }
 

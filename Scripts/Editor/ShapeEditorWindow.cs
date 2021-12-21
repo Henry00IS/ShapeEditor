@@ -15,6 +15,9 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         internal Project project = new Project();
 
+        /// <summary>Whether the mouse is actively in use by a widget or pressed.</summary>
+        internal bool isMouseBusy => isLeftMousePressed || isRightMousePressed || activeWidget != null;
+
         [MenuItem("Window/2D Shape Editor")]
         public static void Init()
         {

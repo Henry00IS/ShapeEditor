@@ -15,9 +15,6 @@ namespace AeternumGames.ShapeEditor
         /// <summary>The size of the control.</summary>
         public float2 size;
 
-        /// <summary>The top left draw position inside of the client area of the window.</summary>
-        public float2 drawPosition => parent.position + position;
-
         /// <summary>Creates a new control at the specified position of the specified size.</summary>
         /// <param name="position">The relative control position in screen coordinates.</param>
         /// <param name="size">The control size in screen coordinates.</param>
@@ -70,7 +67,7 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Called when the control receives a mouse drag event.</summary>
-        public virtual void OnMouseDrag(int button)
+        public virtual void OnMouseDrag(int button, float2 screenDelta)
         {
         }
 
@@ -97,11 +94,23 @@ namespace AeternumGames.ShapeEditor
             return false;
         }
 
+        /// <summary>The top left draw position inside of the client area of the window.</summary>
+        public float2 drawPosition => parent.position + position;
+
         /// <summary>Gets whether the control currently has input focus.</summary>
         public bool isActive => parent.isActive && this == parent.activeControl;
 
         /// <summary>Gets whether the mouse is hovering over the control.</summary>
         public bool isMouseOver => new Rect(float2.zero, size).Contains(mousePosition);
+
+        /// <summary>Gets whether the mouse is hovering over the control and not busy.</summary>
+        public bool isMouseOverNotBusy => isMouseOver && !parent.editor.isMouseBusy;
+
+        /// <summary>
+        /// Returns true when the mouse is not obstructed, hovers over the control and is not busy.
+        /// This check should be used before displaying hover effects.
+        /// </summary>
+        public bool isMouseHoverEffectApplicable => !parent.isMouseObstructed && isMouseOverNotBusy;
 
         /// <summary>Gets the rectangle of the control.</summary>
         public Rect rect => new Rect(position, size);
