@@ -16,23 +16,15 @@ namespace AeternumGames.ShapeEditor
         public string text
         {
             get => _text;
-            private set
-            {
-                // when the text is modified by C# we move the caret to the first position.
-                _text = value;
-                OnTextChanged();
-            }
+            private set => _text = value;
         }
 
-        /// <summary>
-        /// Sets the text to the specified value and resets the caret to the first position.
-        /// </summary>
+        /// <summary>Sets the text to the specified value and resets the caret to the first position.</summary>
         /// <param name="text">The text to be written to the textbox.</param>
         public void SetText(string text)
         {
             _text = text;
             CaretFirst(false);
-            OnTextChanged();
         }
 
         /// <summary>The placeholder text when empty.</summary>
@@ -224,11 +216,6 @@ namespace AeternumGames.ShapeEditor
         protected virtual bool ValidateCharacter(char character)
         {
             return true;
-        }
-
-        /// <summary>Called whenever the text changes.</summary>
-        protected virtual void OnTextChanged()
-        {
         }
 
         /// <summary>Gets the text the user sees (e.g. passwords use different characters).</summary>

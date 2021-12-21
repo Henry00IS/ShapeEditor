@@ -8,10 +8,10 @@ namespace AeternumGames.ShapeEditor
     public class BottomToolbarGuiWindow : GuiWindow
     {
         private GuiLabel statusLabel;
-        private GuiFloatTextbox gridSnapFloatTextbox;
+        private GuiFloatTextbox gridZoomTextbox;
+        private GuiLabel gridZoomLabel;
+        private GuiFloatTextbox gridSnapTextbox;
         private GuiLabel gridSnapLabel;
-
-        private float lastZoom;
 
         public BottomToolbarGuiWindow(ShapeEditorWindow parent, float2 position, float2 size) : base(parent, position, size)
         {
@@ -19,25 +19,39 @@ namespace AeternumGames.ShapeEditor
 
             AddControl(statusLabel = new GuiLabel("", new float2(7f, 4f), new float2(200, 20)));
 
-            AddControl(gridSnapFloatTextbox = new GuiFloatTextbox(new float2(250, 3), new float2(50, 16)));
-            AddControl(gridSnapLabel = new GuiLabel("Zoom: ", new float2(7f, 4f), new float2(50, 20)));
+            AddControl(gridZoomTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)));
+            AddControl(gridZoomLabel = new GuiLabel("Zoom:", new float2(0f, 0f), new float2(32, 20)));
+            AddControl(gridSnapTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)));
+            AddControl(gridSnapLabel = new GuiLabel("Snap:", new float2(0f, 0f), new float2(30, 20)));
         }
 
         public override void OnRender()
         {
+            // stretch over the width of the window.
             position = new float2(0f, parent.position.height - 22f);
             size = new float2(parent.position.width, 22f);
 
-            statusLabel.text = "2D Shape Editor - Snap: " + parent.gridSnap + " Zoom: " + parent.gridZoom;
+            statusLabel.text = "2D Shape Editor - Snap: " + parent.gridSnap;
 
-            gridSnapLabel.position = new float2(size.x - 88f, gridSnapLabel.position.y);
-            gridSnapFloatTextbox.position = new float2(size.x - 53f, gridSnapFloatTextbox.position.y);
+            var xpos = size.x;
 
-            if (parent.gridZoom != lastZoom)
-            {
-                lastZoom = parent.gridZoom;
-                gridSnapFloatTextbox.value = lastZoom;
-            }
+            // grid zoom textbox:
+            xpos -= gridZoomTextbox.size.x + 3f;
+            gridZoomTextbox.position = new float2(xpos, 3f);
+            parent.gridZoom = gridZoomTextbox.UpdateValue(parent.gridZoom);
+
+            // grid zoom label:
+            xpos -= gridZoomLabel.size.x + 3f;
+            gridZoomLabel.position = new float2(xpos, 4f);
+
+            // grid snap textbox:
+            xpos -= gridSnapTextbox.size.x + 3f;
+            gridSnapTextbox.position = new float2(xpos, 3f);
+            parent.gridSnap = gridSnapTextbox.UpdateValue(parent.gridSnap);
+
+            // grid snap label:
+            xpos -= gridSnapLabel.size.x + 3f;
+            gridSnapLabel.position = new float2(xpos, 4f);
 
             base.OnRender();
         }

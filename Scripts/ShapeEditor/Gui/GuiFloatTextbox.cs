@@ -8,27 +8,12 @@ namespace AeternumGames.ShapeEditor
     /// <summary>Represents a float textbox control inside of a window.</summary>
     public class GuiFloatTextbox : GuiTextbox
     {
-        private float _value;
-        private bool _ignoreTextChange = false;
-
-        /// <summary>
-        /// The last correct value written in the textbox. When this property is assigned, the
-        /// number will be validated and modified according to the rules of this textbox.
-        /// </summary>
-        public float value
-        {
-            get
-            {
-                return _value;
-            }
-            set
-            {
-                _value = ValidateNumber(value);
-                // do not bother the user while editing.
-                if (!isActive)
-                    SetTextToValue();
-            }
-        }
+        // by design this textbox does not actually store the number. The caller is reponsible for
+        // storing the number and filtering it through this textbox using the UpdateValue(input)
+        // function. This makes it easy to have textboxes that update their numbers rapidly be
+        // editable by the user, without their temporary edits affecting the current value in any
+        // way. From a programming standpoint this is a much simpler approach and mimics what unity
+        // does with their imgui implementation.
 
         /// <summary>Whether negative numbers are supported.</summary>
         public bool allowNegativeNumbers = true;
@@ -37,10 +22,49 @@ namespace AeternumGames.ShapeEditor
         /// <summary>The value must be at most this number.</summary>
         public float maxValue = float.MaxValue;
 
+        /// <summary>The text before the user made an edit.</summary>
+        private string textBeforeEdit;
+
+        /// <summary>Represents a new number written by the user.</summary>
+        private float newNumber;
+
+        /// <summary>Whether the user has written a new number.</summary>
+        private bool hasNewNumber;
+
         public GuiFloatTextbox(float2 position, float2 size) : base(position, size)
         {
         }
 
+        /// <summary>
+        /// Updates the textbox value and when the user makes an edit returns the new value once.
+        /// <para>Intended to be used like: value = textbox.UpdateValue(value);</para>
+        /// </summary>
+        /// <param name="input">The input value to display.</param>
+        /// <returns>The input value or a new value if there was an edit.</returns>
+        public float UpdateValue(float input)
+        {
+            // unless a new number is available we return the input value.
+            if (!hasNewNumber)
+            {
+                // if the textbox does not have input focus, we can safely update the text.
+                if (!isActive)
+                {
+                    SetText(input.ToString());
+                }
+
+                return input;
+            }
+
+            // a new number is available so we return that instead.
+            hasNewNumber = false;
+            textBeforeEdit = text;
+
+            parent.parent.Repaint();
+
+            return newNumber;
+        }
+
+        // whitelist the input characters related to floating point numbers.
         protected override bool ValidateCharacter(char character)
         {
             switch (character)
@@ -55,40 +79,23 @@ namespace AeternumGames.ShapeEditor
                 case '7':
                 case '8':
                 case '9':
-                    return true;
-
                 case '-':
-                    return allowNegativeNumbers && !text.Contains("-");
-
                 case '.':
-                    return !text.Contains(".");
+                    return true;
             }
             return false;
         }
 
-        protected override void OnTextChanged()
-        {
-            if (_ignoreTextChange) return;
-
-            float lastValue = _value;
-
-            // try parsing the text as a float.
-            if (float.TryParse(text, out _value))
-            {
-                value = _value;
-            }
-            else
-            {
-                // not valid.
-                _value = lastValue;
-            }
-        }
-
-        /// <summary>Modifies the number so that it's valid for the rules of this textbox.</summary>
+        /// <summary>
+        /// Parses and modifies the number so that it's valid for the rules of this textbox.
+        /// </summary>
         /// <param name="number">The number to be checked.</param>
         /// <returns>The corrected number or the same number.</returns>
-        private float ValidateNumber(float number)
+        private float ParseAndValidateNumber(string text)
         {
+            // try parsing the number from the given string.
+            float.TryParse(text, out float number);
+
             // if the number is negative but that's not allowed:
             if (!allowNegativeNumbers && number < 0f)
                 number = 0f;
@@ -99,36 +106,38 @@ namespace AeternumGames.ShapeEditor
             return number;
         }
 
-        /// <summary>Sets the text to the value and tries to keep it nice.</summary>
-        private void SetTextToValue()
+        /// <summary>Called when the user finishes editing the textbox.</summary>
+        private void OnFinishEdit()
         {
-            _ignoreTextChange = true;
-            SetText(_value.ToString("0.00000000").TrimEnd('0').TrimEnd('.'));
-            _ignoreTextChange = false;
+            // if the text is unchanged don't do anything.
+            if (text == textBeforeEdit) return;
+
+            // parse and validate the number that was written by the user.
+            newNumber = ParseAndValidateNumber(text);
+            hasNewNumber = true;
+        }
+
+        public override void OnFocus()
+        {
+            // store a copy of the text before the edit.
+            textBeforeEdit = text;
         }
 
         public override void OnFocusLost()
         {
-            SetTextToValue();
+            // losing the input focus could mean the user finished an edit.
+            OnFinishEdit();
         }
 
         public override bool OnKeyDown(KeyCode keyCode)
         {
+            // pressing the enter key could mean the user finished an edit.
             if (keyCode == KeyCode.Return)
             {
-                SetTextToValue();
+                OnFinishEdit();
             }
 
             return base.OnKeyDown(keyCode);
-        }
-
-        public override void OnRender()
-        {
-            // set the default value when the textbox is empty.
-            if (!isActive && text.Length == 0)
-                SetTextToValue();
-
-            base.OnRender();
         }
     }
 }
