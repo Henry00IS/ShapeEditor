@@ -51,6 +51,12 @@ namespace AeternumGames.ShapeEditor
         {
         }
 
+        /// <summary>Called when the tool receives a mouse scroll event.</summary>
+        public virtual bool OnMouseScroll(float delta)
+        {
+            return false;
+        }
+
         /// <summary>Called when the tool receives a key down event.</summary>
         public virtual bool OnKeyDown(KeyCode keyCode)
         {

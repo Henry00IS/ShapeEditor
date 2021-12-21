@@ -34,6 +34,7 @@ namespace AeternumGames.ShapeEditor
         /// <returns>The window instance if found else null.</returns>
         private GuiWindow FindWindowAtPosition(float2 position)
         {
+            if (windows == null) return null;
             var windowsCount = windows.Count;
             for (int i = 0; i < windowsCount; i++)
                 if (windows[i].rect.Contains(position))

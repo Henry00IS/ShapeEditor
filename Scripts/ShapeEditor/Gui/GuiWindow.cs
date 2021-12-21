@@ -104,6 +104,16 @@ namespace AeternumGames.ShapeEditor
                 control.OnMouseMove(screenDelta);
         }
 
+        /// <summary>Called when the window receives a mouse scroll event.</summary>
+        public virtual bool OnMouseScroll(float delta)
+        {
+            if (activeControl != null)
+            {
+                return activeControl.OnMouseScroll(delta);
+            }
+            return false;
+        }
+
         /// <summary>Called when the window receives a key down event.</summary>
         public virtual bool OnKeyDown(KeyCode keyCode)
         {

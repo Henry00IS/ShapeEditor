@@ -185,6 +185,17 @@ namespace AeternumGames.ShapeEditor
 
         private void OnMouseScroll(float delta)
         {
+            // possibly forward the event to a window.
+            if (activeWindow != null && activeWindow.OnMouseScroll(delta)) { Repaint(); return; }
+
+            // possibly forward the event to a widget.
+            if (activeWidget != null && activeWidget.OnMouseScroll(delta)) { Repaint(); return; }
+
+            // possibly forward the event to a tool.
+            if (activeTool.OnMouseScroll(delta)) { Repaint(); return; }
+
+            // otherwise we provide default behavior: zoom.
+
             var mouseBeforeZoom = ScreenPointToGrid(mousePosition);
 
             gridZoom *= math.pow(2, -delta / 24.0f); // what about math.exp(-delta / 24.0f); ?
