@@ -61,6 +61,10 @@ namespace AeternumGames.ShapeEditor
 
         private Rect drawRect => new Rect(drawPosition, size);
 
+        private const int innerMarginLeft = 3;
+        private const int innerMarginRight = 4;
+        private Rect innerRect => new Rect(drawPosition + new float2(innerMarginLeft, 0f), size - new float2(innerMarginRight, 0f));
+
         public GuiTextbox(float2 position, float2 size) : base(position, size)
         {
             font = ShapeEditorResources.fontSegoeUI14;
@@ -121,21 +125,16 @@ namespace AeternumGames.ShapeEditor
             // ensure that the caret is visible by scrolling the textbox.
             ScrollToCaret();
 
-            // draw the textbox background color.
-            var x1 = drawPosition.x;
-            var y1 = drawPosition.y;
-            var x2 = drawPosition.x + size.x;
-            var y2 = drawPosition.y + size.y;
-
             // used to vertical align text in the middle of the textbox.
-            var textDrawPosition = drawPosition + new float2(0f, (size.y / 2f) - font.halfHeight);
-
-            var textboxBackgroundColor = isReadonly ? backgroundColorReadonly : backgroundColorDefault;
+            var textDrawPosition = new float2(innerRect.x, innerRect.y) + new float2(0f, (size.y / 2f) - font.halfHeight);
 
             // draw textbox background with input focus indicating border.
             GLUtilities.DrawGui(() =>
             {
-                GLUtilities.DrawSolidRectangleWithOutline(drawPosition.x, drawPosition.y, size.x, size.y, textboxBackgroundColor, isActive ? borderColorFocus : borderColorDefault);
+                GLUtilities.DrawSolidRectangleWithOutline(drawRect.x, drawRect.y, drawRect.width, drawRect.height,
+                    isReadonly ? backgroundColorReadonly : backgroundColorDefault,
+                    isActive ? borderColorFocus : borderColorDefault
+                );
             });
 
             // draw the placeholder inside.
@@ -145,7 +144,7 @@ namespace AeternumGames.ShapeEditor
             }
 
             // draw the text inside.
-            GLUtilities.DrawGuiClippedText(drawRect, font, TextGetVisualString(), textDrawPosition + new float2(scrollX, 0f), textColorDefault);
+            GLUtilities.DrawGuiClippedText(innerRect, font, TextGetVisualString(), textDrawPosition + new float2(scrollX, 0f), textColorDefault);
 
             // draw the selection.
             if (isActive && HasSelection())
@@ -157,21 +156,21 @@ namespace AeternumGames.ShapeEditor
                 var selectionEndX = scrollX + CharacterPositionGetDrawX(selectionStringEnd);
 
                 // highlight the selection.
-                GLUtilities.DrawGuiClipped(drawRect, () =>
+                GLUtilities.DrawGuiClipped(innerRect, () =>
                 {
                     GL.Color(selectionColorDefault);
-                    var r = MathEx.RectXYXY(drawPosition.x + selectionBeginX, drawPosition.y + 2, drawPosition.x + selectionEndX, drawPosition.y + size.y - 2);
+                    var r = MathEx.RectXYXY(innerRect.x + selectionBeginX, innerRect.y + 2, innerRect.x + selectionEndX, innerRect.yMax - 2);
                     GLUtilities.DrawRectangle(r.x, r.y, r.width, r.height);
                 });
 
                 // draw the selected text in a different color.
-                GLUtilities.DrawGuiClippedText(drawRect, font, TextGetVisualString().Substring(selectionStringBegin, selectionStringEnd - selectionStringBegin), new float2(drawPosition.x + selectionBeginX, textDrawPosition.y), textColorSelected);
+                GLUtilities.DrawGuiClippedText(innerRect, font, TextGetVisualString().Substring(selectionStringBegin, selectionStringEnd - selectionStringBegin), new float2(textDrawPosition.x + selectionBeginX, textDrawPosition.y), textColorSelected);
             }
 
             // draw the caret.
             if (isActive)
             {
-                var xcaret = drawPosition.x + scrollX + CharacterPositionGetDrawX(caretCharPosition);
+                var xcaret = innerRect.x + scrollX + CharacterPositionGetDrawX(caretCharPosition);
 
                 if (timerCaretBlink < 60)
                 {
@@ -398,7 +397,7 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         private int ToVirtualX(int xpos)
         {
-            return Mathf.RoundToInt(xpos - drawPosition.x) - scrollX;
+            return Mathf.RoundToInt(xpos - innerRect.x) - scrollX;
         }
 
         /// <summary>
@@ -427,7 +426,7 @@ namespace AeternumGames.ShapeEditor
                 // get half of the difference between the widths.
                 // we use this to accept clicks slightly left and right
                 // of the middle of a character.
-                var half = (textTempWidth - textTempWidthPrevious) / 2;
+                var half = (textTempWidth - textTempWidthPrevious) / 2f;
                 if (textTempWidth >= xpos + half)
                     return i;
 
@@ -440,7 +439,7 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Ensures that the caret is visible by scrolling the textbox content.</summary>
         private void ScrollToCaret()
         {
-            var sizex = Mathf.RoundToInt(size.x);
+            var sizex = Mathf.RoundToInt(innerRect.width);
 
             var busy = true;
             while (busy)
