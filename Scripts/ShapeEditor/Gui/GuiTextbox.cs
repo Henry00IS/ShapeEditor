@@ -58,83 +58,48 @@ namespace AeternumGames.ShapeEditor
 			placeholder = "Enter a string...";
 		}
 
+        public override void OnMouseDown(int button)
+        {
+            if (button == 0)
+            {
+				// set the caret position.
+				caret_char_position = _text_x_to_caret_char_position(Mathf.RoundToInt(parent.parent.mousePosition.x));
+
+				// set the selection position.
+				_selection_set(caret_char_position, caret_char_position);
+
+				// reset the caret blink timer.
+				_caret_reset_blink();
+
+				// set the selection end position.
+				_selection_set_end(caret_char_position);
+			}
+		}
+
+        public override void OnMouseDrag(int button)
+        {
+            if (button == 0)
+            {
+				// automatic scrolling when the mouse moves (for the edges on long text).
+				if (mouse_xprevious != Mathf.RoundToInt(mousePosition.x) || mouse_yprevious != Mathf.RoundToInt(mousePosition.y))
+                {
+					// set the caret position.
+					caret_char_position = _text_x_to_caret_char_position(Mathf.RoundToInt(parent.parent.mousePosition.x));
+				}
+
+				// reset the caret blink timer.
+				_caret_reset_blink();
+
+				// set the selection end position.
+				_selection_set_end(caret_char_position);
+			}
+        }
+
         public override void OnRender()
         {
-			/*
-			///////////////////////////////////////////////////////////////////////////////
-			// detect mouse position and clicks to determine whether the textbox has focus.
-			///////////////////////////////////////////////////////////////////////////////
-
-			var x1 = x;
-			var y1 = y;
-			var x2 = x + width;
-			var y2 = y + height;
-
-			// if the mouse is hovering over the textbox:
-			var mouse_x_mrc = device_mouse_x_mrc();
-			var mouse_y_mrc = device_mouse_y_mrc();
-			if (point_in_rectangle(mouse_x_mrc, mouse_y_mrc, x1, y1, x2, y2))
-			{
-				// and the left mouse button was clicked:
-				if (mouse_check_button_pressed(mb_left))
-				{
-					// deselect all other textboxes.
-					with (object_index) { focus = false; }
-		
-					// select this textbox.
-					focus = true;
-		
-					// set the caret position.
-					caret_char_position = _text_x_to_caret_char_position(mouse_x_mrc);
-		
-					// set the selection position.
-					_selection_set(caret_char_position, caret_char_position);
-				}
-	
-				// automatic scrolling when the mouse moves (for the edges on long text).
-				if
-				(
-					mouse_check_button(mb_left)
-					&& (mouse_x_mrc != mouse_xprevious || mouse_y_mrc != mouse_yprevious)
-					&& !keyboard_check(vk_anykey)
-				)
-				{
-					// set the caret position.
-					caret_char_position = _text_x_to_caret_char_position(mouse_x_mrc);
-				}
-	
-				if (mouse_check_button(mb_left))
-				{
-					// reset the caret blink timer.
-					_caret_reset_blink();
-		
-					// set the selection end position.
-					_selection_set_end(caret_char_position);
-				}
-	
-				// set the mouse cursor.
-				window_set_cursor_once(cr_beam);
-			}
-			// else if the mouse is not hovering over the textbox:
-			else
-			{
-				// and the mouse has just been clicked:
-				if (mouse_check_button_pressed(mb_left))
-				{
-					focus = false;
-				}
-			}
-
 			// remember the previous mouse position.
-			mouse_xprevious = mouse_x_mrc;
-			mouse_yprevious = mouse_y_mrc;
-
-			///////////////////////////////////////////////////////////////////////////////
-			// if the textbox does not have focus- stop processing here.
-			///////////////////////////////////////////////////////////////////////////////
-			if (!focus) return;
-			*/
-
+			mouse_xprevious = Mathf.RoundToInt(mousePosition.x);
+			mouse_yprevious = Mathf.RoundToInt(mousePosition.y);
 
 			///////////////////////////////////////////////////////////////////////////////
 			// process the caret blinking timer.
@@ -143,95 +108,89 @@ namespace AeternumGames.ShapeEditor
 			timer_caret_blink++;
 			timer_caret_blink %= 120;
 
-			/*
-
-
 			///////////////////////////////////////////////////////////////////////////////
 			// handle scrolling within the textbox.
 			///////////////////////////////////////////////////////////////////////////////
 
 			// ensure that the caret is visible by scrolling the textbox.
 			_scroll_to_caret();
-			 */
 
-            {
-				///////////////////////////////////////////////////////////////////////////////
-				// draw the textbox background color.
-				///////////////////////////////////////////////////////////////////////////////
+			///////////////////////////////////////////////////////////////////////////////
+			// draw the textbox background color.
+			///////////////////////////////////////////////////////////////////////////////
 
-				var x1 = drawPosition.x;
-				var y1 = drawPosition.y;
-				var x2 = drawPosition.x + size.x;
-				var y2 = drawPosition.y + size.y;
-				var textDrawPosition = drawPosition + text_valign;
+			var x1 = drawPosition.x;
+			var y1 = drawPosition.y;
+			var x2 = drawPosition.x + size.x;
+			var y2 = drawPosition.y + size.y;
+			var textDrawPosition = drawPosition + text_valign;
 
-				var textbox_background_color = isReadonly ? c_background_readonly : c_background_default;
+			var textbox_background_color = isReadonly ? c_background_readonly : c_background_default;
 
-				GLUtilities.DrawGui(() => {
-					GL.Color(textbox_background_color);
-					GLUtilities.DrawRectangle(drawPosition.x, drawPosition.y, size.x, size.y);
+			GLUtilities.DrawGui(() => {
+				GL.Color(textbox_background_color);
+				GLUtilities.DrawRectangle(drawPosition.x, drawPosition.y, size.x, size.y);
+			});
+
+			///////////////////////////////////////////////////////////////////////////////
+			// draw outside border that indicates whether the textbox has input focus.
+			///////////////////////////////////////////////////////////////////////////////
+
+			GLUtilities.DrawGui(() => {
+				GLUtilities.DrawRectangleOutline(drawPosition.x, drawPosition.y, size.x, size.y, isActive ? c_border_focus : c_border_default);
+			});
+
+			///////////////////////////////////////////////////////////////////////////////
+			// draw the placeholder inside.
+			///////////////////////////////////////////////////////////////////////////////
+
+			if (!isActive && placeholder.Length > 0 && text.Length == 0)
+			{
+				GLUtilities.DrawGuiClippedText(drawRect, font, placeholder, textDrawPosition, c_text_placeholder);
+			}
+
+			///////////////////////////////////////////////////////////////////////////////
+			// draw the text inside.
+			///////////////////////////////////////////////////////////////////////////////
+
+			GLUtilities.DrawGuiClippedText(drawRect, font, _text_get_visual_string(), textDrawPosition + new float2(scroll_x, 0f), c_text_default);
+
+			///////////////////////////////////////////////////////////////////////////////
+			// draw the selection.
+			///////////////////////////////////////////////////////////////////////////////
+
+			if (isActive && _has_selection())
+			{
+				var selection_string_begin = _selection_get_begin();
+				var selection_string_end = _selection_get_end();
+
+				var selection_begin_x = scroll_x + _character_position_get_draw_x(selection_string_begin);
+				var selection_end_x = scroll_x + _character_position_get_draw_x(selection_string_end);
+
+				// highlight the selection.
+				GLUtilities.DrawGuiClipped(drawRect, () => {
+					GL.Color(c_selection_default);
+					var r = MathEx.RectXYXY(drawPosition.x + selection_begin_x, drawPosition.y + 2, drawPosition.x + selection_end_x, drawPosition.y + size.y - 2);
+					GLUtilities.DrawRectangle(r.x, r.y, r.width, r.height);
 				});
 
-				///////////////////////////////////////////////////////////////////////////////
-				// draw outside border that indicates whether the textbox has input focus.
-				///////////////////////////////////////////////////////////////////////////////
+				// draw the selected text in a different color.
+				GLUtilities.DrawGuiClippedText(drawRect, font, _text_get_visual_string().Substring(selection_string_begin, selection_string_end - selection_string_begin), new float2(drawPosition.x + selection_begin_x, drawPosition.y + text_valign.y), c_text_selected);
+			}
 
-				GLUtilities.DrawGui(() => {
-					GLUtilities.DrawRectangleOutline(drawPosition.x, drawPosition.y, size.x, size.y, isActive ? c_border_focus : c_border_default);
-				});
+			///////////////////////////////////////////////////////////////////////////////
+			// draw the caret.
+			///////////////////////////////////////////////////////////////////////////////
 
-				///////////////////////////////////////////////////////////////////////////////
-				// draw the placeholder inside.
-				///////////////////////////////////////////////////////////////////////////////
+			if (isActive)
+			{
+				var xcaret = drawPosition.x + scroll_x + _character_position_get_draw_x(caret_char_position);
 
-				if (!isActive && placeholder.Length > 0 && text.Length == 0)
+				if (timer_caret_blink < 60)
 				{
-					GLUtilities.DrawGuiClippedText(drawRect, font, placeholder, textDrawPosition, c_text_placeholder);
-				}
-
-				///////////////////////////////////////////////////////////////////////////////
-				// draw the text inside.
-				///////////////////////////////////////////////////////////////////////////////
-
-				GLUtilities.DrawGuiClippedText(drawRect, font, _text_get_visual_string(), textDrawPosition + new float2(scroll_x, 0f), c_text_default);
-
-				///////////////////////////////////////////////////////////////////////////////
-				// draw the selection.
-				///////////////////////////////////////////////////////////////////////////////
-
-				if (isActive && _has_selection())
-				{
-					var selection_string_begin = _selection_get_begin();
-					var selection_string_end = _selection_get_end();
-
-					var selection_begin_x = scroll_x + _character_position_get_draw_x(selection_string_begin);
-					var selection_end_x = scroll_x + _character_position_get_draw_x(selection_string_end);
-
-					// highlight the selection.
 					GLUtilities.DrawGuiClipped(drawRect, () => {
-						GL.Color(c_selection_default);
-						var r = MathEx.RectXYXY(drawPosition.x + selection_begin_x, drawPosition.y + 2, drawPosition.x + selection_end_x, drawPosition.y + size.y - 2);
-						GLUtilities.DrawRectangle(r.x, r.y, r.width, r.height);
+						GLUtilities.DrawLine(1.0f, xcaret, drawPosition.y + 2, xcaret, drawPosition.y + size.y - 2, c_caret_default, c_caret_default);
 					});
-
-					// draw the selected text in a different color.
-					GLUtilities.DrawGuiClippedText(drawRect, font, _text_get_visual_string().Substring(selection_string_begin, selection_string_end - selection_string_begin), new float2(drawPosition.x + selection_begin_x, drawPosition.y + text_valign.y), c_text_selected);
-				}
-
-				///////////////////////////////////////////////////////////////////////////////
-				// draw the caret.
-				///////////////////////////////////////////////////////////////////////////////
-
-				if (isActive)
-				{
-					var xcaret = drawPosition.x + scroll_x + _character_position_get_draw_x(caret_char_position);
-
-					if (timer_caret_blink < 60)
-					{
-						GLUtilities.DrawGuiClipped(drawRect, () => {
-							GLUtilities.DrawLine(1.0f, xcaret, drawPosition.y + 2, xcaret, drawPosition.y + size.y - 2, c_caret_default, c_caret_default);
-						});
-					}
 				}
 			}
 		}
@@ -441,18 +400,18 @@ namespace AeternumGames.ShapeEditor
 			return font.StringWidth(vs.Substring(0, char_position));
 		}
 
-		/*
+		
 		// takes a room coordinate and transforms it to virtual textbox coordinates.
-		function _to_virtual_x(xpos)
+		private int _to_virtual_x(int xpos)
 		{
-			return (xpos - x) - scroll_x;
+			return Mathf.RoundToInt(xpos - drawPosition.x) - scroll_x;
 		}
-
+		
 		// get the x caret character position within the text for the given x draw position.
-		function _text_x_to_caret_char_position(xpos)
+		private int _text_x_to_caret_char_position(int xpos)
 		{
-			var text_length = string_length(text);
-			if (text_length == 0) return 1;
+			var text_length = text.Length;
+			if (text_length == 0) return 0;
 
 			// transform to local coordinates inside the textbox.
 			xpos = _to_virtual_x(xpos);
@@ -461,13 +420,13 @@ namespace AeternumGames.ShapeEditor
 			var visual_text = _text_get_visual_string();
 			var text_temp = "";
 			var text_temp_width_previous = 0;
-			for (var i = 1; i <= text_length; i++)
+			for (var i = 0; i < text_length; i++)
 			{
 				// add a character to the temp text.
-				text_temp += string_char_at(visual_text, i);
+				text_temp += visual_text[i];
 
 				// get the temp text width after modifications.
-				var text_temp_width = font_string_width(font, text_temp);
+				var text_temp_width = font.StringWidth(text_temp);
 
 				// get half of the difference between the widths.
 				// we use this to accept clicks slightly left and right
@@ -479,12 +438,14 @@ namespace AeternumGames.ShapeEditor
 				text_temp_width_previous = text_temp_width;
 			}
 
-			return text_length + 1;
+			return text_length;
 		}
 
 		// ensures that the caret is visible by scrolling the textbox content.
-		function _scroll_to_caret()
+		private void _scroll_to_caret()
 		{
+			var sizex = Mathf.RoundToInt(size.x);
+
 			var busy = true;
 			while (busy)
 			{
@@ -494,7 +455,7 @@ namespace AeternumGames.ShapeEditor
 				{
 					scroll_x += 10;
 				}
-				else if (xcaret >= width - 10)
+				else if (xcaret >= sizex - 10)
 				{
 					scroll_x -= 10;
 				}
@@ -509,14 +470,14 @@ namespace AeternumGames.ShapeEditor
 
 			// the textbox can never scroll beyond the size of the text (which would leave a gap on the right).
 			var visual_text = _text_get_visual_string();
-			var text_width = font_string_width(font, visual_text);
-			var rightmost_scroll = -(text_width - width) - 1;
+			var text_width = font.StringWidth(visual_text);
+			var rightmost_scroll = -(text_width - sizex) - 1;
 			if (scroll_x < rightmost_scroll)
 				scroll_x = rightmost_scroll;
 
 			// if the full text fits in the textbox, always reset the scroll.
-			if (text_width <= width) scroll_x = 0;
-		}*/
+			if (text_width <= sizex) scroll_x = 0;
+		}
 
 		/// <summary>Sets the selection.</summary>
 		private void _selection_set(int begin_char_position, int end_char_position)
