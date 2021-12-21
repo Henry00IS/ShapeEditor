@@ -32,8 +32,6 @@ namespace AeternumGames.ShapeEditor
         private int selectionBegin = 0;
         /// <summary>The character position where a selection ends.</summary>
         private int selectionEnd = 0;
-        /// <summary>Used to vertical align text in the middle of the textbox.</summary>
-        private float2 textVerticalAlign = new float2(0f, 3f);
 
         private Color backgroundColorDefault = new Color(255 / 255f, 255 / 255f, 255 / 255f);
         private Color backgroundColorReadonly = new Color(180 / 255f, 180 / 255f, 180 / 255f);
@@ -102,7 +100,9 @@ namespace AeternumGames.ShapeEditor
             var y1 = drawPosition.y;
             var x2 = drawPosition.x + size.x;
             var y2 = drawPosition.y + size.y;
-            var textDrawPosition = drawPosition + textVerticalAlign;
+
+            // used to vertical align text in the middle of the textbox.
+            var textDrawPosition = drawPosition + new float2(0f, (size.y / 2f) - font.halfHeight);
 
             var textboxBackgroundColor = isReadonly ? backgroundColorReadonly : backgroundColorDefault;
 
@@ -145,7 +145,7 @@ namespace AeternumGames.ShapeEditor
                 });
 
                 // draw the selected text in a different color.
-                GLUtilities.DrawGuiClippedText(drawRect, font, TextGetVisualString().Substring(selectionStringBegin, selectionStringEnd - selectionStringBegin), new float2(drawPosition.x + selectionBeginX, drawPosition.y + textVerticalAlign.y), textColorSelected);
+                GLUtilities.DrawGuiClippedText(drawRect, font, TextGetVisualString().Substring(selectionStringBegin, selectionStringEnd - selectionStringBegin), new float2(drawPosition.x + selectionBeginX, textDrawPosition.y), textColorSelected);
             }
 
             // draw the caret.

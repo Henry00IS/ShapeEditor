@@ -186,6 +186,9 @@ namespace AeternumGames.ShapeEditor
 
             return width;
         }
+
+        /// <summary>Best guess half height of the font for vertical alignment.</summary>
+        public int halfHeight => Mathf.CeilToInt(lineHeight / 2f);
     }
 }
 
