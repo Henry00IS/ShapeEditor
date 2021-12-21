@@ -10,17 +10,11 @@ namespace AeternumGames.ShapeEditor
 
         public TextboxTestWindow(ShapeEditorWindow parent, float2 position, float2 size) : base(parent, position, size)
         {
-            AddControl(textbox = new GuiTextbox(new float2(10f, 10f), new float2(200, 40))
+            AddControl(textbox = new GuiFloatTextbox(new float2(10f, 10f), new float2(200, 20))
             {
-                placeholder = "Username",
             });
 
-            AddControl(textbox = new GuiTextbox(new float2(10f, 50f), new float2(200, 20))
-            {
-                text = "Something You cannot edit",
-                placeholder = "Read Only",
-                isReadonly = true,
-            });
+            AddControl(textbox = new GuiTextbox(new float2(10f, 50f), new float2(200, 20), "Hello World"));
         }
     }
 }

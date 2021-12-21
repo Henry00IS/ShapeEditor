@@ -32,6 +32,28 @@ namespace AeternumGames.ShapeEditor
         {
         }
 
+        /// <summary>Called when the control receives input focus.</summary>
+        public virtual void OnFocus()
+        {
+        }
+
+        /// <summary>Called when the control loses input focus.</summary>
+        public virtual void OnFocusLost()
+        {
+        }
+
+        /// <summary>Called when the parent window receives input focus.</summary>
+        public virtual void OnParentFocus()
+        {
+        }
+
+        /// <summary>Called when the parent window loses input focus.</summary>
+        public virtual bool OnParentFocusLost()
+        {
+            // whether the control should remain active when the parent has focus again.
+            return false;
+        }
+
         /// <summary>Called when the control receives a mouse down event.</summary>
         public virtual void OnMouseDown(int button)
         {

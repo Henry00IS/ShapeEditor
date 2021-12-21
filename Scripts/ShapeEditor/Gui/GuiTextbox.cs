@@ -9,8 +9,32 @@ namespace AeternumGames.ShapeEditor
     /// <summary>Represents a textbox control inside of a window.</summary>
     public class GuiTextbox : GuiControl
     {
+        /// <summary>Do not access directly, use <see cref="text"/>.</summary>
+        private string _text = "";
+
         /// <summary>The current user-modifiable text.</summary>
-        public string text = "";
+        public string text
+        {
+            get => _text;
+            private set
+            {
+                // when the text is modified by C# we move the caret to the first position.
+                _text = value;
+                OnTextChanged();
+            }
+        }
+
+        /// <summary>
+        /// Sets the text to the specified value and resets the caret to the first position.
+        /// </summary>
+        /// <param name="text">The text to be written to the textbox.</param>
+        public void SetText(string text)
+        {
+            _text = text;
+            CaretFirst(false);
+            OnTextChanged();
+        }
+
         /// <summary>The placeholder text when empty.</summary>
         public string placeholder = "";
         /// <summary>Whether this textbox hides all characters.</summary>
@@ -48,6 +72,12 @@ namespace AeternumGames.ShapeEditor
         public GuiTextbox(float2 position, float2 size) : base(position, size)
         {
             font = ShapeEditorResources.fontSegoeUI14;
+        }
+
+        public GuiTextbox(float2 position, float2 size, string text) : base(position, size)
+        {
+            font = ShapeEditorResources.fontSegoeUI14;
+            this.text = text;
         }
 
         public override void OnMouseDown(int button)
@@ -188,6 +218,19 @@ namespace AeternumGames.ShapeEditor
             return true; // true everything, we are typing!
         }
 
+        /// <summary>Can be used by child classes to whitelist or blacklist characters.</summary>
+        /// <param name="character">The character code that is being typed or pasted.</param>
+        /// <returns>True when the character is accepted else false.</returns>
+        protected virtual bool ValidateCharacter(char character)
+        {
+            return true;
+        }
+
+        /// <summary>Called whenever the text changes.</summary>
+        protected virtual void OnTextChanged()
+        {
+        }
+
         /// <summary>Gets the text the user sees (e.g. passwords use different characters).</summary>
         private string TextGetVisualString()
         {
@@ -203,6 +246,7 @@ namespace AeternumGames.ShapeEditor
             if (character == 0) return;
             if (!font.HasCharacter(character)) return;
             if (text.Length >= maxLength) return;
+            if (!ValidateCharacter(character)) return;
 
             // remove any selected text.
             SelectionRemove();

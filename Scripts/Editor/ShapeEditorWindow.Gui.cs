@@ -8,8 +8,29 @@ namespace AeternumGames.ShapeEditor
     public partial class ShapeEditorWindow
     {
         private List<GuiWindow> windows;
+
+        /// <summary>Do not access directly, use <see cref="activeWindow"/>!</summary>
+        private GuiWindow _activeWindow;
+
         /// <summary>The window that currently has input focus or null.</summary>
-        internal GuiWindow activeWindow;
+        internal GuiWindow activeWindow
+        {
+            get => _activeWindow;
+            set
+            {
+                if (_activeWindow == value) return;
+
+                if (_activeWindow != null)
+                {
+                    var lastActiveWindow = _activeWindow;
+                    _activeWindow = value;
+                    lastActiveWindow.OnFocusLost();
+                }
+
+                _activeWindow = value;
+                _activeWindow?.OnFocus();
+            }
+        }
 
         public void DrawWindows()
         {

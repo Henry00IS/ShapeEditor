@@ -17,8 +17,29 @@ namespace AeternumGames.ShapeEditor
         public float2 size;
         /// <summary>The collection of child controls inside of the window.</summary>
         protected List<GuiControl> controls = new List<GuiControl>();
+
+        /// <summary>Do not access directly, use <see cref="activeControl"/>!</summary>
+        private GuiControl _activeControl;
+
         /// <summary>The control that currently has input focus or null.</summary>
-        internal GuiControl activeControl;
+        internal GuiControl activeControl
+        {
+            get => _activeControl;
+            set
+            {
+                if (_activeControl == value) return;
+
+                if (_activeControl != null)
+                {
+                    var lastActiveControl = _activeControl;
+                    _activeControl = value;
+                    lastActiveControl.OnFocusLost();
+                }
+
+                _activeControl = value;
+                _activeControl?.OnFocus();
+            }
+        }
 
         protected Color colorWindowBackground = new Color(0.192f, 0.192f, 0.192f, 0.5f);
         protected Color colorWindowBorder = new Color(0.1f, 0.1f, 0.1f);
@@ -55,6 +76,28 @@ namespace AeternumGames.ShapeEditor
             var controlsCount = controls.Count;
             for (int i = 0; i < controlsCount; i++)
                 controls[i].OnRender();
+        }
+
+        /// <summary>Called when the window receives input focus.</summary>
+        public virtual void OnFocus()
+        {
+            if (activeControl != null)
+            {
+                activeControl.OnParentFocus();
+            }
+        }
+
+        /// <summary>Called when the window loses input focus.</summary>
+        public virtual void OnFocusLost()
+        {
+            if (activeControl != null)
+            {
+                // also check whether the control should remain active when the parent has focus again.
+                if (!activeControl.OnParentFocusLost())
+                {
+                    activeControl = null;
+                }
+            }
         }
 
         /// <summary>Called when the window receives a mouse down event.</summary>
