@@ -4,6 +4,14 @@ using Unity.Mathematics;
 
 namespace AeternumGames.ShapeEditor
 {
+    // add additional fields for this tool to segments.
+    public partial class Segment
+    {
+        /// <summary>Editor variable used by <see cref="TranslateTool"/>.</summary>
+        [System.NonSerialized]
+        public float2 translateToolInitialPosition;
+    }
+
     public class TranslateTool : BoxSelectTool
     {
         private TranslationWidget translationWidget = new TranslationWidget();
@@ -32,15 +40,32 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        private static float2 CommonAction_DeltaAccumulator;
+
         public static void CommonAction_OnBeginTranslating(ShapeEditorWindow editor)
         {
             editor.RegisterUndo("Translate Selection");
+
+            CommonAction_DeltaAccumulator = float2.zero;
+
+            // store the initial position of all selected segments.
+            foreach (var segment in editor.ForEachSelectedSegment())
+                segment.translateToolInitialPosition = segment.position;
         }
 
         public static void CommonAction_OnMouseDrag(ShapeEditorWindow editor, float2 gridDelta)
         {
+            CommonAction_DeltaAccumulator += gridDelta;
+            float2 position = CommonAction_DeltaAccumulator;
+
             foreach (var segment in editor.ForEachSelectedSegment())
-                segment.position += gridDelta;
+            {
+                // snap to the grid when the control key is being held down.
+                if (editor.isCtrlPressed)
+                    position = position.Snap(editor.gridSnap);
+
+                segment.position = segment.translateToolInitialPosition + position;
+            }
         }
     }
 }
