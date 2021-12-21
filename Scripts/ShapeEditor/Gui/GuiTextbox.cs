@@ -9,539 +9,508 @@ namespace AeternumGames.ShapeEditor
     /// <summary>Represents a textbox control inside of a window.</summary>
     public class GuiTextbox : GuiControl
     {
-		/// <summary>The current user-modifiable text.</summary>
-		public string text = "";
-		/// <summary>The placeholder text when empty.</summary>
-		public string placeholder;
-		/// <summary>Whether this textbox hides all characters.</summary>
-		public bool password;
-		/// <summary>The maximum amount of characters allowed.</summary>
-		public int max_length = 32767;
-		/// <summary>Whether this textbox accepts text input.</summary>
-		public bool isReadonly;
-		/// <summary>The textbox font.</summary>
-		public BmFont font;
+        /// <summary>The current user-modifiable text.</summary>
+        public string text = "";
+        /// <summary>The placeholder text when empty.</summary>
+        public string placeholder = "";
+        /// <summary>Whether this textbox hides all characters.</summary>
+        public bool isPassword;
+        /// <summary>The maximum amount of characters allowed.</summary>
+        public int maxLength = 32767;
+        /// <summary>Whether this textbox accepts text input.</summary>
+        public bool isReadonly;
+        /// <summary>The textbox font.</summary>
+        public BmFont font;
 
-		/// <summary>The caret character position in the text string.</summary>
-		private int caret_char_position = 0;
-		/// <summary>The virtual scroll of text inside the textbox.</summary>
-		private int scroll_x;
-		/// <summary>The caret blink timer used for drawing.</summary>
-		private int timer_caret_blink;
-		/// <summary>Determine whether the mouse moved.</summary>
-		private int mouse_xprevious;
-		/// <summary>Determine whether the mouse moved.</summary>
-		private int mouse_yprevious;
-		/// <summary>The character position where a selection begins.</summary>
-		private int selection_begin = 0;
-		/// <summary>The character position where a selection ends.</summary>
-		private int selection_end = 0;
-		/// <summary>Used to vertical align text in the middle of the textbox.</summary>
-		private float2 text_valign = new float2(0f, 3f);
+        /// <summary>The caret character position in the text string.</summary>
+        private int caretCharPosition = 0;
+        /// <summary>The virtual scroll of text inside the textbox.</summary>
+        private int scrollX;
+        /// <summary>The caret blink timer used for drawing.</summary>
+        private int timerCaretBlink;
+        /// <summary>The character position where a selection begins.</summary>
+        private int selectionBegin = 0;
+        /// <summary>The character position where a selection ends.</summary>
+        private int selectionEnd = 0;
+        /// <summary>Used to vertical align text in the middle of the textbox.</summary>
+        private float2 textVerticalAlign = new float2(0f, 3f);
 
-		private Color c_background_default = new Color(255 / 255f, 255 / 255f, 255 / 255f);
-		private Color c_background_readonly = new Color(180 / 255f, 180 / 255f, 180 / 255f);
-		private Color c_border_default = new Color(122 / 255f, 122 / 255f, 122 / 255f);
-		private Color c_border_focus = new Color(0 / 255f, 120 / 255f, 215 / 255f);
-		private Color c_text_default = new Color(0 / 255f, 0 / 255f, 0 / 255f);
-		private Color c_text_placeholder = new Color(167 / 255f, 167 / 255f, 167 / 255f);
-		private Color c_text_selected = new Color(255 / 255f, 255 / 255f, 255 / 255f);
-		private Color c_caret_default = new Color(0 / 255f, 0 / 255f, 0 / 255f);
-		private Color c_selection_default = new Color(0 / 255f, 120 / 255f, 215 / 255f);
+        private Color backgroundColorDefault = new Color(255 / 255f, 255 / 255f, 255 / 255f);
+        private Color backgroundColorReadonly = new Color(180 / 255f, 180 / 255f, 180 / 255f);
+        private Color borderColorDefault = new Color(122 / 255f, 122 / 255f, 122 / 255f);
+        private Color borderColorFocus = new Color(0 / 255f, 120 / 255f, 215 / 255f);
+        private Color textColorDefault = new Color(0 / 255f, 0 / 255f, 0 / 255f);
+        private Color textColorPlaceholder = new Color(167 / 255f, 167 / 255f, 167 / 255f);
+        private Color textColorSelected = new Color(255 / 255f, 255 / 255f, 255 / 255f);
+        private Color caretColorDefault = new Color(0 / 255f, 0 / 255f, 0 / 255f);
+        private Color selectionColorDefault = new Color(0 / 255f, 120 / 255f, 215 / 255f);
 
-		private Rect drawRect => new Rect(drawPosition, size);
+        private Rect drawRect => new Rect(drawPosition, size);
 
-		public GuiTextbox(float2 position, float2 size) : base(position, size)
-		{
-			font = ShapeEditorResources.fontSegoeUI14;
-			text = "";
-			placeholder = "Enter a string...";
-		}
+        public GuiTextbox(float2 position, float2 size) : base(position, size)
+        {
+            font = ShapeEditorResources.fontSegoeUI14;
+            text = "";
+            placeholder = "Enter a string...";
+        }
 
         public override void OnMouseDown(int button)
         {
             if (button == 0)
             {
-				// set the caret position.
-				caret_char_position = _text_x_to_caret_char_position(Mathf.RoundToInt(parent.parent.mousePosition.x));
+                // set the caret position.
+                caretCharPosition = TextXToCaretCharPosition(Mathf.RoundToInt(parent.parent.mousePosition.x));
 
-				// set the selection position.
-				_selection_set(caret_char_position, caret_char_position);
+                // set the selection position.
+                SelectionSet(caretCharPosition, caretCharPosition);
 
-				// reset the caret blink timer.
-				_caret_reset_blink();
+                // reset the caret blink timer.
+                CaretResetBlink();
 
-				// set the selection end position.
-				_selection_set_end(caret_char_position);
-			}
-		}
+                // set the selection end position.
+                SelectionSetEnd(caretCharPosition);
+            }
+        }
 
         public override void OnMouseDrag(int button)
         {
             if (button == 0)
             {
-				// automatic scrolling when the mouse moves (for the edges on long text).
-				if (mouse_xprevious != Mathf.RoundToInt(mousePosition.x) || mouse_yprevious != Mathf.RoundToInt(mousePosition.y))
-                {
-					// set the caret position.
-					caret_char_position = _text_x_to_caret_char_position(Mathf.RoundToInt(parent.parent.mousePosition.x));
-				}
+                // automatic scrolling when the mouse moves (for the edges on long text).
 
-				// reset the caret blink timer.
-				_caret_reset_blink();
+                // set the caret position.
+                caretCharPosition = TextXToCaretCharPosition(Mathf.RoundToInt(parent.parent.mousePosition.x));
 
-				// set the selection end position.
-				_selection_set_end(caret_char_position);
-			}
+                // reset the caret blink timer.
+                CaretResetBlink();
+
+                // set the selection end position.
+                SelectionSetEnd(caretCharPosition);
+            }
         }
 
         public override void OnRender()
         {
-			// remember the previous mouse position.
-			mouse_xprevious = Mathf.RoundToInt(mousePosition.x);
-			mouse_yprevious = Mathf.RoundToInt(mousePosition.y);
+            // process the caret blinking timer.
+            timerCaretBlink++;
+            timerCaretBlink %= 120;
 
-			///////////////////////////////////////////////////////////////////////////////
-			// process the caret blinking timer.
-			///////////////////////////////////////////////////////////////////////////////
+            // handle scrolling within the textbox.
+            // ensure that the caret is visible by scrolling the textbox.
+            ScrollToCaret();
 
-			timer_caret_blink++;
-			timer_caret_blink %= 120;
+            // draw the textbox background color.
+            var x1 = drawPosition.x;
+            var y1 = drawPosition.y;
+            var x2 = drawPosition.x + size.x;
+            var y2 = drawPosition.y + size.y;
+            var textDrawPosition = drawPosition + textVerticalAlign;
 
-			///////////////////////////////////////////////////////////////////////////////
-			// handle scrolling within the textbox.
-			///////////////////////////////////////////////////////////////////////////////
+            var textboxBackgroundColor = isReadonly ? backgroundColorReadonly : backgroundColorDefault;
 
-			// ensure that the caret is visible by scrolling the textbox.
-			_scroll_to_caret();
+            GLUtilities.DrawGui(() =>
+            {
+                GL.Color(textboxBackgroundColor);
+                GLUtilities.DrawRectangle(drawPosition.x, drawPosition.y, size.x, size.y);
+            });
 
-			///////////////////////////////////////////////////////////////////////////////
-			// draw the textbox background color.
-			///////////////////////////////////////////////////////////////////////////////
+            // draw outside border that indicates whether the textbox has input focus.
+            GLUtilities.DrawGui(() =>
+            {
+                GLUtilities.DrawRectangleOutline(drawPosition.x, drawPosition.y, size.x, size.y, isActive ? borderColorFocus : borderColorDefault);
+            });
 
-			var x1 = drawPosition.x;
-			var y1 = drawPosition.y;
-			var x2 = drawPosition.x + size.x;
-			var y2 = drawPosition.y + size.y;
-			var textDrawPosition = drawPosition + text_valign;
+            // draw the placeholder inside.
+            if (!isActive && placeholder.Length > 0 && text.Length == 0)
+            {
+                GLUtilities.DrawGuiClippedText(drawRect, font, placeholder, textDrawPosition, textColorPlaceholder);
+            }
 
-			var textbox_background_color = isReadonly ? c_background_readonly : c_background_default;
+            // draw the text inside.
+            GLUtilities.DrawGuiClippedText(drawRect, font, TextGetVisualString(), textDrawPosition + new float2(scrollX, 0f), textColorDefault);
 
-			GLUtilities.DrawGui(() => {
-				GL.Color(textbox_background_color);
-				GLUtilities.DrawRectangle(drawPosition.x, drawPosition.y, size.x, size.y);
-			});
+            // draw the selection.
+            if (isActive && HasSelection())
+            {
+                var selectionStringBegin = SelectionGetBegin();
+                var selectionStringEnd = SelectionGetEnd();
 
-			///////////////////////////////////////////////////////////////////////////////
-			// draw outside border that indicates whether the textbox has input focus.
-			///////////////////////////////////////////////////////////////////////////////
+                var selectionBeginX = scrollX + CharacterPositionGetDrawX(selectionStringBegin);
+                var selectionEndX = scrollX + CharacterPositionGetDrawX(selectionStringEnd);
 
-			GLUtilities.DrawGui(() => {
-				GLUtilities.DrawRectangleOutline(drawPosition.x, drawPosition.y, size.x, size.y, isActive ? c_border_focus : c_border_default);
-			});
+                // highlight the selection.
+                GLUtilities.DrawGuiClipped(drawRect, () =>
+                {
+                    GL.Color(selectionColorDefault);
+                    var r = MathEx.RectXYXY(drawPosition.x + selectionBeginX, drawPosition.y + 2, drawPosition.x + selectionEndX, drawPosition.y + size.y - 2);
+                    GLUtilities.DrawRectangle(r.x, r.y, r.width, r.height);
+                });
 
-			///////////////////////////////////////////////////////////////////////////////
-			// draw the placeholder inside.
-			///////////////////////////////////////////////////////////////////////////////
+                // draw the selected text in a different color.
+                GLUtilities.DrawGuiClippedText(drawRect, font, TextGetVisualString().Substring(selectionStringBegin, selectionStringEnd - selectionStringBegin), new float2(drawPosition.x + selectionBeginX, drawPosition.y + textVerticalAlign.y), textColorSelected);
+            }
 
-			if (!isActive && placeholder.Length > 0 && text.Length == 0)
-			{
-				GLUtilities.DrawGuiClippedText(drawRect, font, placeholder, textDrawPosition, c_text_placeholder);
-			}
+            // draw the caret.
+            if (isActive)
+            {
+                var xcaret = drawPosition.x + scrollX + CharacterPositionGetDrawX(caretCharPosition);
 
-			///////////////////////////////////////////////////////////////////////////////
-			// draw the text inside.
-			///////////////////////////////////////////////////////////////////////////////
-
-			GLUtilities.DrawGuiClippedText(drawRect, font, _text_get_visual_string(), textDrawPosition + new float2(scroll_x, 0f), c_text_default);
-
-			///////////////////////////////////////////////////////////////////////////////
-			// draw the selection.
-			///////////////////////////////////////////////////////////////////////////////
-
-			if (isActive && _has_selection())
-			{
-				var selection_string_begin = _selection_get_begin();
-				var selection_string_end = _selection_get_end();
-
-				var selection_begin_x = scroll_x + _character_position_get_draw_x(selection_string_begin);
-				var selection_end_x = scroll_x + _character_position_get_draw_x(selection_string_end);
-
-				// highlight the selection.
-				GLUtilities.DrawGuiClipped(drawRect, () => {
-					GL.Color(c_selection_default);
-					var r = MathEx.RectXYXY(drawPosition.x + selection_begin_x, drawPosition.y + 2, drawPosition.x + selection_end_x, drawPosition.y + size.y - 2);
-					GLUtilities.DrawRectangle(r.x, r.y, r.width, r.height);
-				});
-
-				// draw the selected text in a different color.
-				GLUtilities.DrawGuiClippedText(drawRect, font, _text_get_visual_string().Substring(selection_string_begin, selection_string_end - selection_string_begin), new float2(drawPosition.x + selection_begin_x, drawPosition.y + text_valign.y), c_text_selected);
-			}
-
-			///////////////////////////////////////////////////////////////////////////////
-			// draw the caret.
-			///////////////////////////////////////////////////////////////////////////////
-
-			if (isActive)
-			{
-				var xcaret = drawPosition.x + scroll_x + _character_position_get_draw_x(caret_char_position);
-
-				if (timer_caret_blink < 60)
-				{
-					GLUtilities.DrawGuiClipped(drawRect, () => {
-						GLUtilities.DrawLine(1.0f, xcaret, drawPosition.y + 2, xcaret, drawPosition.y + size.y - 2, c_caret_default, c_caret_default);
-					});
-				}
-			}
-		}
+                if (timerCaretBlink < 60)
+                {
+                    GLUtilities.DrawGuiClipped(drawRect, () =>
+                    {
+                        GLUtilities.DrawLine(1.0f, xcaret, drawPosition.y + 2, xcaret, drawPosition.y + size.y - 2, caretColorDefault, caretColorDefault);
+                    });
+                }
+            }
+        }
 
         public override bool OnKeyDown(KeyCode keyCode)
         {
-			///////////////////////////////////////////////////////////////////////////////
-			// detect valid keyboard character inputs.
-			///////////////////////////////////////////////////////////////////////////////
-			
-			var character = Event.current.character;
-			if (character != 0)
-				_caret_type_character(character);
+            // detect valid keyboard character inputs.
 
-            if (keyCode == KeyCode.Backspace) _caret_backspace();
-			if (keyCode == KeyCode.Delete) _caret_delete();
-            if (keyCode == KeyCode.LeftArrow) _caret_left(parent.parent.isShiftPressed);
-            if (keyCode == KeyCode.RightArrow) _caret_right(parent.parent.isShiftPressed);
-			if (keyCode == KeyCode.Home) _caret_first(parent.parent.isShiftPressed);
-			if (keyCode == KeyCode.UpArrow) _caret_first(parent.parent.isShiftPressed);
-			if (keyCode == KeyCode.DownArrow) _caret_last(parent.parent.isShiftPressed);
-			if (keyCode == KeyCode.End) _caret_last(parent.parent.isShiftPressed);
+            var character = Event.current.character;
+            if (character != 0)
+                CaretTypeCharacter(character);
 
-            if (parent.parent.isCtrlPressed && keyCode == KeyCode.A) _caret_select_all();
-            if (parent.parent.isCtrlPressed && keyCode == KeyCode.C) _caret_copy();
-            if (parent.parent.isCtrlPressed && keyCode == KeyCode.V) _caret_paste();
-			if (parent.parent.isCtrlPressed && keyCode == KeyCode.X) _caret_cut();
+            if (keyCode == KeyCode.Backspace) CaretBackspace();
+            if (keyCode == KeyCode.Delete) CaretDelete();
+            if (keyCode == KeyCode.LeftArrow) CaretLeft(parent.parent.isShiftPressed);
+            if (keyCode == KeyCode.RightArrow) CaretRight(parent.parent.isShiftPressed);
+            if (keyCode == KeyCode.Home) CaretFirst(parent.parent.isShiftPressed);
+            if (keyCode == KeyCode.UpArrow) CaretFirst(parent.parent.isShiftPressed);
+            if (keyCode == KeyCode.DownArrow) CaretLast(parent.parent.isShiftPressed);
+            if (keyCode == KeyCode.End) CaretLast(parent.parent.isShiftPressed);
 
-			return true; // true everything, we are typing!
+            if (parent.parent.isCtrlPressed && keyCode == KeyCode.A) CaretSelectAll();
+            if (parent.parent.isCtrlPressed && keyCode == KeyCode.C) CaretCopy();
+            if (parent.parent.isCtrlPressed && keyCode == KeyCode.V) CaretPaste();
+            if (parent.parent.isCtrlPressed && keyCode == KeyCode.X) CaretCut();
+
+            return true; // true everything, we are typing!
         }
 
-        ///////////////////////////////////////////////////////////////////////////////
-        
-		private string _text_get_visual_string()
-		{
-			if (password)
-				return new string('*', text.Length);
-			return text;
-		}
-
-		/// <summary>Type a character at the caret position.</summary>
-		private void _caret_type_character(char character)
-		{
-			if (isReadonly) return;
-			if (character == 0) return;
-			if (!font.HasCharacter(character)) return;
-			if (text.Length >= max_length) return;
-
-			// remove any selected text.
-			_selection_remove();
-
-			text = text.Insert(caret_char_position, character.ToString());
-			caret_char_position++;
-
-			// reset any selection.
-			_selection_reset();
-
-			// reset the caret blink timer.
-			_caret_reset_blink();
-		}
-
-		/// <summary>Removes a character to the left of the caret position.</summary>
-		private void _caret_backspace()
-		{
-			if (isReadonly) return;
-
-			// when there is a selection we remove that instead.
-			if (_has_selection()) { _selection_remove(); return; }
-
-			if (caret_char_position == 0) return;
-			if (text.Length == 0) return;
-
-			text = text.Remove(caret_char_position - 1, 1);
-			caret_char_position--;
-
-			// reset the caret blink timer.
-			_caret_reset_blink();
-		}
-
-		/// <summary>Removes a character to the right of the caret position.</summary>
-		private void _caret_delete()
-		{
-			if (isReadonly) return;
-
-			// when there is a selection we remove that instead.
-			if (_has_selection()) { _selection_remove(); return; }
-
-			if (caret_char_position == text.Length) return;
-			if (text.Length == 0) return;
-
-			text = text.Remove(caret_char_position, 1);
-
-			// reset the caret blink timer.
-			_caret_reset_blink();
-		}
-
-
-		/// <summary>Move the caret left.</summary>
-		private void _caret_left(bool shift)
-		{
-			if (caret_char_position == 0) return;
-			caret_char_position--;
-
-			// drag selection to caret or reset selection.
-			if (shift) _selection_to_caret(); else _selection_reset();
-
-			// reset the caret blink timer.
-			_caret_reset_blink();
-		}
-
-		/// <summary>Move the caret right.</summary>
-		private void _caret_right(bool shift)
-		{
-			if (caret_char_position == text.Length) return;
-			caret_char_position++;
-
-			// drag selection to caret or reset selection.
-			if (shift) _selection_to_caret(); else _selection_reset();
-
-			// reset the caret blink timer.
-			_caret_reset_blink();
-		}
-
-		/// <summary>Move the caret to the first position.</summary>
-		private void _caret_first(bool shift)
-		{
-			caret_char_position = 0;
-
-			// drag selection to caret or reset selection.
-			if (shift) _selection_to_caret(); else _selection_reset();
-
-			// reset the caret blink timer.
-			_caret_reset_blink();
-		}
-
-		/// <summary>
-		/// Move the caret to the last position.
-		/// </summary>
-		private void _caret_last(bool shift)
-		{
-			caret_char_position = text.Length;
-
-			// drag selection to caret or reset selection.
-			if (shift) _selection_to_caret(); else _selection_reset();
-
-			// reset the caret blink timer.
-			_caret_reset_blink();
-		}
-
-		/// <summary>Copy the selected text into the clipboard contents.</summary>
-		private void _caret_copy()
-		{
-			if (password) return;
-			if (!_has_selection()) return;
-
-			var selection_string_begin = _selection_get_begin();
-			var selection_string_end = _selection_get_end();
-
-			EditorGUIUtility.systemCopyBuffer = text.Substring(selection_string_begin, selection_string_end - selection_string_begin);
-		}
-
-		/// <summary>Paste the clipboard contents at the caret position.</summary>
-		private void _caret_paste()
-		{
-			if (isReadonly) return;
-			var text = EditorGUIUtility.systemCopyBuffer;
-			if (text.Length == 0) return;
-
-			for (var i = 0; i < text.Length; i++)
-				_caret_type_character(text[i]);
-		}
-
-		/// <summary>Cuts the selected text into the clipboard contents.</summary>
-		private void _caret_cut()
-		{
-			if (isReadonly) return;
-			if (password) return;
-			if (!_has_selection()) return;
-
-			_caret_copy();
-			_selection_remove();
-		}
-
-		/// <summary>Selects all of the text and puts the caret on the right.</summary>
-		private void _caret_select_all()
-		{
-			// move the caret to the last position.
-			_caret_last(true);
-
-			// select all of the text.
-			_selection_set(0, caret_char_position);
-		}
-
-		/// <summary>Reset the caret blink timer, ensures the caret is visible.</summary>
-		private void _caret_reset_blink()
-		{
-			timer_caret_blink = 0;
-		}
-
-		/// <summary>
-		/// Get the x draw position of the caret within the text.
-		/// </summary>
-		private int _character_position_get_draw_x(int char_position)
-		{
-			string vs = _text_get_visual_string();
-			if (vs.Length == 0) return 0;
-			return font.StringWidth(vs.Substring(0, char_position));
-		}
-
-		
-		// takes a room coordinate and transforms it to virtual textbox coordinates.
-		private int _to_virtual_x(int xpos)
-		{
-			return Mathf.RoundToInt(xpos - drawPosition.x) - scroll_x;
-		}
-		
-		// get the x caret character position within the text for the given x draw position.
-		private int _text_x_to_caret_char_position(int xpos)
-		{
-			var text_length = text.Length;
-			if (text_length == 0) return 0;
-
-			// transform to local coordinates inside the textbox.
-			xpos = _to_virtual_x(xpos);
-
-			// iterate over every character in the text string.
-			var visual_text = _text_get_visual_string();
-			var text_temp = "";
-			var text_temp_width_previous = 0;
-			for (var i = 0; i < text_length; i++)
-			{
-				// add a character to the temp text.
-				text_temp += visual_text[i];
-
-				// get the temp text width after modifications.
-				var text_temp_width = font.StringWidth(text_temp);
-
-				// get half of the difference between the widths.
-				// we use this to accept clicks slightly left and right
-				// of the middle of a character.
-				var half = (text_temp_width - text_temp_width_previous) / 2;
-				if (text_temp_width >= xpos + half)
-					return i;
-
-				text_temp_width_previous = text_temp_width;
-			}
-
-			return text_length;
-		}
-
-		// ensures that the caret is visible by scrolling the textbox content.
-		private void _scroll_to_caret()
-		{
-			var sizex = Mathf.RoundToInt(size.x);
-
-			var busy = true;
-			while (busy)
-			{
-				var xcaret = scroll_x + _character_position_get_draw_x(caret_char_position);
-
-				if (xcaret <= 10)
-				{
-					scroll_x += 10;
-				}
-				else if (xcaret >= sizex - 10)
-				{
-					scroll_x -= 10;
-				}
-				else
-				{
-					busy = false;
-				}
-			}
-
-			// the textbox can never scroll right (which would leave a gap on the left).
-			if (scroll_x > 0) scroll_x = 0;
-
-			// the textbox can never scroll beyond the size of the text (which would leave a gap on the right).
-			var visual_text = _text_get_visual_string();
-			var text_width = font.StringWidth(visual_text);
-			var rightmost_scroll = -(text_width - sizex) - 1;
-			if (scroll_x < rightmost_scroll)
-				scroll_x = rightmost_scroll;
-
-			// if the full text fits in the textbox, always reset the scroll.
-			if (text_width <= sizex) scroll_x = 0;
-		}
-
-		/// <summary>Sets the selection.</summary>
-		private void _selection_set(int begin_char_position, int end_char_position)
-		{
-			selection_begin = begin_char_position;
-			selection_end = end_char_position;
-		}
-
-		/// <summary>Sets the selection end.</summary>
-		private void _selection_set_end(int end_char_position)
-		{
-			_selection_set(selection_begin, end_char_position);
-		}
-
-		/// <summary>Resets the current selection.</summary>
-		private void _selection_reset()
-		{
-			selection_begin = caret_char_position;
-			selection_end = caret_char_position;
-		}
-
-		/// <summary>Removes the selected text.</summary>
-		private void _selection_remove()
-		{
-			if (isReadonly) return;
-			if (!_has_selection()) return;
-
-			var selection_string_begin = _selection_get_begin();
-			var selection_string_end = _selection_get_end();
-
-			// delete the selected characters.
-			text = text.Remove(selection_string_begin, selection_string_end - selection_string_begin);
-
-			// move the caret to the selection beginning.
-			caret_char_position = selection_string_begin;
-
-			// reset the selection.
-			_selection_reset();
-		}
-
-		/// <summary>Returns the beginning of the selection sorted lowest to highest.</summary>
-		private int _selection_get_begin()
-		{
-			return selection_begin < selection_end ? selection_begin : selection_end;
-		}
-
-		/// <summary>Returns the ending of the selection sorted lowest to highest.</summary>
-		private int _selection_get_end()
-		{
-			return selection_end > selection_begin ? selection_end : selection_begin;
-		}
-
-		/// <summary>Returns whether anything is selected.</summary>
-		private bool _has_selection()
-		{
-			return (selection_begin != selection_end);
-		}
-
-		/// <summary>Drags the selection towards the caret position.</summary>
-		private void _selection_to_caret()
-		{
-			selection_end = caret_char_position;
-		}
-	}
+        /// <summary>Gets the text the user sees (e.g. passwords use different characters).</summary>
+        private string TextGetVisualString()
+        {
+            if (isPassword)
+                return new string('*', text.Length);
+            return text;
+        }
+
+        /// <summary>Type a character at the caret position.</summary>
+        private void CaretTypeCharacter(char character)
+        {
+            if (isReadonly) return;
+            if (character == 0) return;
+            if (!font.HasCharacter(character)) return;
+            if (text.Length >= maxLength) return;
+
+            // remove any selected text.
+            SelectionRemove();
+
+            text = text.Insert(caretCharPosition, character.ToString());
+            caretCharPosition++;
+
+            // reset any selection.
+            SelectionReset();
+
+            // reset the caret blink timer.
+            CaretResetBlink();
+        }
+
+        /// <summary>Removes a character to the left of the caret position.</summary>
+        private void CaretBackspace()
+        {
+            if (isReadonly) return;
+
+            // when there is a selection we remove that instead.
+            if (HasSelection()) { SelectionRemove(); return; }
+
+            if (caretCharPosition == 0) return;
+            if (text.Length == 0) return;
+
+            text = text.Remove(caretCharPosition - 1, 1);
+            caretCharPosition--;
+
+            // reset the caret blink timer.
+            CaretResetBlink();
+        }
+
+        /// <summary>Removes a character to the right of the caret position.</summary>
+        private void CaretDelete()
+        {
+            if (isReadonly) return;
+
+            // when there is a selection we remove that instead.
+            if (HasSelection()) { SelectionRemove(); return; }
+
+            if (caretCharPosition == text.Length) return;
+            if (text.Length == 0) return;
+
+            text = text.Remove(caretCharPosition, 1);
+
+            // reset the caret blink timer.
+            CaretResetBlink();
+        }
+
+        /// <summary>Move the caret left.</summary>
+        private void CaretLeft(bool shift)
+        {
+            if (caretCharPosition == 0) return;
+            caretCharPosition--;
+
+            // drag selection to caret or reset selection.
+            if (shift) SelectionToCaret(); else SelectionReset();
+
+            // reset the caret blink timer.
+            CaretResetBlink();
+        }
+
+        /// <summary>Move the caret right.</summary>
+        private void CaretRight(bool shift)
+        {
+            if (caretCharPosition == text.Length) return;
+            caretCharPosition++;
+
+            // drag selection to caret or reset selection.
+            if (shift) SelectionToCaret(); else SelectionReset();
+
+            // reset the caret blink timer.
+            CaretResetBlink();
+        }
+
+        /// <summary>Move the caret to the first position.</summary>
+        private void CaretFirst(bool shift)
+        {
+            caretCharPosition = 0;
+
+            // drag selection to caret or reset selection.
+            if (shift) SelectionToCaret(); else SelectionReset();
+
+            // reset the caret blink timer.
+            CaretResetBlink();
+        }
+
+        /// <summary>
+        /// Move the caret to the last position.
+        /// </summary>
+        private void CaretLast(bool shift)
+        {
+            caretCharPosition = text.Length;
+
+            // drag selection to caret or reset selection.
+            if (shift) SelectionToCaret(); else SelectionReset();
+
+            // reset the caret blink timer.
+            CaretResetBlink();
+        }
+
+        /// <summary>Copy the selected text into the clipboard contents.</summary>
+        private void CaretCopy()
+        {
+            if (isPassword) return;
+            if (!HasSelection()) return;
+
+            var selectionStringBegin = SelectionGetBegin();
+            var selectionStringEnd = SelectionGetEnd();
+
+            EditorGUIUtility.systemCopyBuffer = text.Substring(selectionStringBegin, selectionStringEnd - selectionStringBegin);
+        }
+
+        /// <summary>Paste the clipboard contents at the caret position.</summary>
+        private void CaretPaste()
+        {
+            if (isReadonly) return;
+            var text = EditorGUIUtility.systemCopyBuffer;
+            if (text.Length == 0) return;
+
+            for (var i = 0; i < text.Length; i++)
+                CaretTypeCharacter(text[i]);
+        }
+
+        /// <summary>Cuts the selected text into the clipboard contents.</summary>
+        private void CaretCut()
+        {
+            if (isReadonly) return;
+            if (isPassword) return;
+            if (!HasSelection()) return;
+
+            CaretCopy();
+            SelectionRemove();
+        }
+
+        /// <summary>Selects all of the text and puts the caret on the right.</summary>
+        private void CaretSelectAll()
+        {
+            // move the caret to the last position.
+            CaretLast(true);
+
+            // select all of the text.
+            SelectionSet(0, caretCharPosition);
+        }
+
+        /// <summary>Reset the caret blink timer, ensures the caret is visible.</summary>
+        private void CaretResetBlink()
+        {
+            timerCaretBlink = 0;
+        }
+
+        /// <summary>
+        /// Get the x draw position of the caret within the text.
+        /// </summary>
+        private int CharacterPositionGetDrawX(int charPosition)
+        {
+            string vs = TextGetVisualString();
+            if (vs.Length == 0) return 0;
+            return font.StringWidth(vs.Substring(0, charPosition));
+        }
+
+        /// <summary>
+        /// Takes a shape editor mouse coordinate and transforms it to virtual textbox coordinates.
+        /// </summary>
+        private int ToVirtualX(int xpos)
+        {
+            return Mathf.RoundToInt(xpos - drawPosition.x) - scrollX;
+        }
+
+        /// <summary>
+        /// Get the x caret character position within the text for the given x draw position.
+        /// </summary>
+        private int TextXToCaretCharPosition(int xpos)
+        {
+            var textLength = text.Length;
+            if (textLength == 0) return 0;
+
+            // transform to local coordinates inside the textbox.
+            xpos = ToVirtualX(xpos);
+
+            // iterate over every character in the text string.
+            var visualText = TextGetVisualString();
+            var textTemp = "";
+            var textTempWidthPrevious = 0;
+            for (var i = 0; i < textLength; i++)
+            {
+                // add a character to the temp text.
+                textTemp += visualText[i];
+
+                // get the temp text width after modifications.
+                var textTempWidth = font.StringWidth(textTemp);
+
+                // get half of the difference between the widths.
+                // we use this to accept clicks slightly left and right
+                // of the middle of a character.
+                var half = (textTempWidth - textTempWidthPrevious) / 2;
+                if (textTempWidth >= xpos + half)
+                    return i;
+
+                textTempWidthPrevious = textTempWidth;
+            }
+
+            return textLength;
+        }
+
+        /// <summary>Ensures that the caret is visible by scrolling the textbox content.</summary>
+        private void ScrollToCaret()
+        {
+            var sizex = Mathf.RoundToInt(size.x);
+
+            var busy = true;
+            while (busy)
+            {
+                var xcaret = scrollX + CharacterPositionGetDrawX(caretCharPosition);
+
+                if (xcaret <= 10)
+                {
+                    scrollX += 10;
+                }
+                else if (xcaret >= sizex - 10)
+                {
+                    scrollX -= 10;
+                }
+                else
+                {
+                    busy = false;
+                }
+            }
+
+            // the textbox can never scroll right (which would leave a gap on the left).
+            if (scrollX > 0) scrollX = 0;
+
+            // the textbox can never scroll beyond the size of the text (which would leave a gap on the right).
+            var visualText = TextGetVisualString();
+            var textWidth = font.StringWidth(visualText);
+            var rightmostScroll = -(textWidth - sizex) - 1;
+            if (scrollX < rightmostScroll)
+                scrollX = rightmostScroll;
+
+            // if the full text fits in the textbox, always reset the scroll.
+            if (textWidth <= sizex) scrollX = 0;
+        }
+
+        /// <summary>Sets the selection.</summary>
+        private void SelectionSet(int beginCharPosition, int endCharPosition)
+        {
+            selectionBegin = beginCharPosition;
+            selectionEnd = endCharPosition;
+        }
+
+        /// <summary>Sets the selection end.</summary>
+        private void SelectionSetEnd(int endCharPosition)
+        {
+            SelectionSet(selectionBegin, endCharPosition);
+        }
+
+        /// <summary>Resets the current selection.</summary>
+        private void SelectionReset()
+        {
+            selectionBegin = caretCharPosition;
+            selectionEnd = caretCharPosition;
+        }
+
+        /// <summary>Removes the selected text.</summary>
+        private void SelectionRemove()
+        {
+            if (isReadonly) return;
+            if (!HasSelection()) return;
+
+            var selectionStringBegin = SelectionGetBegin();
+            var selectionStringEnd = SelectionGetEnd();
+
+            // delete the selected characters.
+            text = text.Remove(selectionStringBegin, selectionStringEnd - selectionStringBegin);
+
+            // move the caret to the selection beginning.
+            caretCharPosition = selectionStringBegin;
+
+            // reset the selection.
+            SelectionReset();
+        }
+
+        /// <summary>Returns the beginning of the selection sorted lowest to highest.</summary>
+        private int SelectionGetBegin()
+        {
+            return selectionBegin < selectionEnd ? selectionBegin : selectionEnd;
+        }
+
+        /// <summary>Returns the ending of the selection sorted lowest to highest.</summary>
+        private int SelectionGetEnd()
+        {
+            return selectionEnd > selectionBegin ? selectionEnd : selectionBegin;
+        }
+
+        /// <summary>Returns whether anything is selected.</summary>
+        private bool HasSelection()
+        {
+            return (selectionBegin != selectionEnd);
+        }
+
+        /// <summary>Drags the selection towards the caret position.</summary>
+        private void SelectionToCaret()
+        {
+            selectionEnd = caretCharPosition;
+        }
+    }
 }
 
 #endif
