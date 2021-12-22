@@ -11,21 +11,11 @@ namespace AeternumGames.ShapeEditor
         private bool isMarqueeSubtractive;
         private static readonly Color marqueeColor = new Color(1.0f, 0.5f, 0.0f);
 
-        private QuickScaleWidget quickScaleWidget = new QuickScaleWidget();
-        private QuickRotationWidget quickRotationWidget = new QuickRotationWidget();
         private QuickCutWidget quickCutWidget = new QuickCutWidget();
 
         public override void OnActivate()
         {
             isMarqueeActive = false;
-
-            editor.AddWidget(quickScaleWidget);
-            quickScaleWidget.onBeginScaling = () => ScaleTool.CommonAction_OnBeginScaling(editor);
-            quickScaleWidget.onMouseDrag = (pivot, scale) => ScaleTool.CommonAction_OnMouseDrag(editor, pivot, scale);
-
-            editor.AddWidget(quickRotationWidget);
-            quickRotationWidget.onBeginRotating = () => RotateTool.CommonAction_OnBeginRotating(editor);
-            quickRotationWidget.onRotation = (pivot, degrees) => RotateTool.CommonAction_OnRotation(editor, pivot, degrees);
 
             editor.AddWidget(quickCutWidget);
         }
@@ -108,8 +98,7 @@ namespace AeternumGames.ShapeEditor
                 case KeyCode.S:
                     if (editor.selectedSegmentsCount > 1)
                     {
-                        quickScaleWidget.position = editor.selectedSegmentsAveragePosition;
-                        quickScaleWidget.Activate();
+                        editor.UseTool(new ScaleTool());
                         return true;
                     }
                     return false;
@@ -117,8 +106,7 @@ namespace AeternumGames.ShapeEditor
                 case KeyCode.R:
                     if (editor.selectedSegmentsCount > 1)
                     {
-                        quickRotationWidget.position = editor.selectedSegmentsAveragePosition;
-                        quickRotationWidget.Activate();
+                        editor.UseTool(new RotateTool());
                         return true;
                     }
                     return false;

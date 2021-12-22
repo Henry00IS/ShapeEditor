@@ -1,59 +1,146 @@
 ﻿#if UNITY_EDITOR
 
 using Unity.Mathematics;
+using UnityEditor;
+using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
-    // add additional fields for this tool to segments.
-    public partial class Segment
-    {
-        /// <summary>Editor variable used by <see cref="ScaleTool"/>.</summary>
-        [System.NonSerialized]
-        public float2 scaleToolInitialPosition;
-    }
-
     public class ScaleTool : BoxSelectTool
     {
+        private bool isSingleUseDone = false;
+        private float2 initialGridPosition;
+        private float initialDistance;
+
         private ScaleWidget scaleWidget = new ScaleWidget();
 
         public override void OnActivate()
         {
             base.OnActivate();
 
-            editor.AddWidget(scaleWidget);
-            scaleWidget.onBeginScaling = () => CommonAction_OnBeginScaling(editor);
-            scaleWidget.onMouseDrag = (pivot, scale) => CommonAction_OnMouseDrag(editor, pivot, scale);
+            if (isSingleUse)
+            {
+                initialGridPosition = editor.ScreenPointToGrid(editor.selectedSegmentsAveragePosition);
+                initialDistance = math.distance(initialGridPosition, editor.mouseGridPosition);
+                ToolOnBeginScaling();
+            }
+            else
+            {
+                editor.AddWidget(scaleWidget);
+                scaleWidget.onBeginScaling = () => ToolOnBeginScaling();
+                scaleWidget.onMouseDrag = (pivot, scale) => ToolOnMouseDrag(pivot, scale);
+            }
         }
 
         public override void OnRender()
         {
             base.OnRender();
 
-            if (editor.selectedSegmentsCount > 0)
+            if (isSingleUse)
             {
-                scaleWidget.position = editor.selectedSegmentsAveragePosition;
-                scaleWidget.visible = true;
+                GLUtilities.DrawGui(() =>
+                {
+                    GL.Color(Color.gray);
+                    GLUtilities.DrawDottedLine(1.0f, editor.mousePosition, editor.GridPointToScreen(initialGridPosition));
+                });
+
+                editor.SetMouseCursor(MouseCursor.ScaleArrow);
             }
             else
             {
-                scaleWidget.visible = false;
+                if (editor.selectedSegmentsCount > 0)
+                {
+                    scaleWidget.position = editor.selectedSegmentsAveragePosition;
+                    scaleWidget.visible = true;
+                }
+                else
+                {
+                    scaleWidget.visible = false;
+                }
             }
         }
 
-        public static void CommonAction_OnBeginScaling(ShapeEditorWindow editor)
+        public override void OnMouseMove(float2 screenDelta, float2 gridDelta)
+        {
+            if (isSingleUse && !isSingleUseDone)
+            {
+                float2 scale = math.distance(initialGridPosition, editor.mouseGridPosition);
+                if (initialDistance == 0f)
+                {
+                    scale = new float2(1.0f, 1.0f);
+                }
+                else
+                {
+                    scale /= initialDistance;
+                }
+
+                ToolOnMouseDrag(initialGridPosition, scale);
+            }
+        }
+
+        public override void OnMouseDown(int button)
+        {
+            if (isSingleUse)
+            {
+                if (button == 0)
+                {
+                    isSingleUseDone = true;
+                }
+            }
+        }
+
+        public override void OnMouseDrag(int button, float2 screenDelta, float2 gridDelta)
+        {
+            if (isSingleUse)
+            {
+                if (button == 0)
+                {
+                    // we do not want the marquee in this mode.
+                    return;
+                }
+            }
+
+            base.OnMouseDrag(button, screenDelta, gridDelta);
+        }
+
+        public override void OnGlobalMouseUp(int button)
+        {
+            if (isSingleUse)
+            {
+                if (button == 0)
+                {
+                    editor.SwitchTool(parent);
+                }
+            }
+            else
+            {
+                base.OnGlobalMouseUp(button);
+            }
+        }
+
+        public override bool IsBusy()
+        {
+            if (isSingleUse)
+            {
+                return !isSingleUseDone;
+            }
+            return false;
+        }
+
+        private void ToolOnBeginScaling()
         {
             editor.RegisterUndo("Scale Selection");
 
             // store the initial position of all selected segments.
             foreach (var segment in editor.ForEachSelectedSegment())
-                segment.scaleToolInitialPosition = segment.position;
+                segment.gpVector1 = segment.position;
         }
 
-        public static void CommonAction_OnMouseDrag(ShapeEditorWindow editor, float2 pivot, float2 scale)
+        private void ToolOnMouseDrag(float2 pivot, float2 scale)
         {
             // scale the selected segments using their initial position.
             foreach (var segment in editor.ForEachSelectedSegment())
-                segment.position = MathEx.ScaleAroundPivot(segment.scaleToolInitialPosition, pivot, scale);
+                segment.position = MathEx.ScaleAroundPivot(segment.gpVector1, pivot, scale);
         }
     }
 }
