@@ -1,62 +1,127 @@
 ﻿#if UNITY_EDITOR
 
 using Unity.Mathematics;
+using UnityEditor;
 
 namespace AeternumGames.ShapeEditor
 {
-    // add additional fields for this tool to segments.
-    public partial class Segment
-    {
-        /// <summary>Editor variable used by <see cref="TranslateTool"/>.</summary>
-        [System.NonSerialized]
-        public float2 translateToolInitialPosition;
-    }
-
     public class TranslateTool : BoxSelectTool
     {
+        private bool isSingleUseDone = false;
         private TranslationWidget translationWidget = new TranslationWidget();
 
         public override void OnActivate()
         {
             base.OnActivate();
 
-            editor.AddWidget(translationWidget);
-            translationWidget.onBeginTranslating = () => CommonAction_OnBeginTranslating(editor);
-            translationWidget.onMouseDrag = (screenDelta, gridDelta) => CommonAction_OnMouseDrag(editor, gridDelta);
+            if (isSingleUse)
+            {
+                ToolOnBeginTranslating(editor);
+            }
+            else
+            {
+                editor.AddWidget(translationWidget);
+                translationWidget.onBeginTranslating = () => ToolOnBeginTranslating(editor);
+                translationWidget.onMouseDrag = (screenDelta, gridDelta) => ToolOnMouseDrag(editor, gridDelta);
+            }
         }
 
         public override void OnRender()
         {
             base.OnRender();
 
-            if (editor.selectedSegmentsCount > 0)
+            if (isSingleUse)
             {
-                translationWidget.position = editor.selectedSegmentsAveragePosition;
-                translationWidget.visible = true;
+                editor.SetMouseCursor(MouseCursor.MoveArrow);
             }
             else
             {
-                translationWidget.visible = false;
+                if (editor.selectedSegmentsCount > 0)
+                {
+                    translationWidget.position = editor.selectedSegmentsAveragePosition;
+                    translationWidget.visible = true;
+                }
+                else
+                {
+                    translationWidget.visible = false;
+                }
             }
         }
 
-        private static float2 CommonAction_DeltaAccumulator;
+        public override void OnMouseMove(float2 screenDelta, float2 gridDelta)
+        {
+            if (isSingleUse && !isSingleUseDone)
+            {
+                ToolOnMouseDrag(editor, gridDelta);
+            }
+        }
 
-        public static void CommonAction_OnBeginTranslating(ShapeEditorWindow editor)
+        public override void OnMouseDown(int button)
+        {
+            if (isSingleUse)
+            {
+                if (button == 0)
+                {
+                    isSingleUseDone = true;
+                }
+            }
+        }
+
+        public override void OnMouseDrag(int button, float2 screenDelta, float2 gridDelta)
+        {
+            if (isSingleUse)
+            {
+                if (button == 0)
+                {
+                    // we do not want the marquee in this mode.
+                    return;
+                }
+            }
+
+            base.OnMouseDrag(button, screenDelta, gridDelta);
+        }
+
+        public override void OnGlobalMouseUp(int button)
+        {
+            if (isSingleUse)
+            {
+                if (button == 0)
+                {
+                    editor.SwitchTool(parent);
+                }
+            }
+            else
+            {
+                base.OnGlobalMouseUp(button);
+            }
+        }
+
+        public override bool IsBusy()
+        {
+            if (isSingleUse)
+            {
+                return !isSingleUseDone;
+            }
+            return false;
+        }
+
+        private float2 deltaAccumulator;
+
+        private void ToolOnBeginTranslating(ShapeEditorWindow editor)
         {
             editor.RegisterUndo("Translate Selection");
 
-            CommonAction_DeltaAccumulator = float2.zero;
+            deltaAccumulator = float2.zero;
 
             // store the initial position of all selected segments.
             foreach (var segment in editor.ForEachSelectedSegment())
-                segment.translateToolInitialPosition = segment.position;
+                segment.gpVector1 = segment.position;
         }
 
-        public static void CommonAction_OnMouseDrag(ShapeEditorWindow editor, float2 gridDelta)
+        private void ToolOnMouseDrag(ShapeEditorWindow editor, float2 gridDelta)
         {
-            CommonAction_DeltaAccumulator += gridDelta;
-            float2 position = CommonAction_DeltaAccumulator;
+            deltaAccumulator += gridDelta;
+            float2 position = deltaAccumulator;
 
             foreach (var segment in editor.ForEachSelectedSegment())
             {
@@ -64,7 +129,7 @@ namespace AeternumGames.ShapeEditor
                 if (editor.isCtrlPressed)
                     position = position.Snap(editor.gridSnap);
 
-                segment.position = segment.translateToolInitialPosition + position;
+                segment.position = segment.gpVector1 + position;
             }
         }
     }

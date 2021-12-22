@@ -1,5 +1,7 @@
 ﻿#if UNITY_EDITOR
 
+using UnityEngine;
+
 namespace AeternumGames.ShapeEditor
 {
     public partial class ShapeEditorWindow
@@ -45,6 +47,27 @@ namespace AeternumGames.ShapeEditor
             tool.editor = this;
             activeTool = tool;
             activeTool.OnActivate();
+
+            // todo: this needs to be checked first.
+            TrySwitchActiveEventReceiver(tool);
+        }
+
+        /// <summary>
+        /// This function switches to the specified single-use tool and returns to the current tool
+        /// when it's done. This is useful for single-use tools that are instantiated with a
+        /// keyboard binding.
+        /// </summary>
+        /// <param name="tool">The single-use tool to switch to.</param>
+        internal void UseTool(Tool tool)
+        {
+            // prevent accidental errors.
+            if (activeTool == tool) { Debug.LogWarning("Cannot UseTool() the already active tool!"); return; }
+
+            // set the parent of the tool to be the currently active tool.
+            tool.parent = activeTool;
+
+            // switch to the new tool.
+            SwitchTool(tool);
         }
 
         /// <summary>Switches to the box select tool unless already active.</summary>

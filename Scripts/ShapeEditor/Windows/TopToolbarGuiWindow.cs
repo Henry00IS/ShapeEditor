@@ -9,13 +9,15 @@ namespace AeternumGames.ShapeEditor
     {
         private GuiButton newProjectButton;
 
-        public TopToolbarGuiWindow(ShapeEditorWindow parent, float2 position, float2 size) : base(parent, position, size)
+        public TopToolbarGuiWindow(float2 position, float2 size) : base(position, size) { }
+
+        public override void OnActivate()
         {
             colorWindowBackground = new Color(0.192f, 0.192f, 0.192f);
 
             AddControl(newProjectButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorNew, new float2(1, 1), new float2(20, 20), () =>
             {
-                parent.OnNewProject();
+                editor.OnNewProject();
             }));
         }
 

@@ -6,10 +6,10 @@ using UnityEngine;
 namespace AeternumGames.ShapeEditor
 {
     /// <summary>Represents a viewport widget (e.g. transform handles).</summary>
-    public abstract class Widget
+    public abstract class Widget : IEditorEventReceiver
     {
         /// <summary>The shape editor window.</summary>
-        public ShapeEditorWindow editor;
+        public ShapeEditorWindow editor { get; set; }
 
         /// <summary>The widget position in screen coordinates.</summary>
         public float2 position;
@@ -21,10 +21,19 @@ namespace AeternumGames.ShapeEditor
         public abstract bool wantsActive { get; }
 
         /// <summary>Gets whether the widget currently has input focus.</summary>
-        public bool isActive => this == editor.activeWidget;
+        public bool isActive => editor.IsActive(this);
 
         /// <summary>Gets whether some other widget currently has input focus.</summary>
-        public bool isOtherActive => editor.activeWidget != null && editor.activeWidget != this;
+        public bool isOtherActive => editor.activeEventReceiverIsWidget && !isActive;
+
+        /// <summary>
+        /// Gets whether the control is busy and has to maintain the input focus, making it
+        /// impossible to switch to another object.
+        /// </summary>
+        public virtual bool IsBusy()
+        {
+            return false;
+        }
 
         /// <summary>Called when the widget is activated.</summary>
         public virtual void OnActivate()
@@ -82,6 +91,16 @@ namespace AeternumGames.ShapeEditor
         public virtual bool OnKeyUp(KeyCode keyCode)
         {
             return false;
+        }
+
+        /// <summary>Called when the widget receives input focus.</summary>
+        public virtual void OnFocus()
+        {
+        }
+
+        /// <summary>Called when the widget loses input focus.</summary>
+        public virtual void OnFocusLost()
+        {
         }
     }
 }

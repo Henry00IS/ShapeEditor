@@ -7,8 +7,6 @@ namespace AeternumGames.ShapeEditor
     public partial class ShapeEditorWindow
     {
         private List<Widget> widgets = new List<Widget>();
-        /// <summary>The widget that currently has input focus or null.</summary>
-        internal Widget activeWidget;
 
         /// <summary>Removes all of the widgets.</summary>
         private void ClearWidgets()

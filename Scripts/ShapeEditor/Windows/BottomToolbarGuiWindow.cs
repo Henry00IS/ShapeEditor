@@ -13,7 +13,7 @@ namespace AeternumGames.ShapeEditor
         private GuiFloatTextbox gridSnapTextbox;
         private GuiLabel gridSnapLabel;
 
-        public BottomToolbarGuiWindow(ShapeEditorWindow parent, float2 position, float2 size) : base(parent, position, size)
+        public BottomToolbarGuiWindow(float2 position, float2 size) : base(position, size)
         {
             colorWindowBackground = new Color(0.192f, 0.192f, 0.192f);
 

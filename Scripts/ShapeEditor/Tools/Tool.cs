@@ -6,10 +6,28 @@ using UnityEngine;
 namespace AeternumGames.ShapeEditor
 {
     /// <summary>Represents a viewport tool that's used to manipulate shapes.</summary>
-    public abstract class Tool
+    public abstract class Tool : IEditorEventReceiver
     {
         /// <summary>The shape editor window.</summary>
-        public ShapeEditorWindow editor;
+        public ShapeEditorWindow editor { get; set; }
+
+        /// <summary>
+        /// The parent tool that called this tool (if any), to which the editor will return once the
+        /// tool is finished. This is set when a single-use tool is instantiated with a keyboard binding.
+        /// </summary>
+        public Tool parent;
+
+        /// <summary>Whether this tool is in single-use mode.</summary>
+        public bool isSingleUse => parent != null;
+
+        /// <summary>
+        /// Gets whether the tool is busy and has to maintain the input focus, making it
+        /// impossible to switch to another object.
+        /// </summary>
+        public virtual bool IsBusy()
+        {
+            return false;
+        }
 
         /// <summary>Called when the tool is activated.</summary>
         public virtual void OnActivate()
@@ -67,6 +85,16 @@ namespace AeternumGames.ShapeEditor
         public virtual bool OnKeyUp(KeyCode keyCode)
         {
             return false;
+        }
+
+        /// <summary>Called when the tool receives input focus.</summary>
+        public virtual void OnFocus()
+        {
+        }
+
+        /// <summary>Called when the tool loses input focus.</summary>
+        public virtual void OnFocusLost()
+        {
         }
     }
 }

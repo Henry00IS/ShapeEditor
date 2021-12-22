@@ -16,7 +16,7 @@ namespace AeternumGames.ShapeEditor
         internal Project project = new Project();
 
         /// <summary>Whether the mouse is actively in use by a widget or pressed.</summary>
-        internal bool isMouseBusy => isLeftMousePressed || isRightMousePressed || activeWidget != null;
+        internal bool isMouseBusy => isLeftMousePressed || isRightMousePressed || isToolBusy;
 
         [MenuItem("Window/2D Shape Editor")]
         public static void Init()
@@ -45,55 +45,93 @@ namespace AeternumGames.ShapeEditor
 
         private void OnMouseDown(int button)
         {
-            // possibly forward the event to a window.
-            // we can not click on windows while a widget is active.
-            activeWindow = FindWindowAtPosition(mousePosition);
-            if (activeWindow != null && activeWidget == null)
+            var eventReceiver = GetActiveEventReceiver();
+
+            // when the event receiver is busy it has exclusive rights to this event.
+            if (eventReceiver.IsBusy())
             {
-                activeWindow.OnMouseDown(button);
+                eventReceiver.OnMouseDown(button);
             }
             else
             {
-                // always inform all widgets.
-                var widgetsCount = widgets.Count;
-                for (int i = 0; i < widgetsCount; i++)
-                    widgets[i].OnMouseDown(button);
-
-                // possibly forward the event to a widget.
-                activeWidget = FindActiveWidget();
-                if (activeWidget != null)
+                // on click we find a window under the mouse cursor.
+                var window = FindWindowAtPosition(mousePosition);
+                if (window != null)
                 {
-                    // the active widget will receive the click twice.
-                    activeWidget.OnMouseDown(button);
+                    // try to focus the window.
+                    if (TrySwitchActiveEventReceiver(window))
+                    {
+                        eventReceiver = window;
+                        MoveWindowToFront(window);
+                    }
                 }
                 else
                 {
-                    activeTool.OnMouseDown(button);
+                    // always inform all widgets so they can calculate input focus.
+                    // this means they get the on mouse down event twice.
+                    var widgetsCount = widgets.Count;
+                    for (int i = 0; i < widgetsCount; i++)
+                        widgets[i].OnMouseDown(button);
+
+                    // find a widget that wants focus.
+                    var widget = FindActiveWidget();
+                    if (widget != null)
+                    {
+                        // try to focus the widget.
+                        if (TrySwitchActiveEventReceiver(widget))
+                        {
+                            eventReceiver = widget;
+                        }
+                    }
+                    else
+                    {
+                        // try to focus the active tool.
+                        if (TrySwitchActiveEventReceiver(activeTool))
+                        {
+                            eventReceiver = activeTool;
+                        }
+                    }
                 }
+
+                eventReceiver.OnMouseDown(button);
             }
+
             Repaint();
         }
 
         private void OnMouseUp(int button)
         {
-            if (activeWindow != null && activeWidget == null)
+            var eventReceiver = GetActiveEventReceiver();
+
+            // when the event receiver is busy it has exclusive rights to this event.
+            if (eventReceiver.IsBusy())
             {
-                activeWindow.OnMouseUp(button);
+                eventReceiver.OnMouseUp(button);
             }
             else
             {
-                if (activeWidget != null && activeWidget.wantsActive)
+                // handle widgets that no longer wish to be active.
+                if (activeEventReceiverIsWidget)
                 {
-                    activeWidget.OnMouseUp(button);
+                    var widget = GetActiveEventReceiver<Widget>();
+                    if (!widget.wantsActive)
+                    {
+                        eventReceiver.OnMouseUp(button);
+
+                        // try to focus the active tool.
+                        if (TrySwitchActiveEventReceiver(activeTool))
+                        {
+                            eventReceiver = activeTool;
+                        }
+                    }
+                    else
+                    {
+                        eventReceiver.OnMouseUp(button);
+                    }
                 }
                 else
                 {
-                    activeWidget = null;
-                    var widgetsCount = widgets.Count;
-                    for (int i = 0; i < widgetsCount; i++)
-                        widgets[i].OnMouseUp(button);
-
-                    activeTool.OnMouseUp(button);
+                    eventReceiver.OnMouseUp(button);
                 }
             }
 
@@ -102,24 +140,37 @@ namespace AeternumGames.ShapeEditor
 
         private void OnGlobalMouseUp(int button)
         {
-            if (activeWindow != null && activeWidget == null)
+            var eventReceiver = GetActiveEventReceiver();
+
+            // when the event receiver is busy it has exclusive rights to this event.
+            if (eventReceiver.IsBusy())
             {
-                activeWindow.OnGlobalMouseUp(button);
+                eventReceiver.OnGlobalMouseUp(button);
             }
             else
             {
-                if (activeWidget != null && activeWidget.wantsActive)
+                // handle widgets that no longer wish to be active.
+                if (activeEventReceiverIsWidget)
                 {
-                    activeWidget.OnGlobalMouseUp(button);
+                    var widget = GetActiveEventReceiver<Widget>();
+                    if (!widget.wantsActive)
+                    {
+                        eventReceiver.OnGlobalMouseUp(button);
+
+                        // try to focus the active tool.
+                        if (TrySwitchActiveEventReceiver(activeTool))
+                        {
+                            eventReceiver = activeTool;
+                        }
+                    }
+                    else
+                    {
+                        eventReceiver.OnGlobalMouseUp(button);
+                    }
                 }
                 else
                 {
-                    activeWidget = null;
-                    var widgetsCount = widgets.Count;
-                    for (int i = 0; i < widgetsCount; i++)
-                        widgets[i].OnGlobalMouseUp(button);
-
-                    activeTool.OnGlobalMouseUp(button);
+                    eventReceiver.OnGlobalMouseUp(button);
                 }
             }
 
@@ -128,26 +179,21 @@ namespace AeternumGames.ShapeEditor
 
         private void OnMouseDrag(int button, float2 screenDelta, float2 gridDelta)
         {
-            if (activeWindow != null && activeWidget == null)
+            var eventReceiver = GetActiveEventReceiver();
+
+            // when the event receiver is busy it has exclusive rights to this event.
+            if (eventReceiver.IsBusy())
             {
-                activeWindow.OnMouseDrag(button, screenDelta);
+                eventReceiver.OnMouseDrag(button, screenDelta, gridDelta);
             }
             else
             {
-                if (activeWidget != null && activeWidget.wantsActive)
-                {
-                    activeWidget.OnMouseDrag(button, screenDelta, gridDelta);
-                }
-                else
-                {
-                    activeWidget = null;
-                    var widgetsCount = widgets.Count;
-                    for (int i = 0; i < widgetsCount; i++)
-                        widgets[i].OnMouseDrag(button, screenDelta, gridDelta);
+                eventReceiver.OnMouseDrag(button, screenDelta, gridDelta);
+            }
 
-                    activeTool.OnMouseDrag(button, screenDelta, gridDelta);
-                }
-
+            // maybe check for a return value and disable this behavior.
+            if (activeEventReceiverIsTool || activeEventReceiverIsWidget)
+            {
                 // pan the viewport around with the right mouse button.
                 if (isRightMousePressed)
                 {
@@ -160,27 +206,16 @@ namespace AeternumGames.ShapeEditor
 
         private void OnMouseMove(float2 screenDelta, float2 gridDelta)
         {
-            // forward this event to the topmost window under the mouse position.
-            var window = FindWindowAtPosition(mousePosition);
-            if (window != null && activeWidget == null)
+            var eventReceiver = GetActiveEventReceiver();
+
+            // when the event receiver is busy it has exclusive rights to this event.
+            if (eventReceiver.IsBusy())
             {
-                window.OnMouseMove(screenDelta);
+                eventReceiver.OnMouseMove(screenDelta, gridDelta);
             }
             else
             {
-                if (activeWidget != null && activeWidget.wantsActive)
-                {
-                    activeWidget.OnMouseMove(screenDelta, gridDelta);
-                }
-                else
-                {
-                    activeWidget = null;
-                    var widgetsCount = widgets.Count;
-                    for (int i = 0; i < widgetsCount; i++)
-                        widgets[i].OnMouseMove(screenDelta, gridDelta);
-
-                    activeTool.OnMouseMove(screenDelta, gridDelta);
-                }
+                eventReceiver.OnMouseMove(screenDelta, gridDelta);
             }
 
             Repaint();
@@ -188,19 +223,22 @@ namespace AeternumGames.ShapeEditor
 
         private void OnMouseScroll(float delta)
         {
-            // possibly forward the event to a window.
-            if (activeWindow != null && activeWindow.OnMouseScroll(delta)) { Repaint(); return; }
+            var eventReceiver = GetActiveEventReceiver();
 
-            // possibly forward the event to a widget.
-            if (activeWidget != null && activeWidget.OnMouseScroll(delta)) { Repaint(); return; }
-
-            // possibly forward the event to a tool.
-            if (activeTool.OnMouseScroll(delta)) { Repaint(); return; }
+            // when the event receiver is busy it has exclusive rights to this event.
+            if (eventReceiver.IsBusy())
+            {
+                // possibly forward the event to a window.
+                if (eventReceiver.OnMouseScroll(delta)) { Repaint(); return; }
+            }
+            else
+            {
+                // possibly forward the event to a window.
+                if (eventReceiver.OnMouseScroll(delta)) { Repaint(); return; }
+            }
 
             // otherwise we provide default behavior: zoom.
-
             var mouseBeforeZoom = ScreenPointToGrid(mousePosition);
-
             gridZoom *= math.pow(2, -delta / 24.0f); // what about math.exp(-delta / 24.0f); ?
 
             // recalculate the grid offset to zoom into whatever is under the mouse cursor.
@@ -213,99 +251,97 @@ namespace AeternumGames.ShapeEditor
 
         private bool OnKeyDown(KeyCode keyCode)
         {
-            // possibly forward the event to a window.
-            if (activeWindow != null && activeWidget == null)
+            var eventReceiver = GetActiveEventReceiver();
+
+            // when the event receiver is busy it has exclusive rights to this event.
+            if (eventReceiver.IsBusy())
             {
-                return activeWindow.OnKeyDown(keyCode);
+                eventReceiver.OnKeyDown(keyCode);
             }
             else
             {
-                // possibly forward the event to a widget.
-                if (activeWidget != null)
+                var used = eventReceiver.OnKeyDown(keyCode);
+
+                // in tool mode we provide default keyboard shortcuts.
+                if (activeEventReceiverIsTool && !used)
                 {
-                    return activeWidget.OnKeyDown(keyCode);
-                }
-                else
-                {
-                    // possibly forward the event to the tool.
-                    if (activeTool.OnKeyDown(keyCode))
+                    switch (keyCode)
                     {
-                        return true;
-                    }
-                    else
-                    {
-                        switch (keyCode)
-                        {
-                            case KeyCode.H:
-                                GridResetOffset();
-                                GridResetZoom();
+                        case KeyCode.H:
+                            GridResetOffset();
+                            GridResetZoom();
+                            return true;
+
+                        case KeyCode.Q:
+                            SwitchToBoxSelectTool();
+                            return true;
+
+                        case KeyCode.W:
+                            SwitchToTranslateTool();
+                            return true;
+
+                        case KeyCode.E:
+                            SwitchToRotateTool();
+                            return true;
+
+                        case KeyCode.R:
+                            SwitchToScaleTool();
+                            return true;
+
+                        case KeyCode.Delete:
+                            DeleteSelection();
+                            return true;
+
+                        case KeyCode.Y:
+                            if (hasFocus && isCtrlPressed)
+                            {
+                                OnRedo();
                                 return true;
+                            }
+                            return true;
 
-                            case KeyCode.Q:
-                                SwitchToBoxSelectTool();
+                        case KeyCode.Z:
+                            if (hasFocus && isCtrlPressed)
+                            {
+                                OnUndo();
                                 return true;
-
-                            case KeyCode.W:
-                                SwitchToTranslateTool();
-                                return true;
-
-                            case KeyCode.E:
-                                SwitchToRotateTool();
-                                return true;
-
-                            case KeyCode.R:
-                                SwitchToScaleTool();
-                                return true;
-
-                            case KeyCode.Delete:
-                                DeleteSelection();
-                                return true;
-
-                            case KeyCode.Y:
-                                if (hasFocus && isCtrlPressed)
-                                {
-                                    OnRedo();
-                                    return true;
-                                }
-                                return false;
-
-                            case KeyCode.Z:
-                                if (hasFocus && isCtrlPressed)
-                                {
-                                    OnUndo();
-                                    return true;
-                                }
-                                return false;
-                        }
+                            }
+                            return true;
                     }
                 }
             }
+
+            // focus check, was this required? do this in the editor code?
+            if (hasFocus)
+            {
+                Repaint();
+                return true;
+            }
+
             return false;
         }
 
         private bool OnKeyUp(KeyCode keyCode)
         {
-            // possibly forward the event to a window.
-            if (activeWindow != null && activeWidget == null)
+            var eventReceiver = GetActiveEventReceiver();
+
+            // when the event receiver is busy it has exclusive rights to this event.
+            if (eventReceiver.IsBusy())
             {
-                return activeWindow.OnKeyUp(keyCode);
+                eventReceiver.OnKeyUp(keyCode);
             }
             else
             {
-                // possibly forward the event to a widget.
-                if (activeWidget != null)
-                {
-                    return activeWidget.OnKeyUp(keyCode);
-                }
-                else
-                {
-                    // possibly forward the event to the tool.
-                    if (activeTool.OnKeyUp(keyCode))
-                    {
-                        return true;
-                    }
-                }
+                eventReceiver.OnKeyUp(keyCode);
             }
+
+            // focus check, was this required? do this in the editor code?
+            if (hasFocus)
+            {
+                Repaint();
+                return true;
+            }
+
             return false;
         }
 

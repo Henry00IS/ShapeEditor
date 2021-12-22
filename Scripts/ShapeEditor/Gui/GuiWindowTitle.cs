@@ -46,7 +46,7 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        public override void OnMouseDrag(int button, float2 screenDelta)
+        public override void OnMouseDrag(int button, float2 screenDelta, float2 gridDelta)
         {
             if (button == 0)
             {

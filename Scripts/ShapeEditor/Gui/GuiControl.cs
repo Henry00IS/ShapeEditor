@@ -6,8 +6,11 @@ using UnityEngine;
 namespace AeternumGames.ShapeEditor
 {
     /// <summary>Represents a control inside of a window.</summary>
-    public abstract class GuiControl
+    public abstract class GuiControl : IEditorEventReceiver
     {
+        /// <summary>The shape editor window.</summary>
+        public ShapeEditorWindow editor { get; set; }
+
         /// <summary>The parent window that this control resides in.</summary>
         public GuiWindow parent;
         /// <summary>The relative position to the parent.</summary>
@@ -22,6 +25,25 @@ namespace AeternumGames.ShapeEditor
         {
             this.position = position;
             this.size = size;
+        }
+
+        /// <summary>
+        /// Gets whether the control is busy and has to maintain the input focus, making it
+        /// impossible to switch to another object.
+        /// </summary>
+        public virtual bool IsBusy()
+        {
+            return false;
+        }
+
+        /// <summary>Called when the control is activated.</summary>
+        public virtual void OnActivate()
+        {
+        }
+
+        /// <summary>Called when the control is deactivated.</summary>
+        public virtual void OnDeactivate()
+        {
         }
 
         /// <summary>Called when the control is rendered.</summary>
@@ -67,12 +89,12 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Called when the control receives a mouse drag event.</summary>
-        public virtual void OnMouseDrag(int button, float2 screenDelta)
+        public virtual void OnMouseDrag(int button, float2 screenDelta, float2 gridDelta)
         {
         }
 
         /// <summary>Called when the control receives a mouse move event.</summary>
-        public virtual void OnMouseMove(float2 screenDelta)
+        public virtual void OnMouseMove(float2 screenDelta, float2 gridDelta)
         {
         }
 

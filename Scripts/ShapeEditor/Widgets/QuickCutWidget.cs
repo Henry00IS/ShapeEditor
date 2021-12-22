@@ -23,7 +23,7 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Activates this keyboard shortcut widget.</summary>
         public void Activate()
         {
-            editor.activeWidget = this;
+            //editor.activeWidget = this;
             _wantsActive = true;
             isDone = false;
         }

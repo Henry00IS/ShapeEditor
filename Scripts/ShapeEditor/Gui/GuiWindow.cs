@@ -7,10 +7,11 @@ using UnityEngine;
 namespace AeternumGames.ShapeEditor
 {
     /// <summary>Represents a floating window inside of the 2D Shape Editor.</summary>
-    public class GuiWindow
+    public class GuiWindow : IEditorEventReceiver
     {
         /// <summary>The shape editor window.</summary>
-        public ShapeEditorWindow editor;
+        public ShapeEditorWindow editor { get; set; }
+
         /// <summary>The window position in screen coordinates.</summary>
         public float2 position;
         /// <summary>The window size in screen coordinates.</summary>
@@ -46,14 +47,21 @@ namespace AeternumGames.ShapeEditor
         protected Color colorWindowBorder = new Color(0.1f, 0.1f, 0.1f);
 
         /// <summary>Creates a new window at the specified position of the specified size.</summary>
-        /// <param name="parent">The parent window that this window resides in.</param>
         /// <param name="position">The window position in screen coordinates.</param>
         /// <param name="size">The window size in screen coordinates.</param>
-        public GuiWindow(ShapeEditorWindow parent, float2 position, float2 size)
+        public GuiWindow(float2 position, float2 size)
         {
-            this.editor = parent;
             this.position = position;
             this.size = size;
+        }
+
+        /// <summary>
+        /// Gets whether the window is busy and has to maintain the input focus, making it
+        /// impossible to switch to another object.
+        /// </summary>
+        public virtual bool IsBusy()
+        {
+            return false;
         }
 
         /// <summary>Adds the specified control to the window.</summary>
@@ -62,6 +70,16 @@ namespace AeternumGames.ShapeEditor
         {
             control.parent = this;
             controls.Add(control);
+        }
+
+        /// <summary>Called when the window is activated.</summary>
+        public virtual void OnActivate()
+        {
+        }
+
+        /// <summary>Called when the window is deactivated.</summary>
+        public virtual void OnDeactivate()
+        {
         }
 
         /// <summary>Called when the window is rendered.</summary>
@@ -131,21 +149,21 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Called when the window receives a mouse drag event.</summary>
-        public virtual void OnMouseDrag(int button, float2 screenDelta)
+        public virtual void OnMouseDrag(int button, float2 screenDelta, float2 gridDelta)
         {
             if (activeControl != null)
             {
-                activeControl.OnMouseDrag(button, screenDelta);
+                activeControl.OnMouseDrag(button, screenDelta, gridDelta);
             }
         }
 
         /// <summary>Called when the window receives a mouse move event.</summary>
-        public virtual void OnMouseMove(float2 screenDelta)
+        public virtual void OnMouseMove(float2 screenDelta, float2 gridDelta)
         {
             // forward this event to the topmost control under the mouse position.
             var control = FindControlAtPosition(mousePosition);
             if (control != null)
-                control.OnMouseMove(screenDelta);
+                control.OnMouseMove(screenDelta, gridDelta);
         }
 
         /// <summary>Called when the window receives a mouse scroll event.</summary>
@@ -179,7 +197,7 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Gets whether the window currently has input focus.</summary>
-        public bool isActive => this == editor.activeWindow;
+        public bool isActive => editor.IsActive(this);
 
         /// <summary>Whether there is an obstruction between the window and the mouse.</summary>
         public bool isMouseObstructed;

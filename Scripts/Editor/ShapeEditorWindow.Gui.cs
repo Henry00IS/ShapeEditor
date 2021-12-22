@@ -9,43 +9,15 @@ namespace AeternumGames.ShapeEditor
     {
         private List<GuiWindow> windows;
 
-        /// <summary>Do not access directly, use <see cref="activeWindow"/>!</summary>
-        private GuiWindow _activeWindow;
-
-        /// <summary>The window that currently has input focus or null.</summary>
-        internal GuiWindow activeWindow
-        {
-            get => _activeWindow;
-            set
-            {
-                if (_activeWindow == value) return;
-
-                if (_activeWindow != null)
-                {
-                    var lastActiveWindow = _activeWindow;
-                    _activeWindow = value;
-                    lastActiveWindow.OnFocusLost();
-                }
-
-                _activeWindow = value;
-                _activeWindow?.OnFocus();
-
-                // put the active window on top.
-                MoveWindowToFront(_activeWindow);
-            }
-        }
-
         public void DrawWindows()
         {
             if (windows == null)
             {
-                windows = new List<GuiWindow>()
-                {
-                    new TopToolbarGuiWindow(this, float2.zero, float2.zero),
-                    new BottomToolbarGuiWindow(this, float2.zero, float2.zero),
-                    new ToolbarGuiWindow(this, new float2(20, 40), new float2(30, 400)),
-                    new TextboxTestWindow(this, new float2(300, 100), new float2(220, 80)),
-                };
+                windows = new List<GuiWindow>();
+                AddWindow(new TopToolbarGuiWindow(float2.zero, float2.zero));
+                AddWindow(new BottomToolbarGuiWindow(float2.zero, float2.zero));
+                AddWindow(new ToolbarGuiWindow(new float2(20, 40), new float2(30, 400)));
+                AddWindow(new TextboxTestWindow(new float2(300, 100), new float2(220, 80)));
             }
 
             // before we draw the windows we check whether the mouse is obstructed.
@@ -100,6 +72,15 @@ namespace AeternumGames.ShapeEditor
                     }
                 }
             }
+        }
+
+        /// <summary>Adds the window the shape editor window.</summary>
+        /// <param name="window">The window to be added.</param>
+        internal void AddWindow(GuiWindow window)
+        {
+            window.editor = this;
+            windows.Add(window);
+            window.OnActivate();
         }
     }
 }

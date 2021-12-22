@@ -11,7 +11,6 @@ namespace AeternumGames.ShapeEditor
         private bool isMarqueeSubtractive;
         private static readonly Color marqueeColor = new Color(1.0f, 0.5f, 0.0f);
 
-        private QuickTranslationWidget quickTranslationWidget = new QuickTranslationWidget();
         private QuickScaleWidget quickScaleWidget = new QuickScaleWidget();
         private QuickRotationWidget quickRotationWidget = new QuickRotationWidget();
         private QuickCutWidget quickCutWidget = new QuickCutWidget();
@@ -19,10 +18,6 @@ namespace AeternumGames.ShapeEditor
         public override void OnActivate()
         {
             isMarqueeActive = false;
-
-            editor.AddWidget(quickTranslationWidget);
-            quickTranslationWidget.onBeginTranslating = () => TranslateTool.CommonAction_OnBeginTranslating(editor);
-            quickTranslationWidget.onMouseDrag = (screenDelta, gridDelta) => TranslateTool.CommonAction_OnMouseDrag(editor, gridDelta);
 
             editor.AddWidget(quickScaleWidget);
             quickScaleWidget.onBeginScaling = () => ScaleTool.CommonAction_OnBeginScaling(editor);
@@ -105,8 +100,7 @@ namespace AeternumGames.ShapeEditor
                 case KeyCode.G:
                     if (editor.selectedSegmentsCount > 0)
                     {
-                        quickTranslationWidget.position = editor.selectedSegmentsAveragePosition;
-                        quickTranslationWidget.Activate();
+                        editor.UseTool(new TranslateTool());
                         return true;
                     }
                     return false;

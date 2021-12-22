@@ -46,6 +46,10 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         public int bezierDetail = 3;
 
+        /// <summary>General purpose editor variable available to the object with input focus.</summary>
+        [NonSerialized]
+        public float2 gpVector1;
+
         /// <summary>Initializes a new instance of the <see cref="Segment"/> class.</summary>
         /// <param name="shape">The parent shape of this segment.</param>
         /// <param name="x">The x-coordinate on the grid.</param>
