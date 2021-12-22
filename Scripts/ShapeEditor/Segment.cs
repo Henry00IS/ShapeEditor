@@ -14,6 +14,10 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         private float2 _position;
 
+        /// <summary>The segment modifier.</summary>
+        [SerializeField]
+        private SegmentModifier _modifier;
+
         /// <summary>Whether the segment is selected.</summary>
         [NonSerialized]
         private bool _selected;
@@ -33,10 +37,18 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>
         /// The segment modifier with the type set to <see cref="SegmentModifierType.Nothing"/> if
-        /// not used. Modifiers can change how segments are generated and add selectable objects.
+        /// not used. Modifiers can change how segments are generated and add selectable objects.x
         /// </summary>
-        [SerializeField]
-        public SegmentModifier modifier = new SegmentModifier();
+        public SegmentModifier modifier
+        {
+            get
+            {
+                if (_modifier == null)
+                    _modifier = new SegmentModifier();
+                return _modifier;
+            }
+            set => _modifier = value;
+        }
 
         /// <summary>General purpose editor variable available to the object with input focus.</summary>
         public float2 gpVector1 { get; set; }
