@@ -11,13 +11,9 @@ namespace AeternumGames.ShapeEditor
         private bool isMarqueeSubtractive;
         private static readonly Color marqueeColor = new Color(1.0f, 0.5f, 0.0f);
 
-        private QuickCutWidget quickCutWidget = new QuickCutWidget();
-
         public override void OnActivate()
         {
             isMarqueeActive = false;
-
-            editor.AddWidget(quickCutWidget);
         }
 
         public override void OnRender()
@@ -85,6 +81,9 @@ namespace AeternumGames.ShapeEditor
 
         public override bool OnKeyDown(KeyCode keyCode)
         {
+            // these single-use tools are not available while in single-use mode.
+            if (isSingleUse) return false;
+
             switch (keyCode)
             {
                 case KeyCode.G:
@@ -112,8 +111,7 @@ namespace AeternumGames.ShapeEditor
                     return false;
 
                 case KeyCode.C:
-                    editor.RegisterUndo("Quick Cut");
-                    quickCutWidget.Activate();
+                    editor.UseTool(new CutTool());
                     return true;
             }
             return false;
