@@ -9,6 +9,8 @@ namespace AeternumGames.ShapeEditor
         Linear,
         /// <summary>Generates a bezier curve between two segments.</summary>
         Bezier,
+        /// <summary>Generates a sine wave between two segments.</summary>
+        Sine,
     }
 }
 

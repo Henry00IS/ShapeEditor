@@ -22,8 +22,8 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>
-        /// Creates a special segment generator, the following types are supported:
-        /// <para><see cref="SegmentGeneratorType.Bezier"/></para>
+        /// Creates a segment generator, the following types are supported with this constructor:
+        /// <para><see cref="SegmentGeneratorType.Bezier"/>, <see cref="SegmentGeneratorType.Sine"/></para>
         /// </summary>
         /// <param name="editor">The shape editor window.</param>
         /// <param name="segment">The first segment (that has the modifier).</param>
@@ -41,6 +41,10 @@ namespace AeternumGames.ShapeEditor
                 case SegmentGeneratorType.Bezier:
                     Bezier_Constructor(editor, segment, next);
                     break;
+
+                case SegmentGeneratorType.Sine:
+                    Sine_Constructor(editor, segment, next);
+                    break;
             }
         }
 
@@ -53,11 +57,13 @@ namespace AeternumGames.ShapeEditor
                     yield break;
 
                 case SegmentGeneratorType.Bezier:
-                    {
-                        foreach (var selectable in Bezier_ForEachSelectableObject())
-                            yield return selectable;
-                    }
+                    foreach (var selectable in Bezier_ForEachSelectableObject())
+                        yield return selectable;
+                    yield break;
 
+                case SegmentGeneratorType.Sine:
+                    foreach (var selectable in Sine_ForEachSelectableObject())
+                        yield return selectable;
                     yield break;
             }
         }
@@ -77,6 +83,10 @@ namespace AeternumGames.ShapeEditor
                 case SegmentGeneratorType.Bezier:
                     Bezier_DrawSegments(editor, segment, next);
                     break;
+
+                case SegmentGeneratorType.Sine:
+                    Sine_DrawSegments(editor, segment, next);
+                    break;
             }
         }
 
@@ -93,6 +103,10 @@ namespace AeternumGames.ShapeEditor
 
                 case SegmentGeneratorType.Bezier:
                     Bezier_DrawPivots(editor, segment, next);
+                    break;
+
+                case SegmentGeneratorType.Sine:
+                    Sine_DrawPivots(editor, segment, next);
                     break;
             }
         }

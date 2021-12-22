@@ -112,7 +112,7 @@ namespace AeternumGames.ShapeEditor
 
                 case KeyCode.C:
                     editor.UseTool(new CutTool());
-                    return true;
+                    return false;
 
                 case KeyCode.B:
                     if (editor.selectedSegmentsCount > 0)
@@ -120,7 +120,15 @@ namespace AeternumGames.ShapeEditor
                         editor.ToggleBezierTest();
                         return true;
                     }
-                    return true;
+                    return false;
+
+                case KeyCode.N:
+                    if (editor.selectedSegmentsCount > 0)
+                    {
+                        editor.ToggleSineTest();
+                        return true;
+                    }
+                    return false;
             }
             return false;
         }
