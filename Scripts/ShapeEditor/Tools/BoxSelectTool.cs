@@ -44,7 +44,7 @@ namespace AeternumGames.ShapeEditor
                 {
                     // iterate over all segments within the marquee.
                     var marqueeRect = MathEx.RectXYXY(editor.mouseGridInitialPosition, editor.mouseGridPosition);
-                    foreach (var segment in editor.ForEachSegmentInGridRect(marqueeRect))
+                    foreach (var segment in editor.ForEachSelectableInGridRect(marqueeRect))
                         segment.selected = !isMarqueeSubtractive;
                 }
                 else
@@ -112,6 +112,14 @@ namespace AeternumGames.ShapeEditor
 
                 case KeyCode.C:
                     editor.UseTool(new CutTool());
+                    return true;
+
+                case KeyCode.B:
+                    if (editor.selectedSegmentsCount > 0)
+                    {
+                        editor.ToggleBezierTest();
+                        return true;
+                    }
                     return true;
             }
             return false;

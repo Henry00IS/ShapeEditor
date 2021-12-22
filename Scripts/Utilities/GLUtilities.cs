@@ -370,6 +370,17 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        public static void DrawBezierLine(float thickness, float2 start, float2 p1, float2 p2, float2 end, int detail)
+        {
+            var lineStart = MathEx.BezierGetPoint(start, p1, p2, end, 0f);
+            for (int i = 1; i <= detail; i++)
+            {
+                var lineEnd = MathEx.BezierGetPoint(start, p1, p2, end, i / (float)detail);
+                DrawLine(thickness, lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
+                lineStart = lineEnd;
+            }
+        }
+
         public static void DrawCircle(float thickness, float2 position, float radius, Color color, int segments = 32)
         {
             float angle = 0f;

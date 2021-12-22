@@ -31,24 +31,15 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Gets or sets whether the segment is selected.</summary>
         public bool selected { get => _selected; set => _selected = value; }
 
-        /// <summary>The segment type.</summary>
+        /// <summary>
+        /// The segment modifier with the type set to <see cref="SegmentModifierType.Nothing"/> if
+        /// not used. Modifiers can change how segments are generated and add selectable objects.
+        /// </summary>
         [SerializeField]
-        public SegmentType type = SegmentType.Linear;
-
-        /// <summary>The first bezier pivot (see <see cref="SegmentType.Bezier"/>).</summary>
-        [SerializeField]
-        public Pivot bezierPivot1 = new Pivot();
-
-        /// <summary>The second bezier pivot (see <see cref="SegmentType.Bezier"/>).</summary>
-        [SerializeField]
-        public Pivot bezierPivot2 = new Pivot();
-
-        [SerializeField]
-        public int bezierDetail = 3;
+        public SegmentModifier modifier = new SegmentModifier();
 
         /// <summary>General purpose editor variable available to the object with input focus.</summary>
-        [NonSerialized]
-        public float2 gpVector1;
+        public float2 gpVector1 { get; set; }
 
         /// <summary>Initializes a new instance of the <see cref="Segment"/> class.</summary>
         /// <param name="shape">The parent shape of this segment.</param>

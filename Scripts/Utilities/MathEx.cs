@@ -244,6 +244,24 @@ namespace AeternumGames.ShapeEditor
             dotP = Mathf.Clamp(dotP, 0f, magnitudeMax);
             return origin + (float2)heading * dotP;
         }
+
+        /// <summary>Gets the point on a 4-point curve.</summary>
+        /// <param name="p0">The start point.</param>
+        /// <param name="p1">The first pivot point.</param>
+        /// <param name="p2">The second pivot point.</param>
+        /// <param name="p3">The end point.</param>
+        /// <param name="t">The interpolant along the curve.</param>
+        /// <returns>The point on the curve.</returns>
+        public static float2 BezierGetPoint(float2 p0, float2 p1, float2 p2, float2 p3, float t)
+        {
+            t = Mathf.Clamp01(t);
+            float OneMinusT = 1f - t;
+            return
+                OneMinusT * OneMinusT * OneMinusT * p0 +
+                3f * OneMinusT * OneMinusT * t * p1 +
+                3f * OneMinusT * t * t * p2 +
+                t * t * t * p3;
+        }
     }
 }
 

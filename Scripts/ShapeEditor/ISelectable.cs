@@ -12,6 +12,9 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>The position of the object on the grid.</summary>
         float2 position { get; set; }
+
+        /// <summary>General purpose editor variable available to the object with input focus.</summary>
+        float2 gpVector1 { get; set; }
     }
 }
 

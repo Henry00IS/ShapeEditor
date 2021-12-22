@@ -40,7 +40,14 @@ namespace AeternumGames.ShapeEditor
         {
             var segmentsCount = segments.Count;
             for (int i = 0; i < segmentsCount; i++)
-                segments[i].selected = false;
+            {
+                var segment = segments[i];
+                segment.selected = false;
+
+                if (segment.modifier.type != SegmentModifierType.Nothing)
+                    foreach (var modifierSelectable in segment.modifier.ForEachSelectableObject())
+                        modifierSelectable.selected = false;
+            }
         }
 
         /// <summary>Calculates the pivot position so that it's centered on the shape.</summary>

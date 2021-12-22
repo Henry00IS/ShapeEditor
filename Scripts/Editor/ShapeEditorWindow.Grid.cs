@@ -9,11 +9,11 @@ namespace AeternumGames.ShapeEditor
     public partial class ShapeEditorWindow
     {
         private const float screenScale = 200f;
-        private const float pivotScale = 9f;
-        private const float halfPivotScale = pivotScale / 2f;
-        private static readonly Color segmentColor = new Color(0.7f, 0.7f, 0.7f);
-        private static readonly Color segmentPivotSelectedColor = new Color(0.9f, 0.45f, 0.0f);
-        private static readonly Color segmentPivotOutlineColor = new Color(1.0f, 0.5f, 0.0f);
+        internal const float pivotScale = 9f;
+        internal const float halfPivotScale = pivotScale / 2f;
+        internal static readonly Color segmentColor = new Color(0.7f, 0.7f, 0.7f);
+        internal static readonly Color segmentPivotSelectedColor = new Color(0.9f, 0.45f, 0.0f);
+        internal static readonly Color segmentPivotOutlineColor = new Color(1.0f, 0.5f, 0.0f);
         private float2 gridOffset;
         internal float gridZoom = 1f;
         internal float gridSnap = 0.125f;
@@ -89,11 +89,15 @@ namespace AeternumGames.ShapeEditor
                         var segment = shape.segments[j];
                         var next = shape.segments[j + 1 >= segmentsCount ? 0 : j + 1];
 
-                        if (segment.type == SegmentType.Linear)
+                        if (segment.modifier.type == SegmentModifierType.Nothing)
                         {
-                            Vector2 p1 = GridPointToScreen(segment.position);
-                            Vector2 p2 = GridPointToScreen(next.position);
+                            var p1 = GridPointToScreen(segment.position);
+                            var p2 = GridPointToScreen(next.position);
                             GLUtilities.DrawLine(1.0f, p1.x, p1.y, p2.x, p2.y, segment.selected ? segmentPivotOutlineColor : segmentColor, next.selected ? segmentPivotOutlineColor : segmentColor);
+                        }
+                        else
+                        {
+                            segment.modifier.DrawSegments(this, segment, next);
                         }
                     }
                 }
@@ -107,10 +111,20 @@ namespace AeternumGames.ShapeEditor
 
             GLUtilities.DrawGui(() =>
             {
-                foreach (Shape shape in project.shapes)
+                // for every shape in the project:
+                var shapesCount = project.shapes.Count;
+                for (int i = 0; i < shapesCount; i++)
                 {
-                    foreach (Segment segment in shape.segments)
+                    var shape = project.shapes[i];
+
+                    // for every segment in the project:
+                    var segmentsCount = shape.segments.Count;
+                    for (int j = 0; j < segmentsCount; j++)
                     {
+                        // get the current segment and the next segment (wrapping around).
+                        var segment = shape.segments[j];
+                        var next = shape.segments[j + 1 >= segmentsCount ? 0 : j + 1];
+
                         float2 pos = GridPointToScreen(segment.position);
                         GLUtilities.DrawSolidRectangleWithOutline(pos.x - halfPivotScale, pos.y - halfPivotScale, pivotScale, pivotScale, segment.selected ? segmentPivotSelectedColor : Color.white, segment.selected ? segmentPivotOutlineColor : Color.black);
 
@@ -118,6 +132,11 @@ namespace AeternumGames.ShapeEditor
                         {
                             selectedSegmentsCount++;
                             selectedSegmentsAveragePosition += pos;
+                        }
+
+                        if (segment.modifier.type != SegmentModifierType.Nothing)
+                        {
+                            segment.modifier.DrawPivots(this, segment, next);
                         }
                     }
                 }
@@ -187,39 +206,15 @@ namespace AeternumGames.ShapeEditor
             gridZoom = 1f;
         }
 
-        /// <summary>Attempts to find the closest segment at the specified grid position.</summary>
-        /// <param name="position">The grid position to search at.</param>
-        /// <returns>The segment if found or null.</returns>
-        private Segment FindSegmentAtGridPosition(float2 position, float maxDistance)
-        {
-            float closestDistance = float.MaxValue;
-            Segment result = null;
-
-            foreach (Shape shape in project.shapes)
-            {
-                foreach (Segment segment in shape.segments)
-                {
-                    var distance = math.distance(position, segment.position);
-                    if (distance < maxDistance && distance < closestDistance)
-                    {
-                        closestDistance = distance;
-                        result = segment;
-                    }
-                }
-            }
-
-            return result;
-        }
-
         /// <summary>Attempts to find the closest segment at the specified screen position.</summary>
         /// <param name="position">The screen position to search at.</param>
         /// <returns>The segment if found or null.</returns>
-        internal Segment FindSegmentAtScreenPosition(float2 position, float maxDistance)
+        internal ISelectable FindSegmentAtScreenPosition(float2 position, float maxDistance)
         {
             float closestDistance = float.MaxValue;
-            Segment result = null;
+            ISelectable result = null;
 
-            foreach (Shape shape in project.shapes)
+            foreach (var shape in project.shapes)
             {
                 foreach (Segment segment in shape.segments)
                 {
@@ -228,6 +223,19 @@ namespace AeternumGames.ShapeEditor
                     {
                         closestDistance = distance;
                         result = segment;
+                    }
+
+                    if (segment.modifier.type != SegmentModifierType.Nothing)
+                    {
+                        foreach (var modifierSelectable in segment.modifier.ForEachSelectableObject())
+                        {
+                            distance = math.distance(position, GridPointToScreen(modifierSelectable.position));
+                            if (distance < maxDistance && distance < closestDistance)
+                            {
+                                closestDistance = distance;
+                                result = modifierSelectable;
+                            }
+                        }
                     }
                 }
             }
@@ -266,10 +274,10 @@ namespace AeternumGames.ShapeEditor
                     var segment = shape.segments[j];
                     var next = shape.segments[j + 1 >= segmentsCount ? 0 : j + 1];
 
-                    if (segment.type == SegmentType.Linear)
+                    if (segment.modifier.type == SegmentModifierType.Nothing)
                     {
-                        Vector2 p1 = GridPointToScreen(segment.position);
-                        Vector2 p2 = GridPointToScreen(next.position);
+                        var p1 = GridPointToScreen(segment.position);
+                        var p2 = GridPointToScreen(next.position);
 
                         var distance = MathEx.PointDistanceFromLine(position, p1, p2);
                         if (distance < maxDistance && distance < closestDistance)
@@ -289,28 +297,40 @@ namespace AeternumGames.ShapeEditor
             return found;
         }
 
-        /// <summary>Iterates over all of the selected segments.</summary>
-        internal IEnumerable<Segment> ForEachSelectedSegment()
+        /// <summary>Iterates over all of the selected objects.</summary>
+        internal IEnumerable<ISelectable> ForEachSelectedObject()
         {
-            foreach (Shape shape in project.shapes)
+            foreach (var shape in project.shapes)
             {
-                foreach (Segment segment in shape.segments)
+                foreach (var segment in shape.segments)
                 {
                     if (segment.selected)
                         yield return segment;
+
+                    if (segment.modifier.type != SegmentModifierType.Nothing)
+                        foreach (var modifierSelectable in segment.modifier.ForEachSelectableObject())
+                            if (modifierSelectable.selected)
+                                yield return modifierSelectable;
                 }
             }
         }
 
-        /// <summary>Iterates over all of the segments within the given rectangle.</summary>
-        internal IEnumerable<Segment> ForEachSegmentInGridRect(Rect rect)
+        /// <summary>Iterates over all of the selectable objects within the given rectangle.</summary>
+        internal IEnumerable<ISelectable> ForEachSelectableInGridRect(Rect rect)
         {
-            foreach (Shape shape in project.shapes)
+            foreach (var shape in project.shapes)
             {
-                foreach (Segment segment in shape.segments)
+                foreach (var segment in shape.segments)
                 {
                     if (rect.Contains(segment.position))
                         yield return segment;
+
+                    if (segment.modifier.type != SegmentModifierType.Nothing)
+                    {
+                        foreach (var modifierSelectable in segment.modifier.ForEachSelectableObject())
+                            if (rect.Contains(modifierSelectable.position))
+                                yield return modifierSelectable;
+                    }
                 }
             }
         }
@@ -336,6 +356,38 @@ namespace AeternumGames.ShapeEditor
                 // remove the shape if it's empty.
                 if (segments.Count == 0)
                     project.shapes.RemoveAt(i);
+            }
+        }
+
+        public void ToggleBezierTest()
+        {
+            // for every shape in the project:
+            var shapesCount = project.shapes.Count;
+            for (int i = shapesCount; i-- > 0;)
+            {
+                var shape = project.shapes[i];
+
+                // for every segment in the project:
+                var segments = shape.segments;
+                var segmentsCount = segments.Count;
+                for (int j = segmentsCount; j-- > 0;)
+                {
+                    if (segments[j].selected)
+                    {
+                        // get the current segment and the next segment (wrapping around).
+                        var segment = shape.segments[j];
+                        var next = shape.segments[j + 1 >= segmentsCount ? 0 : j + 1];
+
+                        if (segment.modifier.type == SegmentModifierType.Nothing)
+                        {
+                            segment.modifier = new SegmentModifier(this, segment, next, SegmentModifierType.Bezier);
+                        }
+                        else
+                        {
+                            segment.modifier = null;
+                        }
+                    }
+                }
             }
         }
     }

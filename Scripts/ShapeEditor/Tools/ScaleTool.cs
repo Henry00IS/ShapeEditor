@@ -132,7 +132,7 @@ namespace AeternumGames.ShapeEditor
             editor.RegisterUndo("Scale Selection");
 
             // store the initial position of all selected segments.
-            foreach (var segment in editor.ForEachSelectedSegment())
+            foreach (var segment in editor.ForEachSelectedObject())
                 segment.gpVector1 = segment.position;
         }
 
@@ -143,7 +143,7 @@ namespace AeternumGames.ShapeEditor
                 scale = scale.Snap(editor.gridSnap);
 
             // scale the selected segments using their initial position.
-            foreach (var segment in editor.ForEachSelectedSegment())
+            foreach (var segment in editor.ForEachSelectedObject())
                 segment.position = MathEx.ScaleAroundPivot(segment.gpVector1, pivot, scale);
         }
     }

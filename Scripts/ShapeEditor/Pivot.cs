@@ -23,6 +23,8 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Gets or sets whether the pivot is selected.</summary>
         public bool selected { get => _selected; set => _selected = value; }
+
+        public float2 gpVector1 { get; set; }
     }
 }
 

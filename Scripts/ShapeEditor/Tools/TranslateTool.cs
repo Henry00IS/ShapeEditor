@@ -114,7 +114,7 @@ namespace AeternumGames.ShapeEditor
             deltaAccumulator = float2.zero;
 
             // store the initial position of all selected segments.
-            foreach (var segment in editor.ForEachSelectedSegment())
+            foreach (var segment in editor.ForEachSelectedObject())
                 segment.gpVector1 = segment.position;
         }
 
@@ -123,7 +123,7 @@ namespace AeternumGames.ShapeEditor
             deltaAccumulator += gridDelta;
             float2 position = deltaAccumulator;
 
-            foreach (var segment in editor.ForEachSelectedSegment())
+            foreach (var segment in editor.ForEachSelectedObject())
             {
                 // snap to the grid when the control key is being held down.
                 if (editor.isCtrlPressed)

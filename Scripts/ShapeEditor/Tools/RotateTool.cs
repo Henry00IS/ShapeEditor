@@ -126,7 +126,7 @@ namespace AeternumGames.ShapeEditor
             editor.RegisterUndo("Rotate Selection");
 
             // store the initial position of all selected segments.
-            foreach (var segment in editor.ForEachSelectedSegment())
+            foreach (var segment in editor.ForEachSelectedObject())
                 segment.gpVector1 = segment.position;
         }
 
@@ -138,7 +138,7 @@ namespace AeternumGames.ShapeEditor
             }
 
             // rotate the selected segments using their initial position.
-            foreach (var segment in editor.ForEachSelectedSegment())
+            foreach (var segment in editor.ForEachSelectedObject())
                 segment.position = MathEx.RotatePointAroundPivot(segment.gpVector1, pivot, degrees);
         }
     }
