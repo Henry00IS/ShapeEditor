@@ -32,7 +32,7 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         public virtual bool IsBusy()
         {
-            return false;
+            return isActive && wantsActive;
         }
 
         /// <summary>Called when the widget is activated.</summary>
