@@ -138,6 +138,10 @@ namespace AeternumGames.ShapeEditor
 
         private void ToolOnMouseDrag(float2 pivot, float2 scale)
         {
+            // snap the scale to grid increments when the control key is being held down.
+            if (editor.isCtrlPressed)
+                scale = scale.Snap(editor.gridSnap);
+
             // scale the selected segments using their initial position.
             foreach (var segment in editor.ForEachSelectedSegment())
                 segment.position = MathEx.ScaleAroundPivot(segment.gpVector1, pivot, scale);
