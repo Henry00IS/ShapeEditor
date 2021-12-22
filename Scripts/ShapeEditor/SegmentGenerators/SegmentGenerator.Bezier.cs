@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
-    public partial class SegmentModifier
+    public partial class SegmentGenerator
     {
-        // a segment modifier that generates a bezier curve between two segments.
+        // a segment generator that generates a bezier curve between two segments.
 
         [SerializeField]
         public int bezierDetail = 3;

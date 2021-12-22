@@ -44,8 +44,8 @@ namespace AeternumGames.ShapeEditor
                 var segment = segments[i];
                 segment.selected = false;
 
-                if (segment.modifier.type != SegmentModifierType.Nothing)
-                    foreach (var modifierSelectable in segment.modifier.ForEachSelectableObject())
+                if (segment.generator.type != SegmentGeneratorType.Linear)
+                    foreach (var modifierSelectable in segment.generator.ForEachSelectableObject())
                         modifierSelectable.selected = false;
             }
         }

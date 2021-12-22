@@ -89,16 +89,8 @@ namespace AeternumGames.ShapeEditor
                         var segment = shape.segments[j];
                         var next = shape.segments[j + 1 >= segmentsCount ? 0 : j + 1];
 
-                        if (segment.modifier.type == SegmentModifierType.Nothing)
-                        {
-                            var p1 = GridPointToScreen(segment.position);
-                            var p2 = GridPointToScreen(next.position);
-                            GLUtilities.DrawLine(1.0f, p1.x, p1.y, p2.x, p2.y, segment.selected ? segmentPivotOutlineColor : segmentColor, next.selected ? segmentPivotOutlineColor : segmentColor);
-                        }
-                        else
-                        {
-                            segment.modifier.DrawSegments(this, segment, next);
-                        }
+                        // have the segment generator draw the segments.
+                        segment.generator.DrawSegments(this, segment, next);
                     }
                 }
             });
@@ -134,10 +126,8 @@ namespace AeternumGames.ShapeEditor
                             selectedSegmentsAveragePosition += pos;
                         }
 
-                        if (segment.modifier.type != SegmentModifierType.Nothing)
-                        {
-                            segment.modifier.DrawPivots(this, segment, next);
-                        }
+                        // have the segment generator draw additional pivots.
+                        segment.generator.DrawPivots(this, segment, next);
                     }
                 }
             });
@@ -225,16 +215,14 @@ namespace AeternumGames.ShapeEditor
                         result = segment;
                     }
 
-                    if (segment.modifier.type != SegmentModifierType.Nothing)
+                    // check for additional selectable objects in the segment generator.
+                    foreach (var modifierSelectable in segment.generator.ForEachSelectableObject())
                     {
-                        foreach (var modifierSelectable in segment.modifier.ForEachSelectableObject())
+                        distance = math.distance(position, GridPointToScreen(modifierSelectable.position));
+                        if (distance < maxDistance && distance < closestDistance)
                         {
-                            distance = math.distance(position, GridPointToScreen(modifierSelectable.position));
-                            if (distance < maxDistance && distance < closestDistance)
-                            {
-                                closestDistance = distance;
-                                result = modifierSelectable;
-                            }
+                            closestDistance = distance;
+                            result = modifierSelectable;
                         }
                     }
                 }
@@ -274,7 +262,8 @@ namespace AeternumGames.ShapeEditor
                     var segment = shape.segments[j];
                     var next = shape.segments[j + 1 >= segmentsCount ? 0 : j + 1];
 
-                    if (segment.modifier.type == SegmentModifierType.Nothing)
+                    // todo: generators should tell us this:
+                    if (segment.generator.type == SegmentGeneratorType.Linear)
                     {
                         var p1 = GridPointToScreen(segment.position);
                         var p2 = GridPointToScreen(next.position);
@@ -307,10 +296,10 @@ namespace AeternumGames.ShapeEditor
                     if (segment.selected)
                         yield return segment;
 
-                    if (segment.modifier.type != SegmentModifierType.Nothing)
-                        foreach (var modifierSelectable in segment.modifier.ForEachSelectableObject())
-                            if (modifierSelectable.selected)
-                                yield return modifierSelectable;
+                    // check for additional selectable objects in the segment generator.
+                    foreach (var modifierSelectable in segment.generator.ForEachSelectableObject())
+                        if (modifierSelectable.selected)
+                            yield return modifierSelectable;
                 }
             }
         }
@@ -325,12 +314,10 @@ namespace AeternumGames.ShapeEditor
                     if (rect.Contains(segment.position))
                         yield return segment;
 
-                    if (segment.modifier.type != SegmentModifierType.Nothing)
-                    {
-                        foreach (var modifierSelectable in segment.modifier.ForEachSelectableObject())
-                            if (rect.Contains(modifierSelectable.position))
-                                yield return modifierSelectable;
-                    }
+                    // check for additional selectable objects in the segment generator.
+                    foreach (var modifierSelectable in segment.generator.ForEachSelectableObject())
+                        if (rect.Contains(modifierSelectable.position))
+                            yield return modifierSelectable;
                 }
             }
         }
@@ -378,13 +365,13 @@ namespace AeternumGames.ShapeEditor
                         var segment = shape.segments[j];
                         var next = shape.segments[j + 1 >= segmentsCount ? 0 : j + 1];
 
-                        if (segment.modifier.type == SegmentModifierType.Nothing)
+                        if (segment.generator.type == SegmentGeneratorType.Linear)
                         {
-                            segment.modifier = new SegmentModifier(this, segment, next, SegmentModifierType.Bezier);
+                            segment.generator = new SegmentGenerator(this, segment, next, SegmentGeneratorType.Bezier);
                         }
                         else
                         {
-                            segment.modifier = null;
+                            segment.generator = new SegmentGenerator();
                         }
                     }
                 }
