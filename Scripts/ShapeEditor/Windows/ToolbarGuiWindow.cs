@@ -11,6 +11,7 @@ namespace AeternumGames.ShapeEditor
         private GuiButton translateButton;
         private GuiButton rotateButton;
         private GuiButton scaleButton;
+        private GuiButton cutButton;
 
         public ToolbarGuiWindow(float2 position, float2 size) : base(position, size) { }
 
@@ -35,6 +36,11 @@ namespace AeternumGames.ShapeEditor
             {
                 editor.SwitchToScaleTool();
             }));
+
+            AddControl(cutButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorCut, new float2(1, 113), new float2(28, 28), () =>
+            {
+                editor.SwitchToCutTool();
+            }));
         }
 
         public override void OnRender()
@@ -44,6 +50,7 @@ namespace AeternumGames.ShapeEditor
             translateButton.isChecked = type == typeof(TranslateTool);
             rotateButton.isChecked = type == typeof(RotateTool);
             scaleButton.isChecked = type == typeof(ScaleTool);
+            cutButton.isChecked = type == typeof(CutTool);
 
             base.OnRender();
         }

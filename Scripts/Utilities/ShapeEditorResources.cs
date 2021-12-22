@@ -40,6 +40,7 @@ namespace AeternumGames.ShapeEditor
         }
 
         public Texture2D shapeEditorCreatePolygon;
+        public Texture2D shapeEditorCut;
         public Texture2D shapeEditorDelete;
         public Texture2D shapeEditorExtrudeBevel;
         public Texture2D shapeEditorExtrudePoint;
