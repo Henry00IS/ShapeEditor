@@ -64,6 +64,8 @@ namespace AeternumGames.ShapeEditor
 
                     if (cutFound)
                     {
+                        editor.RegisterUndo("Cut Segment");
+
                         // clear the active selection.
                         editor.project.ClearSelection();
 

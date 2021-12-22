@@ -12,6 +12,8 @@ namespace AeternumGames.ShapeEditor
         private GuiLabel gridZoomLabel;
         private GuiFloatTextbox gridSnapTextbox;
         private GuiLabel gridSnapLabel;
+        private GuiFloatTextbox angleSnapTextbox;
+        private GuiLabel angleSnapLabel;
 
         public BottomToolbarGuiWindow(float2 position, float2 size) : base(position, size)
         {
@@ -23,6 +25,8 @@ namespace AeternumGames.ShapeEditor
             AddControl(gridZoomLabel = new GuiLabel("Zoom:", new float2(0f, 0f), new float2(32, 20)));
             AddControl(gridSnapTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)) { allowNegativeNumbers = false });
             AddControl(gridSnapLabel = new GuiLabel("Snap:", new float2(0f, 0f), new float2(30, 20)));
+            AddControl(angleSnapTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)) { allowNegativeNumbers = false });
+            AddControl(angleSnapLabel = new GuiLabel("Angle:", new float2(0f, 0f), new float2(32, 20)));
         }
 
         public override void OnRender()
@@ -52,6 +56,15 @@ namespace AeternumGames.ShapeEditor
             // grid snap label:
             xpos -= gridSnapLabel.size.x + 3f;
             gridSnapLabel.position = new float2(xpos, 4f);
+
+            // angle snap textbox:
+            xpos -= angleSnapTextbox.size.x + 3f;
+            angleSnapTextbox.position = new float2(xpos, 3f);
+            editor.angleSnap = angleSnapTextbox.UpdateValue(editor.angleSnap);
+
+            // angle snap label:
+            xpos -= angleSnapLabel.size.x + 3f;
+            angleSnapLabel.position = new float2(xpos, 4f);
 
             base.OnRender();
         }

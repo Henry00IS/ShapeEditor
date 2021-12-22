@@ -132,6 +132,11 @@ namespace AeternumGames.ShapeEditor
 
         private void ToolOnRotation(float2 pivot, float degrees)
         {
+            if (editor.isCtrlPressed)
+            {
+                degrees = degrees.Snap(editor.angleSnap);
+            }
+
             // rotate the selected segments using their initial position.
             foreach (var segment in editor.ForEachSelectedSegment())
                 segment.position = MathEx.RotatePointAroundPivot(segment.gpVector1, pivot, degrees);

@@ -173,6 +173,11 @@ namespace AeternumGames.ShapeEditor
         /// <param name="snap">The multiple to snap against.</param>
         public static float2 Snap(this float2 value, float2 snap) => new float2(Snapping.Snap(value.x, snap.x), Snapping.Snap(value.y, snap.y));
 
+        /// <summary>Rounds to the closest multiple of snap.</summary>
+        /// <param name="value">The value to be snapped.</param>
+        /// <param name="snap">The multiple to snap against.</param>
+        public static float Snap(this float value, float snap) => Snapping.Snap(value, snap);
+
         public static Rect RectXYXY(float x1, float y1, float x2, float y2)
         {
             var mx1 = math.min(x1, x2);

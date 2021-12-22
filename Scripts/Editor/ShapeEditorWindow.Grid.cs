@@ -17,6 +17,7 @@ namespace AeternumGames.ShapeEditor
         private float2 gridOffset;
         internal float gridZoom = 1f;
         internal float gridSnap = 0.125f;
+        internal float angleSnap = 15f;
         internal int renderTextureWidth = 1;
         internal int renderTextureHeight = 1;
 
