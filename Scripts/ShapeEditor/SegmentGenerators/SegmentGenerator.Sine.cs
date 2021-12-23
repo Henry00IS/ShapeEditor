@@ -46,11 +46,28 @@ namespace AeternumGames.ShapeEditor
 
             GL.Color(ShapeEditorWindow.segmentColor);
 
+            var detail = 64;
+            var frequency = 4f;
+            var normal = math.normalize(p2 - p1);
+            var cross = Vector2.Perpendicular(normal);
+
             var prevPos = p1;
-            for (int i = 0; i < 64; i++)
+            for (int i = 1; i <= detail; i++)
             {
-                var pos = math.lerp(p1, p2, i / 64f);
-                pos.y += math.sin((i / 64f) * 32.0f) * height;
+                float2 pos;
+                if (i == detail)
+                {
+                    pos = p2; // make sure it always aligns perfectly.
+                }
+                else
+                {
+                    var t = i / (float)detail;
+                    pos = math.lerp(p1, p2, t);
+
+                    var curve = math.sin(2f * Mathf.PI * t * frequency) * height;
+                    pos.x += curve * cross.x;
+                    pos.y += curve * cross.y;
+                }
 
                 GLUtilities.DrawLine(1.0f, prevPos, pos);
                 prevPos = pos;
