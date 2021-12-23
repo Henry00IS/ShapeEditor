@@ -144,11 +144,10 @@ namespace AeternumGames.ShapeEditor
             enumerator.MoveNext();
             float2 last = editor.GridPointToScreen(enumerator.Current);
 
+            GL.Color(segment.selected ? ShapeEditorWindow.segmentPivotOutlineColor : ShapeEditorWindow.segmentColor);
             while (enumerator.MoveNext())
             {
                 float2 next = editor.GridPointToScreen(enumerator.Current);
-
-                GL.Color(segment.selected ? ShapeEditorWindow.segmentPivotOutlineColor : ShapeEditorWindow.segmentColor);
                 GLUtilities.DrawLine(1.0f, last.x, last.y, next.x, next.y);
                 last = next;
             }

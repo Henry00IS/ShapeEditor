@@ -11,7 +11,10 @@ namespace AeternumGames.ShapeEditor
         // a segment generator that generates a sine wave between two segments.
 
         [SerializeField]
-        public int sineDetail = 3;
+        public int sineDetail = 64;
+
+        [SerializeField]
+        public float sineFrequency = -3.5f;
 
         [SerializeField]
         public Pivot sinePivot1 = new Pivot();
@@ -59,25 +62,23 @@ namespace AeternumGames.ShapeEditor
             var p3 = sinePivot1.position;
 
             var height = math.distance(p1, p3);
-            var detail = 64;
-            var frequency = -3.5f;
             var normal = math.normalize(p2 - p1);
             var cross = Vector2.Perpendicular(normal);
 
             var prevPos = p1;
-            for (int i = 1; i <= detail; i++)
+            for (int i = 1; i <= sineDetail; i++)
             {
                 float2 pos;
-                if (i == detail)
+                if (i == sineDetail)
                 {
                     pos = p2; // make sure it always aligns perfectly.
                 }
                 else
                 {
-                    var t = i / (float)detail;
+                    var t = i / (float)sineDetail;
                     pos = math.lerp(p1, p2, t);
 
-                    var curve = math.sin(2f * Mathf.PI * t * frequency) * height;
+                    var curve = math.sin(2f * Mathf.PI * t * sineFrequency) * height;
                     pos.x += curve * cross.x;
                     pos.y += curve * cross.y;
                 }
