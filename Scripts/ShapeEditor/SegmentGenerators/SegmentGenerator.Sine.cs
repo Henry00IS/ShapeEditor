@@ -16,14 +16,14 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         public Pivot sinePivot1 = new Pivot();
 
-        public void Sine_Constructor(ShapeEditorWindow editor, Segment segment)
+        private void Sine_Constructor(ShapeEditorWindow editor, Segment segment)
         {
             var distance = math.distance(segment.position, segment.next.position);
             var normal = math.normalize(segment.next.position - segment.position);
             sinePivot1.position = segment.position + (normal * distance * 0.125f);
         }
 
-        public void Sine_DrawPivots(ShapeEditorWindow editor, Segment segment)
+        private void Sine_DrawPivots(ShapeEditorWindow editor, Segment segment)
         {
             float2 p1 = editor.GridPointToScreen(sinePivot1.position);
 
@@ -36,16 +36,29 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        public void Sine_DrawSegments(ShapeEditorWindow editor, Segment segment)
+        private void Sine_DrawSegments(ShapeEditorWindow editor, Segment segment)
         {
+            DrawSegments(editor, segment, Sine_ForEachSegmentPoint(editor, segment));
+
             var p1 = editor.GridPointToScreen(segment.position);
-            var p2 = editor.GridPointToScreen(segment.next.position);
             var p3 = editor.GridPointToScreen(sinePivot1.position);
 
+            GL.Color(Color.red);
+            GLUtilities.DrawLine(1.0f, p1, p3);
+        }
+
+        private IEnumerable<ISelectable> Sine_ForEachSelectableObject()
+        {
+            yield return sinePivot1;
+        }
+
+        private IEnumerable<float2> Sine_ForEachSegmentPoint(ShapeEditorWindow editor, Segment segment)
+        {
+            var p1 = segment.position;
+            var p2 = segment.next.position;
+            var p3 = sinePivot1.position;
+
             var height = math.distance(p1, p3);
-
-            GL.Color(ShapeEditorWindow.segmentColor);
-
             var detail = 64;
             var frequency = -3.5f;
             var normal = math.normalize(p2 - p1);
@@ -69,17 +82,10 @@ namespace AeternumGames.ShapeEditor
                     pos.y += curve * cross.y;
                 }
 
-                GLUtilities.DrawLine(1.0f, prevPos, pos);
+                yield return prevPos;
+                yield return pos;
                 prevPos = pos;
             }
-
-            GL.Color(Color.red);
-            GLUtilities.DrawLine(1.0f, p1, p3);
-        }
-
-        public IEnumerable<ISelectable> Sine_ForEachSelectableObject()
-        {
-            yield return sinePivot1;
         }
     }
 }

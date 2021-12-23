@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -90,7 +91,7 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Draws the modifier pivots to the screen.</summary>
         /// <param name="editor">The shape editor window.</param>
-        /// <param name="segment">The first segment (that has the modifier).</param>
+        /// <param name="segment">The segment that has the modifier.</param>
         public void DrawPivots(ShapeEditorWindow editor, Segment segment)
         {
             switch (type)
@@ -105,6 +106,51 @@ namespace AeternumGames.ShapeEditor
                 case SegmentGeneratorType.Sine:
                     Sine_DrawPivots(editor, segment);
                     break;
+            }
+        }
+
+        /// <summary>Iterates over the generated segment points in grid coordinates.</summary>
+        /// <param name="editor">The shape editor window.</param>
+        /// <param name="segment">The segment that has the modifier.</param>
+        public IEnumerable<float2> ForEachSegmentPoint(ShapeEditorWindow editor, Segment segment)
+        {
+            switch (type)
+            {
+                case SegmentGeneratorType.Linear:
+                    foreach (var point in Linear_ForEachSegmentPoint(editor, segment))
+                        yield return point;
+                    break;
+
+                case SegmentGeneratorType.Bezier:
+                    foreach (var point in Bezier_ForEachSegmentPoint(editor, segment))
+                        yield return point;
+                    break;
+
+                case SegmentGeneratorType.Sine:
+                    foreach (var point in Sine_ForEachSegmentPoint(editor, segment))
+                        yield return point;
+                    break;
+            }
+            yield break;
+        }
+
+        /// <summary>Iterates over the enumerable of grid coordinate points to draw segments.</summary>
+        /// <param name="editor">The shape editor window.</param>
+        /// <param name="segment">The segment that has the modifier.</param>
+        /// <param name="iterator">The generated segment points in grid coordinates.</param>
+        private void DrawSegments(ShapeEditorWindow editor, Segment segment, IEnumerable<float2> iterator)
+        {
+            var enumerator = iterator.GetEnumerator();
+            enumerator.MoveNext();
+            float2 last = editor.GridPointToScreen(enumerator.Current);
+
+            while (enumerator.MoveNext())
+            {
+                float2 next = editor.GridPointToScreen(enumerator.Current);
+
+                GL.Color(segment.selected ? ShapeEditorWindow.segmentPivotOutlineColor : ShapeEditorWindow.segmentColor);
+                GLUtilities.DrawLine(1.0f, last.x, last.y, next.x, next.y);
+                last = next;
             }
         }
     }
