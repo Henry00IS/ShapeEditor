@@ -19,15 +19,15 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         public Pivot bezierPivot2 = new Pivot();
 
-        public void Bezier_Constructor(ShapeEditorWindow editor, Segment segment, Segment next)
+        public void Bezier_Constructor(ShapeEditorWindow editor, Segment segment)
         {
-            var distance = math.distance(segment.position, next.position);
-            var normal = math.normalize(next.position - segment.position);
+            var distance = math.distance(segment.position, segment.next.position);
+            var normal = math.normalize(segment.next.position - segment.position);
             bezierPivot1.position = segment.position + (normal * distance * 0.25f);
-            bezierPivot2.position = next.position - (normal * distance * 0.25f);
+            bezierPivot2.position = segment.next.position - (normal * distance * 0.25f);
         }
 
-        public void Bezier_DrawPivots(ShapeEditorWindow editor, Segment segment, Segment next)
+        public void Bezier_DrawPivots(ShapeEditorWindow editor, Segment segment)
         {
             float2 p1 = editor.GridPointToScreen(bezierPivot1.position);
             float2 p2 = editor.GridPointToScreen(bezierPivot2.position);
@@ -48,12 +48,12 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        public void Bezier_DrawSegments(ShapeEditorWindow editor, Segment segment, Segment next)
+        public void Bezier_DrawSegments(ShapeEditorWindow editor, Segment segment)
         {
             var p1 = editor.GridPointToScreen(segment.position);
             var p2 = editor.GridPointToScreen(bezierPivot1.position);
             var p3 = editor.GridPointToScreen(bezierPivot2.position);
-            var p4 = editor.GridPointToScreen(next.position);
+            var p4 = editor.GridPointToScreen(segment.next.position);
             GL.Color(ShapeEditorWindow.segmentColor);
             GLUtilities.DrawBezierLine(1.0f, p1, p2, p3, p4, 8);
 

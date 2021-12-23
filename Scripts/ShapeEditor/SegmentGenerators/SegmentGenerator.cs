@@ -26,10 +26,9 @@ namespace AeternumGames.ShapeEditor
         /// <para><see cref="SegmentGeneratorType.Bezier"/>, <see cref="SegmentGeneratorType.Sine"/></para>
         /// </summary>
         /// <param name="editor">The shape editor window.</param>
-        /// <param name="segment">The first segment (that has the modifier).</param>
-        /// <param name="next">The next connected segment.</param>
+        /// <param name="segment">The segment that has the modifier.</param>
         /// <param name="type">The segment generator type to create.</param>
-        public SegmentGenerator(ShapeEditorWindow editor, Segment segment, Segment next, SegmentGeneratorType type)
+        public SegmentGenerator(ShapeEditorWindow editor, Segment segment, SegmentGeneratorType type)
         {
             this.type = type;
 
@@ -39,11 +38,11 @@ namespace AeternumGames.ShapeEditor
                     break;
 
                 case SegmentGeneratorType.Bezier:
-                    Bezier_Constructor(editor, segment, next);
+                    Bezier_Constructor(editor, segment);
                     break;
 
                 case SegmentGeneratorType.Sine:
-                    Sine_Constructor(editor, segment, next);
+                    Sine_Constructor(editor, segment);
                     break;
             }
         }
@@ -70,22 +69,21 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Draws the modifier segments to the screen.</summary>
         /// <param name="editor">The shape editor window.</param>
-        /// <param name="segment">The first segment (that has the modifier).</param>
-        /// <param name="next">The next connected segment.</param>
-        public void DrawSegments(ShapeEditorWindow editor, Segment segment, Segment next)
+        /// <param name="segment">The segment that has the modifier.</param>
+        public void DrawSegments(ShapeEditorWindow editor, Segment segment)
         {
             switch (type)
             {
                 case SegmentGeneratorType.Linear:
-                    Linear_DrawSegments(editor, segment, next);
+                    Linear_DrawSegments(editor, segment);
                     break;
 
                 case SegmentGeneratorType.Bezier:
-                    Bezier_DrawSegments(editor, segment, next);
+                    Bezier_DrawSegments(editor, segment);
                     break;
 
                 case SegmentGeneratorType.Sine:
-                    Sine_DrawSegments(editor, segment, next);
+                    Sine_DrawSegments(editor, segment);
                     break;
             }
         }
@@ -93,8 +91,7 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Draws the modifier pivots to the screen.</summary>
         /// <param name="editor">The shape editor window.</param>
         /// <param name="segment">The first segment (that has the modifier).</param>
-        /// <param name="next">The next connected segment.</param>
-        public void DrawPivots(ShapeEditorWindow editor, Segment segment, Segment next)
+        public void DrawPivots(ShapeEditorWindow editor, Segment segment)
         {
             switch (type)
             {
@@ -102,11 +99,11 @@ namespace AeternumGames.ShapeEditor
                     break;
 
                 case SegmentGeneratorType.Bezier:
-                    Bezier_DrawPivots(editor, segment, next);
+                    Bezier_DrawPivots(editor, segment);
                     break;
 
                 case SegmentGeneratorType.Sine:
-                    Sine_DrawPivots(editor, segment, next);
+                    Sine_DrawPivots(editor, segment);
                     break;
             }
         }

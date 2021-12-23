@@ -16,14 +16,14 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         public Pivot sinePivot1 = new Pivot();
 
-        public void Sine_Constructor(ShapeEditorWindow editor, Segment segment, Segment next)
+        public void Sine_Constructor(ShapeEditorWindow editor, Segment segment)
         {
-            var distance = math.distance(segment.position, next.position);
-            var normal = math.normalize(next.position - segment.position);
+            var distance = math.distance(segment.position, segment.next.position);
+            var normal = math.normalize(segment.next.position - segment.position);
             sinePivot1.position = segment.position + (normal * distance * 0.125f);
         }
 
-        public void Sine_DrawPivots(ShapeEditorWindow editor, Segment segment, Segment next)
+        public void Sine_DrawPivots(ShapeEditorWindow editor, Segment segment)
         {
             float2 p1 = editor.GridPointToScreen(sinePivot1.position);
 
@@ -36,10 +36,10 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        public void Sine_DrawSegments(ShapeEditorWindow editor, Segment segment, Segment next)
+        public void Sine_DrawSegments(ShapeEditorWindow editor, Segment segment)
         {
             var p1 = editor.GridPointToScreen(segment.position);
-            var p2 = editor.GridPointToScreen(next.position);
+            var p2 = editor.GridPointToScreen(segment.next.position);
             var p3 = editor.GridPointToScreen(sinePivot1.position);
 
             var height = math.distance(p1, p3);

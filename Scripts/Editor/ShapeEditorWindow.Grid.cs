@@ -87,10 +87,9 @@ namespace AeternumGames.ShapeEditor
                     {
                         // get the current segment and the next segment (wrapping around).
                         var segment = shape.segments[j];
-                        var next = shape.segments[j + 1 >= segmentsCount ? 0 : j + 1];
 
                         // have the segment generator draw the segments.
-                        segment.generator.DrawSegments(this, segment, next);
+                        segment.generator.DrawSegments(this, segment);
                     }
                 }
             });
@@ -115,7 +114,6 @@ namespace AeternumGames.ShapeEditor
                     {
                         // get the current segment and the next segment (wrapping around).
                         var segment = shape.segments[j];
-                        var next = shape.segments[j + 1 >= segmentsCount ? 0 : j + 1];
 
                         float2 pos = GridPointToScreen(segment.position);
                         GLUtilities.DrawSolidRectangleWithOutline(pos.x - halfPivotScale, pos.y - halfPivotScale, pivotScale, pivotScale, segment.selected ? segmentPivotSelectedColor : Color.white, segment.selected ? segmentPivotOutlineColor : Color.black);
@@ -127,7 +125,7 @@ namespace AeternumGames.ShapeEditor
                         }
 
                         // have the segment generator draw additional pivots.
-                        segment.generator.DrawPivots(this, segment, next);
+                        segment.generator.DrawPivots(this, segment);
                     }
                 }
             });
@@ -363,11 +361,10 @@ namespace AeternumGames.ShapeEditor
                     {
                         // get the current segment and the next segment (wrapping around).
                         var segment = shape.segments[j];
-                        var next = shape.segments[j + 1 >= segmentsCount ? 0 : j + 1];
 
                         if (segment.generator.type != SegmentGeneratorType.Bezier)
                         {
-                            segment.generator = new SegmentGenerator(this, segment, next, SegmentGeneratorType.Bezier);
+                            segment.generator = new SegmentGenerator(this, segment, SegmentGeneratorType.Bezier);
                         }
                         else
                         {
@@ -395,11 +392,10 @@ namespace AeternumGames.ShapeEditor
                     {
                         // get the current segment and the next segment (wrapping around).
                         var segment = shape.segments[j];
-                        var next = shape.segments[j + 1 >= segmentsCount ? 0 : j + 1];
 
                         if (segment.generator.type != SegmentGeneratorType.Sine)
                         {
-                            segment.generator = new SegmentGenerator(this, segment, next, SegmentGeneratorType.Sine);
+                            segment.generator = new SegmentGenerator(this, segment, SegmentGeneratorType.Sine);
                         }
                         else
                         {
