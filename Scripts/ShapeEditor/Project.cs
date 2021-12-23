@@ -40,6 +40,23 @@ namespace AeternumGames.ShapeEditor
             for (int i = 0; i < shapesCount; i++)
                 shapes[i].ClearSelection();
         }
+
+        [NonSerialized]
+        private bool isValid = false;
+
+        /// <summary>Ensures all data in the project is ready to go (especially after C# reloads).</summary>
+        public void Validate()
+        {
+            if (!isValid)
+            {
+                isValid = true;
+
+                // recalculate the segment indices.
+                var shapesCount = shapes.Count;
+                for (int i = 0; i < shapesCount; i++)
+                    shapes[i].RecalculateSegmentIndices();
+            }
+        }
     }
 }
 

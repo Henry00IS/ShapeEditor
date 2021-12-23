@@ -338,7 +338,7 @@ namespace AeternumGames.ShapeEditor
                 var segmentsCount = segments.Count;
                 for (int j = segmentsCount; j-- > 0;)
                     if (segments[j].selected)
-                        segments.RemoveAt(j);
+                        shape.RemoveSegment(segments[j]);
 
                 // remove the shape if it's empty.
                 if (segments.Count == 0)

@@ -24,6 +24,9 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Called by the Unity Editor to process events.</summary>
         private void OnGUI()
         {
+            // ensure the project is ready, it has data that's lost on deserialization.
+            project.Validate();
+
             // continue to request mouse move events, as this flag can get reset upon c# reloads.
             wantsMouseMove = true;
 

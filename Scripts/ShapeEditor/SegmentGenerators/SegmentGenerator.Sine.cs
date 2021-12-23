@@ -20,7 +20,7 @@ namespace AeternumGames.ShapeEditor
         {
             var distance = math.distance(segment.position, next.position);
             var normal = math.normalize(next.position - segment.position);
-            sinePivot1.position = segment.position + (normal * distance * 0.25f);
+            sinePivot1.position = segment.position + (normal * distance * 0.125f);
         }
 
         public void Sine_DrawPivots(ShapeEditorWindow editor, Segment segment, Segment next)
@@ -47,7 +47,7 @@ namespace AeternumGames.ShapeEditor
             GL.Color(ShapeEditorWindow.segmentColor);
 
             var detail = 64;
-            var frequency = 4f;
+            var frequency = -3.5f;
             var normal = math.normalize(p2 - p1);
             var cross = Vector2.Perpendicular(normal);
 

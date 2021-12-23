@@ -88,7 +88,7 @@ namespace AeternumGames.ShapeEditor
             var shape = findSegmentLineResult.shape;
             var segment = new Segment(shape, cutGridPosition);
             segment.selected = true;
-            shape.segments.Insert(findSegmentLineResult.segmentIndex2, segment);
+            shape.InsertSegmentBefore(findSegmentLineResult.segment2, segment);
         }
 
         public override void OnGlobalMouseUp(int button)

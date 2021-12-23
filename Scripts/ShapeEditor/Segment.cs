@@ -31,6 +31,14 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Gets or sets whether the segment is selected.</summary>
         public bool selected { get => _selected; set => _selected = value; }
 
+        /// <summary>Gets the previous segment.</summary>
+        [NonSerialized]
+        public Segment previous;
+
+        /// <summary>Gets the next segment.</summary>
+        [NonSerialized]
+        public Segment next;
+
         /// <summary>
         /// The segment generator with the type set to <see cref="SegmentGeneratorType.Linear"/> by
         /// default. Generators define how segments are generated and sometimes add selectable
