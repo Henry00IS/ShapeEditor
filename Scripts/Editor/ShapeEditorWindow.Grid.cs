@@ -21,8 +21,12 @@ namespace AeternumGames.ShapeEditor
         internal int renderTextureWidth = 1;
         internal int renderTextureHeight = 1;
 
+        /// <summary>After rendering the pivots this variable holds the total number of segments.</summary>
+        internal int totalSegmentsCount;
+
         /// <summary>After rendering the pivots this variable holds the number of selected segments.</summary>
         internal int selectedSegmentsCount;
+
         /// <summary>
         /// After rendering the pivots this variable holds the average position of all selected
         /// segments. Only available when the selected segments count is greater than 0.
@@ -85,11 +89,8 @@ namespace AeternumGames.ShapeEditor
                     var segmentsCount = shape.segments.Count;
                     for (int j = 0; j < segmentsCount; j++)
                     {
-                        // get the current segment and the next segment (wrapping around).
-                        var segment = shape.segments[j];
-
                         // have the segment generator draw the segments.
-                        segment.generator.DrawSegments(this, segment);
+                        shape.segments[j].generator.DrawSegments();
                     }
                 }
             });
@@ -97,6 +98,7 @@ namespace AeternumGames.ShapeEditor
 
         private void DrawPivots()
         {
+            totalSegmentsCount = 0;
             selectedSegmentsCount = 0;
             selectedSegmentsAveragePosition = float2.zero;
 
@@ -118,6 +120,7 @@ namespace AeternumGames.ShapeEditor
                         float2 pos = GridPointToScreen(segment.position);
                         GLUtilities.DrawSolidRectangleWithOutline(pos.x - halfPivotScale, pos.y - halfPivotScale, pivotScale, pivotScale, segment.selected ? segmentPivotSelectedColor : Color.white, segment.selected ? segmentPivotOutlineColor : Color.black);
 
+                        totalSegmentsCount++;
                         if (segment.selected)
                         {
                             selectedSegmentsCount++;
@@ -125,7 +128,7 @@ namespace AeternumGames.ShapeEditor
                         }
 
                         // have the segment generator draw additional pivots.
-                        segment.generator.DrawPivots(this, segment);
+                        segment.generator.DrawPivots();
                     }
                 }
             });
@@ -363,11 +366,11 @@ namespace AeternumGames.ShapeEditor
 
                         if (segment.generator.type != SegmentGeneratorType.Bezier)
                         {
-                            segment.generator = new SegmentGenerator(this, segment, SegmentGeneratorType.Bezier);
+                            segment.generator = new SegmentGenerator(segment, SegmentGeneratorType.Bezier);
                         }
                         else
                         {
-                            segment.generator = new SegmentGenerator();
+                            segment.generator = new SegmentGenerator(segment);
                         }
                     }
                 }
@@ -394,12 +397,37 @@ namespace AeternumGames.ShapeEditor
 
                         if (segment.generator.type != SegmentGeneratorType.Sine)
                         {
-                            segment.generator = new SegmentGenerator(this, segment, SegmentGeneratorType.Sine);
+                            segment.generator = new SegmentGenerator(segment, SegmentGeneratorType.Sine);
                         }
                         else
                         {
-                            segment.generator = new SegmentGenerator();
+                            segment.generator = new SegmentGenerator(segment);
                         }
+                    }
+                }
+            }
+        }
+
+        public void ApplyGeneratorTest()
+        {
+            // for every shape in the project:
+            var shapesCount = project.shapes.Count;
+            for (int i = shapesCount; i-- > 0;)
+            {
+                var shape = project.shapes[i];
+
+                // for every segment in the project:
+                var segments = shape.segments;
+                var segmentsCount = segments.Count;
+                for (int j = segmentsCount; j-- > 0;)
+                {
+                    if (segments[j].selected)
+                    {
+                        // get the current segment and the next segment (wrapping around).
+                        var segment = shape.segments[j];
+
+                        segment.generator.ApplyGenerator();
+                        segment.generator = new SegmentGenerator(segment);
                     }
                 }
             }

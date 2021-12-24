@@ -19,15 +19,16 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         public Pivot sinePivot1 = new Pivot();
 
-        private void Sine_Constructor(ShapeEditorWindow editor, Segment segment)
+        private void Sine_Constructor()
         {
             var distance = math.distance(segment.position, segment.next.position);
             var normal = math.normalize(segment.next.position - segment.position);
             sinePivot1.position = segment.position + (normal * distance * 0.125f);
         }
 
-        private void Sine_DrawPivots(ShapeEditorWindow editor, Segment segment)
+        private void Sine_DrawPivots()
         {
+            var editor = ShapeEditorWindow.Instance;
             float2 p1 = editor.GridPointToScreen(sinePivot1.position);
 
             GLUtilities.DrawSolidRectangleWithOutline(p1.x - ShapeEditorWindow.halfPivotScale, p1.y - ShapeEditorWindow.halfPivotScale, ShapeEditorWindow.pivotScale, ShapeEditorWindow.pivotScale, sinePivot1.selected ? ShapeEditorWindow.segmentPivotSelectedColor : Color.white, sinePivot1.selected ? ShapeEditorWindow.segmentPivotOutlineColor : Color.black);
@@ -39,9 +40,10 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        private void Sine_DrawSegments(ShapeEditorWindow editor, Segment segment)
+        private void Sine_DrawSegments()
         {
-            DrawSegments(editor, segment, Sine_ForEachSegmentPoint(editor, segment));
+            var editor = ShapeEditorWindow.Instance;
+            DrawSegments(Sine_ForEachSegmentPoint());
 
             var p1 = editor.GridPointToScreen(segment.position);
             var p3 = editor.GridPointToScreen(sinePivot1.position);
@@ -55,7 +57,7 @@ namespace AeternumGames.ShapeEditor
             yield return sinePivot1;
         }
 
-        private IEnumerable<float2> Sine_ForEachSegmentPoint(ShapeEditorWindow editor, Segment segment)
+        private IEnumerable<float2> Sine_ForEachSegmentPoint()
         {
             var p1 = segment.position;
             var p2 = segment.next.position;
@@ -65,27 +67,17 @@ namespace AeternumGames.ShapeEditor
             var normal = math.normalize(p2 - p1);
             var cross = Vector2.Perpendicular(normal);
 
-            var prevPos = p1;
-            for (int i = 1; i <= sineDetail; i++)
+            for (int i = 1; i <= sineDetail - 1; i++)
             {
                 float2 pos;
-                if (i == sineDetail)
-                {
-                    pos = p2; // make sure it always aligns perfectly.
-                }
-                else
-                {
-                    var t = i / (float)sineDetail;
-                    pos = math.lerp(p1, p2, t);
+                var t = i / (float)sineDetail;
+                pos = math.lerp(p1, p2, t);
 
-                    var curve = math.sin(2f * Mathf.PI * t * sineFrequency) * height;
-                    pos.x += curve * cross.x;
-                    pos.y += curve * cross.y;
-                }
+                var curve = math.sin(2f * Mathf.PI * t * sineFrequency) * height;
+                pos.x += curve * cross.x;
+                pos.y += curve * cross.y;
 
-                yield return prevPos;
                 yield return pos;
-                prevPos = pos;
             }
         }
     }

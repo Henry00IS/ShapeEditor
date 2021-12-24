@@ -19,7 +19,7 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         public Pivot bezierPivot2 = new Pivot();
 
-        private void Bezier_Constructor(ShapeEditorWindow editor, Segment segment)
+        private void Bezier_Constructor()
         {
             var distance = math.distance(segment.position, segment.next.position);
             var normal = math.normalize(segment.next.position - segment.position);
@@ -27,8 +27,9 @@ namespace AeternumGames.ShapeEditor
             bezierPivot2.position = segment.next.position - (normal * distance * 0.25f);
         }
 
-        private void Bezier_DrawPivots(ShapeEditorWindow editor, Segment segment)
+        private void Bezier_DrawPivots()
         {
+            var editor = ShapeEditorWindow.Instance;
             float2 p1 = editor.GridPointToScreen(bezierPivot1.position);
             float2 p2 = editor.GridPointToScreen(bezierPivot2.position);
 
@@ -48,14 +49,15 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        private void Bezier_DrawSegments(ShapeEditorWindow editor, Segment segment)
+        private void Bezier_DrawSegments()
         {
+            var editor = ShapeEditorWindow.Instance;
             var p1 = editor.GridPointToScreen(segment.position);
             var p2 = editor.GridPointToScreen(bezierPivot1.position);
             var p3 = editor.GridPointToScreen(bezierPivot2.position);
             var p4 = editor.GridPointToScreen(segment.next.position);
 
-            // draw manually because we have a function for it.
+            // draw manually in screen space because we have a function for it.
             GL.Color(segment.selected ? ShapeEditorWindow.segmentPivotOutlineColor : ShapeEditorWindow.segmentColor);
             GLUtilities.DrawBezierLine(1.0f, p1, p2, p3, p4, bezierDetail);
 
@@ -70,20 +72,16 @@ namespace AeternumGames.ShapeEditor
             yield return bezierPivot2;
         }
 
-        private IEnumerable<float2> Bezier_ForEachSegmentPoint(ShapeEditorWindow editor, Segment segment)
+        private IEnumerable<float2> Bezier_ForEachSegmentPoint()
         {
             var p1 = segment.position;
             var p2 = bezierPivot1.position;
             var p3 = bezierPivot2.position;
             var p4 = segment.next.position;
 
-            var lineStart = MathEx.BezierGetPoint(p1, p2, p3, p4, 0f);
-            for (int i = 1; i <= bezierDetail; i++)
+            for (int i = 1; i <= bezierDetail - 1; i++)
             {
-                var lineEnd = MathEx.BezierGetPoint(p1, p2, p3, p4, i / (float)bezierDetail);
-                yield return lineStart;
-                yield return lineEnd;
-                lineStart = lineEnd;
+                yield return MathEx.BezierGetPoint(p1, p2, p3, p4, i / (float)bezierDetail);
             }
         }
     }

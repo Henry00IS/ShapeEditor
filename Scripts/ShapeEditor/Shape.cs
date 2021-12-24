@@ -14,9 +14,6 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         public List<Segment> segments = new List<Segment>();
 
-        /// <summary>The center pivot of the shape.</summary>
-        public Pivot pivot = new Pivot();
-
         /// <summary>Creates a new shape.</summary>
         public Shape()
         {
@@ -122,22 +119,32 @@ namespace AeternumGames.ShapeEditor
             segments.RemoveAt(index);
         }
 
-        public void RecalculateSegmentIndices()
+        /// <summary>Ensures all data in the shape is ready to go (especially after C# reloads).</summary>
+        public void Validate()
         {
-            var segmentsCount = segments.Count;
-
-            // handle special cases first:
-            if (segmentsCount == 0) return;
-
             // for every segment in the shape:
+            var segmentsCount = segments.Count;
             for (int i = 0; i < segmentsCount; i++)
             {
+                // fill the segment with references.
+
                 var segment = segments[i];
+                segment.shape = this;
+
+                // recalculate the segment indices.
+
                 var previous = segments[i - 1 < 0 ? segmentsCount - 1 : i - 1];
                 var next = segments[i + 1 >= segmentsCount ? 0 : i + 1];
 
                 segment.previous = previous;
                 segment.next = next;
+
+                // fill the generators with references.
+
+                if (segment.generator == null)
+                    segment.generator = new SegmentGenerator(segment);
+                else
+                    segment.generator.segment = segment;
             }
         }
 

@@ -35,7 +35,7 @@ namespace AeternumGames.ShapeEditor
             position = new float2(0f, editor.position.height - 22f);
             size = new float2(editor.position.width, 22f);
 
-            statusLabel.text = "2D Shape Editor";
+            statusLabel.text = "2D Shape Editor (" + editor.totalSegmentsCount + " Segments)";
 
             var xpos = size.x;
 

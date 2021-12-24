@@ -18,15 +18,12 @@ namespace AeternumGames.ShapeEditor
         [NonSerialized]
         private bool _selected;
 
-        /// <summary>The parent shape of the segment.</summary>
+        /// <summary>The parent shape of the segment (read only).</summary>
         [NonSerialized]
-        private Shape _shape;
+        public Shape shape;
 
         /// <summary>Gets or sets the position of the segment on the grid.</summary>
         public float2 position { get => _position; set => _position = value; }
-
-        /// <summary>Gets the parent shape of the segment.</summary>
-        public Shape shape { get => _shape; }
 
         /// <summary>Gets or sets whether the segment is selected.</summary>
         public bool selected { get => _selected; set => _selected = value; }
@@ -45,7 +42,7 @@ namespace AeternumGames.ShapeEditor
         /// objects. Never set this to null.
         /// </summary>
         [SerializeField]
-        public SegmentGenerator generator = new SegmentGenerator();
+        public SegmentGenerator generator;
 
         /// <summary>General purpose editor variable available to the object with input focus.</summary>
         public float2 gpVector1 { get; set; }
@@ -56,8 +53,9 @@ namespace AeternumGames.ShapeEditor
         /// <param name="y">The y-coordinate on the grid.</param>
         public Segment(Shape shape, float x, float y)
         {
-            _shape = shape;
+            this.shape = shape;
             _position = new float2(x, y);
+            generator = new SegmentGenerator(this);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Segment"/> class.</summary>
@@ -65,8 +63,9 @@ namespace AeternumGames.ShapeEditor
         /// <param name="position">The coordinate on the grid.</param>
         public Segment(Shape shape, float2 position)
         {
-            _shape = shape;
+            this.shape = shape;
             _position = position;
+            generator = new SegmentGenerator(this);
         }
     }
 }

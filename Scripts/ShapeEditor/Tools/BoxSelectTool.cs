@@ -129,6 +129,14 @@ namespace AeternumGames.ShapeEditor
                         return true;
                     }
                     return false;
+
+                case KeyCode.V:
+                    if (editor.selectedSegmentsCount > 0)
+                    {
+                        editor.ApplyGeneratorTest();
+                        return true;
+                    }
+                    return false;
             }
             return false;
         }

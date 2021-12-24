@@ -45,16 +45,17 @@ namespace AeternumGames.ShapeEditor
         private bool isValid = false;
 
         /// <summary>Ensures all data in the project is ready to go (especially after C# reloads).</summary>
+        /// <param name="editor">The shape editor window.</param>
         public void Validate()
         {
             if (!isValid)
             {
                 isValid = true;
 
-                // recalculate the segment indices.
+                // validate every shape in the project:
                 var shapesCount = shapes.Count;
                 for (int i = 0; i < shapesCount; i++)
-                    shapes[i].RecalculateSegmentIndices();
+                    shapes[i].Validate();
             }
         }
     }
