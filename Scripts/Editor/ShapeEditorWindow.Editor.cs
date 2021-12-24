@@ -8,6 +8,7 @@ namespace AeternumGames.ShapeEditor
 {
     public partial class ShapeEditorWindow
     {
+        internal float lastRenderTime;
         internal bool isLeftMousePressed;
         private bool isRightMousePressed;
         internal float2 mousePosition;
@@ -34,7 +35,9 @@ namespace AeternumGames.ShapeEditor
 
             if (e.type == EventType.Repaint)
             {
+                var time = Time.realtimeSinceStartup;
                 OnRepaint();
+                lastRenderTime = Time.realtimeSinceStartup - time;
 
                 // set the desired mouse cursor.
                 if (desiredMouseCursor != MouseCursor.Arrow)
