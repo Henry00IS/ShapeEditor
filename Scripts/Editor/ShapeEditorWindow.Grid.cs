@@ -85,7 +85,7 @@ namespace AeternumGames.ShapeEditor
                 {
                     var shape = project.shapes[i];
 
-                    // for every segment in the project:
+                    // for every segment in the shape:
                     var segmentsCount = shape.segments.Count;
                     for (int j = 0; j < segmentsCount; j++)
                     {

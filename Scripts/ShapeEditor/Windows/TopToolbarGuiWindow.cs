@@ -19,6 +19,11 @@ namespace AeternumGames.ShapeEditor
             {
                 editor.OnNewProject();
             }));
+
+            AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorExtrudeShape, new float2(21, 1), new float2(20, 20), () =>
+            {
+                editor.OnCreatePolygonMeshTest();
+            }));
         }
 
         public override void OnRender()

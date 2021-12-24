@@ -368,6 +368,29 @@ namespace AeternumGames.ShapeEditor
             project = new Project();
             Repaint();
         }
+
+        internal void OnCreatePolygonMeshTest()
+        {
+            // for every shape in the project:
+            var shapesCount = project.shapes.Count;
+            for (int i = 0; i < shapesCount; i++)
+            {
+                var shape = project.shapes[i];
+
+                // generate the vertices.
+                var vertices = shape.GenerateVertices();
+
+                // decompose the polygon.
+                var convexPolygons = BayazitDecomposer.ConvexPartition(vertices);
+
+                // generate a mesh.
+                var mesh = MeshGenerator.CreatePolygonMesh(convexPolygons);
+
+                var go = new GameObject("2D Shape Editor Polygon");
+                go.AddComponent<MeshFilter>().sharedMesh = mesh;
+                go.AddComponent<MeshRenderer>();//.material = ???
+            }
+        }
     }
 }
 

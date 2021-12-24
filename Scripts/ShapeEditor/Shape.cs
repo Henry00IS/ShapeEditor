@@ -148,6 +148,28 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        /// <summary>Generates the vertices representing this shape for convex decomposition.</summary>
+        /// <returns>The collection of vertices.</returns>
+        public Vertices GenerateVertices()
+        {
+            Vertices results = new Vertices();
+
+            // for every segment in the shape:
+            var segmentsCount = segments.Count;
+            for (int j = 0; j < segmentsCount; j++)
+            {
+                // add the segment point.
+                var segment = segments[j];
+                results.Add(segment.position);
+
+                // have the segment generator add additional points.
+                foreach (var point in segments[j].generator.ForEachAdditionalSegmentPoint())
+                    results.Add(point);
+            }
+
+            return results;
+        }
+
         /// <summary>Clones this shape and returns the copy.</summary>
         /// <returns>A copy of the shape.</returns>
         public Shape Clone()
