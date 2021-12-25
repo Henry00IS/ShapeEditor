@@ -9,8 +9,8 @@ namespace AeternumGames.ShapeEditor
     {
         internal void OnNewProject()
         {
+            RegisterUndo("New Project");
             project = new Project();
-            Repaint();
         }
 
         internal void OnOpenProject()
@@ -27,16 +27,21 @@ namespace AeternumGames.ShapeEditor
                     switch (proj.version)
                     {
                         case 1:
+                            RegisterUndo("Load Project");
                             project = JsonUtility.FromJson<ProjectV1>(text).ToV2();
                             break;
 
                         case 2:
+                            RegisterUndo("Load Project");
                             project = JsonUtility.FromJson<Project>(text);
                             break;
 
                         default:
                             if (EditorUtility.DisplayDialog("2D Shape Editor", "Unsupported project version! Would you like to try loading it anyway?", "Yes", "No"))
+                            {
+                                RegisterUndo("Load Project");
                                 project = JsonUtility.FromJson<Project>(text);
+                            }
                             break;
                     }
                 }
