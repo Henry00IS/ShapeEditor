@@ -176,6 +176,24 @@ namespace AeternumGames.ShapeEditor
                 if (OnKeyUp(e.keyCode))
                     e.Use();
             }
+
+            if (e.type == EventType.DragUpdated)
+            {
+                DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                e.Use();
+            }
+
+            if (e.type == EventType.DragPerform)
+            {
+                DragAndDrop.AcceptDrag();
+
+                if (DragAndDrop.paths.Length > 0)
+                {
+                    OnOpenProject(DragAndDrop.paths[0]);
+                }
+
+                e.Use();
+            }
         }
 
         internal Rect GetViewportRect()
