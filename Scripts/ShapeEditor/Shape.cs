@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -150,9 +151,9 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Generates the vertices representing this shape for convex decomposition.</summary>
         /// <returns>The collection of vertices.</returns>
-        public Vertices GenerateVertices()
+        public Polygon2D GenerateConcavePolygon()
         {
-            Vertices vertices = new Vertices();
+            Polygon2D vertices = new Polygon2D();
 
             // for every segment in the shape:
             var segmentsCount = segments.Count;
@@ -160,11 +161,11 @@ namespace AeternumGames.ShapeEditor
             {
                 // add the segment point.
                 var segment = segments[j];
-                vertices.Add(segment.position);
+                vertices.Add(new float2(segment.position.x, segment.position.y));
 
                 // have the segment generator add additional points.
                 foreach (var point in segments[j].generator.ForEachAdditionalSegmentPoint())
-                    vertices.Add(point);
+                    vertices.Add(new float2(point.x, point.y));
             }
 
             // ensure the vertices are counter clockwise.

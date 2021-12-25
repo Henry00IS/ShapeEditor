@@ -54,21 +54,21 @@ namespace AeternumGames.ShapeEditor
         /// Decompose the polygon into several smaller non-concave polygon. If the polygon is already convex, it will
         /// return the original polygon, unless it is over Settings.MaxPolygonVertices.
         /// </summary>
-        public static List<Vertices> ConvexPartition(Vertices vertices)
+        public static List<Polygon2D> ConvexPartition(Polygon2D vertices)
         {
-            Debug.Assert(vertices.Count > 3);
+            Debug.Assert(vertices.Count >= 3);
             Debug.Assert(vertices.IsCounterClockWise());
 
             return TriangulatePolygon(vertices);
         }
 
-        private static List<Vertices> TriangulatePolygon(Vertices vertices)
+        private static List<Polygon2D> TriangulatePolygon(Polygon2D vertices)
         {
-            List<Vertices> list = new List<Vertices>();
+            List<Polygon2D> list = new List<Polygon2D>();
             float2 lowerInt = new float2();
             float2 upperInt = new float2(); // intersection points
             int lowerIndex = 0, upperIndex = 0;
-            Vertices lowerPoly, upperPoly;
+            Polygon2D lowerPoly, upperPoly;
 
             for (int i = 0; i < vertices.Count; ++i)
             {
@@ -179,20 +179,20 @@ namespace AeternumGames.ShapeEditor
             return list;
         }
 
-        private static float2 At(int i, Vertices vertices)
+        private static float2 At(int i, Polygon2D vertices)
         {
             int s = vertices.Count;
             return vertices[i < 0 ? s - 1 - ((-i - 1) % s) : i % s];
         }
 
-        private static Vertices Copy(int i, int j, Vertices vertices)
+        private static Polygon2D Copy(int i, int j, Polygon2D vertices)
         {
             while (j < i)
             {
                 j += vertices.Count;
             }
 
-            Vertices p = new Vertices(j);
+            Polygon2D p = new Polygon2D(j);
 
             for (; i <= j; ++i)
             {
@@ -201,7 +201,7 @@ namespace AeternumGames.ShapeEditor
             return p;
         }
 
-        private static bool CanSee(int i, int j, Vertices vertices)
+        private static bool CanSee(int i, int j, Polygon2D vertices)
         {
             if (Reflex(i, vertices))
             {
@@ -234,12 +234,12 @@ namespace AeternumGames.ShapeEditor
             return true;
         }
 
-        private static bool Reflex(int i, Vertices vertices)
+        private static bool Reflex(int i, Polygon2D vertices)
         {
             return Right(i, vertices);
         }
 
-        private static bool Right(int i, Vertices vertices)
+        private static bool Right(int i, Polygon2D vertices)
         {
             return Right(At(i - 1, vertices), At(i, vertices), At(i + 1, vertices));
         }

@@ -6,16 +6,16 @@ using UnityEngine;
 namespace AeternumGames.ShapeEditor
 {
     /// <summary>
-    /// Generates meshes for a given collection of <see cref="Vertices"/> (decomposed convex polygons).
+    /// Generates meshes for a given collection of <see cref="Polygon2D"/> (decomposed convex polygons).
     /// </summary>
     public static class MeshGenerator
     {
         /// <summary>Decomposes all of the shapes in the project into convex polygons.</summary>
         /// <param name="project">The project to decompose into convex polygons.</param>
         /// <returns>The list of convex polygon vertices.</returns>
-        public static List<Vertices> GetProjectPolygons(Project project)
+        public static List<Polygon2D> GetProjectPolygons(Project project)
         {
-            List<Vertices> convexPolygons = new List<Vertices>();
+            List<Polygon2D> convexPolygons = new List<Polygon2D>();
 
             // for every shape in the project:
             var shapesCount = project.shapes.Count;
@@ -23,73 +23,53 @@ namespace AeternumGames.ShapeEditor
             {
                 var shape = project.shapes[i];
 
-                // generate the vertices.
-                var vertices = shape.GenerateVertices();
+                // generate the polygon.
+                var concavePolygon = shape.GenerateConcavePolygon();
 
                 // decompose the polygon.
-                convexPolygons.AddRange(BayazitDecomposer.ConvexPartition(vertices));
+                convexPolygons.AddRange(BayazitDecomposer.ConvexPartition(concavePolygon));
             }
 
             return convexPolygons;
         }
 
-        /// <summary>Creates a flat mesh out of the convex polygons.</summary>
+        /// <summary>Creates a flat mesh out of convex polygons.</summary>
         /// <param name="convexPolygons">The decomposed convex polygons.</param>
-        public static Mesh CreatePolygonMesh(List<Vertices> convexPolygons)
+        public static Mesh CreatePolygonMesh(List<Polygon2D> convexPolygons)
         {
-            var mesh = new Mesh();
-            mesh.name = "2DSE Polygon";
+            var polygonMesh = new PolygonMesh();
 
-            var vertices = new List<Vector3>();
-            var triangles = new List<int>();
-            var first = 0;
+            foreach (var convexPolygon in convexPolygons)
+                polygonMesh.Add(new Polygon3D(convexPolygon));
 
-            foreach (var polygon in convexPolygons)
-            {
-                var vertexCount = polygon.Count;
-                for (int i = 0; i < vertexCount; i++)
-                {
-                    vertices.Add(new Vector3(polygon[i].x, -polygon[i].y));
-                }
-
-                int next = first + 1;
-                for (int i = 2; i < vertexCount; i++)
-                {
-                    triangles.Add(first);
-                    triangles.Add(next);
-                    triangles.Add(first + i);
-                    next = first + i;
-                }
-                first += vertexCount;
-            }
-
-            mesh.SetVertices(vertices);
-            mesh.SetTriangles(triangles, 0);
-            mesh.SetUVs(0, GenerateUV0_SabreCSG(vertices));
-
-            mesh.RecalculateNormals();
-            mesh.RecalculateTangents();
-
-            return mesh;
+            return polygonMesh.ToMesh();
         }
 
-        private static Vector2[] GenerateUV0_SabreCSG(List<Vector3> vertices)
+        /// <summary>Creates an extruded mesh out of convex polygons.</summary>
+        /// <param name="convexPolygons">The decomposed convex polygons.</param>
+        /// <param name="distance">The distance to extrude by.</param>
+        public static Mesh CreateExtrudedPolygonMesh(List<Polygon2D> convexPolygons, float distance)
         {
-            var results = new Vector2[vertices.Count];
+            var polygonMesh = new PolygonMesh();
 
-            var plane = new Plane(vertices[0], vertices[1], vertices[2]);
-
-            Vector3 planeNormal = plane.normal;
-            Quaternion cancellingRotation = Quaternion.Inverse(Quaternion.LookRotation(-planeNormal));
-            // Sets the UV at each point to the position on the plane
-            for (int i = 0; i < results.Length; i++)
+            foreach (var convexPolygon in convexPolygons)
             {
-                Vector3 position = vertices[i];
-                Vector2 uv = new Vector3(0.5f, 0.5f, 0f) + (cancellingRotation * position);
-                results[i] = uv;
+                // create the front polygon.
+                var polygon3D = new Polygon3D(convexPolygon);
+                polygonMesh.Add(polygon3D);
+
+                // extrude it to build the sides.
+                foreach (var extrudedPolygon in polygon3D.Extrude(distance))
+                    polygonMesh.Add(extrudedPolygon);
+
+                // create the back polygon.
+                var back = polygon3D.flipped;
+                back.RecalculatePlane();
+                back.Translate(back.plane.normal * distance);
+                polygonMesh.Add(back);
             }
 
-            return results;
+            return polygonMesh.ToMesh();
         }
     }
 }

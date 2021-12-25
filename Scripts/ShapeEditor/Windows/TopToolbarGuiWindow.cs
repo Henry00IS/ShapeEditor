@@ -30,9 +30,14 @@ namespace AeternumGames.ShapeEditor
                 editor.OnSaveProject();
             }));
 
-            AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorExtrudeShape, new float2(61, 1), new float2(20, 20), () =>
+            AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorCreatePolygon, new float2(61, 1), new float2(20, 20), () =>
             {
                 editor.OnCreatePolygonMeshTest();
+            }));
+
+            AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorExtrudeShape, new float2(81, 1), new float2(20, 20), () =>
+            {
+                editor.OnCreateExtrudedMeshTest();
             }));
         }
 

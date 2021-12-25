@@ -2,17 +2,20 @@
 
 using System.Collections.Generic;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
-    public class Vertices : List<float2>
+    /// <summary>A collection of vertex points that make up a 2D polygon.</summary>
+    public class Polygon2D : List<float2>
     {
-        public Vertices()
-        { }
+        public Polygon2D()
+        {
+        }
 
-        public Vertices(int capacity) : base(capacity) { }
+        public Polygon2D(int capacity) : base(capacity) { }
 
-        public Vertices(IEnumerable<float2> vertices)
+        public Polygon2D(IEnumerable<float2> vertices)
         {
             AddRange(vertices);
         }
@@ -23,7 +26,7 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         public bool IsCounterClockWise()
         {
-            // the simplest polygon which can exist in the Euclidean plane has 3 sides.
+            // the simplest polygon which can exist in the euclidean plane has 3 sides.
             if (Count < 3)
                 return false;
 
@@ -33,7 +36,7 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Forces the vertices to be counter clock wise order.</summary>
         public void ForceCounterClockWise()
         {
-            // the simplest polygon which can exist in the Euclidean plane has 3 sides.
+            // the simplest polygon which can exist in the euclidean plane has 3 sides.
             if (Count < 3)
                 return;
 
@@ -45,16 +48,15 @@ namespace AeternumGames.ShapeEditor
         /// <returns>The signed area</returns>
         public float GetSignedArea()
         {
-            //The simplest polygon which can exist in the Euclidean plane has 3 sides.
-            if (Count < 3)
-                return 0;
+            int count = Count;
+            Debug.Assert(count >= 3, "Attempted to calculate signed area of a 2D polygon with less than 3 vertices.");
 
             int i;
             float area = 0;
 
-            for (i = 0; i < Count; i++)
+            for (i = 0; i < count; i++)
             {
-                int j = (i + 1) % Count;
+                int j = (i + 1) % count;
 
                 float2 vi = this[i];
                 float2 vj = this[j];

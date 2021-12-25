@@ -367,7 +367,26 @@ namespace AeternumGames.ShapeEditor
         {
             // generate a mesh.
             var convexPolygons = MeshGenerator.GetProjectPolygons(project);
+
             var mesh = MeshGenerator.CreatePolygonMesh(convexPolygons);
+
+            var transform = Selection.activeTransform;
+            if (transform)
+            {
+                var target = transform.GetComponent<ShapeEditorTarget>();
+                if (target)
+                {
+                    target.OnShapeEditorMesh(mesh);
+                }
+            }
+        }
+
+        internal void OnCreateExtrudedMeshTest()
+        {
+            // generate a mesh.
+            var convexPolygons = MeshGenerator.GetProjectPolygons(project);
+
+            var mesh = MeshGenerator.CreateExtrudedPolygonMesh(convexPolygons, 0.25f);
 
             var transform = Selection.activeTransform;
             if (transform)
