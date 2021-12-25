@@ -74,6 +74,7 @@ namespace AeternumGames.ShapeEditor
         public TextAsset shapeEditorFontSegoeUI14Xml;
         public Texture2D shapeEditorFontSegoeUI14;
 
+        public Material shapeEditorDefaultMaterial;
         public Material shapeEditorGridMaterial;
         public Material shapeEditorGuiMaterial;
 

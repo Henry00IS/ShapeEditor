@@ -386,9 +386,15 @@ namespace AeternumGames.ShapeEditor
                 // generate a mesh.
                 var mesh = MeshGenerator.CreatePolygonMesh(convexPolygons);
 
-                var go = new GameObject("2D Shape Editor Polygon");
-                go.AddComponent<MeshFilter>().sharedMesh = mesh;
-                go.AddComponent<MeshRenderer>();//.material = ???
+                var transform = Selection.activeTransform;
+                if (transform)
+                {
+                    var target = transform.GetComponent<ShapeEditorTarget>();
+                    if (target)
+                    {
+                        target.OnShapeEditorMesh(mesh);
+                    }
+                }
             }
         }
     }

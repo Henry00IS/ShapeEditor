@@ -24,8 +24,6 @@ namespace AeternumGames.ShapeEditor
             foreach (var polygon in convexPolygons)
             {
                 var vertexCount = polygon.Count;
-                Debug.Log(vertexCount);
-
                 for (int i = 0; i < vertexCount; i++)
                 {
                     vertices.Add(new Vector3(polygon[i].x, -polygon[i].y));
@@ -44,8 +42,31 @@ namespace AeternumGames.ShapeEditor
 
             mesh.SetVertices(vertices);
             mesh.SetTriangles(triangles, 0);
+            mesh.SetUVs(0, GenerateUV0_SabreCSG(vertices));
+
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
 
             return mesh;
+        }
+
+        private static Vector2[] GenerateUV0_SabreCSG(List<Vector3> vertices)
+        {
+            var results = new Vector2[vertices.Count];
+
+            var plane = new Plane(vertices[0], vertices[1], vertices[2]);
+
+            Vector3 planeNormal = plane.normal;
+            Quaternion cancellingRotation = Quaternion.Inverse(Quaternion.LookRotation(-planeNormal));
+            // Sets the UV at each point to the position on the plane
+            for (int i = 0; i < results.Length; i++)
+            {
+                Vector3 position = vertices[i];
+                Vector2 uv = new Vector3(0.5f, 0.5f, 0f) + (cancellingRotation * position);
+                results[i] = uv;
+            }
+
+            return results;
         }
     }
 }
