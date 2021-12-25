@@ -70,7 +70,7 @@ namespace AeternumGames.ShapeEditor
         {
             int count = Count;
             Debug.Assert(count >= 3, "Attempted to extrude a 3D polygon with less than 3 vertices.");
-            var results = new List<Polygon3D>(count - 1);
+            var results = new List<Polygon3D>(count);
 
             RecalculatePlane();
             var normal = plane.normal;
@@ -85,6 +85,14 @@ namespace AeternumGames.ShapeEditor
                 }));
             }
 
+            // one more face that wraps around to index 0.
+            results.Add(new Polygon3D(new Vector3[] {
+                this[count - 1],
+                this[count - 1] - normal * distance,
+                this[0] - normal * distance,
+                this[0],
+            }));
+
             return results;
         }
 
@@ -98,7 +106,7 @@ namespace AeternumGames.ShapeEditor
         {
             int count = Count;
             Debug.Assert(count >= 3, "Attempted to extrude a 3D polygon with less than 3 vertices.");
-            var results = new List<Polygon3D>(count - 1);
+            var results = new List<Polygon3D>(count);
 
             RecalculatePlane();
             var normal = plane.normal;
@@ -112,6 +120,14 @@ namespace AeternumGames.ShapeEditor
                     this[i + 1],
                 }));
             }
+
+            // one more face that wraps around to index 0.
+            results.Add(new Polygon3D(new Vector3[] {
+                this[count - 1],
+                this[count - 1] + normal * clippingPlane.GetDistanceToPoint(this[count - 1]),
+                this[0] + normal * clippingPlane.GetDistanceToPoint(this[0]),
+                this[0],
+            }));
 
             return results;
         }

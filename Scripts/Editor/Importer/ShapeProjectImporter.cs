@@ -36,7 +36,7 @@ namespace AeternumGames.ShapeEditor
 
             // generate a mesh.
             var convexPolygons = MeshGenerator.GetProjectPolygons(project);
-            var mesh = MeshGenerator.CreatePolygonMesh(convexPolygons);
+            var mesh = MeshGenerator.CreateExtrudedPolygonMesh(convexPolygons, 0.25f);
 
             var transform = new GameObject("2D Shape");
             if (transform)
