@@ -23,11 +23,22 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         public bool IsCounterClockWise()
         {
-            //The simplest polygon which can exist in the Euclidean plane has 3 sides.
+            // the simplest polygon which can exist in the Euclidean plane has 3 sides.
             if (Count < 3)
                 return false;
 
             return GetSignedArea() > 0.0f;
+        }
+
+        /// <summary>Forces the vertices to be counter clock wise order.</summary>
+        public void ForceCounterClockWise()
+        {
+            // the simplest polygon which can exist in the Euclidean plane has 3 sides.
+            if (Count < 3)
+                return;
+
+            if (!IsCounterClockWise())
+                Reverse();
         }
 
         /// <summary>Gets the signed area. If the area is less than 0, it indicates that the polygon is clockwise winded.</summary>

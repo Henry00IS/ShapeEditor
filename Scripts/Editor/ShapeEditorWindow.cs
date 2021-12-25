@@ -369,6 +369,51 @@ namespace AeternumGames.ShapeEditor
             Repaint();
         }
 
+        internal void OnOpenProject()
+        {
+            try
+            {
+                string path = EditorUtility.OpenFilePanel("Load 2D Shape Editor Project", "", "s2d");
+                if (path.Length != 0)
+                {
+                    Project proj = JsonUtility.FromJson<Project>(System.IO.File.ReadAllText(path));
+                    // incompatible project version detected!
+                    if (proj.version != 2)
+                    {
+                        if (EditorUtility.DisplayDialog("2D Shape Editor", "Unsupported project version! Would you like to try loading it anyway?", "Yes", "No"))
+                            project = proj;
+                        Repaint();
+                    }
+                    else
+                    {
+                        project = proj;
+                        Repaint();
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                EditorUtility.DisplayDialog("2D Shape Editor", "An exception occured while loading the project:\r\n" + ex.Message, "Ohno!");
+            }
+        }
+
+        internal void OnSaveProject()
+        {
+            try
+            {
+                string path = EditorUtility.SaveFilePanel("Save 2D Shape Editor Project", "", "Project", "s2d");
+                if (path.Length != 0)
+                {
+                    string json = JsonUtility.ToJson(project);
+                    System.IO.File.WriteAllText(path, json);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                EditorUtility.DisplayDialog("2D Shape Editor", "An exception occured while saving the project:\r\n" + ex.Message, "Ohno!");
+            }
+        }
+
         internal void OnCreatePolygonMeshTest()
         {
             // for every shape in the project:

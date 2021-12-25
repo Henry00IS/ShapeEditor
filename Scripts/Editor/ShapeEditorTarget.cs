@@ -15,7 +15,7 @@ namespace AeternumGames.ShapeEditor
         {
             var meshFilter = GetComponent<MeshFilter>();
             var meshRenderer = GetComponent<MeshRenderer>();
-            meshFilter.mesh = mesh;
+            meshFilter.sharedMesh = mesh;
             if (!meshRenderer.sharedMaterial)
             {
                 meshRenderer.sharedMaterial = ShapeEditorResources.Instance.shapeEditorDefaultMaterial;

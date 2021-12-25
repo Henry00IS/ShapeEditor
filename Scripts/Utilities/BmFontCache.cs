@@ -45,6 +45,7 @@ namespace AeternumGames.ShapeEditor
         }
 
         private static Mesh emptyMesh;
+
         public static Mesh GetStringMesh(BmFont font, string text)
         {
             // we can't handle null strings so return an empty mesh.
@@ -67,6 +68,12 @@ namespace AeternumGames.ShapeEditor
                 stringData = new BmStringData();
                 stringData.mesh = font.BuildStringMesh(text);
                 strings.Add(text, stringData);
+            }
+
+            // after exiting play mode the mesh may be null (why?) so check for that too.
+            if (!stringData.mesh)
+            {
+                stringData.mesh = font.BuildStringMesh(text);
             }
 
             // reset the lifetime.
