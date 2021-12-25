@@ -62,6 +62,14 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        /// <summary>Opens the specified project immediately.</summary>
+        /// <param name="project">The project to be loaded.</param>
+        internal void OnOpenProject(Project project)
+        {
+            RegisterUndo("Load Project");
+            this.project = project;
+        }
+
         internal void OnSaveProject()
         {
             try

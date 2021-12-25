@@ -363,56 +363,15 @@ namespace AeternumGames.ShapeEditor
             return false;
         }
 
-        internal void OnCreatePolygonMeshTest()
+        internal void OnAssignProjectToTargets()
         {
-            // generate a mesh.
-            var convexPolygons = MeshGenerator.GetProjectPolygons(project);
-
-            var mesh = MeshGenerator.CreatePolygonMesh(convexPolygons);
-
             var transform = Selection.activeTransform;
             if (transform)
             {
                 var target = transform.GetComponent<ShapeEditorTarget>();
                 if (target)
                 {
-                    target.OnShapeEditorMesh(mesh);
-                }
-            }
-        }
-
-        internal void OnCreateExtrudedMeshTest()
-        {
-            // generate a mesh.
-            var convexPolygons = MeshGenerator.GetProjectPolygons(project);
-
-            var mesh = MeshGenerator.CreateExtrudedPolygonMesh(convexPolygons, 0.25f);
-
-            var transform = Selection.activeTransform;
-            if (transform)
-            {
-                var target = transform.GetComponent<ShapeEditorTarget>();
-                if (target)
-                {
-                    target.OnShapeEditorMesh(mesh);
-                }
-            }
-        }
-
-        internal void OnCreateExtrudedAgainstPlaneMeshTest()
-        {
-            // generate a mesh.
-            var convexPolygons = MeshGenerator.GetProjectPolygons(project);
-
-            var mesh = MeshGenerator.CreateExtrudedPolygonAgainstPlaneMesh(convexPolygons, new Plane(new Vector3(0.3f, 0.0f, 1.0f), Vector3.forward));
-
-            var transform = Selection.activeTransform;
-            if (transform)
-            {
-                var target = transform.GetComponent<ShapeEditorTarget>();
-                if (target)
-                {
-                    target.OnShapeEditorMesh(mesh);
+                    target.OnShapeEditorUpdateProject(project);
                 }
             }
         }
