@@ -71,6 +71,32 @@ namespace AeternumGames.ShapeEditor
 
             return polygonMesh.ToMesh();
         }
+
+        /// <summary>Creates an extruded mesh out of convex polygons.</summary>
+        /// <param name="convexPolygons">The decomposed convex polygons.</param>
+        /// <param name="distance">The distance to extrude by.</param>
+        public static Mesh CreateExtrudedPolygonAgainstPlaneMesh(List<Polygon2D> convexPolygons, Plane clippingPlane)
+        {
+            var polygonMesh = new PolygonMesh();
+
+            foreach (var convexPolygon in convexPolygons)
+            {
+                // create the front polygon.
+                var polygon3D = new Polygon3D(convexPolygon);
+                polygonMesh.Add(polygon3D);
+
+                // extrude it to build the sides.
+                foreach (var extrudedPolygon in polygon3D.ExtrudeAgainstPlane(clippingPlane))
+                    polygonMesh.Add(extrudedPolygon);
+
+                // create the back polygon.
+                var back = polygon3D.flipped;
+                back.ProjectOnPlane(clippingPlane);
+                polygonMesh.Add(back);
+            }
+
+            return polygonMesh.ToMesh();
+        }
     }
 }
 

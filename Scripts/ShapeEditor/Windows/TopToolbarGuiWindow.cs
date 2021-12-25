@@ -39,6 +39,11 @@ namespace AeternumGames.ShapeEditor
             {
                 editor.OnCreateExtrudedMeshTest();
             }));
+
+            AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorExtrudeShape, new float2(101, 1), new float2(20, 20), () =>
+            {
+                editor.OnCreateExtrudedAgainstPlaneMeshTest();
+            }));
         }
 
         public override void OnRender()

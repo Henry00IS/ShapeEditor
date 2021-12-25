@@ -398,6 +398,24 @@ namespace AeternumGames.ShapeEditor
                 }
             }
         }
+
+        internal void OnCreateExtrudedAgainstPlaneMeshTest()
+        {
+            // generate a mesh.
+            var convexPolygons = MeshGenerator.GetProjectPolygons(project);
+
+            var mesh = MeshGenerator.CreateExtrudedPolygonAgainstPlaneMesh(convexPolygons, new Plane(new Vector3(0.3f, 0.0f, 1.0f), Vector3.forward));
+
+            var transform = Selection.activeTransform;
+            if (transform)
+            {
+                var target = transform.GetComponent<ShapeEditorTarget>();
+                if (target)
+                {
+                    target.OnShapeEditorMesh(mesh);
+                }
+            }
+        }
     }
 }
 

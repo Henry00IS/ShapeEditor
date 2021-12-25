@@ -88,6 +88,34 @@ namespace AeternumGames.ShapeEditor
             return results;
         }
 
+        /// <summary>
+        /// Extrudes this polygon by the distance from the given plane along its normal and returns
+        /// the extruded polygons.
+        /// </summary>
+        /// <param name="clippingPlane">The plane to extrude against.</param>
+        /// <returns>The extruded polygons.</returns>
+        public List<Polygon3D> ExtrudeAgainstPlane(Plane clippingPlane)
+        {
+            int count = Count;
+            Debug.Assert(count >= 3, "Attempted to extrude a 3D polygon with less than 3 vertices.");
+            var results = new List<Polygon3D>(count - 1);
+
+            RecalculatePlane();
+            var normal = plane.normal;
+
+            for (int i = 0; i < count - 1; i++)
+            {
+                results.Add(new Polygon3D(new Vector3[] {
+                    this[i],
+                    this[i] + normal * clippingPlane.GetDistanceToPoint(this[i]),
+                    this[i + 1] + normal * clippingPlane.GetDistanceToPoint(this[i + 1]),
+                    this[i + 1],
+                }));
+            }
+
+            return results;
+        }
+
         /// <summary>Generates UV0 coordinates using the AutoUV algorithm of SabreCSG.</summary>
         public Vector2[] GenerateUV_SabreCSG()
         {
@@ -129,6 +157,21 @@ namespace AeternumGames.ShapeEditor
             int count = Count;
             for (int i = 0; i < count; i++)
                 this[i] += position;
+        }
+
+        /// <summary>
+        /// Translates the vertices along the polygon normal against the plane.
+        /// </summary>
+        /// <param name="projectPlane">The plane to project the vertices against.</param>
+        public void ProjectOnPlane(Plane projectPlane)
+        {
+            int count = Count;
+
+            RecalculatePlane();
+            var normal = plane.normal;
+
+            for (int i = 0; i < count; i++)
+                this[i] -= normal * projectPlane.GetDistanceToPoint(this[i]);
         }
     }
 }
