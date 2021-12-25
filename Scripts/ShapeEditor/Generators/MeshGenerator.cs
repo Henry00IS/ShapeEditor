@@ -10,6 +10,29 @@ namespace AeternumGames.ShapeEditor
     /// </summary>
     public static class MeshGenerator
     {
+        /// <summary>Decomposes all of the shapes in the project into convex polygons.</summary>
+        /// <param name="project">The project to decompose into convex polygons.</param>
+        /// <returns>The list of convex polygon vertices.</returns>
+        public static List<Vertices> GetProjectPolygons(Project project)
+        {
+            List<Vertices> convexPolygons = new List<Vertices>();
+
+            // for every shape in the project:
+            var shapesCount = project.shapes.Count;
+            for (int i = 0; i < shapesCount; i++)
+            {
+                var shape = project.shapes[i];
+
+                // generate the vertices.
+                var vertices = shape.GenerateVertices();
+
+                // decompose the polygon.
+                convexPolygons.AddRange(BayazitDecomposer.ConvexPartition(vertices));
+            }
+
+            return convexPolygons;
+        }
+
         /// <summary>Creates a flat mesh out of the convex polygons.</summary>
         /// <param name="convexPolygons">The decomposed convex polygons.</param>
         public static Mesh CreatePolygonMesh(List<Vertices> convexPolygons)

@@ -365,29 +365,17 @@ namespace AeternumGames.ShapeEditor
 
         internal void OnCreatePolygonMeshTest()
         {
-            // for every shape in the project:
-            var shapesCount = project.shapes.Count;
-            for (int i = 0; i < shapesCount; i++)
+            // generate a mesh.
+            var convexPolygons = MeshGenerator.GetProjectPolygons(project);
+            var mesh = MeshGenerator.CreatePolygonMesh(convexPolygons);
+
+            var transform = Selection.activeTransform;
+            if (transform)
             {
-                var shape = project.shapes[i];
-
-                // generate the vertices.
-                var vertices = shape.GenerateVertices();
-
-                // decompose the polygon.
-                var convexPolygons = BayazitDecomposer.ConvexPartition(vertices);
-
-                // generate a mesh.
-                var mesh = MeshGenerator.CreatePolygonMesh(convexPolygons);
-
-                var transform = Selection.activeTransform;
-                if (transform)
+                var target = transform.GetComponent<ShapeEditorTarget>();
+                if (target)
                 {
-                    var target = transform.GetComponent<ShapeEditorTarget>();
-                    if (target)
-                    {
-                        target.OnShapeEditorMesh(mesh);
-                    }
+                    target.OnShapeEditorMesh(mesh);
                 }
             }
         }
