@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -71,33 +72,55 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        private void OnDrawGizmosSelected()
+        {
+            if (targetMode == TargetMode.SplineExtrude)
+            {
+                // make sure we have enough points to visualize a spline.
+                var splinePoints = GetChildPointsAndDrawGizmos(out var hash);
+                if (splinePoints.Length < 3) return;
+
+                var spline = new MathEx.Spline3(splinePoints);
+
+                // draw the spline itself.
+                Gizmos.color = Color.green;
+                Vector3 lastPoint = spline.GetPoint(0.0f);
+                for (int i = 1; i < splineExtrudePrecision + 1; i++)
+                {
+                    Vector3 nextPoint = spline.GetPoint(i / (float)splineExtrudePrecision);
+                    Gizmos.DrawLine(lastPoint, nextPoint);
+                    lastPoint = nextPoint;
+                }
+
+                // detect changes in the local child positions.
+                if (hash != splineChildrenHash)
+                {
+                    splineChildrenHash = hash;
+                    Rebuild();
+                }
+            }
+        }
+
         private void OnDrawGizmos()
         {
-            // make sure we have enough points to visualize a spline.
-            var splinePoints = GetChildPointsAndDrawGizmos();
-            if (splinePoints.Length < 3) return;
-
-            var spline = new MathEx.Spline3(splinePoints);
-
-            // draw the spline itself.
-            Gizmos.color = Color.green;
-            Vector3 lastPoint = spline.GetPoint(0.0f);
-            for (int i = 1; i < splineExtrudePrecision + 1; i++)
+            if (targetMode == TargetMode.SplineExtrude)
             {
-                Vector3 nextPoint = spline.GetPoint(i / (float)splineExtrudePrecision);
-                Gizmos.DrawLine(lastPoint, nextPoint);
-                lastPoint = nextPoint;
+                if (Selection.activeGameObject != gameObject && Selection.activeTransform?.parent == transform)
+                    OnDrawGizmosSelected();
             }
         }
 
         /// <summary>For use in editor only!</summary>
-        private Vector3[] GetChildPointsAndDrawGizmos()
+        private Vector3[] GetChildPointsAndDrawGizmos(out int hash)
         {
+            hash = 0;
             int childCount = transform.childCount;
             Vector3[] points = new Vector3[childCount];
             for (int i = 0; i < childCount; i++)
             {
-                points[i] = transform.GetChild(i).position;
+                var child = transform.GetChild(i);
+                unchecked { hash += child.localPosition.GetHashCode(); }
+                points[i] = child.position;
                 Gizmos.color = (i % 2 == 0) ? Color.white : Color.red;
                 Gizmos.DrawCube(points[i], Vector3.one * 0.05f);
             }

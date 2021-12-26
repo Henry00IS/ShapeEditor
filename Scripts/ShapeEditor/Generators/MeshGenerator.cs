@@ -88,22 +88,6 @@ namespace AeternumGames.ShapeEditor
                 // extrude it along the spline to build the sides.
                 foreach (var extrudedPolygon in polygon3D.ExtrudeAlongSpline(spline, precision))
                     polygonMesh.Add(extrudedPolygon);
-
-                /*
-                for (int i = 0; i < precision; i++)
-                {
-                    var t = i / (float)precision;
-                    var tnext = (i + 1) / (float)precision;
-
-                    var poly = new Polygon3D(polygon3D);
-
-                    var forward = (spline.GetForward(t) + spline.GetForward(tnext)).normalized;
-
-                    poly.Rotate(Quaternion.LookRotation(forward, -spline.GetUp(t)));
-                    poly.Translate(spline.GetPoint(t));
-
-                    polygonMesh.Add(poly);
-                }*/
             }
 
             return polygonMesh.ToMesh();

@@ -13,6 +13,9 @@ namespace AeternumGames.ShapeEditor
         [Min(1)]
         internal int splineExtrudePrecision = 8;
 
+        [SerializeField]
+        private int splineChildrenHash = 0;
+
         private void SplineExtrude_Rebuild()
         {
             var spline = GetSpline3();
