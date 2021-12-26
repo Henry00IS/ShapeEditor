@@ -34,16 +34,13 @@ namespace AeternumGames.ShapeEditor
             // ensure the project data is ready.
             project.Validate();
 
-            // generate a mesh.
-            var convexPolygons = MeshGenerator.GetProjectPolygons(project);
-            var mesh = MeshGenerator.CreateExtrudedPolygonMesh(convexPolygons, 0.25f);
-
             var transform = new GameObject("2D Shape");
             if (transform)
             {
                 var target = transform.AddComponent<ShapeEditorTarget>();
-                target.OnShapeEditorMesh(mesh);
-                ctx.AddObjectToAsset("Mesh", mesh);
+                target.targetMode = TargetMode.FixedExtrude;
+                target.OnShapeEditorUpdateProject(project);
+                ctx.AddObjectToAsset("Mesh", target.GetComponent<MeshFilter>().sharedMesh);
             }
 
             ctx.AddObjectToAsset("Shape", transform);

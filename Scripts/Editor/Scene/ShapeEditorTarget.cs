@@ -21,7 +21,7 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>The operating mode.</summary>
         [SerializeField]
-        private TargetMode targetMode = TargetMode.Polygon;
+        internal TargetMode targetMode = TargetMode.Polygon;
 
         /// <summary>Called by the shape editor when a target gets assigned.</summary>
         /// <param name="project">The shape editor project to be used.</param>
