@@ -58,7 +58,7 @@ namespace AeternumGames.ShapeEditor
             var p4 = editor.GridPointToScreen(segment.next.position);
 
             // draw manually in screen space because we have a function for it.
-            GL.Color(segment.selected ? ShapeEditorWindow.segmentPivotOutlineColor : ShapeEditorWindow.segmentColor);
+            GL.Color((segment.selected && segment.next.selected) ? ShapeEditorWindow.segmentPivotOutlineColor : ShapeEditorWindow.segmentColor);
             GLUtilities.DrawBezierLine(1.0f, p1, p2, p3, p4, bezierDetail);
 
             GL.Color(Color.blue);

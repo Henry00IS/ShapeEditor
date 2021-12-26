@@ -138,7 +138,7 @@ namespace AeternumGames.ShapeEditor
             var editor = ShapeEditorWindow.Instance;
 
             float2 last = editor.GridPointToScreen(segment.position);
-            GL.Color(segment.selected ? ShapeEditorWindow.segmentPivotOutlineColor : ShapeEditorWindow.segmentColor);
+            GL.Color((segment.selected && segment.next.selected) ? ShapeEditorWindow.segmentPivotOutlineColor : ShapeEditorWindow.segmentColor);
 
             foreach (var point in iterator)
             {
