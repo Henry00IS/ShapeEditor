@@ -304,13 +304,11 @@ namespace AeternumGames.ShapeEditor
                 {
                     // get the current segment and the next segment (wrapping around).
                     var segment = shape.segments[j];
+                    var p1 = GridPointToScreen(segment.position);
+                    var p2 = GridPointToScreen(segment.next.position);
 
-                    // todo: generators should tell us this:
                     if (segment.generator.type == SegmentGeneratorType.Linear)
                     {
-                        var p1 = GridPointToScreen(segment.position);
-                        var p2 = GridPointToScreen(segment.next.position);
-
                         var distance = MathEx.PointDistanceFromLine(position, p1, p2);
                         if (distance < maxDistance && distance < closestDistance)
                         {
@@ -321,6 +319,28 @@ namespace AeternumGames.ShapeEditor
                             result.segmentIndex1 = j;
                             result.segmentIndex2 = j + 1 >= segmentsCount ? 0 : j + 1;
                             found = true;
+                        }
+                    }
+                    else
+                    {
+                        // check generated segments from the segment generator.
+                        foreach (var point in segment.generator.ForEachAdditionalSegmentPoint())
+                        {
+                            p2 = GridPointToScreen(point);
+
+                            var distance = MathEx.PointDistanceFromLine(position, p1, p2);
+                            if (distance < maxDistance && distance < closestDistance)
+                            {
+                                closestDistance = distance;
+                                result.shape = shape;
+                                result.segment1 = segment;
+                                result.segment2 = segment.next;
+                                result.segmentIndex1 = j;
+                                result.segmentIndex2 = j + 1 >= segmentsCount ? 0 : j + 1;
+                                found = true;
+                            }
+
+                            p1 = p2;
                         }
                     }
                 }
