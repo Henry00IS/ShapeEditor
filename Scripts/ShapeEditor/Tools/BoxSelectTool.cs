@@ -48,6 +48,7 @@ namespace AeternumGames.ShapeEditor
                         segment.selected = !isMarqueeSubtractive;
 
                     // todo, check for edges in edge mode.
+                    // todo, check for shapes in shape mode.
                 }
                 else
                 {
@@ -79,6 +80,19 @@ namespace AeternumGames.ShapeEditor
                             break;
 
                         case ShapeSelectMode.Face:
+                            // find what shape the click position is inside of.
+                            var shape = editor.FindShapeAtScreenPosition(editor.mousePosition);
+                            if (shape != null)
+                            {
+                                if (shape.IsSelected())
+                                {
+                                    shape.ClearSelection();
+                                }
+                                else
+                                {
+                                    shape.SelectAll();
+                                }
+                            }
                             break;
                     }
                 }

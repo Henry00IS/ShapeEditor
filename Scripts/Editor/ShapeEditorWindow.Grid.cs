@@ -232,6 +232,21 @@ namespace AeternumGames.ShapeEditor
             return result;
         }
 
+        /// <summary>Attempts to find the shape at the specified screen position.</summary>
+        /// <param name="position">The screen position to search at.</param>
+        /// <returns>The shape if found or null.</returns>
+        internal Shape FindShapeAtScreenPosition(float2 position)
+        {
+            foreach (var shape in project.shapes)
+            {
+                var gridPosition = ScreenPointToGrid(position);
+                if (shape.ContainsPoint(gridPosition) >= 0)
+                    return shape;
+            }
+
+            return null;
+        }
+
         internal struct FindSegmentLineResult
         {
             public Shape shape;

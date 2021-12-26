@@ -1,5 +1,8 @@
 ﻿#if UNITY_EDITOR
 
+// contains source code from https://github.com/Genbox/VelcroPhysics (see Licenses/VelcroPhysics.txt).
+// contains source code from https://github.com/sabresaurus/SabreCSG (see Licenses/SabreCSG.txt).
+
 using System.Collections.Generic;
 using UnityEngine;
 

@@ -1,5 +1,7 @@
 ﻿#if UNITY_EDITOR
 
+// contains source code from https://github.com/Genbox/VelcroPhysics (see Licenses/VelcroPhysics.txt).
+
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -229,6 +231,20 @@ namespace AeternumGames.ShapeEditor
         public static float PointDistanceFromLine(float2 point, float2 from, float2 to)
         {
             return math.abs(math.distance(from, point) + math.distance(to, point) - math.distance(from, to));
+        }
+
+        /// <summary>Returns a positive number if c is to the left of the line going from a to b.</summary>
+        /// <returns>Positive number if point is left, negative if point is right, and 0 if points are collinear.</returns>
+        public static float Area(float2 a, float2 b, float2 c)
+        {
+            return Area(ref a, ref b, ref c);
+        }
+
+        /// <summary>Returns a positive number if c is to the left of the line going from a to b.</summary>
+        /// <returns>Positive number if point is left, negative if point is right, and 0 if points are collinear.</returns>
+        public static float Area(ref float2 a, ref float2 b, ref float2 c)
+        {
+            return a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y);
         }
 
         public static float2 FindNearestPointOnLine(float2 point, float2 origin, float2 end)

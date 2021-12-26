@@ -47,6 +47,40 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        /// <summary>Select all selectable objects in the shape.</summary>
+        public void SelectAll()
+        {
+            var segmentsCount = segments.Count;
+            for (int i = 0; i < segmentsCount; i++)
+            {
+                var segment = segments[i];
+                segment.selected = true;
+
+                if (segment.generator.type != SegmentGeneratorType.Linear)
+                    foreach (var modifierSelectable in segment.generator.ForEachSelectableObject())
+                        modifierSelectable.selected = true;
+            }
+        }
+
+        /// <summary>Checks whether all selectable objects in the shape are selected.</summary>
+        public bool IsSelected()
+        {
+            var segmentsCount = segments.Count;
+            for (int i = 0; i < segmentsCount; i++)
+            {
+                var segment = segments[i];
+                if (!segment.selected)
+                    return false;
+
+                if (segment.generator.type != SegmentGeneratorType.Linear)
+                    foreach (var modifierSelectable in segment.generator.ForEachSelectableObject())
+                        if (!modifierSelectable.selected)
+                            return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Adds a segment to the end of the shape. This is usually used while generating shapes.
         /// </summary>
@@ -172,6 +206,20 @@ namespace AeternumGames.ShapeEditor
             vertices.ForceCounterClockWise();
 
             return vertices;
+        }
+
+        // original source code from https://github.com/Genbox/VelcroPhysics/ (see Licenses/VelcroPhysics.txt).
+        /// <summary>Winding number test for a point in a polygon.</summary>
+        /// See more info about the algorithm here: http://softsurfer.com/Archive/algorithm_0103/algorithm_0103.htm
+        /// <param name="point">The point to be tested.</param>
+        /// <returns>
+        /// -1 if the winding number is zero and the point is outside the polygon, 1 if the point is
+        ///  inside the polygon, and 0 if the point is on the polygons edge.
+        /// </returns>
+        public int ContainsPoint(float2 point)
+        {
+            var polygon = GenerateConcavePolygon();
+            return polygon.ContainsPoint(ref point);
         }
 
         /// <summary>Clones this shape and returns the copy.</summary>
