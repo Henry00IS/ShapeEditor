@@ -9,6 +9,9 @@ namespace AeternumGames.ShapeEditor
         /// <summary>The currently active viewport tool.</summary>
         internal Tool activeTool;
 
+        /// <summary>The shape select mode (e.g. vertex or edge or face select).</summary>
+        internal ShapeSelectMode shapeSelectMode = ShapeSelectMode.Vertex;
+
         private BoxSelectTool boxSelectTool;
         private TranslateTool translateTool;
         private RotateTool rotateTool;
@@ -86,6 +89,15 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Switches to the cut tool unless already active.</summary>
         internal void SwitchToCutTool() => SwitchTool(cutTool);
+
+        /// <summary>Switches to the vertex select mode.</summary>
+        internal void SwitchToVertexSelectMode() => shapeSelectMode = ShapeSelectMode.Vertex;
+
+        /// <summary>Switches to the edge select mode.</summary>
+        internal void SwitchToEdgeSelectMode() => shapeSelectMode = ShapeSelectMode.Edge;
+
+        /// <summary>Switches to the face select mode.</summary>
+        internal void SwitchToFaceSelectMode() => shapeSelectMode = ShapeSelectMode.Face;
 
         /// <summary>Draws the active tool.</summary>
         private void DrawTool()

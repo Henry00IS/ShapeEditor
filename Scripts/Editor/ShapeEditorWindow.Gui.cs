@@ -16,7 +16,7 @@ namespace AeternumGames.ShapeEditor
                 windows = new List<GuiWindow>();
                 AddWindow(new TopToolbarGuiWindow(float2.zero, float2.zero));
                 AddWindow(new BottomToolbarGuiWindow(float2.zero, float2.zero));
-                AddWindow(new ToolbarGuiWindow(new float2(20, 40), new float2(30, 400)));
+                AddWindow(new ToolbarGuiWindow(new float2(20, 40)));
                 AddWindow(new TextboxTestWindow(new float2(300, 100), new float2(220, 80)));
             }
 

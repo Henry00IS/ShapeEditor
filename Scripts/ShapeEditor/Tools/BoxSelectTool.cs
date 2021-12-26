@@ -46,20 +46,41 @@ namespace AeternumGames.ShapeEditor
                     var marqueeRect = MathEx.RectXYXY(editor.mouseGridInitialPosition, editor.mouseGridPosition);
                     foreach (var segment in editor.ForEachSelectableInGridRect(marqueeRect))
                         segment.selected = !isMarqueeSubtractive;
+
+                    // todo, check for edges in edge mode.
                 }
                 else
                 {
-                    // find the closest segment to the click position.
-                    var segment = editor.FindSegmentAtScreenPosition(editor.mousePosition, 60.0f);
-                    if (segment != null)
-                        segment.selected = !segment.selected;
-
-                    /* // this works, implement later.
-                    if (editor.FindSegmentLineAtScreenPosition(editor.mousePosition, 60.0f, out var segment1, out var segment2))
+                    switch (editor.shapeSelectMode)
                     {
-                        segment1.selected = true;
-                        segment2.selected = true;
-                    }*/
+                        case ShapeSelectMode.Vertex:
+                            // find the closest segment to the click position.
+                            var segment = editor.FindSegmentAtScreenPosition(editor.mousePosition, 60.0f);
+                            if (segment != null)
+                                segment.selected = !segment.selected;
+                            break;
+
+                        case ShapeSelectMode.Edge:
+                            // find the closest edge to the click position.
+                            var lineResult = new ShapeEditorWindow.FindSegmentLineResult();
+                            if (editor.FindSegmentLineAtScreenPosition(editor.mousePosition, 60.0f, ref lineResult))
+                            {
+                                if (lineResult.segment1.selected && lineResult.segment2.selected)
+                                {
+                                    lineResult.segment1.selected = false;
+                                    lineResult.segment2.selected = false;
+                                }
+                                else
+                                {
+                                    lineResult.segment1.selected = true;
+                                    lineResult.segment2.selected = true;
+                                }
+                            }
+                            break;
+
+                        case ShapeSelectMode.Face:
+                            break;
+                    }
                 }
 
                 isMarqueeActive = false;

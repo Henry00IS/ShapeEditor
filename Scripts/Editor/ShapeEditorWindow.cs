@@ -285,6 +285,18 @@ namespace AeternumGames.ShapeEditor
                 {
                     switch (keyCode)
                     {
+                        case KeyCode.Alpha1:
+                            SwitchToVertexSelectMode();
+                            return true;
+
+                        case KeyCode.Alpha2:
+                            SwitchToEdgeSelectMode();
+                            return true;
+
+                        case KeyCode.Alpha3:
+                            SwitchToFaceSelectMode();
+                            return true;
+
                         case KeyCode.H:
                             GridResetOffset();
                             GridResetZoom();
@@ -374,6 +386,11 @@ namespace AeternumGames.ShapeEditor
                     target.OnShapeEditorUpdateProject(project);
                 }
             }
+        }
+
+        internal void OnAddShapeToProject()
+        {
+            project.shapes.Add(new Shape());
         }
     }
 }

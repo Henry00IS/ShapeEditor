@@ -132,7 +132,10 @@ namespace AeternumGames.ShapeEditor
             return results;
         }
 
-        /// <summary>Extrudes this polygon along a 3 point spline and returns the extruded polygons.</summary>
+        /// <summary>
+        /// Extrudes this polygon along a 3 point spline and returns the extruded polygons. This
+        /// function may crack quads depending on how the spline moves.
+        /// </summary>
         /// <param name="spline">The spline to be followed.</param>
         /// <param name="precision">The spline precision.</param>
         /// <param name="frontFace">Whether to add a front face.</param>

@@ -15,10 +15,12 @@ MonoBehaviour:
   shapeEditorCreatePolygon: {fileID: 2800000, guid: 2e7ea28a97ddc00478361b08f10aecc5, type: 3}
   shapeEditorCut: {fileID: 2800000, guid: ba6aee88efca1344bacb0e0f82e2a395, type: 3}
   shapeEditorDelete: {fileID: 2800000, guid: 5efe46f796cdc1b438c1a2b21d3ea154, type: 3}
+  shapeEditorEdgeSelect: {fileID: 2800000, guid: c837781f9e5f2c34a83aa4d169761d3b, type: 3}
   shapeEditorExtrudeBevel: {fileID: 2800000, guid: 83f4159c0236d0e4a9c4615884a4c7f4, type: 3}
   shapeEditorExtrudePoint: {fileID: 2800000, guid: 8d61963e1a756f748aac6c2d773ad121, type: 3}
   shapeEditorExtrudeRevolve: {fileID: 2800000, guid: 9ce7aa50860214e4da8999216b99bb8a, type: 3}
   shapeEditorExtrudeShape: {fileID: 2800000, guid: 857ef677c5d21454fb5587a2d5ec394f, type: 3}
+  shapeEditorFaceSelect: {fileID: 2800000, guid: 70271061b970f6142bc1c570451d1331, type: 3}
   shapeEditorFlipHorizontally: {fileID: 2800000, guid: f3869c58b7571c04bb3d92c15d2b6881, type: 3}
   shapeEditorFlipVertically: {fileID: 2800000, guid: 620c7febb2a0936488a0f70141a5ecb8, type: 3}
   shapeEditorHome: {fileID: 2800000, guid: fc1b94e293a80fc4e9a2dee33d4f727b, type: 3}
@@ -41,6 +43,7 @@ MonoBehaviour:
   shapeEditorShapeCreate: {fileID: 2800000, guid: e4c14eb60e41b5047914244525a107fa, type: 3}
   shapeEditorShapeDuplicate: {fileID: 2800000, guid: 88f6d48a2764a9d42b790eae3790de86, type: 3}
   shapeEditorTranslate: {fileID: 2800000, guid: 29ace29ff0a46a94fbdcf2d319acd416, type: 3}
+  shapeEditorVertexSelect: {fileID: 2800000, guid: 39a55776995e72b4d8e7286baf55163c, type: 3}
   shapeEditorZoomIn: {fileID: 2800000, guid: 4680d936fb0455f4f99c0d94155d38df, type: 3}
   shapeEditorZoomOut: {fileID: 2800000, guid: 62299d3e26649b442aed157a222ab744, type: 3}
   shapeEditorFontSegoeUI14Xml: {fileID: 4900000, guid: 96c44120173bdb24081e0676c015daee, type: 3}

@@ -7,28 +7,62 @@ namespace AeternumGames.ShapeEditor
 {
     public class TopToolbarGuiWindow : GuiWindow
     {
+        private GuiButton vertexSelectButton;
+        private GuiButton edgeSelectButton;
+        private GuiButton faceSelectButton;
+
         public TopToolbarGuiWindow(float2 position, float2 size) : base(position, size) { }
+
+        private GuiHorizontalLayout horizontalLayout;
 
         public override void OnActivate()
         {
             colorWindowBackground = new Color(0.192f, 0.192f, 0.192f);
 
-            AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorNew, new float2(1, 1), new float2(20, 20), () =>
+            horizontalLayout = new GuiHorizontalLayout(this);
+
+            horizontalLayout.AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorNew, 20, () =>
             {
                 editor.OnNewProject();
             }));
 
-            AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorOpen, new float2(21, 1), new float2(20, 20), () =>
+            horizontalLayout.AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorOpen, 20, () =>
             {
                 editor.OnOpenProject();
             }));
 
-            AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorSave, new float2(41, 1), new float2(20, 20), () =>
+            horizontalLayout.AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorSave, 20, () =>
             {
                 editor.OnSaveProject();
             }));
 
-            AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorExtrudeShape, new float2(61, 1), new float2(20, 20), () =>
+            horizontalLayout.Space(5);
+
+            horizontalLayout.AddControl(vertexSelectButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorVertexSelect, 20, () =>
+            {
+                editor.SwitchToVertexSelectMode();
+            }));
+
+            horizontalLayout.AddControl(edgeSelectButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorEdgeSelect, 20, () =>
+            {
+                editor.SwitchToEdgeSelectMode();
+            }));
+
+            horizontalLayout.AddControl(faceSelectButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorFaceSelect, 20, () =>
+            {
+                editor.SwitchToFaceSelectMode();
+            }));
+
+            horizontalLayout.Space(5);
+
+            horizontalLayout.AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorShapeCreate, 20, () =>
+            {
+                editor.OnAddShapeToProject();
+            }));
+
+            horizontalLayout.Space(5);
+
+            horizontalLayout.AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorExtrudeShape, 20, () =>
             {
                 editor.OnAssignProjectToTargets();
             }));
@@ -37,6 +71,11 @@ namespace AeternumGames.ShapeEditor
         public override void OnRender()
         {
             size = new float2(editor.position.width, 22f);
+
+            var shapeSelectMode = editor.shapeSelectMode;
+            vertexSelectButton.isChecked = shapeSelectMode == ShapeSelectMode.Vertex;
+            edgeSelectButton.isChecked = shapeSelectMode == ShapeSelectMode.Edge;
+            faceSelectButton.isChecked = shapeSelectMode == ShapeSelectMode.Face;
 
             base.OnRender();
         }

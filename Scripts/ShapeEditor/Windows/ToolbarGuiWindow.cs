@@ -13,34 +13,40 @@ namespace AeternumGames.ShapeEditor
         private GuiButton scaleButton;
         private GuiButton cutButton;
 
-        public ToolbarGuiWindow(float2 position, float2 size) : base(position, size) { }
+        public ToolbarGuiWindow(float2 position) : base(position, float2.zero) { }
+
+        private GuiVerticalLayout verticalLayout;
 
         public override void OnActivate()
         {
-            AddControl(selectBoxButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorSelectBox, new float2(1, 1), new float2(28, 28), () =>
+            verticalLayout = new GuiVerticalLayout(this);
+
+            verticalLayout.AddControl(selectBoxButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorSelectBox, 28, () =>
             {
                 editor.SwitchToBoxSelectTool();
             }));
 
-            AddControl(translateButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorTranslate, new float2(1, 29), new float2(28, 28), () =>
+            verticalLayout.AddControl(translateButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorTranslate, 28, () =>
             {
                 editor.SwitchToTranslateTool();
             }));
 
-            AddControl(rotateButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorRotate, new float2(1, 57), new float2(28, 28), () =>
+            verticalLayout.AddControl(rotateButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorRotate, 28, () =>
             {
                 editor.SwitchToRotateTool();
             }));
 
-            AddControl(scaleButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorScale, new float2(1, 85), new float2(28, 28), () =>
+            verticalLayout.AddControl(scaleButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorScale, 28, () =>
             {
                 editor.SwitchToScaleTool();
             }));
 
-            AddControl(cutButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorCut, new float2(1, 113), new float2(28, 28), () =>
+            verticalLayout.AddControl(cutButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorCut, 28, () =>
             {
                 editor.SwitchToCutTool();
             }));
+
+            size = verticalLayout.windowSize;
         }
 
         public override void OnRender()

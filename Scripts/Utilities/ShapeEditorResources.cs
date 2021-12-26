@@ -42,10 +42,12 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorCreatePolygon;
         public Texture2D shapeEditorCut;
         public Texture2D shapeEditorDelete;
+        public Texture2D shapeEditorEdgeSelect;
         public Texture2D shapeEditorExtrudeBevel;
         public Texture2D shapeEditorExtrudePoint;
         public Texture2D shapeEditorExtrudeRevolve;
         public Texture2D shapeEditorExtrudeShape;
+        public Texture2D shapeEditorFaceSelect;
         public Texture2D shapeEditorFlipHorizontally;
         public Texture2D shapeEditorFlipVertically;
         public Texture2D shapeEditorHome;
@@ -68,6 +70,7 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorShapeCreate;
         public Texture2D shapeEditorShapeDuplicate;
         public Texture2D shapeEditorTranslate;
+        public Texture2D shapeEditorVertexSelect;
         public Texture2D shapeEditorZoomIn;
         public Texture2D shapeEditorZoomOut;
 

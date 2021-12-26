@@ -32,6 +32,12 @@ namespace AeternumGames.ShapeEditor
             this.onClick = onClick;
         }
 
+        public GuiButton(Texture2D icon, float2 size, System.Action onClick) : base(float2.zero, size)
+        {
+            this.icon = icon;
+            this.onClick = onClick;
+        }
+
         /// <summary>Called when the control is rendered.</summary>
         public override void OnRender()
         {
