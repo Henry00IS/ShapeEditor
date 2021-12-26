@@ -11,6 +11,11 @@ namespace AeternumGames.ShapeEditor
         private bool isMarqueeSubtractive;
         private static readonly Color marqueeColor = new Color(1.0f, 0.5f, 0.0f);
 
+        /// <summary>Used to cycle through selectable objects when the click position is unchanged.</summary>
+        private float2 lastMouseUpPosition;
+        /// <summary>The last selected shape in face select mode for cycling through shapes.</summary>
+        private Shape lastSelectedShape;
+
         public override void OnActivate()
         {
             isMarqueeActive = false;
@@ -80,23 +85,25 @@ namespace AeternumGames.ShapeEditor
                             break;
 
                         case ShapeSelectMode.Face:
+
+                            // when the mouse position changed we reset the selection cycle.
+                            if (!editor.mousePosition.Equals(lastMouseUpPosition))
+                                lastSelectedShape = null;
+
                             // find what shape the click position is inside of.
-                            var shape = editor.FindShapeAtScreenPosition(editor.mousePosition);
-                            if (shape != null)
+                            lastSelectedShape = editor.FindShapeAtGridPosition(editor.mouseGridPosition, lastSelectedShape);
+                            if (lastSelectedShape != null)
                             {
-                                if (shape.IsSelected())
-                                {
-                                    shape.ClearSelection();
-                                }
+                                if (lastSelectedShape.IsSelected())
+                                    lastSelectedShape.ClearSelection();
                                 else
-                                {
-                                    shape.SelectAll();
-                                }
+                                    lastSelectedShape.SelectAll();
                             }
                             break;
                     }
                 }
 
+                lastMouseUpPosition = editor.mousePosition;
                 isMarqueeActive = false;
             }
         }

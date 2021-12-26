@@ -234,17 +234,45 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Attempts to find the shape at the specified screen position.</summary>
         /// <param name="position">The screen position to search at.</param>
+        /// <param name="cycle">For cycling through shapes, the last found shape.</param>
         /// <returns>The shape if found or null.</returns>
-        internal Shape FindShapeAtScreenPosition(float2 position)
+        internal Shape FindShapeAtGridPosition(float2 position, Shape cycle = null)
         {
-            foreach (var shape in project.shapes)
+            bool foundLast = cycle == null;
+            Shape candidate = null;
+
+            foreach (var shape in ForEachShapeAtGridPosition(position))
             {
-                var gridPosition = ScreenPointToGrid(position);
-                if (shape.ContainsPoint(gridPosition) >= 0)
+                // the candidate is always the first shape found.
+                if (candidate == null)
+                    candidate = shape;
+
+                // if we encountered the last shape we found the next shape.
+                if (foundLast)
                     return shape;
+
+                // check whether this was the last shape.
+                if (shape == cycle)
+                    foundLast = true;
             }
 
-            return null;
+            return candidate;
+        }
+
+        /// <summary>Iterates over all of the shapes at the specified screen position in reverse order.</summary>
+        /// <param name="position">The screen position to search at.</param>
+        internal IEnumerable<Shape> ForEachShapeAtGridPosition(float2 position)
+        {
+            var shapes = project.shapes;
+            var shapesCount = shapes.Count;
+
+            for (int i = shapesCount; i-- > 0;)
+            {
+                var shape = shapes[i];
+
+                if (shape.ContainsPoint(position) >= 0)
+                    yield return shape;
+            }
         }
 
         internal struct FindSegmentLineResult
