@@ -72,6 +72,43 @@ namespace AeternumGames.ShapeEditor
             return polygonMesh.ToMesh();
         }
 
+        /// <summary>Creates a mesh by extrudes the convex polygons along a 3 point spline.</summary>
+        /// <param name="convexPolygons">The decomposed convex polygons.</param>
+        /// <param name="spline">The spline to be followed.</param>
+        /// <param name="precision">The spline precision.</param>
+        public static Mesh CreateSplineExtrudeMesh(List<Polygon2D> convexPolygons, MathEx.Spline3 spline, int precision)
+        {
+            var polygonMesh = new PolygonMesh();
+
+            foreach (var convexPolygon in convexPolygons)
+            {
+                // create the front polygon.
+                var polygon3D = new Polygon3D(convexPolygon);
+
+                // extrude it along the spline to build the sides.
+                foreach (var extrudedPolygon in polygon3D.ExtrudeAlongSpline(spline, precision))
+                    polygonMesh.Add(extrudedPolygon);
+
+                /*
+                for (int i = 0; i < precision; i++)
+                {
+                    var t = i / (float)precision;
+                    var tnext = (i + 1) / (float)precision;
+
+                    var poly = new Polygon3D(polygon3D);
+
+                    var forward = (spline.GetForward(t) + spline.GetForward(tnext)).normalized;
+
+                    poly.Rotate(Quaternion.LookRotation(forward, -spline.GetUp(t)));
+                    poly.Translate(spline.GetPoint(t));
+
+                    polygonMesh.Add(poly);
+                }*/
+            }
+
+            return polygonMesh.ToMesh();
+        }
+
         /// <summary>Creates an extruded mesh out of convex polygons.</summary>
         /// <param name="convexPolygons">The decomposed convex polygons.</param>
         /// <param name="distance">The distance to extrude by.</param>

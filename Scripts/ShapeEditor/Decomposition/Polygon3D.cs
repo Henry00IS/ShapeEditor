@@ -132,6 +132,77 @@ namespace AeternumGames.ShapeEditor
             return results;
         }
 
+        /// <summary>Extrudes this polygon along a 3 point spline and returns the extruded polygons.</summary>
+        /// <param name="spline">The spline to be followed.</param>
+        /// <param name="precision">The spline precision.</param>
+        /// <param name="frontFace">Whether to add a front face.</param>
+        /// <param name="backFace">Whether to add a back face.</param>
+        public List<Polygon3D> ExtrudeAlongSpline(MathEx.Spline3 spline, int precision, bool frontFace = true, bool backFace = true)
+        {
+            int count = Count;
+            Debug.Assert(count >= 3, "Attempted to extrude a 3D polygon with less than 3 vertices.");
+            var results = new List<Polygon3D>(count * precision);
+
+            // keep track of the last polygon target.
+            var lastPoly = new Polygon3D(this);
+            {
+                var there = 0f;
+                var tnext = 1f / precision;
+                var avgforward = (spline.GetForward(there) + spline.GetForward(tnext)).normalized;
+
+                // position and rotate it to the desired target.
+                lastPoly.Rotate(Quaternion.LookRotation(avgforward, -spline.GetUp(there)));
+                lastPoly.Translate(spline.GetPoint(there));
+            }
+
+            // optionally add the front face.
+            if (frontFace)
+                results.Add(lastPoly);
+
+            for (int p = 1; p < precision + 1; p++)
+            {
+                // clone the initial polygon.
+                var poly = new Polygon3D(this);
+                var there = p / (float)precision;
+                var tnext = (p + 1) / (float)precision;
+                var avgforward = (spline.GetForward(there) + spline.GetForward(tnext)).normalized;
+
+                // position and rotate it to the desired target.
+                poly.Rotate(Quaternion.LookRotation(avgforward, -spline.GetUp(there)));
+                poly.Translate(spline.GetPoint(there));
+
+                // fill the gap with quads "extruding" the shape.
+                for (int i = 0; i < count - 1; i++)
+                {
+                    results.Add(new Polygon3D(new Vector3[] {
+                        lastPoly[i],
+                        poly[i],
+                        poly[i + 1],
+                        lastPoly[i + 1],
+                    }));
+                }
+
+                // one more face that wraps around to index 0.
+                results.Add(new Polygon3D(new Vector3[] {
+                    lastPoly[count - 1],
+                    poly[count - 1],
+                    poly[0],
+                    lastPoly[0],
+                }));
+
+                lastPoly = poly;
+            }
+
+            // optionally add the back face.
+            if (backFace)
+            {
+                lastPoly.Reverse();
+                results.Add(lastPoly);
+            }
+
+            return results;
+        }
+
         /// <summary>Generates UV0 coordinates using the AutoUV algorithm of SabreCSG.</summary>
         public Vector2[] GenerateUV_SabreCSG()
         {
@@ -173,6 +244,17 @@ namespace AeternumGames.ShapeEditor
             int count = Count;
             for (int i = 0; i < count; i++)
                 this[i] += position;
+        }
+
+        /// <summary>
+        /// Rotates this polygon by the specified amount.
+        /// </summary>
+        /// <param name="rotation">The rotation to be added to all vertices.</param>
+        public void Rotate(Quaternion rotation)
+        {
+            int count = Count;
+            for (int i = 0; i < count; i++)
+                this[i] = rotation * this[i];
         }
 
         /// <summary>

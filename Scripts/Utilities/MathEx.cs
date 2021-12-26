@@ -262,6 +262,165 @@ namespace AeternumGames.ShapeEditor
                 3f * OneMinusT * t * t * p2 +
                 t * t * t * p3;
         }
+
+        /// <summary>Represents a spline that uses 3 points.</summary>
+        [System.Serializable]
+        public class Spline3
+        {
+            /// <summary>The points of the spline.</summary>
+            [SerializeField]
+            private Vector3[] points;
+
+            /// <summary>Initializes a new instance of the <see cref="Spline3"/> class.</summary>
+            /// <param name="points">The points that make up the spline.</param>
+            public Spline3(Vector3[] points)
+            {
+                Debug.Assert(points.Length >= 3, "Tried to create a Spline3 with less than 3 points.");
+                this.points = points;
+            }
+
+            /// <summary>Gets the point on a 3-point curve.</summary>
+            /// <param name="p0">The start point.</param>
+            /// <param name="p1">The pivot point.</param>
+            /// <param name="p2">The end point.</param>
+            /// <param name="t">The interpolant along the curve.</param>
+            /// <returns>The point on the curve.</returns>
+            public static Vector3 GetPoint(Vector3 p0, Vector3 p1, Vector3 p2, float t)
+            {
+                t = Mathf.Clamp01(t);
+                float oneMinusT = 1f - t;
+                return
+                    oneMinusT * oneMinusT * p0 +
+                    2f * oneMinusT * t * p1 +
+                    t * t * p2;
+            }
+
+            public static Vector3 GetFirstDerivative(Vector3 p0, Vector3 p1, Vector3 p2, float t)
+            {
+                return
+                    2f * (1f - t) * (p1 - p0) +
+                    2f * t * (p2 - p1);
+            }
+
+            /// <summary>Gets a point on the spline.</summary>
+            /// <param name="t">The interpolant on the spline to get the position for.</param>
+            /// <returns>The point on the spline.</returns>
+            public Vector3 GetPoint(float t)
+            {
+                int i;
+                if (t >= 1f)
+                {
+                    t = 1f;
+                    i = points.Length - 3;
+                }
+                else
+                {
+                    t = Mathf.Clamp01(t) * CurveCount;
+                    i = (int)t;
+                    t -= i;
+                    i *= 2;
+                }
+                return GetPoint(points[i], points[i + 1], points[i + 2], t);
+            }
+
+            /// <summary>Gets the velocity on the spline.</summary>
+            /// <param name="t">The interpolant on the spline to get the velocity for.</param>
+            /// <returns>The velocity on the spline.</returns>
+            public Vector3 GetVelocity(float t)
+            {
+                int i;
+                if (t >= 1f)
+                {
+                    t = 1f;
+                    i = points.Length - 3;
+                }
+                else
+                {
+                    t = Mathf.Clamp01(t) * CurveCount;
+                    i = (int)t;
+                    t -= i;
+                    i *= 2;
+                }
+                return GetFirstDerivative(points[i], points[i + 1], points[i + 2], t);
+            }
+
+            /// <summary>Gets the direction the spline is moving in.</summary>
+            /// <param name="t">The interpolant on the spline to get the direction for.</param>
+            /// <returns>The direction on the spline.</returns>
+            public Vector3 GetDirection(float t)
+            {
+                return GetVelocity(t).normalized;
+            }
+
+            /// <summary>Gets the amount of curves in this spline.</summary>
+            /// <value>The amount of curves.</value>
+            public int CurveCount
+            {
+                get
+                {
+                    return (points.Length - 1) / 2;
+                }
+            }
+
+            public Vector3 GetRight(float t)
+            {
+                var A = GetPoint(t - 0.001f);
+                var B = GetPoint(t + 0.001f);
+                var delta = (B - A);
+                return new Vector3(-delta.z, 0, delta.x).normalized;
+            }
+
+            public Vector3 GetForward(float t)
+            {
+                var A = GetPoint(t - 0.001f);
+                var B = GetPoint(t + 0.001f);
+                return (B - A).normalized;
+            }
+
+            public Vector3 GetUp(float t)
+            {
+                var A = GetPoint(t - 0.001f);
+                var B = GetPoint(t + 0.001f);
+                var delta = (B - A).normalized;
+                return Vector3.Cross(delta, GetRight(t));
+            }
+
+            /// <summary>Calculates the physical length of the spline.</summary>
+            public float GetLength(int segments)
+            {
+                float length = 0.0f;
+                Vector3 lastPoint = GetPoint(0.0f);
+                for (int i = 1; i < segments + 1; i++)
+                {
+                    Vector3 nextPoint = GetPoint(i / (float)segments);
+                    length += Vector3.Distance(lastPoint, nextPoint);
+                    lastPoint = nextPoint;
+                }
+                return length;
+            }
+
+            /// <summary>
+            /// Walks through the spline and tries to find the interpolant that's closest to the
+            /// specified position.
+            /// </summary>
+            public float FindNearestPointForwards(Vector3 position, int segments)
+            {
+                float bestDistance = float.MaxValue;
+                float bestT = 0.0f;
+                for (int i = 0; i < segments + 1; i++)
+                {
+                    float t = i / (float)segments;
+                    Vector3 point = GetPoint(t);
+                    float distance = Vector3.Distance(point, position);
+                    if (distance < bestDistance)
+                    {
+                        bestDistance = distance;
+                        bestT = t;
+                    }
+                }
+                return bestT;
+            }
+        }
     }
 }
 

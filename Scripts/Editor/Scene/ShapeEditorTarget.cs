@@ -70,6 +70,39 @@ namespace AeternumGames.ShapeEditor
                     break;
             }
         }
+
+        private void OnDrawGizmos()
+        {
+            // make sure we have enough points to visualize a spline.
+            var splinePoints = GetChildPointsAndDrawGizmos();
+            if (splinePoints.Length < 3) return;
+
+            var spline = new MathEx.Spline3(splinePoints);
+
+            // draw the spline itself.
+            Gizmos.color = Color.green;
+            Vector3 lastPoint = spline.GetPoint(0.0f);
+            for (int i = 1; i < splineExtrudePrecision + 1; i++)
+            {
+                Vector3 nextPoint = spline.GetPoint(i / (float)splineExtrudePrecision);
+                Gizmos.DrawLine(lastPoint, nextPoint);
+                lastPoint = nextPoint;
+            }
+        }
+
+        /// <summary>For use in editor only!</summary>
+        private Vector3[] GetChildPointsAndDrawGizmos()
+        {
+            int childCount = transform.childCount;
+            Vector3[] points = new Vector3[childCount];
+            for (int i = 0; i < childCount; i++)
+            {
+                points[i] = transform.GetChild(i).position;
+                Gizmos.color = (i % 2 == 0) ? Color.white : Color.red;
+                Gizmos.DrawCube(points[i], Vector3.one * 0.05f);
+            }
+            return points;
+        }
     }
 }
 
