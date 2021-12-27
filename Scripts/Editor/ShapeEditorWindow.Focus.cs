@@ -57,6 +57,7 @@ namespace AeternumGames.ShapeEditor
             if (activeEventReceiver == null)
             {
                 Debug.Log("Setting the default box select tool as the active event receiver.");
+                ValidateTools();
                 TrySwitchActiveEventReceiver(boxSelectTool);
             }
             return activeEventReceiver;
