@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 
 using Unity.Mathematics;
-using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
@@ -24,7 +23,7 @@ namespace AeternumGames.ShapeEditor
         /// Returns true when the mouse is not obstructed, hovers over the control and is not busy.
         /// This check should be used before displaying hover effects.
         /// </summary>
-        public bool isMouseHoverEffectApplicable => !parent.isMouseObstructed && isMouseOverNotBusy;
+        public bool isMouseHoverEffectApplicable => !isMouseObstructed && isMouseOverNotBusy;
     }
 }
 

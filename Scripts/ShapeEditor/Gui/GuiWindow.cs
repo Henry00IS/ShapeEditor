@@ -1,6 +1,5 @@
 ﻿#if UNITY_EDITOR
 
-using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 

@@ -8,19 +8,22 @@ namespace AeternumGames.ShapeEditor
     /// <summary>Helps place controls in a vertical column.</summary>
     public class GuiVerticalLayout
     {
-        private GuiWindow window;
+        private GuiContainer<GuiControl> container;
+        private int leftPosition = 1;
         private int topPosition = 1;
         private int minWidth = 2;
 
-        public GuiVerticalLayout(GuiWindow window)
+        public GuiVerticalLayout(GuiContainer<GuiControl> container, int xposition = 1, int yposition = 1)
         {
-            this.window = window;
+            this.container = container;
+            leftPosition = xposition;
+            topPosition = yposition;
         }
 
         public void AddControl(GuiControl control)
         {
-            window.Add(control);
-            control.position = new float2(1f, topPosition);
+            container.Add(control);
+            control.position = new float2(leftPosition, topPosition);
             topPosition += Mathf.FloorToInt(control.size.y);
 
             if (control.size.x + 2f > minWidth)

@@ -19,7 +19,27 @@ namespace AeternumGames.ShapeEditor
         {
             colorWindowBackground = new Color(0.192f, 0.192f, 0.192f);
 
-            horizontalLayout = new GuiHorizontalLayout(this);
+            var menu = new GuiMenuStrip();
+            Add(menu);
+
+            var resources = ShapeEditorResources.Instance;
+
+            var fileMenu = menu.Add("File");
+            fileMenu.Add("New Project", resources.shapeEditorNew);
+            fileMenu.Add("Open Project...", resources.shapeEditorOpen);
+            fileMenu.Separator();
+            fileMenu.Add("Save As...", resources.shapeEditorSave);
+            fileMenu.Separator();
+            fileMenu.Add("Exit");
+
+            var viewMenu = menu.Add("View");
+            viewMenu.Add("Textbox Test Window");
+            viewMenu.Add("Inspector Window");
+
+            var helpMenu = menu.Add("Help");
+            helpMenu.Add("About");
+
+            horizontalLayout = new GuiHorizontalLayout(this, 1, 21);
 
             horizontalLayout.AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorNew, 20, () =>
             {
@@ -70,7 +90,7 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnRender()
         {
-            size = new float2(editor.position.width, 22f);
+            size = new float2(editor.position.width, 42f);
 
             var shapeSelectMode = editor.shapeSelectMode;
             vertexSelectButton.isChecked = shapeSelectMode == ShapeSelectMode.Vertex;

@@ -45,7 +45,7 @@ namespace AeternumGames.ShapeEditor
 
         public Rect sizeRect => new Rect(float2.zero, size);
 
-        public Rect drawRect => new Rect(position, size);
+        public Rect drawRect => new Rect(drawPosition, size);
 
         public bool isMouseOver => sizeRect.Contains(mousePosition);
 
@@ -98,6 +98,12 @@ namespace AeternumGames.ShapeEditor
             // add the child to the container.
             children.Add(child);
             return child;
+        }
+
+        public void AddRange(IEnumerable<T> children)
+        {
+            foreach (var child in children)
+                Add(child);
         }
 
         public bool IsActiveOrHasActiveChild()

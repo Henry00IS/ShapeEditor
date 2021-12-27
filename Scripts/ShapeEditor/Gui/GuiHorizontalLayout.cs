@@ -8,19 +8,20 @@ namespace AeternumGames.ShapeEditor
     /// <summary>Helps place controls in a horizontal row.</summary>
     public class GuiHorizontalLayout
     {
-        private GuiWindow window;
+        private GuiContainer<GuiControl> container;
         private int leftPosition = 1;
         private int topPosition = 1;
 
-        public GuiHorizontalLayout(GuiWindow window, int yposition = 1)
+        public GuiHorizontalLayout(GuiContainer<GuiControl> container, int xposition = 1, int yposition = 1)
         {
-            this.window = window;
+            this.container = container;
+            leftPosition = xposition;
             topPosition = yposition;
         }
 
         public void AddControl(GuiControl control)
         {
-            window.Add(control);
+            container.Add(control);
             control.position = new float2(leftPosition, topPosition);
             leftPosition += Mathf.FloorToInt(control.size.x);
         }

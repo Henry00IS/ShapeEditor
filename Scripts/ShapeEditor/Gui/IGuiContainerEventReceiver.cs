@@ -79,6 +79,13 @@ namespace AeternumGames.ShapeEditor
         /// <param name="child">The child <typeparamref name="T"/> to be added.</param>
         /// <returns>A reference to the child that was added to the container.</returns>
         public T Add(T child);
+
+        /// <summary>
+        /// Adds the specified enumerable of <typeparamref name="T"/> to the container as children.
+        /// </summary>
+        /// <param name="children">The child enumerable <typeparamref name="T"/> to be added.</param>
+        public void AddRange(IEnumerable<T> children);
     }
 }
+
 #endif

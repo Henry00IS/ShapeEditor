@@ -60,8 +60,6 @@ namespace AeternumGames.ShapeEditor
         private Color caretColorDefault = new Color(0.706f, 0.706f, 0.706f);
         private Color selectionColorDefault = new Color(0.212f, 0.384f, 0.627f);
 
-        private Rect drawRect => new Rect(drawPosition, size);
-
         private const int innerMarginLeft = 3;
         private const int innerMarginRight = 4;
         private Rect innerRect => new Rect(drawPosition + new float2(innerMarginLeft, 0f), size - new float2(innerMarginRight, 0f));
