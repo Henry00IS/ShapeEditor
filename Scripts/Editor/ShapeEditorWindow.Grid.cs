@@ -471,6 +471,37 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        public void ToggleRepeatTest()
+        {
+            // for every shape in the project:
+            var shapesCount = project.shapes.Count;
+            for (int i = shapesCount; i-- > 0;)
+            {
+                var shape = project.shapes[i];
+
+                // for every segment in the project:
+                var segments = shape.segments;
+                var segmentsCount = segments.Count;
+                for (int j = segmentsCount; j-- > 0;)
+                {
+                    if (segments[j].selected)
+                    {
+                        // get the current segment and the next segment (wrapping around).
+                        var segment = shape.segments[j];
+
+                        if (segment.generator.type != SegmentGeneratorType.Repeat)
+                        {
+                            segment.generator = new SegmentGenerator(segment, SegmentGeneratorType.Repeat);
+                        }
+                        else
+                        {
+                            segment.generator = new SegmentGenerator(segment);
+                        }
+                    }
+                }
+            }
+        }
+
         public void ApplyGeneratorTest()
         {
             // for every shape in the project:

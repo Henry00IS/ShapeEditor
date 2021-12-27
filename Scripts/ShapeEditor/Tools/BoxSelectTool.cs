@@ -172,6 +172,14 @@ namespace AeternumGames.ShapeEditor
                     }
                     return false;
 
+                case KeyCode.M:
+                    if (editor.selectedSegmentsCount > 0)
+                    {
+                        editor.ToggleRepeatTest();
+                        return true;
+                    }
+                    return false;
+
                 case KeyCode.V:
                     if (editor.selectedSegmentsCount > 0)
                     {

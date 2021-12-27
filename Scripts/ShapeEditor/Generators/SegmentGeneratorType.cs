@@ -11,6 +11,8 @@ namespace AeternumGames.ShapeEditor
         Bezier,
         /// <summary>Generates a sine wave between two segments.</summary>
         Sine,
+        /// <summary>Repeats x amount of previous segments.</summary>
+        Repeat,
     }
 }
 

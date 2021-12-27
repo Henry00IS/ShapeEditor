@@ -90,6 +90,10 @@ namespace AeternumGames.ShapeEditor
                 case SegmentGeneratorType.Sine:
                     Sine_DrawSegments();
                     break;
+
+                case SegmentGeneratorType.Repeat:
+                    Repeat_DrawSegments();
+                    break;
             }
         }
 
@@ -126,6 +130,11 @@ namespace AeternumGames.ShapeEditor
 
                 case SegmentGeneratorType.Sine:
                     foreach (var point in Sine_ForEachSegmentPoint())
+                        yield return point;
+                    yield break;
+
+                case SegmentGeneratorType.Repeat:
+                    foreach (var point in Repeat_ForEachSegmentPoint())
                         yield return point;
                     yield break;
             }

@@ -381,6 +381,20 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        public static void DrawLineArrow(float thickness, float2 from, float2 to, float arrowHeadLength = 16f, float arrowHeadAngle = 20.0f)
+        {
+            DrawLine(thickness, from, to);
+
+            var normal = math.normalize(to - from);
+            var point = to - normal * arrowHeadLength;
+
+            var arrowFromLeft = MathEx.RotatePointAroundPivot(point, to, arrowHeadAngle);
+            var arrowFromRight = MathEx.RotatePointAroundPivot(point, to, -arrowHeadAngle);
+
+            DrawLine(thickness, arrowFromLeft, to);
+            DrawLine(thickness, arrowFromRight, to);
+        }
+
         public static void DrawCircle(float thickness, float2 position, float radius, Color color, int segments = 32)
         {
             float angle = 0f;
