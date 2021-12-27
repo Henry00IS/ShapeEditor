@@ -19,14 +19,14 @@ namespace AeternumGames.ShapeEditor
         {
             colorWindowBackground = new Color(0.192f, 0.192f, 0.192f);
 
-            AddControl(statusLabel = new GuiLabel("", new float2(7f, 4f), new float2(200, 20)));
+            Add(statusLabel = new GuiLabel("", new float2(7f, 4f), new float2(200, 20)));
 
-            AddControl(gridZoomTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)) { allowNegativeNumbers = false });
-            AddControl(gridZoomLabel = new GuiLabel("Zoom:", new float2(0f, 0f), new float2(32, 20)));
-            AddControl(gridSnapTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)) { allowNegativeNumbers = false });
-            AddControl(gridSnapLabel = new GuiLabel("Snap:", new float2(0f, 0f), new float2(30, 20)));
-            AddControl(angleSnapTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)) { allowNegativeNumbers = false });
-            AddControl(angleSnapLabel = new GuiLabel("Angle:", new float2(0f, 0f), new float2(32, 20)));
+            Add(gridZoomTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)) { allowNegativeNumbers = false });
+            Add(gridZoomLabel = new GuiLabel("Zoom:", new float2(0f, 0f), new float2(32, 20)));
+            Add(gridSnapTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)) { allowNegativeNumbers = false });
+            Add(gridSnapLabel = new GuiLabel("Snap:", new float2(0f, 0f), new float2(30, 20)));
+            Add(angleSnapTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)) { allowNegativeNumbers = false });
+            Add(angleSnapLabel = new GuiLabel("Angle:", new float2(0f, 0f), new float2(32, 20)));
         }
 
         public override void OnRender()

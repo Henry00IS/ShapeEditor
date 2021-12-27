@@ -33,7 +33,7 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         /// <param name="eventReceiver">The event receiver to try and switch to.</param>
         /// <returns>True when the switch was successful else false.</returns>
-        private bool TrySwitchActiveEventReceiver(IEditorEventReceiver eventReceiver)
+        internal bool TrySwitchActiveEventReceiver(IEditorEventReceiver eventReceiver)
         {
             if (eventReceiver == null) return false;
 

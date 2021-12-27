@@ -14,14 +14,17 @@ namespace AeternumGames.ShapeEditor
             if (windows == null)
             {
                 windows = new List<GuiWindow>();
-                AddWindow(new TopToolbarGuiWindow(float2.zero, float2.zero));
-                AddWindow(new BottomToolbarGuiWindow(float2.zero, float2.zero));
-                AddWindow(new ToolbarGuiWindow(new float2(20, 40)));
-                AddWindow(new TextboxTestWindow(new float2(300, 100), new float2(220, 80)));
+                OpenWindow(new TopToolbarGuiWindow(float2.zero, float2.zero));
+                OpenWindow(new BottomToolbarGuiWindow(float2.zero, float2.zero));
+                OpenWindow(new ToolbarGuiWindow(new float2(20, 60)));
+                OpenWindow(new TextboxTestWindow(new float2(300, 100), new float2(220, 80)));
             }
 
             // before we draw the windows we check whether the mouse is obstructed.
             UpdateWindowMouseObstructionFlags();
+
+            // remove any closed windows.
+            RemoveClosedWindows();
 
             // render windows in reverse.
             var windowsCount = windows.Count;
@@ -76,11 +79,27 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Adds the window the shape editor window.</summary>
         /// <param name="window">The window to be added.</param>
-        internal void AddWindow(GuiWindow window)
+        internal void OpenWindow(GuiWindow window)
         {
             window.editor = this;
-            windows.Add(window);
+            windows.Insert(0, window);
             window.OnActivate();
+        }
+
+        /// <summary>Removes all of the windows that were marked as closed.</summary>
+        private void RemoveClosedWindows()
+        {
+            // iterate over the windows in reverse.
+            var windowsCount = windows.Count;
+            for (int i = windowsCount; i-- > 0;)
+            {
+                var window = windows[i];
+                if (window.closed)
+                {
+                    window.OnDeactivate();
+                    windows.RemoveAt(i);
+                }
+            }
         }
     }
 }

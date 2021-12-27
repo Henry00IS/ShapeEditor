@@ -19,7 +19,7 @@ namespace AeternumGames.ShapeEditor
 
         public void AddControl(GuiControl control)
         {
-            window.AddControl(control);
+            window.Add(control);
             control.position = new float2(1f, topPosition);
             topPosition += Mathf.FloorToInt(control.size.y);
 
