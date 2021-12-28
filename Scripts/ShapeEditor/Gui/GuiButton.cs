@@ -81,6 +81,11 @@ namespace AeternumGames.ShapeEditor
                     onClick();
             }
         }
+
+        public override bool IsBusy()
+        {
+            return isPressed;
+        }
     }
 }
 

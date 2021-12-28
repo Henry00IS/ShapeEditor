@@ -32,7 +32,7 @@ namespace AeternumGames.ShapeEditor
             fileMenu.Add("Exit", editor.UserExitShapeEditor);
 
             var viewMenu = menu.Add("View");
-            viewMenu.Add("Textbox Test Window", () => { Debug.Log("Textbox Test Window"); });
+            viewMenu.Add("Textbox Test Window", editor.UserShowTextboxTestWindow);
             viewMenu.Add("Inspector Window", () => { Debug.Log("Inspector Window"); });
 
             var helpMenu = menu.Add("Help");

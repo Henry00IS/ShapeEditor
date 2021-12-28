@@ -27,9 +27,14 @@ namespace AeternumGames.ShapeEditor
         {
             get
             {
-                if (parent != null)
-                    return parent.position + position;
-                return position;
+                var offset = position;
+                var current = parent;
+                while (current != null)
+                {
+                    offset += current.position;
+                    current = current.parent;
+                }
+                return offset;
             }
         }
 

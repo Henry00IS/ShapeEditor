@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 
+using Unity.Mathematics;
 using UnityEditor;
-using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
@@ -228,6 +228,11 @@ namespace AeternumGames.ShapeEditor
         internal void UserExitShapeEditor()
         {
             Close();
+        }
+
+        internal void UserShowTextboxTestWindow()
+        {
+            OpenWindow(new TextboxTestWindow(new float2(300, 100), new float2(220, 80)), false);
         }
     }
 }
