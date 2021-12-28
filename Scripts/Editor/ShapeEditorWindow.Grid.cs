@@ -187,8 +187,9 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Will reset the grid offset to the center of the viewport.</summary>
         private void GridResetOffset()
         {
+            // add 19 pixels because of the thick top toolbar window.
             var viewportRect = GetViewportRect();
-            gridOffset = new float2(Mathf.RoundToInt(viewportRect.width / 2f), Mathf.RoundToInt((viewportRect.height - viewportRect.y) / 2f));
+            gridOffset = new float2(Mathf.RoundToInt(viewportRect.width / 2f), Mathf.RoundToInt((viewportRect.height - viewportRect.y + 19f) / 2f));
         }
 
         /// <summary>Will reset the grid zoom.</summary>
