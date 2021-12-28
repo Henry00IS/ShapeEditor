@@ -298,8 +298,7 @@ namespace AeternumGames.ShapeEditor
                             return true;
 
                         case KeyCode.H:
-                            GridResetOffset();
-                            GridResetZoom();
+                            UserResetCamera();
                             return true;
 
                         case KeyCode.Q:

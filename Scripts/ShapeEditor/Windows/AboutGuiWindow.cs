@@ -24,29 +24,31 @@ namespace AeternumGames.ShapeEditor
         private static float2 GetCenterPosition()
         {
             return new float2(
-                (ShapeEditorWindow.Instance.position.width / 2f) - (windowSize.x / 2f),
-                (ShapeEditorWindow.Instance.position.height / 2f) - (windowSize.y / 2f)
+                Mathf.RoundToInt((ShapeEditorWindow.Instance.position.width / 2f) - (windowSize.x / 2f)),
+                Mathf.RoundToInt((ShapeEditorWindow.Instance.position.height / 2f) - (windowSize.y / 2f))
             );
         }
 
         public override void OnRender()
         {
-            base.OnRender();
-
-            GLUtilities.DrawGuiTextured(ShapeEditorResources.Instance.shapeEditorAbout, () =>
-            {
-                var rect = drawRect;
-                GLUtilities.DrawFlippedUvRectangle(rect.x, rect.y, rect.width, rect.height);
-            });
-
-            if (patreonButton.isMouseOver)
-            {
-                editor.SetMouseCursor(ShapeEditorResources.Instance.shapeEditorMouseCursorHand, new float2(6f, 0f));
-            }
-
             if (!IsActiveOrHasActiveChild())
             {
                 Close();
+            }
+            else
+            {
+                base.OnRender();
+
+                GLUtilities.DrawGuiTextured(ShapeEditorResources.Instance.shapeEditorAbout, () =>
+                {
+                    var rect = drawRect;
+                    GLUtilities.DrawFlippedUvRectangle(rect.x, rect.y, rect.width, rect.height);
+                });
+
+                if (patreonButton.isMouseOver)
+                {
+                    editor.SetMouseCursor(ShapeEditorResources.Instance.shapeEditorMouseCursorHand, new float2(6f, 0f));
+                }
             }
         }
     }

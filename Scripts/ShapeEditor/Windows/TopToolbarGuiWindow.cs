@@ -42,9 +42,14 @@ namespace AeternumGames.ShapeEditor
             var viewMenu = menu.Add("View");
             viewMenu.Add("Textbox Test Window", editor.UserShowTextboxTestWindow);
             viewMenu.Add("Inspector Window", () => { Debug.Log("Inspector Window"); });
+            viewMenu.Separator();
+            viewMenu.Add("Reset Camera", editor.UserResetCamera);
 
             var helpMenu = menu.Add("Help");
-            helpMenu.Add("About", editor.UserShowAboutWindow);
+            helpMenu.Add("About 2D Shape Editor", editor.UserShowAboutWindow);
+            helpMenu.Separator();
+            helpMenu.Add("GitHub Repository", editor.UserOpenGitHubRepository);
+            helpMenu.Add("Online Manual", editor.UserOpenOnlineManual);
 
             horizontalLayout = new GuiHorizontalLayout(this, 1, 21);
 

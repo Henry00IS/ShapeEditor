@@ -2,6 +2,7 @@
 
 using Unity.Mathematics;
 using UnityEditor;
+using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
@@ -236,9 +237,22 @@ namespace AeternumGames.ShapeEditor
             OpenWindow(new TextboxTestWindow(new float2(300, 100), new float2(220, 80)), false);
         }
 
+        /// <summary>Displays the about window.</summary>
         internal void UserShowAboutWindow()
         {
             OpenWindow(new AboutGuiWindow());
+        }
+
+        /// <summary>Opens the GitHub repository in a browser window.</summary>
+        internal void UserOpenGitHubRepository()
+        {
+            Application.OpenURL("https://github.com/Henry00IS/ShapeEditor");
+        }
+
+        /// <summary>Opens the GitHub repository wiki in a browser window.</summary>
+        internal void UserOpenOnlineManual()
+        {
+            Application.OpenURL("https://github.com/Henry00IS/ShapeEditor/wiki");
         }
 
         /// <summary>Called on CTRL+Z when the editor window has focus.</summary>
@@ -259,6 +273,13 @@ namespace AeternumGames.ShapeEditor
             RegisterUndo("Snap Selection To Grid");
             foreach (var selectable in ForEachSelectedObject())
                 selectable.position = selectable.position.Snap(gridSnap);
+        }
+
+        /// <summary>Centers the camera by resetting the grid offset and zoom.</summary>
+        internal void UserResetCamera()
+        {
+            GridResetOffset();
+            GridResetZoom();
         }
     }
 }
