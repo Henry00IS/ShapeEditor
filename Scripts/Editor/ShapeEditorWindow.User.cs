@@ -234,6 +234,18 @@ namespace AeternumGames.ShapeEditor
         {
             OpenWindow(new TextboxTestWindow(new float2(300, 100), new float2(220, 80)), false);
         }
+
+        /// <summary>Called on CTRL+Z when the editor window has focus.</summary>
+        internal void UserUndo()
+        {
+            OnUndo();
+        }
+
+        /// <summary>Called on CTRL+Y when the editor window has focus.</summary>
+        internal void UserRedo()
+        {
+            OnRedo();
+        }
     }
 }
 

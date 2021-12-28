@@ -11,6 +11,9 @@ namespace AeternumGames.ShapeEditor
         private const float height = 20f;
         private static readonly Color colorMenuItemHoverBackground = new Color(0.243f, 0.243f, 0.251f);
 
+        /// <summary>Whether the menu item is enabled or disabled if supported.</summary>
+        public bool enabled = true;
+
         /// <summary>The icon of the menu item if supported.</summary>
         public Texture icon;
 

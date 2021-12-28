@@ -54,10 +54,10 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Gets whether an undo operation is available.</summary>
-        private bool canUndo => undoStack.Count > 0;
+        internal bool canUndo => undoStack.Count > 0;
 
         /// <summary>Gets whether a redo operation is available.</summary>
-        private bool canRedo => redoStack.Count > 0;
+        internal bool canRedo => redoStack.Count > 0;
     }
 }
 

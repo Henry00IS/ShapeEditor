@@ -10,6 +10,8 @@ namespace AeternumGames.ShapeEditor
         private GuiButton vertexSelectButton;
         private GuiButton edgeSelectButton;
         private GuiButton faceSelectButton;
+        private GuiMenuVerticalItem menuUndoItem;
+        private GuiMenuVerticalItem menuRedoItem;
 
         public TopToolbarGuiWindow(float2 position, float2 size) : base(position, size) { }
 
@@ -30,6 +32,11 @@ namespace AeternumGames.ShapeEditor
             fileMenu.Add("Save As...", resources.shapeEditorSave, editor.UserSaveProjectAs);
             fileMenu.Separator();
             fileMenu.Add("Exit", editor.UserExitShapeEditor);
+
+            var editMenu = menu.Add("Edit");
+            menuUndoItem = editMenu.Add("Undo", editor.UserUndo);
+            menuRedoItem = editMenu.Add("Redo", editor.UserRedo);
+            editMenu.Separator();
 
             var viewMenu = menu.Add("View");
             viewMenu.Add("Textbox Test Window", editor.UserShowTextboxTestWindow);
@@ -61,6 +68,9 @@ namespace AeternumGames.ShapeEditor
             vertexSelectButton.isChecked = shapeSelectMode == ShapeSelectMode.Vertex;
             edgeSelectButton.isChecked = shapeSelectMode == ShapeSelectMode.Edge;
             faceSelectButton.isChecked = shapeSelectMode == ShapeSelectMode.Face;
+
+            menuUndoItem.enabled = editor.canUndo;
+            menuRedoItem.enabled = editor.canRedo;
 
             base.OnRender();
         }

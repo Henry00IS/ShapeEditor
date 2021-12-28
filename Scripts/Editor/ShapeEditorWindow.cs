@@ -325,7 +325,7 @@ namespace AeternumGames.ShapeEditor
                         case KeyCode.Y:
                             if (hasFocus && isCtrlPressed)
                             {
-                                OnRedo();
+                                UserRedo();
                                 return true;
                             }
                             return true;
@@ -333,7 +333,7 @@ namespace AeternumGames.ShapeEditor
                         case KeyCode.Z:
                             if (hasFocus && isCtrlPressed)
                             {
-                                OnUndo();
+                                UserUndo();
                                 return true;
                             }
                             return true;

@@ -38,7 +38,7 @@ namespace AeternumGames.ShapeEditor
         {
             base.OnRender();
 
-            GLUtilities.DrawGuiText(ShapeEditorResources.fontSegoeUI14, text, drawPosition + new float2(27f, 4f));
+            GLUtilities.DrawGuiText(ShapeEditorResources.fontSegoeUI14, text, drawPosition + new float2(27f, 4f), enabled ? Color.white : Color.gray);
 
             if (icon)
             {
@@ -53,6 +53,9 @@ namespace AeternumGames.ShapeEditor
         {
             if (button == 0)
             {
+                // the menu item must be enabled.
+                if (!enabled) return;
+
                 if (isMouseOver)
                 {
                     if (parent is GuiMenuWindow parentWindow)
