@@ -159,7 +159,7 @@ namespace AeternumGames.ShapeEditor
                 case KeyCode.B:
                     if (editor.selectedSegmentsCount > 0)
                     {
-                        editor.ToggleBezierTest();
+                        editor.UserToggleBezierTest();
                         return true;
                     }
                     return false;
@@ -167,7 +167,7 @@ namespace AeternumGames.ShapeEditor
                 case KeyCode.N:
                     if (editor.selectedSegmentsCount > 0)
                     {
-                        editor.ToggleSineTest();
+                        editor.UserToggleSineTest();
                         return true;
                     }
                     return false;
@@ -175,7 +175,7 @@ namespace AeternumGames.ShapeEditor
                 case KeyCode.M:
                     if (editor.selectedSegmentsCount > 0)
                     {
-                        editor.ToggleRepeatTest();
+                        editor.UserToggleRepeatTest();
                         return true;
                     }
                     return false;
@@ -183,7 +183,7 @@ namespace AeternumGames.ShapeEditor
                 case KeyCode.V:
                     if (editor.selectedSegmentsCount > 0)
                     {
-                        editor.ApplyGeneratorTest();
+                        editor.UserApplyGeneratorTest();
                         return true;
                     }
                     return false;

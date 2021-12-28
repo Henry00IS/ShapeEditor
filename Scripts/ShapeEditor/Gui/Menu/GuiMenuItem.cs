@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -17,47 +18,53 @@ namespace AeternumGames.ShapeEditor
         public string text = "";
 
         /// <summary>Called when the menu item is clicked.</summary>
-        public System.Action<GuiMenuItem> onClick;
+        public Action onClick;
 
         /// <summary>Vertical layout helper to place the menu items in a column.</summary>
         private GuiVerticalLayout verticalLayout;
 
         /// <summary>Initializes a new instance with the specified caption for the menu item.</summary>
         /// <param name="text">The caption for the menu item.</param>
-        protected GuiMenuItem(string text) : base(1f, height)
+        /// <param name="onClick">Called when the menu item is clicked.</param>
+        protected GuiMenuItem(string text, Action onClick = null) : base(1f, height)
         {
             this.text = text;
+            this.onClick = onClick;
             verticalLayout = new GuiVerticalLayout(this);
         }
 
         /// <summary>Initializes a new instance with the specified caption and icon for the menu item.</summary>
         /// <param name="text">The caption for the menu item.</param>
         /// <param name="icon">The icon of the menu item.</param>
-        protected GuiMenuItem(string text, Texture icon) : base(1f, height)
+        /// <param name="onClick">Called when the menu item is clicked.</param>
+        protected GuiMenuItem(string text, Texture icon, Action onClick = null) : base(1f, height)
         {
             this.text = text;
             this.icon = icon;
+            this.onClick = onClick;
             verticalLayout = new GuiVerticalLayout(this);
         }
 
         /// <summary>Adds a vertical menu item to the menu strip.</summary>
         /// <param name="text">The caption of the menu item.</param>
+        /// <param name="onClick">Called when the menu item is clicked.</param>
         /// <returns>The vertical menu item that has been created.</returns>
-        public GuiMenuVerticalItem Add(string text)
+        public GuiMenuVerticalItem Add(string text, Action onClick)
         {
-            var item = new GuiMenuVerticalItem(text);
-            verticalLayout.AddControl(item);
+            var item = new GuiMenuVerticalItem(text, onClick);
+            verticalLayout.Add(item);
             return item;
         }
 
         /// <summary>Adds a vertical menu item to the menu strip.</summary>
         /// <param name="text">The caption of the menu item.</param>
         /// <param name="icon">The icon of the menu item.</param>
+        /// <param name="onClick">Called when the menu item is clicked.</param>
         /// <returns>The vertical menu item that has been created.</returns>
-        public GuiMenuVerticalItem Add(string text, Texture icon)
+        public GuiMenuVerticalItem Add(string text, Texture icon, Action onClick)
         {
-            var item = new GuiMenuVerticalItem(text, icon);
-            verticalLayout.AddControl(item);
+            var item = new GuiMenuVerticalItem(text, icon, onClick);
+            verticalLayout.Add(item);
             return item;
         }
 
@@ -66,7 +73,7 @@ namespace AeternumGames.ShapeEditor
         public GuiMenuSeparator Separator()
         {
             var item = new GuiMenuSeparator();
-            verticalLayout.AddControl(item);
+            verticalLayout.Add(item);
             return item;
         }
 
@@ -121,7 +128,12 @@ namespace AeternumGames.ShapeEditor
         {
             if (button == 0)
             {
-                onClick?.Invoke(this);
+                if (parent is GuiMenuWindow parentWindow)
+                {
+                    parentWindow.OnMenuItemClicked();
+                }
+
+                onClick?.Invoke();
             }
         }
     }

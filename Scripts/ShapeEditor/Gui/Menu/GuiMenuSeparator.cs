@@ -37,6 +37,11 @@ namespace AeternumGames.ShapeEditor
                 GLUtilities.DrawLine(1.0f, drawPosition + new float2(0f, 1f), drawPosition + new float2(size.x, 1f));
             });
         }
+
+        // ignore mouse down on separators, so we don't close the menu.
+        public override void OnMouseDown(int button)
+        {
+        }
     }
 }
 

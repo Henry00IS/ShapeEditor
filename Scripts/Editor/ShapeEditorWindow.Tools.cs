@@ -75,30 +75,6 @@ namespace AeternumGames.ShapeEditor
             SwitchTool(tool);
         }
 
-        /// <summary>Switches to the box select tool unless already active.</summary>
-        internal void SwitchToBoxSelectTool() => SwitchTool(boxSelectTool);
-
-        /// <summary>Switches to the translate tool unless already active.</summary>
-        internal void SwitchToTranslateTool() => SwitchTool(translateTool);
-
-        /// <summary>Switches to the rotate tool unless already active.</summary>
-        internal void SwitchToRotateTool() => SwitchTool(rotateTool);
-
-        /// <summary>Switches to the scale tool unless already active.</summary>
-        internal void SwitchToScaleTool() => SwitchTool(scaleTool);
-
-        /// <summary>Switches to the cut tool unless already active.</summary>
-        internal void SwitchToCutTool() => SwitchTool(cutTool);
-
-        /// <summary>Switches to the vertex select mode.</summary>
-        internal void SwitchToVertexSelectMode() => shapeSelectMode = ShapeSelectMode.Vertex;
-
-        /// <summary>Switches to the edge select mode.</summary>
-        internal void SwitchToEdgeSelectMode() => shapeSelectMode = ShapeSelectMode.Edge;
-
-        /// <summary>Switches to the face select mode.</summary>
-        internal void SwitchToFaceSelectMode() => shapeSelectMode = ShapeSelectMode.Face;
-
         /// <summary>Draws the active tool.</summary>
         private void DrawTool()
         {

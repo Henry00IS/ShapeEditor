@@ -78,7 +78,7 @@ namespace AeternumGames.ShapeEditor
                 // display the 2d shape editor.
                 ShapeEditorWindow window = ShapeEditorWindow.InitAndGetHandle();
                 // load a copy of the embedded project into the editor.
-                window.OnOpenProject(shapeEditorTarget.project.Clone());
+                window.OpenProject(shapeEditorTarget.project.Clone());
             }
             GUILayout.EndHorizontal();
         }

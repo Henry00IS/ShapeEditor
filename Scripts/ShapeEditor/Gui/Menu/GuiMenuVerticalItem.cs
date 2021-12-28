@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -8,12 +9,12 @@ namespace AeternumGames.ShapeEditor
     /// <summary>A vertical menu item used in open menus.</summary>
     public class GuiMenuVerticalItem : GuiMenuItem
     {
-        public GuiMenuVerticalItem(string text) : base(text)
+        public GuiMenuVerticalItem(string text, Action onClick = null) : base(text, onClick)
         {
             size = new float2(GetWidth(), GetHeight());
         }
 
-        public GuiMenuVerticalItem(string text, Texture icon) : base(text, icon)
+        public GuiMenuVerticalItem(string text, Texture icon, Action onClick = null) : base(text, icon, onClick)
         {
             size = new float2(GetWidth(), GetHeight());
         }

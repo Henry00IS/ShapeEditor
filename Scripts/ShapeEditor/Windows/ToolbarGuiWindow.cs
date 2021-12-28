@@ -21,30 +21,11 @@ namespace AeternumGames.ShapeEditor
         {
             verticalLayout = new GuiVerticalLayout(this);
 
-            verticalLayout.AddControl(selectBoxButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorSelectBox, 28, () =>
-            {
-                editor.SwitchToBoxSelectTool();
-            }));
-
-            verticalLayout.AddControl(translateButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorTranslate, 28, () =>
-            {
-                editor.SwitchToTranslateTool();
-            }));
-
-            verticalLayout.AddControl(rotateButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorRotate, 28, () =>
-            {
-                editor.SwitchToRotateTool();
-            }));
-
-            verticalLayout.AddControl(scaleButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorScale, 28, () =>
-            {
-                editor.SwitchToScaleTool();
-            }));
-
-            verticalLayout.AddControl(cutButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorCut, 28, () =>
-            {
-                editor.SwitchToCutTool();
-            }));
+            verticalLayout.Add(selectBoxButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorSelectBox, 28, editor.UserSwitchToBoxSelectTool));
+            verticalLayout.Add(translateButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorTranslate, 28, editor.UserSwitchToTranslateTool));
+            verticalLayout.Add(rotateButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorRotate, 28, editor.UserSwitchToRotateTool));
+            verticalLayout.Add(scaleButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorScale, 28, editor.UserSwitchToScaleTool));
+            verticalLayout.Add(cutButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorCut, 28, editor.UserSwitchToCutTool));
 
             size = verticalLayout.windowSize;
         }

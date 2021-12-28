@@ -286,15 +286,15 @@ namespace AeternumGames.ShapeEditor
                     switch (keyCode)
                     {
                         case KeyCode.Alpha1:
-                            SwitchToVertexSelectMode();
+                            UserSwitchToVertexSelectMode();
                             return true;
 
                         case KeyCode.Alpha2:
-                            SwitchToEdgeSelectMode();
+                            UserSwitchToEdgeSelectMode();
                             return true;
 
                         case KeyCode.Alpha3:
-                            SwitchToFaceSelectMode();
+                            UserSwitchToFaceSelectMode();
                             return true;
 
                         case KeyCode.H:
@@ -303,23 +303,23 @@ namespace AeternumGames.ShapeEditor
                             return true;
 
                         case KeyCode.Q:
-                            SwitchToBoxSelectTool();
+                            UserSwitchToBoxSelectTool();
                             return true;
 
                         case KeyCode.W:
-                            SwitchToTranslateTool();
+                            UserSwitchToTranslateTool();
                             return true;
 
                         case KeyCode.E:
-                            SwitchToRotateTool();
+                            UserSwitchToRotateTool();
                             return true;
 
                         case KeyCode.R:
-                            SwitchToScaleTool();
+                            UserSwitchToScaleTool();
                             return true;
 
                         case KeyCode.Delete:
-                            DeleteSelection();
+                            UserDeleteSelection();
                             return true;
 
                         case KeyCode.Y:
@@ -373,24 +373,6 @@ namespace AeternumGames.ShapeEditor
             }
 
             return false;
-        }
-
-        internal void OnAssignProjectToTargets()
-        {
-            var transform = Selection.activeTransform;
-            if (transform)
-            {
-                var target = transform.GetComponent<ShapeEditorTarget>();
-                if (target)
-                {
-                    target.OnShapeEditorUpdateProject(project);
-                }
-            }
-        }
-
-        internal void OnAddShapeToProject()
-        {
-            project.shapes.Add(new Shape());
         }
     }
 }

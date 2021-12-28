@@ -7,7 +7,8 @@ namespace AeternumGames.ShapeEditor
 {
     public partial class ShapeEditorWindow
     {
-        internal void OnNewProject()
+        /// <summary>Pushes the current project onto the undo stack and creates a new project.</summary>
+        private void NewProject()
         {
             RegisterUndo("New Project");
             project = new Project();
@@ -17,7 +18,7 @@ namespace AeternumGames.ShapeEditor
         /// Attempts to open the project at the specified file path. May prompt the user.
         /// </summary>
         /// <param name="path">The file path of the project file.</param>
-        internal void OnOpenProject(string path)
+        private void OpenProject(string path)
         {
             try
             {
@@ -52,39 +53,21 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        /// <summary>Displays a file open dialog to select a project file.</summary>
-        internal void OnOpenProject()
-        {
-            string path = EditorUtility.OpenFilePanel("Load 2D Shape Editor Project", "", "s2d,sabre2d");
-            if (path.Length != 0)
-            {
-                OnOpenProject(path);
-            }
-        }
-
-        /// <summary>Opens the specified project immediately.</summary>
+        /// <summary>Pushes the current project onto the undo stack and opens the specified project immediately.</summary>
         /// <param name="project">The project to be loaded.</param>
-        internal void OnOpenProject(Project project)
+        internal void OpenProject(Project project)
         {
             RegisterUndo("Load Project");
             this.project = project;
         }
 
-        internal void OnSaveProject()
+        /// <summary>Saves the current project to the specified file path.</summary>
+        /// <param name="path">The file path to save the project to.</param>
+        /// <exception cref="System.IO.IOException"></exception>
+        private void SaveProject(string path)
         {
-            try
-            {
-                string path = EditorUtility.SaveFilePanel("Save 2D Shape Editor Project", "", "Project", "s2d");
-                if (path.Length != 0)
-                {
-                    string json = JsonUtility.ToJson(project);
-                    System.IO.File.WriteAllText(path, json);
-                }
-            }
-            catch (System.Exception ex)
-            {
-                EditorUtility.DisplayDialog("2D Shape Editor", "An exception occured while saving the project:\r\n" + ex.Message, "Ohno!");
-            }
+            string json = JsonUtility.ToJson(project);
+            System.IO.File.WriteAllText(path, json);
         }
     }
 }

@@ -17,75 +17,40 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnActivate()
         {
+            var resources = ShapeEditorResources.Instance;
             colorWindowBackground = new Color(0.192f, 0.192f, 0.192f);
 
             var menu = new GuiMenuStrip();
             Add(menu);
 
-            var resources = ShapeEditorResources.Instance;
-
             var fileMenu = menu.Add("File");
-            fileMenu.Add("New Project", resources.shapeEditorNew);
-            fileMenu.Add("Open Project...", resources.shapeEditorOpen);
+            fileMenu.Add("New Project", resources.shapeEditorNew, editor.UserNewProject);
+            fileMenu.Add("Open Project...", resources.shapeEditorOpen, editor.UserOpenProject);
             fileMenu.Separator();
-            fileMenu.Add("Save As...", resources.shapeEditorSave);
+            fileMenu.Add("Save As...", resources.shapeEditorSave, editor.UserSaveProjectAs);
             fileMenu.Separator();
-            fileMenu.Add("Exit");
+            fileMenu.Add("Exit", editor.UserExitShapeEditor);
 
             var viewMenu = menu.Add("View");
-            viewMenu.Add("Textbox Test Window");
-            viewMenu.Add("Inspector Window");
+            viewMenu.Add("Textbox Test Window", () => { Debug.Log("Textbox Test Window"); });
+            viewMenu.Add("Inspector Window", () => { Debug.Log("Inspector Window"); });
 
             var helpMenu = menu.Add("Help");
-            helpMenu.Add("About");
+            helpMenu.Add("About", () => { Debug.Log("About"); });
 
             horizontalLayout = new GuiHorizontalLayout(this, 1, 21);
 
-            horizontalLayout.AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorNew, 20, () =>
-            {
-                editor.OnNewProject();
-            }));
-
-            horizontalLayout.AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorOpen, 20, () =>
-            {
-                editor.OnOpenProject();
-            }));
-
-            horizontalLayout.AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorSave, 20, () =>
-            {
-                editor.OnSaveProject();
-            }));
-
+            horizontalLayout.Add(new GuiButton(resources.shapeEditorNew, 20, editor.UserNewProject));
+            horizontalLayout.Add(new GuiButton(resources.shapeEditorOpen, 20, editor.UserOpenProject));
+            horizontalLayout.Add(new GuiButton(resources.shapeEditorSave, 20, editor.UserSaveProjectAs));
             horizontalLayout.Space(5);
-
-            horizontalLayout.AddControl(vertexSelectButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorVertexSelect, 20, () =>
-            {
-                editor.SwitchToVertexSelectMode();
-            }));
-
-            horizontalLayout.AddControl(edgeSelectButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorEdgeSelect, 20, () =>
-            {
-                editor.SwitchToEdgeSelectMode();
-            }));
-
-            horizontalLayout.AddControl(faceSelectButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorFaceSelect, 20, () =>
-            {
-                editor.SwitchToFaceSelectMode();
-            }));
-
+            horizontalLayout.Add(vertexSelectButton = new GuiButton(resources.shapeEditorVertexSelect, 20, editor.UserSwitchToVertexSelectMode));
+            horizontalLayout.Add(edgeSelectButton = new GuiButton(resources.shapeEditorEdgeSelect, 20, editor.UserSwitchToEdgeSelectMode));
+            horizontalLayout.Add(faceSelectButton = new GuiButton(resources.shapeEditorFaceSelect, 20, editor.UserSwitchToFaceSelectMode));
             horizontalLayout.Space(5);
-
-            horizontalLayout.AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorShapeCreate, 20, () =>
-            {
-                editor.OnAddShapeToProject();
-            }));
-
+            horizontalLayout.Add(new GuiButton(resources.shapeEditorShapeCreate, 20, editor.UserAddShapeToProject));
             horizontalLayout.Space(5);
-
-            horizontalLayout.AddControl(new GuiButton(ShapeEditorResources.Instance.shapeEditorExtrudeShape, 20, () =>
-            {
-                editor.OnAssignProjectToTargets();
-            }));
+            horizontalLayout.Add(new GuiButton(resources.shapeEditorExtrudeShape, 20, editor.UserAssignProjectToTargets));
         }
 
         public override void OnRender()

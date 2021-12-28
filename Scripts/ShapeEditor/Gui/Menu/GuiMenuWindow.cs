@@ -15,7 +15,7 @@ namespace AeternumGames.ShapeEditor
 
         public GuiMenuWindow(GuiMenuItem item) : base(0f, 2f)
         {
-            this.parentMenu = item;
+            parentMenu = item;
 
             colorWindowBackground = colorMenuBackground;
 
@@ -43,6 +43,12 @@ namespace AeternumGames.ShapeEditor
             {
                 base.OnRender();
             }
+        }
+
+        /// <summary>Called when a menu item inside of the window was clicked.</summary>
+        public void OnMenuItemClicked()
+        {
+            Close();
         }
     }
 }

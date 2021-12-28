@@ -27,8 +27,8 @@ namespace AeternumGames.ShapeEditor
         public GuiMenuHorizontalItem Add(string text)
         {
             var item = new GuiMenuHorizontalItem(text);
-            horizontalLayout.AddControl(item);
-            item.onClick += OnMenuItemClicked;
+            horizontalLayout.Add(item);
+            item.onClick += () => OnMenuItemClicked(item);
             return item;
         }
 

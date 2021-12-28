@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System;
 using Unity.Mathematics;
 
 namespace AeternumGames.ShapeEditor
@@ -7,7 +8,7 @@ namespace AeternumGames.ShapeEditor
     /// <summary>A horizontal menu item used in menu bars.</summary>
     public class GuiMenuHorizontalItem : GuiMenuItem
     {
-        public GuiMenuHorizontalItem(string text) : base(text)
+        public GuiMenuHorizontalItem(string text, Action onClick = null) : base(text, onClick)
         {
             size = new float2(GetWidth(), GetHeight());
         }
