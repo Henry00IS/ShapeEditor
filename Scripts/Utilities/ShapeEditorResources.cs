@@ -39,6 +39,8 @@ namespace AeternumGames.ShapeEditor
             s_Instance = (ShapeEditorResources)Resources.Load("ShapeEditorResources");
         }
 
+        public Texture2D shapeEditorAbout;
+        public Texture2D shapeEditorAboutPatreon;
         public Texture2D shapeEditorCreatePolygon;
         public Texture2D shapeEditorCut;
         public Texture2D shapeEditorDelete;
@@ -52,6 +54,7 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorFlipVertically;
         public Texture2D shapeEditorHome;
         public Texture2D shapeEditorIcon;
+        public Texture2D shapeEditorMouseCursorHand;
         public Texture2D shapeEditorMouseCursorScissors;
         public Texture2D shapeEditorNew;
         public Texture2D shapeEditorOpen;

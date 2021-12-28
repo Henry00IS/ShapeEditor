@@ -44,7 +44,7 @@ namespace AeternumGames.ShapeEditor
             viewMenu.Add("Inspector Window", () => { Debug.Log("Inspector Window"); });
 
             var helpMenu = menu.Add("Help");
-            helpMenu.Add("About", () => { Debug.Log("About"); });
+            helpMenu.Add("About", editor.UserShowAboutWindow);
 
             horizontalLayout = new GuiHorizontalLayout(this, 1, 21);
 

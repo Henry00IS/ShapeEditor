@@ -15,6 +15,11 @@ namespace AeternumGames.ShapeEditor
             this.text = text;
         }
 
+        public GuiLabel(string text) : base(float2.zero, 20f)
+        {
+            this.text = text;
+        }
+
         /// <summary>Called when the control is rendered.</summary>
         public override void OnRender()
         {
