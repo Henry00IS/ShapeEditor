@@ -225,6 +225,7 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        /// <summary>Closes the shape editor window.</summary>
         internal void UserExitShapeEditor()
         {
             Close();
@@ -245,6 +246,14 @@ namespace AeternumGames.ShapeEditor
         internal void UserRedo()
         {
             OnRedo();
+        }
+
+        /// <summary>Snaps the selected objects to the grid.</summary>
+        internal void UserSnapSelectionToGrid()
+        {
+            RegisterUndo("Snap Selection To Grid");
+            foreach (var selectable in ForEachSelectedObject())
+                selectable.position = selectable.position.Snap(gridSnap);
         }
     }
 }
