@@ -8,8 +8,11 @@ namespace AeternumGames.ShapeEditor
     /// <summary>Represents a floating window inside of the 2D Shape Editor.</summary>
     public class GuiWindow : GuiContainer<GuiControl>
     {
-        /// <summary>Gets whether the window was closed and is about to be removed.</summary>
-        public bool closed { get; private set; }
+        /// <summary>
+        /// Gets whether the window was closed and is about to be removed.
+        /// <para>Use <see cref="Open"/> and <see cref="Close"/> instead of setting this flag.</para>
+        /// </summary>
+        public bool closed { get; set; }
 
         protected Color colorWindowBackground = new Color(0.192f, 0.192f, 0.192f, 0.5f);
         protected Color colorWindowBorder = new Color(0.1f, 0.1f, 0.1f);
@@ -21,6 +24,13 @@ namespace AeternumGames.ShapeEditor
         {
             this.position = position;
             this.size = size;
+        }
+
+        /// <summary>Opens the window inside of the shape editor window.</summary>
+        /// <param name="focus">Whether to try and give the window input focus.</param>
+        public void Open(bool focus = true)
+        {
+            editor.OpenWindow(this, focus);
         }
 
         /// <summary>

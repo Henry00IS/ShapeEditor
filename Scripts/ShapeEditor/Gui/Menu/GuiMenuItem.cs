@@ -10,18 +10,21 @@ namespace AeternumGames.ShapeEditor
         private const float height = 20f;
         private static readonly Color colorMenuItemHoverBackground = new Color(0.243f, 0.243f, 0.251f);
 
-        /// <summary>Vertical layout helper to place the menu items in a column.</summary>
-        private GuiVerticalLayout verticalLayout;
-
         /// <summary>The icon of the menu item if supported.</summary>
         public Texture icon;
 
         /// <summary>The caption of the menu item.</summary>
         public string text = "";
 
+        /// <summary>Called when the menu item is clicked.</summary>
+        public System.Action<GuiMenuItem> onClick;
+
+        /// <summary>Vertical layout helper to place the menu items in a column.</summary>
+        private GuiVerticalLayout verticalLayout;
+
         /// <summary>Initializes a new instance with the specified caption for the menu item.</summary>
         /// <param name="text">The caption for the menu item.</param>
-        public GuiMenuItem(string text) : base(1f, height)
+        protected GuiMenuItem(string text) : base(1f, height)
         {
             this.text = text;
             verticalLayout = new GuiVerticalLayout(this);
@@ -30,7 +33,7 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Initializes a new instance with the specified caption and icon for the menu item.</summary>
         /// <param name="text">The caption for the menu item.</param>
         /// <param name="icon">The icon of the menu item.</param>
-        public GuiMenuItem(string text, Texture icon) : base(1f, height)
+        protected GuiMenuItem(string text, Texture icon) : base(1f, height)
         {
             this.text = text;
             this.icon = icon;
@@ -111,6 +114,14 @@ namespace AeternumGames.ShapeEditor
                     GL.Color(colorMenuItemHoverBackground);
                     GLUtilities.DrawRectangle(drawPosition.x, drawPosition.y, size.x, size.y);
                 });
+            }
+        }
+
+        public override void OnMouseDown(int button)
+        {
+            if (button == 0)
+            {
+                onClick?.Invoke(this);
             }
         }
     }

@@ -13,17 +13,20 @@ namespace AeternumGames.ShapeEditor
         /// <summary>The parent menu that has a collection of menu items.</summary>
         public readonly GuiMenuItem parentMenu;
 
-        public GuiMenuWindow(float2 position, GuiMenuItem parentMenu) : base(position, 2f)
+        public GuiMenuWindow(GuiMenuItem item) : base(0f, 2f)
         {
-            this.parentMenu = parentMenu;
+            this.parentMenu = item;
 
             colorWindowBackground = colorMenuBackground;
 
+            // calculate the menu position.
+            position = new float2(item.drawRect.x, item.drawRect.yMax);
+
             // calculate the required menu size.
-            size = new float2(parentMenu.GetLargestWidthOfChildren(), parentMenu.GetMenuHeight() + 2f);
+            size = new float2(item.GetLargestWidthOfChildren(), item.GetMenuHeight() + 2f);
 
             // add the menu items.
-            foreach (var child in parentMenu.children)
+            foreach (var child in item.children)
             {
                 child.size = new float2(size.x - 2f, child.size.y);
                 Add(child);

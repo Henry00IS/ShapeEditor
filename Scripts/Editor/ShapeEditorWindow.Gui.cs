@@ -14,17 +14,17 @@ namespace AeternumGames.ShapeEditor
             if (windows == null)
             {
                 windows = new List<GuiWindow>();
-                OpenWindow(new TopToolbarGuiWindow(float2.zero, float2.zero));
-                OpenWindow(new BottomToolbarGuiWindow(float2.zero, float2.zero));
-                OpenWindow(new ToolbarGuiWindow(new float2(20, 60)));
-                OpenWindow(new TextboxTestWindow(new float2(300, 100), new float2(220, 80)));
+                OpenWindow(new TopToolbarGuiWindow(float2.zero, float2.zero), false);
+                OpenWindow(new BottomToolbarGuiWindow(float2.zero, float2.zero), false);
+                OpenWindow(new ToolbarGuiWindow(new float2(20, 60)), false);
+                OpenWindow(new TextboxTestWindow(new float2(300, 100), new float2(220, 80)), false);
             }
-
-            // before we draw the windows we check whether the mouse is obstructed.
-            UpdateWindowMouseObstructionFlags();
 
             // remove any closed windows.
             RemoveClosedWindows();
+
+            // before we draw the windows we check whether the mouse is obstructed.
+            UpdateWindowMouseObstructionFlags();
 
             // render windows in reverse.
             var windowsCount = windows.Count;
@@ -79,11 +79,20 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Adds the window the shape editor window.</summary>
         /// <param name="window">The window to be added.</param>
-        internal void OpenWindow(GuiWindow window)
+        /// <param name="focus">Whether to try and give the window input focus.</param>
+        internal void OpenWindow(GuiWindow window, bool focus = true)
         {
             window.editor = this;
-            windows.Insert(0, window);
-            window.OnActivate();
+            window.closed = false;
+
+            if (!windows.Contains(window))
+            {
+                windows.Insert(0, window);
+                window.OnActivate();
+            }
+
+            if (focus)
+                TrySwitchActiveEventReceiver(window);
         }
 
         /// <summary>Removes all of the windows that were marked as closed.</summary>
