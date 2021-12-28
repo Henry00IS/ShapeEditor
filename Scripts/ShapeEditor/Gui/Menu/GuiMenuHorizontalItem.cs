@@ -2,6 +2,7 @@
 
 using System;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
@@ -30,9 +31,30 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnRender()
         {
-            base.OnRender();
+            // if the menu is open we darken the background of this item.
+            if (parent is GuiMenuStrip menuStrip && menuStrip.IsMenuOpen(this))
+            {
+                var rect = drawRect;
+                GLUtilities.DrawGui(() =>
+                {
+                    GL.Color(GuiMenuWindow.colorMenuBackground);
+                    GLUtilities.DrawRectangle(rect.x, rect.y, rect.width, rect.height);
+                });
+            }
+            else
+            {
+                base.OnRender();
+            }
 
             GLUtilities.DrawGuiText(ShapeEditorResources.fontSegoeUI14, text, drawPosition + new float2(7f, 3f));
+        }
+
+        public override void OnMouseDown(int button)
+        {
+            if (button == 0)
+            {
+                onClick?.Invoke();
+            }
         }
     }
 }

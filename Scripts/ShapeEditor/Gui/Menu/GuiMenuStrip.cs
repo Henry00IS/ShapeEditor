@@ -45,17 +45,17 @@ namespace AeternumGames.ShapeEditor
                 GLUtilities.DrawRectangle(drawPosition.x, drawPosition.y, size.x, size.y);
             });
 
-            // draw the horizontal menu items.
-            base.OnRender();
-
             // if the mouse is hovering over the menu bar that has an open menu:
             if (isMouseOver && !isMouseObstructed && IsMenuOpen())
             {
                 // switch to a different menu if we are hovering over a different item.
-                var item = FindItemAtPosition(editor.mousePosition);
+                var item = FindItemAtPosition(mousePosition);
                 if (item != null)
                     OpenMenu(item);
             }
+
+            // draw the horizontal menu items.
+            base.OnRender();
         }
 
         /// <summary>Finds a menu item at the specified position.</summary>
@@ -99,7 +99,7 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Checks whether the specified menu item is open.</summary>
         /// <returns>True when a menu for the specified item is open else false.</returns>
-        private bool IsMenuOpen(GuiMenuItem item)
+        public bool IsMenuOpen(GuiMenuItem item)
         {
             if (!IsMenuOpen()) return false;
             return activeMenuWindow.parentMenu == item;

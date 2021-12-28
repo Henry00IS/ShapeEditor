@@ -8,7 +8,7 @@ namespace AeternumGames.ShapeEditor
     /// <summary>Represents an opened menu that shows selectable menu items.</summary>
     public class GuiMenuWindow : GuiWindow
     {
-        private static readonly Color colorMenuBackground = new Color(0.106f, 0.106f, 0.110f);
+        public static readonly Color colorMenuBackground = new Color(0.106f, 0.106f, 0.110f);
 
         /// <summary>The parent menu that has a collection of menu items.</summary>
         public readonly GuiMenuItem parentMenu;
@@ -45,10 +45,42 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        public override void OnMouseUp(int button)
+        {
+            if (activeChild != null)
+            {
+                base.OnMouseUp(button);
+            }
+            else
+            {
+                // the menu items never got a mouse down event, none of them are active, so we
+                // manually forward the mouse up event.
+                if (FindAtPosition(mousePosition) is GuiMenuVerticalItem item)
+                {
+                    activeChild = item;
+                    item.OnMouseUp(button);
+                }
+            }
+        }
+
         /// <summary>Called when a menu item inside of the window was clicked.</summary>
         public void OnMenuItemClicked()
         {
             Close();
+        }
+
+        /// <summary>
+        /// Called when the user let go of the mouse, possibly over a different menu item.
+        /// </summary>
+        public void OnMouseUpOutsideActiveMenuItem(int button)
+        {
+            // the menu item the mouse is hovering over, if there is one, never got a mouse down
+            // event, so it's not active, thus we manually forward the mouse up event.
+            if (FindAtPosition(mousePosition) is GuiMenuVerticalItem item)
+            {
+                activeChild = item;
+                item.OnMouseUp(button);
+            }
         }
     }
 }

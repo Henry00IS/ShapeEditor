@@ -123,19 +123,6 @@ namespace AeternumGames.ShapeEditor
                 });
             }
         }
-
-        public override void OnMouseDown(int button)
-        {
-            if (button == 0)
-            {
-                if (parent is GuiMenuWindow parentWindow)
-                {
-                    parentWindow.OnMenuItemClicked();
-                }
-
-                onClick?.Invoke();
-            }
-        }
     }
 }
 

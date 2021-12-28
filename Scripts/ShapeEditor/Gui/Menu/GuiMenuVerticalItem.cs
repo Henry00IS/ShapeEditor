@@ -48,6 +48,30 @@ namespace AeternumGames.ShapeEditor
                 });
             }
         }
+
+        public override void OnMouseUp(int button)
+        {
+            if (button == 0)
+            {
+                if (isMouseOver)
+                {
+                    if (parent is GuiMenuWindow parentWindow)
+                    {
+                        parentWindow.OnMenuItemClicked();
+                    }
+
+                    onClick?.Invoke();
+                }
+                else
+                {
+                    // user let go of the mouse, possibly over a different menu item.
+                    if (parent is GuiMenuWindow parentWindow)
+                    {
+                        parentWindow.OnMouseUpOutsideActiveMenuItem(button);
+                    }
+                }
+            }
+        }
     }
 }
 
