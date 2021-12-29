@@ -2,14 +2,13 @@
 
 using Unity.Mathematics;
 using UnityEngine;
-using FindSegmentLineResult = AeternumGames.ShapeEditor.ShapeEditorWindow.FindSegmentLineResult;
 
 namespace AeternumGames.ShapeEditor
 {
     public class CutTool : Tool
     {
         private bool isSingleUseDone = false;
-        private FindSegmentLineResult findSegmentLineResult;
+        private Segment findSegmentLineResult;
         private float2 cutGridPosition;
         private bool cutFound;
 
@@ -27,10 +26,13 @@ namespace AeternumGames.ShapeEditor
                 mousePosition = editor.GridPointToScreen(editor.mouseGridPosition.Snap(editor.gridSnap));
             }
 
-            if (cutFound = editor.FindSegmentLineAtScreenPosition(mousePosition, 64f, ref findSegmentLineResult))
+            findSegmentLineResult = editor.FindSegmentLineAtScreenPosition(mousePosition, 64f);
+            cutFound = findSegmentLineResult != null;
+
+            if (cutFound)
             {
-                var segmentScreenPosition1 = editor.GridPointToScreen(findSegmentLineResult.segment1.position);
-                var segmentScreenPosition2 = editor.GridPointToScreen(findSegmentLineResult.segment2.position);
+                var segmentScreenPosition1 = editor.GridPointToScreen(findSegmentLineResult.position);
+                var segmentScreenPosition2 = editor.GridPointToScreen(findSegmentLineResult.next.position);
                 var cutScreenPosition = MathEx.FindNearestPointOnLine(mousePosition, segmentScreenPosition1, segmentScreenPosition2);
                 cutGridPosition = editor.ScreenPointToGrid(cutScreenPosition);
 
@@ -88,7 +90,7 @@ namespace AeternumGames.ShapeEditor
             var shape = findSegmentLineResult.shape;
             var segment = new Segment(shape, cutGridPosition);
             segment.selected = true;
-            shape.InsertSegmentBefore(findSegmentLineResult.segment2, segment);
+            shape.InsertSegmentBefore(findSegmentLineResult.next, segment);
         }
 
         public override void OnGlobalMouseUp(int button)

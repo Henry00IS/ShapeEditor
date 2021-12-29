@@ -34,101 +34,56 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        internal void UserToggleBezierTest()
+        /// <summary>For all selected edges, resets all segment generators to linear.</summary>
+        internal void UserResetSegmentGeneratorForSelectedEdges()
         {
-            // for every shape in the project:
-            var shapesCount = project.shapes.Count;
-            for (int i = shapesCount; i-- > 0;)
-            {
-                var shape = project.shapes[i];
+            RegisterUndo("Reset Edge To Linear");
 
-                // for every segment in the project:
-                var segments = shape.segments;
-                var segmentsCount = segments.Count;
-                for (int j = segmentsCount; j-- > 0;)
-                {
-                    if (segments[j].selected)
-                    {
-                        // get the current segment and the next segment (wrapping around).
-                        var segment = shape.segments[j];
-
-                        if (segment.generator.type != SegmentGeneratorType.Bezier)
-                        {
-                            segment.generator = new SegmentGenerator(segment, SegmentGeneratorType.Bezier);
-                        }
-                        else
-                        {
-                            segment.generator = new SegmentGenerator(segment);
-                        }
-                    }
-                }
-            }
+            foreach (var segment in ForEachSelectedEdge())
+                segment.generator = new SegmentGenerator(segment);
         }
 
-        internal void UserToggleSineTest()
+        /// <summary>
+        /// For all selected edges, toggles between the bezier segment generator or linear.
+        /// </summary>
+        internal void UserToggleBezierSegmentGeneratorForSelectedEdges()
         {
-            // for every shape in the project:
-            var shapesCount = project.shapes.Count;
-            for (int i = shapesCount; i-- > 0;)
-            {
-                var shape = project.shapes[i];
+            RegisterUndo("Toggle Bezier Generator");
 
-                // for every segment in the project:
-                var segments = shape.segments;
-                var segmentsCount = segments.Count;
-                for (int j = segmentsCount; j-- > 0;)
-                {
-                    if (segments[j].selected)
-                    {
-                        // get the current segment and the next segment (wrapping around).
-                        var segment = shape.segments[j];
-
-                        if (segment.generator.type != SegmentGeneratorType.Sine)
-                        {
-                            segment.generator = new SegmentGenerator(segment, SegmentGeneratorType.Sine);
-                        }
-                        else
-                        {
-                            segment.generator = new SegmentGenerator(segment);
-                        }
-                    }
-                }
-            }
+            foreach (var segment in ForEachSelectedEdge())
+                segment.generator = new SegmentGenerator(segment, segment.generator.type != SegmentGeneratorType.Bezier ? SegmentGeneratorType.Bezier : SegmentGeneratorType.Linear);
         }
 
-        internal void UserToggleRepeatTest()
+        /// <summary>
+        /// For all selected edges, toggles between the sine segment generator or linear.
+        /// </summary>
+        internal void UserToggleSineSegmentGeneratorForSelectedEdges()
         {
-            // for every shape in the project:
-            var shapesCount = project.shapes.Count;
-            for (int i = shapesCount; i-- > 0;)
-            {
-                var shape = project.shapes[i];
+            RegisterUndo("Toggle Sine Generator");
 
-                // for every segment in the project:
-                var segments = shape.segments;
-                var segmentsCount = segments.Count;
-                for (int j = segmentsCount; j-- > 0;)
-                {
-                    if (segments[j].selected)
-                    {
-                        // get the current segment and the next segment (wrapping around).
-                        var segment = shape.segments[j];
-
-                        if (segment.generator.type != SegmentGeneratorType.Repeat)
-                        {
-                            segment.generator = new SegmentGenerator(segment, SegmentGeneratorType.Repeat);
-                        }
-                        else
-                        {
-                            segment.generator = new SegmentGenerator(segment);
-                        }
-                    }
-                }
-            }
+            foreach (var segment in ForEachSelectedEdge())
+                segment.generator = new SegmentGenerator(segment, segment.generator.type != SegmentGeneratorType.Sine ? SegmentGeneratorType.Sine : SegmentGeneratorType.Linear);
         }
 
-        internal void UserApplyGeneratorTest()
+        /// <summary>
+        /// For all selected edges, toggles between the repeat segment generator or linear.
+        /// </summary>
+        internal void UserToggleRepeatSegmentGeneratorForSelectedEdges()
         {
+            RegisterUndo("Toggle Repeat Generator");
+
+            foreach (var segment in ForEachSelectedEdge())
+                segment.generator = new SegmentGenerator(segment, segment.generator.type != SegmentGeneratorType.Repeat ? SegmentGeneratorType.Repeat : SegmentGeneratorType.Linear);
+        }
+
+        /// <summary>
+        /// For all selected edges, applies the segment generator by inserting the generated points
+        /// as new segments.
+        /// </summary>
+        internal void UserApplyGeneratorForSelectedEdges()
+        {
+            RegisterUndo("Apply Selected Generators");
+
             // for every shape in the project:
             var shapesCount = project.shapes.Count;
             for (int i = shapesCount; i-- > 0;)
@@ -140,11 +95,9 @@ namespace AeternumGames.ShapeEditor
                 var segmentsCount = segments.Count;
                 for (int j = segmentsCount; j-- > 0;)
                 {
-                    if (segments[j].selected)
+                    var segment = segments[j];
+                    if (segment.selected && segment.next.selected)
                     {
-                        // get the current segment and the next segment (wrapping around).
-                        var segment = shape.segments[j];
-
                         segment.generator.ApplyGenerator();
                         segment.generator = new SegmentGenerator(segment);
                     }
@@ -165,9 +118,75 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        /// <summary>Created a polygon in the scene, assign the project and select it.</summary>
+        internal void UserCreatePolygonTarget()
+        {
+            GameObject go = new GameObject("Polygon");
+            var target = go.AddComponent<ShapeEditorTarget>();
+            target.OnShapeEditorUpdateProject(project);
+            Selection.activeGameObject = go;
+        }
+
+        /// <summary>
+        /// Created a polygon in the scene, assign the project, set the mode to fixed extrude and
+        /// select it.
+        /// </summary>
+        internal void UserCreateFixedExtrudeTarget()
+        {
+            GameObject go = new GameObject("Extruded Shape");
+            var target = go.AddComponent<ShapeEditorTarget>();
+            target.targetMode = TargetMode.FixedExtrude;
+            target.OnShapeEditorUpdateProject(project);
+            Selection.activeGameObject = go;
+        }
+
+        /// <summary>
+        /// Created a polygon in the scene, assign the project, set the mode to spline extrude and
+        /// select it.
+        /// </summary>
+        internal void UserCreateSplineExtrudeTarget()
+        {
+            GameObject go = new GameObject("Spline Extruded Shape");
+            var target = go.AddComponent<ShapeEditorTarget>();
+
+            GameObject p1 = new GameObject("Point");
+            p1.transform.parent = go.transform;
+            p1.transform.localPosition = new Vector3(0f, 0f, 0f);
+            GameObject p2 = new GameObject("Point");
+            p2.transform.parent = go.transform;
+            p2.transform.localPosition = new Vector3(0f, 0f, 1f);
+            GameObject p3 = new GameObject("Point");
+            p3.transform.parent = go.transform;
+            p3.transform.localPosition = new Vector3(1f, 0f, 1f);
+
+            target.targetMode = TargetMode.SplineExtrude;
+            target.OnShapeEditorUpdateProject(project);
+            Selection.activeGameObject = go;
+        }
+
+        /// <summary>Clears the selection, adds a new shape and selects it.</summary>
         internal void UserAddShapeToProject()
         {
-            project.shapes.Add(new Shape());
+            RegisterUndo("Add Shape");
+
+            project.ClearSelection();
+
+            var shape = new Shape();
+            project.shapes.Add(shape);
+
+            shape.SelectAll();
+        }
+
+        /// <summary>Clears the selection of all selectable objects in the project.</summary>
+        internal void UserClearSelection()
+        {
+            project.ClearSelection();
+        }
+
+        /// <summary>Selects all of the selectable objects in the project.</summary>
+        internal void UserSelectAll()
+        {
+            project.SelectAll();
         }
 
         /// <summary>Switches to the box select tool unless already active.</summary>
@@ -240,7 +259,13 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Displays the about window.</summary>
         internal void UserShowAboutWindow()
         {
-            OpenWindow(new AboutGuiWindow());
+            OpenWindow(new AboutWindow());
+        }
+
+        /// <summary>Displays the inspector window.</summary>
+        internal void UserShowInspectorWindow()
+        {
+            OpenWindow(new InspectorWindow());
         }
 
         /// <summary>Opens the GitHub repository in a browser window.</summary>

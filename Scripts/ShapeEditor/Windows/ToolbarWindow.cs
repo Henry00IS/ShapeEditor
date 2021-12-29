@@ -5,7 +5,7 @@ using Unity.Mathematics;
 
 namespace AeternumGames.ShapeEditor
 {
-    public class ToolbarGuiWindow : GuiWindow
+    public class ToolbarWindow : GuiWindow
     {
         private GuiButton selectBoxButton;
         private GuiButton translateButton;
@@ -13,7 +13,7 @@ namespace AeternumGames.ShapeEditor
         private GuiButton scaleButton;
         private GuiButton cutButton;
 
-        public ToolbarGuiWindow(float2 position) : base(position, float2.zero) { }
+        public ToolbarWindow(float2 position) : base(position, float2.zero) { }
 
         private GuiVerticalLayout verticalLayout;
 

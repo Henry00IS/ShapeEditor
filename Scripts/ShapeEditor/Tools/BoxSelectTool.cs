@@ -68,18 +68,18 @@ namespace AeternumGames.ShapeEditor
 
                         case ShapeSelectMode.Edge:
                             // find the closest edge to the click position.
-                            var lineResult = new ShapeEditorWindow.FindSegmentLineResult();
-                            if (editor.FindSegmentLineAtScreenPosition(editor.mousePosition, 60.0f, ref lineResult))
+                            var lineResult = editor.FindSegmentLineAtScreenPosition(editor.mousePosition, 60.0f);
+                            if (lineResult != null)
                             {
-                                if (lineResult.segment1.selected && lineResult.segment2.selected)
+                                if (lineResult.selected && lineResult.next.selected)
                                 {
-                                    lineResult.segment1.selected = false;
-                                    lineResult.segment2.selected = false;
+                                    lineResult.selected = false;
+                                    lineResult.next.selected = false;
                                 }
                                 else
                                 {
-                                    lineResult.segment1.selected = true;
-                                    lineResult.segment2.selected = true;
+                                    lineResult.selected = true;
+                                    lineResult.next.selected = true;
                                 }
                             }
                             break;
@@ -159,7 +159,7 @@ namespace AeternumGames.ShapeEditor
                 case KeyCode.B:
                     if (editor.selectedSegmentsCount > 0)
                     {
-                        editor.UserToggleBezierTest();
+                        editor.UserToggleBezierSegmentGeneratorForSelectedEdges();
                         return true;
                     }
                     return false;
@@ -167,7 +167,7 @@ namespace AeternumGames.ShapeEditor
                 case KeyCode.N:
                     if (editor.selectedSegmentsCount > 0)
                     {
-                        editor.UserToggleSineTest();
+                        editor.UserToggleSineSegmentGeneratorForSelectedEdges();
                         return true;
                     }
                     return false;
@@ -175,7 +175,7 @@ namespace AeternumGames.ShapeEditor
                 case KeyCode.M:
                     if (editor.selectedSegmentsCount > 0)
                     {
-                        editor.UserToggleRepeatTest();
+                        editor.UserToggleRepeatSegmentGeneratorForSelectedEdges();
                         return true;
                     }
                     return false;
@@ -183,7 +183,7 @@ namespace AeternumGames.ShapeEditor
                 case KeyCode.V:
                     if (editor.selectedSegmentsCount > 0)
                     {
-                        editor.UserApplyGeneratorTest();
+                        editor.UserApplyGeneratorForSelectedEdges();
                         return true;
                     }
                     return false;

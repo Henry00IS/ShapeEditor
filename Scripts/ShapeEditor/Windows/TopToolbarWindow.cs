@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
-    public class TopToolbarGuiWindow : GuiWindow
+    public class TopToolbarWindow : GuiWindow
     {
         private GuiButton vertexSelectButton;
         private GuiButton edgeSelectButton;
@@ -13,7 +13,7 @@ namespace AeternumGames.ShapeEditor
         private GuiMenuVerticalItem editMenuUndoItem;
         private GuiMenuVerticalItem editMenuRedoItem;
 
-        public TopToolbarGuiWindow(float2 position, float2 size) : base(position, size) { }
+        public TopToolbarWindow(float2 position, float2 size) : base(position, size) { }
 
         private GuiHorizontalLayout horizontalLayout;
 
@@ -37,11 +37,31 @@ namespace AeternumGames.ShapeEditor
             editMenuUndoItem = editMenu.Add("Undo", editor.UserUndo);
             editMenuRedoItem = editMenu.Add("Redo", editor.UserRedo);
             editMenu.Separator();
+            editMenu.Add("Select All", editor.UserSelectAll);
+            editMenu.Add("Clear Selection", editor.UserClearSelection);
+            editMenu.Separator();
             editMenu.Add("Snap Selection To Grid", editor.UserSnapSelectionToGrid);
+            editMenu.Separator();
+            editMenu.Add("Reset Edge To Linear", resources.shapeEditorSegmentLinear, editor.UserResetSegmentGeneratorForSelectedEdges);
+            editMenu.Add("Toggle Bezier Generator", resources.shapeEditorSegmentBezier, editor.UserToggleBezierSegmentGeneratorForSelectedEdges);
+            editMenu.Add("Toggle Sine Generator", resources.shapeEditorSegmentSine, editor.UserToggleSineSegmentGeneratorForSelectedEdges);
+            editMenu.Add("Toggle Repeat Generator", resources.shapeEditorSegmentRepeat, editor.UserToggleRepeatSegmentGeneratorForSelectedEdges);
+            editMenu.Separator();
+            editMenu.Add("Apply Selected Generators", resources.shapeEditorSegmentApply, editor.UserApplyGeneratorForSelectedEdges);
+
+            var projectMenu = menu.Add("Project");
+            projectMenu.Add("Add Shape", resources.shapeEditorShapeCreate, editor.UserAddShapeToProject);
+
+            var sceneMenu = menu.Add("Scene");
+            sceneMenu.Add("Assign Project To Targets", resources.shapeEditorExtrudeShape, editor.UserAssignProjectToTargets);
+            sceneMenu.Separator();
+            sceneMenu.Add("Create Polygon Target", resources.shapeEditorCreatePolygon, editor.UserCreatePolygonTarget);
+            sceneMenu.Add("Create Fixed Extrude Target", resources.shapeEditorExtrudeShape, editor.UserCreateFixedExtrudeTarget);
+            sceneMenu.Add("Create Spline Extrude Target", resources.shapeEditorExtrudeRevolve, editor.UserCreateSplineExtrudeTarget);
 
             var viewMenu = menu.Add("View");
             viewMenu.Add("Textbox Test Window", editor.UserShowTextboxTestWindow);
-            viewMenu.Add("Inspector Window", () => { Debug.Log("Inspector Window"); });
+            viewMenu.Add("Inspector Window", editor.UserShowInspectorWindow);
             viewMenu.Separator();
             viewMenu.Add("Reset Camera", editor.UserResetCamera);
 
@@ -60,6 +80,11 @@ namespace AeternumGames.ShapeEditor
             horizontalLayout.Add(vertexSelectButton = new GuiButton(resources.shapeEditorVertexSelect, 20, editor.UserSwitchToVertexSelectMode));
             horizontalLayout.Add(edgeSelectButton = new GuiButton(resources.shapeEditorEdgeSelect, 20, editor.UserSwitchToEdgeSelectMode));
             horizontalLayout.Add(faceSelectButton = new GuiButton(resources.shapeEditorFaceSelect, 20, editor.UserSwitchToFaceSelectMode));
+            horizontalLayout.Space(5);
+            horizontalLayout.Add(new GuiButton(resources.shapeEditorSegmentLinear, 20, editor.UserResetSegmentGeneratorForSelectedEdges));
+            horizontalLayout.Add(new GuiButton(resources.shapeEditorSegmentBezier, 20, editor.UserToggleBezierSegmentGeneratorForSelectedEdges));
+            horizontalLayout.Add(new GuiButton(resources.shapeEditorSegmentSine, 20, editor.UserToggleSineSegmentGeneratorForSelectedEdges));
+            horizontalLayout.Add(new GuiButton(resources.shapeEditorSegmentRepeat, 20, editor.UserToggleRepeatSegmentGeneratorForSelectedEdges));
             horizontalLayout.Space(5);
             horizontalLayout.Add(new GuiButton(resources.shapeEditorShapeCreate, 20, editor.UserAddShapeToProject));
             horizontalLayout.Space(5);

@@ -276,21 +276,12 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        internal struct FindSegmentLineResult
-        {
-            public Shape shape;
-            public Segment segment1;
-            public Segment segment2;
-            public int segmentIndex1;
-            public int segmentIndex2;
-        }
-
         /// <summary>Attempts to find the closest segment line at the specified screen position.</summary>
         /// <param name="position">The screen position to search at.</param>
         /// <returns>The segments if found or null.</returns>
-        internal bool FindSegmentLineAtScreenPosition(float2 position, float maxDistance, ref FindSegmentLineResult result)
+        internal Segment FindSegmentLineAtScreenPosition(float2 position, float maxDistance)
         {
-            bool found = false;
+            Segment result = null;
             float closestDistance = float.MaxValue;
 
             // for every shape in the project:
@@ -314,12 +305,7 @@ namespace AeternumGames.ShapeEditor
                         if (distance < maxDistance && distance < closestDistance)
                         {
                             closestDistance = distance;
-                            result.shape = shape;
-                            result.segment1 = segment;
-                            result.segment2 = segment.next;
-                            result.segmentIndex1 = j;
-                            result.segmentIndex2 = j + 1 >= segmentsCount ? 0 : j + 1;
-                            found = true;
+                            result = segment;
                         }
                     }
                     else
@@ -333,12 +319,7 @@ namespace AeternumGames.ShapeEditor
                             if (distance < maxDistance && distance < closestDistance)
                             {
                                 closestDistance = distance;
-                                result.shape = shape;
-                                result.segment1 = segment;
-                                result.segment2 = segment.next;
-                                result.segmentIndex1 = j;
-                                result.segmentIndex2 = j + 1 >= segmentsCount ? 0 : j + 1;
-                                found = true;
+                                result = segment;
                             }
 
                             p1 = p2;
@@ -347,7 +328,7 @@ namespace AeternumGames.ShapeEditor
                 }
             }
 
-            return found;
+            return result;
         }
 
         /// <summary>Iterates over all of the selected objects.</summary>
@@ -384,6 +365,15 @@ namespace AeternumGames.ShapeEditor
                             yield return modifierSelectable;
                 }
             }
+        }
+
+        /// <summary>Iterates over all selected edges and returns the first segment.</summary>
+        internal IEnumerable<Segment> ForEachSelectedEdge()
+        {
+            foreach (var shape in project.shapes)
+                foreach (var segment in shape.segments)
+                    if (segment.selected && segment.next.selected)
+                        yield return segment;
         }
     }
 }

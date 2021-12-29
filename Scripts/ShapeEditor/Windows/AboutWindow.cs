@@ -6,12 +6,12 @@ using UnityEngine;
 namespace AeternumGames.ShapeEditor
 {
     /// <summary>The about window that displays the 2D Shape Editor credits.</summary>
-    public class AboutGuiWindow : GuiWindow
+    public class AboutWindow : GuiWindow
     {
         private static float2 windowSize = new float2(300, 200);
         private GuiButton patreonButton;
 
-        public AboutGuiWindow() : base(GetCenterPosition(), windowSize)
+        public AboutWindow() : base(GetCenterPosition(), windowSize)
         {
             colorWindowBackground = new Color(0.192f, 0.192f, 0.192f);
 
@@ -37,6 +37,8 @@ namespace AeternumGames.ShapeEditor
             }
             else
             {
+                position = GetCenterPosition();
+
                 base.OnRender();
 
                 GLUtilities.DrawGuiTextured(ShapeEditorResources.Instance.shapeEditorAbout, () =>

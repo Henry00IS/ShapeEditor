@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
-    public class BottomToolbarGuiWindow : GuiWindow
+    public class BottomToolbarWindow : GuiWindow
     {
         private GuiLabel statusLabel;
         private GuiFloatTextbox gridZoomTextbox;
@@ -15,7 +15,7 @@ namespace AeternumGames.ShapeEditor
         private GuiFloatTextbox angleSnapTextbox;
         private GuiLabel angleSnapLabel;
 
-        public BottomToolbarGuiWindow(float2 position, float2 size) : base(position, size)
+        public BottomToolbarWindow(float2 position, float2 size) : base(position, size)
         {
             colorWindowBackground = new Color(0.192f, 0.192f, 0.192f);
 

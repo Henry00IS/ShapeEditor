@@ -37,11 +37,13 @@ MonoBehaviour:
   shapeEditorRotate90Right: {fileID: 2800000, guid: afa384404a420d94f9d0f2a62bb51451, type: 3}
   shapeEditorSave: {fileID: 2800000, guid: 76adb6eb78c8f42438808b9ee4f5b194, type: 3}
   shapeEditorScale: {fileID: 2800000, guid: dcd56c9580c27d643a9a6de926a57f60, type: 3}
-  shapeEditorSegmentBezier: {fileID: 2800000, guid: da9b944f960933a40826cee738d26de9, type: 3}
+  shapeEditorSegmentBezier: {fileID: 2800000, guid: 8edcf55907a9330459e010614fb83a5c, type: 3}
   shapeEditorSegmentBezierDetail: {fileID: 2800000, guid: 71ed1a9056d0c5a488787b5de3727ec4, type: 3}
   shapeEditorSegmentExtrude: {fileID: 2800000, guid: 46170e4cb750c394e9358362c37029db, type: 3}
   shapeEditorSegmentInsert: {fileID: 2800000, guid: c224c044a8d3ae84699909162c1c4362, type: 3}
-  shapeEditorSegmentLinear: {fileID: 2800000, guid: 511e0ee48308b1b40a0e2910b7715686, type: 3}
+  shapeEditorSegmentLinear: {fileID: 2800000, guid: 573428ea1bb74f745b055651c14dfa93, type: 3}
+  shapeEditorSegmentRepeat: {fileID: 2800000, guid: c74f455a51736f5458caa45eca082818, type: 3}
+  shapeEditorSegmentSine: {fileID: 2800000, guid: 6c4c3cb36aac2394f98718cf88845c7c, type: 3}
   shapeEditorSelectBox: {fileID: 2800000, guid: 11bd4eebd3f0df646899c8a9671d559f, type: 3}
   shapeEditorShapeCreate: {fileID: 2800000, guid: e4c14eb60e41b5047914244525a107fa, type: 3}
   shapeEditorShapeDuplicate: {fileID: 2800000, guid: 88f6d48a2764a9d42b790eae3790de86, type: 3}

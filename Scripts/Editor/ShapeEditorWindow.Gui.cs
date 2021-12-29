@@ -14,9 +14,9 @@ namespace AeternumGames.ShapeEditor
             if (windows == null)
             {
                 windows = new List<GuiWindow>();
-                OpenWindow(new TopToolbarGuiWindow(float2.zero, float2.zero), false);
-                OpenWindow(new BottomToolbarGuiWindow(float2.zero, float2.zero), false);
-                OpenWindow(new ToolbarGuiWindow(new float2(20, 60)), false);
+                OpenWindow(new TopToolbarWindow(float2.zero, float2.zero), false);
+                OpenWindow(new BottomToolbarWindow(float2.zero, float2.zero), false);
+                OpenWindow(new ToolbarWindow(new float2(20, 60)), false);
             }
 
             // remove any closed windows.

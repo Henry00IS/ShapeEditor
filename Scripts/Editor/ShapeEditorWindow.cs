@@ -297,6 +297,30 @@ namespace AeternumGames.ShapeEditor
                             UserSwitchToFaceSelectMode();
                             return true;
 
+                        case KeyCode.A:
+                            if (isCtrlPressed)
+                            {
+                                UserSelectAll();
+                                return true;
+                            }
+                            return false;
+
+                        case KeyCode.D:
+                            if (isShiftPressed)
+                            {
+                                UserClearSelection();
+                                return true;
+                            }
+                            return false;
+
+                        case KeyCode.S:
+                            if (isCtrlPressed)
+                            {
+                                UserSaveProjectAs();
+                                return true;
+                            }
+                            return false;
+
                         case KeyCode.H:
                             UserResetCamera();
                             return true;

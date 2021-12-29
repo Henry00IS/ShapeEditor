@@ -64,11 +64,14 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorRotate90Right;
         public Texture2D shapeEditorSave;
         public Texture2D shapeEditorScale;
+        public Texture2D shapeEditorSegmentApply;
         public Texture2D shapeEditorSegmentBezier;
         public Texture2D shapeEditorSegmentBezierDetail;
         public Texture2D shapeEditorSegmentExtrude;
         public Texture2D shapeEditorSegmentInsert;
         public Texture2D shapeEditorSegmentLinear;
+        public Texture2D shapeEditorSegmentRepeat;
+        public Texture2D shapeEditorSegmentSine;
         public Texture2D shapeEditorSelectBox;
         public Texture2D shapeEditorShapeCreate;
         public Texture2D shapeEditorShapeDuplicate;

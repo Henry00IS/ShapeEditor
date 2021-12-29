@@ -30,7 +30,7 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>
         /// Creates a segment generator, the following types are supported with this constructor:
-        /// <para><see cref="SegmentGeneratorType.Bezier"/>, <see cref="SegmentGeneratorType.Sine"/></para>
+        /// <para><see cref="SegmentGeneratorType.Linear"/>, <see cref="SegmentGeneratorType.Bezier"/>, <see cref="SegmentGeneratorType.Sine"/></para>
         /// </summary>
         /// <param name="segment">The segment that has the modifier.</param>
         /// <param name="type">The segment generator type to create.</param>
