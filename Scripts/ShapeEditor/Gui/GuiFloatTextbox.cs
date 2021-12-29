@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using Unity.Mathematics;
+using UnityEditor;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -57,14 +58,14 @@ namespace AeternumGames.ShapeEditor
 
             // a new number is available so we return that instead.
             hasNewNumber = false;
-            textBeforeEdit = text;
+            textBeforeEdit = newNumber.ToString();
 
-            parent.editor.Repaint();
+            SetText(textBeforeEdit, true);
 
             return newNumber;
         }
 
-        // whitelist the input characters related to floating point numbers.
+        // whitelist the input characters related to floating point numbers and math.
         protected override bool ValidateCharacter(char character)
         {
             switch (character)
@@ -80,10 +81,15 @@ namespace AeternumGames.ShapeEditor
                 case '8':
                 case '9':
                 case '.':
-                    return true;
-
                 case '-':
-                    return allowNegativeNumbers;
+                case '+':
+                case '*':
+                case '/':
+                case '%':
+                case '^':
+                case '(':
+                case ')':
+                    return true;
             }
             return false;
         }
@@ -95,8 +101,8 @@ namespace AeternumGames.ShapeEditor
         /// <returns>The corrected number or the same number.</returns>
         private float ParseAndValidateNumber(string text)
         {
-            // try parsing the number from the given string.
-            float.TryParse(text, out float number);
+            // have unity parse and evaluate mathematical expressions.
+            ExpressionEvaluator.Evaluate(text, out float number);
 
             // if the number is negative but that's not allowed:
             if (!allowNegativeNumbers && number < 0f)

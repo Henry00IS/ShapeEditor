@@ -21,10 +21,18 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Sets the text to the specified value and resets the caret to the first position.</summary>
         /// <param name="text">The text to be written to the textbox.</param>
-        public void SetText(string text)
+        /// <param name="caretLast">Whether to move the caret to the last position.</param>
+        public void SetText(string text, bool caretLast = false)
         {
             _text = text;
-            CaretFirst(false);
+            if (caretLast)
+            {
+                CaretLast(false);
+            }
+            else
+            {
+                CaretFirst(false);
+            }
         }
 
         /// <summary>The placeholder text when empty.</summary>
@@ -80,7 +88,7 @@ namespace AeternumGames.ShapeEditor
             if (button == 0)
             {
                 // set the caret position.
-                caretCharPosition = TextXToCaretCharPosition(Mathf.RoundToInt(parent.editor.mousePosition.x));
+                caretCharPosition = TextXToCaretCharPosition(Mathf.RoundToInt(editor.mousePosition.x));
 
                 // set the selection position.
                 SelectionSet(caretCharPosition, caretCharPosition);
@@ -100,7 +108,7 @@ namespace AeternumGames.ShapeEditor
                 // automatic scrolling when the mouse moves (for the edges on long text).
 
                 // set the caret position.
-                caretCharPosition = TextXToCaretCharPosition(Mathf.RoundToInt(parent.editor.mousePosition.x));
+                caretCharPosition = TextXToCaretCharPosition(Mathf.RoundToInt(editor.mousePosition.x));
 
                 // reset the caret blink timer.
                 CaretResetBlink();
@@ -114,7 +122,7 @@ namespace AeternumGames.ShapeEditor
         {
             // change the mouse cursor when hovering over this control.
             if (isMouseHoverEffectApplicable)
-                parent.editor.SetMouseCursor(MouseCursor.Text);
+                editor.SetMouseCursor(MouseCursor.Text);
 
             // process the caret blinking timer.
             timerCaretBlink++;
@@ -191,17 +199,17 @@ namespace AeternumGames.ShapeEditor
 
             if (keyCode == KeyCode.Backspace) CaretBackspace();
             if (keyCode == KeyCode.Delete) CaretDelete();
-            if (keyCode == KeyCode.LeftArrow) CaretLeft(parent.editor.isShiftPressed);
-            if (keyCode == KeyCode.RightArrow) CaretRight(parent.editor.isShiftPressed);
-            if (keyCode == KeyCode.Home) CaretFirst(parent.editor.isShiftPressed);
-            if (keyCode == KeyCode.UpArrow) CaretFirst(parent.editor.isShiftPressed);
-            if (keyCode == KeyCode.DownArrow) CaretLast(parent.editor.isShiftPressed);
-            if (keyCode == KeyCode.End) CaretLast(parent.editor.isShiftPressed);
+            if (keyCode == KeyCode.LeftArrow) CaretLeft(editor.isShiftPressed);
+            if (keyCode == KeyCode.RightArrow) CaretRight(editor.isShiftPressed);
+            if (keyCode == KeyCode.Home) CaretFirst(editor.isShiftPressed);
+            if (keyCode == KeyCode.UpArrow) CaretFirst(editor.isShiftPressed);
+            if (keyCode == KeyCode.DownArrow) CaretLast(editor.isShiftPressed);
+            if (keyCode == KeyCode.End) CaretLast(editor.isShiftPressed);
 
-            if (parent.editor.isCtrlPressed && keyCode == KeyCode.A) CaretSelectAll();
-            if (parent.editor.isCtrlPressed && keyCode == KeyCode.C) CaretCopy();
-            if (parent.editor.isCtrlPressed && keyCode == KeyCode.V) CaretPaste();
-            if (parent.editor.isCtrlPressed && keyCode == KeyCode.X) CaretCut();
+            if (editor.isCtrlPressed && keyCode == KeyCode.A) CaretSelectAll();
+            if (editor.isCtrlPressed && keyCode == KeyCode.C) CaretCopy();
+            if (editor.isCtrlPressed && keyCode == KeyCode.V) CaretPaste();
+            if (editor.isCtrlPressed && keyCode == KeyCode.X) CaretCut();
 
             return true; // true everything, we are typing!
         }
