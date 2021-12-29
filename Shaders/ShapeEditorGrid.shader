@@ -69,6 +69,10 @@ Shader "Aeternum Games/Shape Editor Grid"
 					pos.x -= _offsetX;
 					pos.y -= _offsetY;
 
+					// try to mitigate some floating point issues.
+					_zoom += 0.00001;
+					pos = floor(pos);
+
 					// draw the background grid.
 					fixed4 col = fixed4(0.0, 0.0, 0.0, 1.0);
 					// draw horizontal and vertical grid lines on top of the background color.
