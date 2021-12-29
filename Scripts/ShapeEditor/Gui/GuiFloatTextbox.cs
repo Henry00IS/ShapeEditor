@@ -89,6 +89,7 @@ namespace AeternumGames.ShapeEditor
                 case '^':
                 case '(':
                 case ')':
+                case 'e':
                     return true;
             }
             return false;
