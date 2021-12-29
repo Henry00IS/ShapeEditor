@@ -2,6 +2,14 @@
 
 The 2D Shape Editor is a versatile tool to create complex 3D meshes out of 2D shapes.
 
+With this program you can easily create a design cross-section in a two-dimensional view and then expand it to a 3D mesh.
+
+![Default 2D Shape Editor Window](https://github.com/Henry00IS/ShapeEditor/wiki/images/home/default-window.png)
+
+This tool has been integrated directly into the Unity editor to ensure a seamless and fast workflow. When you need a special design, such as curved pipes, an underground channel or a baroque arch, this is the tool for the job.
+
+The controls and user interface were inspired by the popular modeling program Blender. Many of the shortcuts and tricks also work in this program. Special tools have been provided to allow a non-destructive workflow with generators that can be easily modified.
+
 ## Installation Instructions:
 
 Add the following line to your Unity Package Manager:
@@ -12,8 +20,8 @@ Add the following line to your Unity Package Manager:
 
 ## Donations:
 
-If you found this package useful and wish to say thanks then please feel free to make a donation. Your donations are a huge motivator to continue the development and support of this package. 😁
-
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/henrydejongh)
+If you found this package useful, please consider making a donation or supporting me on Patreon. Your donations are a tremendous encouragement for the continued development and support of this package. 😁
 
 [![Support me on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dhenrydejongh%26type%3Dpatrons&style=for-the-badge)](https://patreon.com/henrydejongh)
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/henrydejongh)
