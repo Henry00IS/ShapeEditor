@@ -271,7 +271,7 @@ namespace AeternumGames.ShapeEditor
             {
                 var shape = shapes[i];
 
-                if (shape.ContainsPoint(position) >= 0)
+                if (shape.ContainsPoint(new Vector3(position.x, position.y)) >= 0)
                     yield return shape;
             }
         }

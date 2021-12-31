@@ -6,8 +6,19 @@ using UnityEngine;
 namespace AeternumGames.ShapeEditor
 {
     /// <summary>A collection of 3D polygons that make up a 3D mesh.</summary>
-    public class PolygonMesh : List<Polygon3D>
+    public class PolygonMesh : List<Polygon>
     {
+        /// <summary>Creates a new empty polygon mesh.</summary>
+        public PolygonMesh()
+        {
+        }
+
+        /// <summary>Creates a new polygon mesh containing the specified polygons.</summary>
+        /// <param name="polygons">The initial polygons to add to the new polygon mesh.</param>
+        public PolygonMesh(List<Polygon> polygons) : base(polygons)
+        {
+        }
+
         /// <summary>Creates a mesh out of the polygons.</summary>
         public Mesh ToMesh()
         {
@@ -16,33 +27,41 @@ namespace AeternumGames.ShapeEditor
             var vertices = new List<Vector3>();
             var uvs = new List<Vector2>();
             var triangles = new List<int>();
-            var first = 0;
 
-            foreach (var polygon in this)
+            int triangleOffset = 0;
+            int count = Count;
+            for (int i = 0; i < count; i++)
             {
-                vertices.AddRange(polygon);
-                uvs.AddRange(polygon.GenerateUV_SabreCSG());
+                var polygon = this[i];
 
-                var vertexCount = polygon.Count;
-                int next = first + 1;
-                for (int i = 2; i < vertexCount; i++)
-                {
-                    triangles.Add(first);
-                    triangles.Add(next);
-                    triangles.Add(first + i);
-                    next = first + i;
-                }
-                first += vertexCount;
+                vertices.AddRange(polygon.GetVertices());
+                uvs.AddRange(polygon.GetUV0());
+                triangles.AddRange(polygon.GetTriangles(triangleOffset));
+
+                triangleOffset = vertices.Count;
             }
 
             mesh.SetVertices(vertices);
-            mesh.SetTriangles(triangles, 0);
             mesh.SetUVs(0, uvs);
-
-            mesh.RecalculateNormals();
-            mesh.RecalculateTangents();
+            mesh.SetTriangles(triangles, 0);
 
             return mesh;
+        }
+
+        /// <summary>
+        /// Combines the given collection of polygon meshes into a single concave polygon mesh.
+        /// </summary>
+        /// <param name="polygonMeshes">The collection of polygon meshes to be combined.</param>
+        /// <returns>The concave polygon mesh result.</returns>
+        public static PolygonMesh Combine(List<PolygonMesh> polygonMeshes)
+        {
+            var result = new PolygonMesh();
+
+            var polygonMeshesCount = polygonMeshes.Count;
+            for (int i = 0; i < polygonMeshesCount; i++)
+                result.AddRange(polygonMeshes[i]);
+
+            return result;
         }
     }
 }

@@ -66,6 +66,28 @@ namespace AeternumGames.ShapeEditor
                     shapes[i].Validate();
             }
         }
+
+        /// <summary>
+        /// [2D] Decomposes all shapes into convex polygons representing this project.
+        /// <para>The Y coordinate will be flipped to match X and Y in 3D space.</para>
+        /// </summary>
+        /// <returns>The collection of convex polygons.</returns>
+        public List<Polygon> GenerateConvexPolygons()
+        {
+            var convexPolygons = new List<Polygon>();
+
+            var shapesCount = shapes.Count;
+            for (int i = 0; i < shapesCount; i++)
+            {
+                // generate the concave polygon.
+                var concavePolygon = shapes[i].GenerateConcavePolygon(true);
+
+                // decompose the concave polygon.
+                convexPolygons.AddRange(BayazitDecomposer.ConvexPartition(concavePolygon));
+            }
+
+            return convexPolygons;
+        }
     }
 }
 

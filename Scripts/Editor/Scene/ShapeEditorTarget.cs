@@ -18,7 +18,7 @@ namespace AeternumGames.ShapeEditor
         internal Project project;
 
         /// <summary>The convex polygons set by the shape editor.</summary>
-        private List<Polygon2D> convexPolygons2D;
+        private List<Polygon> convexPolygons2D;
 
         /// <summary>The operating mode.</summary>
         [SerializeField]
@@ -53,7 +53,7 @@ namespace AeternumGames.ShapeEditor
                 // ensure the project data is ready.
                 project.Validate();
 
-                convexPolygons2D = MeshGenerator.GetProjectPolygons(project);
+                convexPolygons2D = project.GenerateConvexPolygons();
             }
 
             switch (targetMode)

@@ -8,9 +8,10 @@ using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
-    /// <summary>A collection of vertex points that make up a 3D polygon.</summary>
+    /// <summary>OLD DO NOT USE A collection of vertex points that make up a 3D polygon OLD DO NOT USE.</summary>
     public class Polygon3D : List<Vector3>
     {
+        /*
         /// <summary>
         /// After calling <see cref="RecalculatePlane"/> a plane that approximately resembles the polygon.
         /// </summary>
@@ -27,7 +28,7 @@ namespace AeternumGames.ShapeEditor
             AddRange(vertices);
         }
 
-        public Polygon3D(Polygon2D polygon)
+        public Polygon3D(Polygon polygon)
         {
             int count = polygon.Count;
             for (int i = 0; i < count; i++)
@@ -276,7 +277,7 @@ namespace AeternumGames.ShapeEditor
 
             for (int i = 0; i < count; i++)
                 this[i] -= normal * projectPlane.GetDistanceToPoint(this[i]);
-        }
+        }*/
     }
 }
 

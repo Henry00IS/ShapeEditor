@@ -24,24 +24,24 @@ namespace AeternumGames.ShapeEditor
         private static int MaxPolygonVertices = 1024; // henry: used to be 8, but we want less CSG brushes / meshes.
 
         /// <summary>
-        /// Decompose the polygon into several smaller non-concave polygon. If the polygon is already convex, it will
-        /// return the original polygon, unless it is over Settings.MaxPolygonVertices.
+        /// [2D] Decompose the polygon into several smaller non-concave polygon. If the polygon is
+        /// already convex, it will return the original polygon, unless it is over Settings.MaxPolygonVertices.
         /// </summary>
-        public static List<Polygon2D> ConvexPartition(Polygon2D vertices)
+        public static List<Polygon> ConvexPartition(Polygon vertices)
         {
             Debug.Assert(vertices.Count >= 3);
-            Debug.Assert(vertices.IsCounterClockWise());
+            Debug.Assert(vertices.IsCounterClockWise2D());
 
             return TriangulatePolygon(vertices);
         }
 
-        private static List<Polygon2D> TriangulatePolygon(Polygon2D vertices)
+        private static List<Polygon> TriangulatePolygon(Polygon vertices)
         {
-            List<Polygon2D> list = new List<Polygon2D>();
-            float2 lowerInt = new float2();
-            float2 upperInt = new float2(); // intersection points
+            var list = new List<Polygon>();
+            var lowerInt = new Vector3();
+            var upperInt = new Vector3(); // intersection points
             int lowerIndex = 0, upperIndex = 0;
-            Polygon2D lowerPoly, upperPoly;
+            Polygon lowerPoly, upperPoly;
 
             for (int i = 0; i < vertices.Count; ++i)
             {
@@ -53,7 +53,7 @@ namespace AeternumGames.ShapeEditor
                     {
                         // if line intersects with an edge
                         float d;
-                        float2 p;
+                        Vector3 p;
                         if (Left(At(i - 1, vertices), At(i, vertices), At(j, vertices)) && RightOn(At(i - 1, vertices), At(i, vertices), At(j - 1, vertices)))
                         {
                             // find the point of intersection
@@ -93,12 +93,12 @@ namespace AeternumGames.ShapeEditor
                     // if there are no vertices to connect to, choose a point in the middle
                     if (lowerIndex == (upperIndex + 1) % vertices.Count)
                     {
-                        float2 p = (lowerInt + upperInt) / 2;
+                        var p = (lowerInt + upperInt) / 2;
 
                         lowerPoly = Copy(i, upperIndex, vertices);
-                        lowerPoly.Add(p);
+                        lowerPoly.Add(new Vertex(p));
                         upperPoly = Copy(lowerIndex, i, vertices);
-                        upperPoly.Add(p);
+                        upperPoly.Add(new Vertex(p));
                     }
                     else
                     {
@@ -152,29 +152,29 @@ namespace AeternumGames.ShapeEditor
             return list;
         }
 
-        private static float2 At(int i, Polygon2D vertices)
+        private static Vector2 At(int i, Polygon vertices)
         {
             int s = vertices.Count;
-            return vertices[i < 0 ? s - 1 - ((-i - 1) % s) : i % s];
+            return vertices[i < 0 ? s - 1 - ((-i - 1) % s) : i % s].position;
         }
 
-        private static Polygon2D Copy(int i, int j, Polygon2D vertices)
+        private static Polygon Copy(int i, int j, Polygon vertices)
         {
             while (j < i)
             {
                 j += vertices.Count;
             }
 
-            Polygon2D p = new Polygon2D(j);
+            var p = new Polygon(j);
 
             for (; i <= j; ++i)
             {
-                p.Add(At(i, vertices));
+                p.Add(new Vertex(At(i, vertices)));
             }
             return p;
         }
 
-        private static bool CanSee(int i, int j, Polygon2D vertices)
+        private static bool CanSee(int i, int j, Polygon vertices)
         {
             if (Reflex(i, vertices))
             {
@@ -207,46 +207,46 @@ namespace AeternumGames.ShapeEditor
             return true;
         }
 
-        private static bool Reflex(int i, Polygon2D vertices)
+        private static bool Reflex(int i, Polygon vertices)
         {
             return Right(i, vertices);
         }
 
-        private static bool Right(int i, Polygon2D vertices)
+        private static bool Right(int i, Polygon vertices)
         {
             return Right(At(i - 1, vertices), At(i, vertices), At(i + 1, vertices));
         }
 
-        private static bool Left(float2 a, float2 b, float2 c)
+        private static bool Left(Vector2 a, Vector2 b, Vector2 c)
         {
-            return Area(ref a, ref b, ref c) > 0;
+            return MathEx.Area(ref a, ref b, ref c) > 0;
         }
 
-        private static bool LeftOn(float2 a, float2 b, float2 c)
+        private static bool LeftOn(Vector2 a, Vector2 b, Vector2 c)
         {
-            return Area(ref a, ref b, ref c) >= 0;
+            return MathEx.Area(ref a, ref b, ref c) >= 0;
         }
 
-        private static bool Right(float2 a, float2 b, float2 c)
+        private static bool Right(Vector2 a, Vector2 b, Vector2 c)
         {
-            return Area(ref a, ref b, ref c) < 0;
+            return MathEx.Area(ref a, ref b, ref c) < 0;
         }
 
-        private static bool RightOn(float2 a, float2 b, float2 c)
+        private static bool RightOn(Vector2 a, Vector2 b, Vector2 c)
         {
-            return Area(ref a, ref b, ref c) <= 0;
+            return MathEx.Area(ref a, ref b, ref c) <= 0;
         }
 
-        private static float SquareDist(float2 a, float2 b)
+        private static float SquareDist(Vector2 a, Vector2 b)
         {
             float dx = b.x - a.x;
             float dy = b.y - a.y;
             return dx * dx + dy * dy;
         }
 
-        private static float2 LineIntersect(float2 p1, float2 p2, float2 q1, float2 q2)
+        private static Vector2 LineIntersect(Vector2 p1, Vector2 p2, Vector2 q1, Vector2 q2)
         {
-            float2 i = float2.zero;
+            var i = Vector2.zero;
             float a1 = p2.y - p1.y;
             float b1 = p1.x - p2.x;
             float c1 = a1 * p1.x + b1 * p1.y;
@@ -346,13 +346,6 @@ namespace AeternumGames.ShapeEditor
         private static bool LineIntersect(float2 point1, float2 point2, float2 point3, float2 point4, out float2 intersectionPoint)
         {
             return LineIntersect(ref point1, ref point2, ref point3, ref point4, true, true, out intersectionPoint);
-        }
-
-        /// <summary>Returns a positive number if c is to the left of the line going from a to b.</summary>
-        /// <returns>Positive number if point is left, negative if point is right, and 0 if points are collinear.</returns>
-        private static float Area(ref float2 a, ref float2 b, ref float2 c)
-        {
-            return a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y);
         }
 
         private const float Epsilon = 1.192092896e-07f;

@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -183,11 +182,13 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        /// <summary>Generates the vertices representing this shape for convex decomposition.</summary>
+        /// <summary>[2D] Generates the vertices representing this shape for convex decomposition.</summary>
+        /// <param name="flipY">Whether to flip the shape on the Y-axis.</param>
         /// <returns>The collection of vertices.</returns>
-        public Polygon2D GenerateConcavePolygon()
+        public Polygon GenerateConcavePolygon(bool flipY)
         {
-            Polygon2D vertices = new Polygon2D();
+            Polygon vertices = new Polygon();
+            float flip = flipY ? -1.0f : 1.0f;
 
             // for every segment in the shape:
             var segmentsCount = segments.Count;
@@ -195,31 +196,31 @@ namespace AeternumGames.ShapeEditor
             {
                 // add the segment point.
                 var segment = segments[j];
-                vertices.Add(new float2(segment.position.x, segment.position.y));
+                vertices.Add(new Vertex(segment.position.x, flip * segment.position.y));
 
                 // have the segment generator add additional points.
                 foreach (var point in segments[j].generator.ForEachAdditionalSegmentPoint())
-                    vertices.Add(new float2(point.x, point.y));
+                    vertices.Add(new Vertex(point.x, flip * point.y));
             }
 
             // ensure the vertices are counter clockwise.
-            vertices.ForceCounterClockWise();
+            vertices.ForceCounterClockWise2D();
 
             return vertices;
         }
 
         // original source code from https://github.com/Genbox/VelcroPhysics/ (see Licenses/VelcroPhysics.txt).
-        /// <summary>Winding number test for a point in a polygon.</summary>
+        /// <summary>[2D] Winding number test for a point in a polygon.</summary>
         /// See more info about the algorithm here: http://softsurfer.com/Archive/algorithm_0103/algorithm_0103.htm
         /// <param name="point">The point to be tested.</param>
         /// <returns>
         /// -1 if the winding number is zero and the point is outside the polygon, 1 if the point is
         ///  inside the polygon, and 0 if the point is on the polygons edge.
         /// </returns>
-        public int ContainsPoint(float2 point)
+        public int ContainsPoint(Vector3 point)
         {
-            var polygon = GenerateConcavePolygon();
-            return polygon.ContainsPoint(ref point);
+            var polygon = GenerateConcavePolygon(false);
+            return polygon.ContainsPoint2D(ref point);
         }
 
         /// <summary>Clones this shape and returns the copy.</summary>

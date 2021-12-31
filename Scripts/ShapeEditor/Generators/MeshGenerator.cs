@@ -6,89 +6,102 @@ using UnityEngine;
 namespace AeternumGames.ShapeEditor
 {
     /// <summary>
-    /// Generates meshes for a given collection of <see cref="Polygon2D"/> (decomposed convex polygons).
+    /// Generates meshes for a given collection decomposed convex <see cref="Polygon"/>.
     /// </summary>
     public static class MeshGenerator
     {
-        /// <summary>Decomposes all of the shapes in the project into convex polygons.</summary>
-        /// <param name="project">The project to decompose into convex polygons.</param>
-        /// <returns>The list of convex polygon vertices.</returns>
-        public static List<Polygon2D> GetProjectPolygons(Project project)
-        {
-            List<Polygon2D> convexPolygons = new List<Polygon2D>();
-
-            // for every shape in the project:
-            var shapesCount = project.shapes.Count;
-            for (int i = 0; i < shapesCount; i++)
-            {
-                var shape = project.shapes[i];
-
-                // generate the polygon.
-                var concavePolygon = shape.GenerateConcavePolygon();
-
-                // decompose the polygon.
-                convexPolygons.AddRange(BayazitDecomposer.ConvexPartition(concavePolygon));
-            }
-
-            return convexPolygons;
-        }
-
         /// <summary>Creates a flat mesh out of convex polygons.</summary>
         /// <param name="convexPolygons">The decomposed convex polygons.</param>
-        public static Mesh CreatePolygonMesh(List<Polygon2D> convexPolygons)
+        public static Mesh CreatePolygonMesh(List<Polygon> convexPolygons)
         {
             var polygonMesh = new PolygonMesh();
 
-            foreach (var convexPolygon in convexPolygons)
-                polygonMesh.Add(new Polygon3D(convexPolygon));
-
-            return polygonMesh.ToMesh();
-        }
-
-        /// <summary>Creates an extruded mesh out of convex polygons.</summary>
-        /// <param name="convexPolygons">The decomposed convex polygons.</param>
-        /// <param name="distance">The distance to extrude by.</param>
-        public static Mesh CreateExtrudedPolygonMesh(List<Polygon2D> convexPolygons, float distance)
-        {
-            var polygonMesh = new PolygonMesh();
-
-            foreach (var convexPolygon in convexPolygons)
+            var convexPolygonsCount = convexPolygons.Count;
+            for (int i = 0; i < convexPolygonsCount; i++)
             {
-                // create the front polygon.
-                var polygon3D = new Polygon3D(convexPolygon);
-                polygonMesh.Add(polygon3D);
-
-                // extrude it to build the sides.
-                foreach (var extrudedPolygon in polygon3D.Extrude(distance))
-                    polygonMesh.Add(extrudedPolygon);
-
-                // create the back polygon.
-                var back = polygon3D.flipped;
-                back.RecalculatePlane();
-                back.Translate(back.plane.normal * distance);
-                polygonMesh.Add(back);
+                // calculate 2D UV coordinates for the front polygon.
+                convexPolygons[i].ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
+                // add the front polygon.
+                polygonMesh.Add(convexPolygons[i]);
             }
 
-            return polygonMesh.ToMesh();
+            var mesh = polygonMesh.ToMesh();
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
+
+            return mesh;
+        }
+
+        /// <summary>[Convex] Creates extruded meshes out of convex polygons.</summary>
+        /// <param name="convexPolygons">The decomposed convex polygons.</param>
+        /// <param name="distance">The distance to extrude by.</param>
+        public static List<PolygonMesh> CreateExtrudedPolygonMeshes(List<Polygon> convexPolygons, float distance)
+        {
+            var polygonMeshes = new List<PolygonMesh>();
+
+            var convexPolygonsCount = convexPolygons.Count;
+            for (int i = 0; i < convexPolygonsCount; i++)
+            {
+                // calculate 2D UV coordinates for the front polygon.
+                convexPolygons[i].ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
+
+                // create a new polygon mesh for the front polygon.
+                var brush = new PolygonMesh();
+                polygonMeshes.Add(brush);
+
+                // add the front polygon to the mesh.
+                brush.Add(convexPolygons[i]);
+
+                // extrude the front polygon.
+                foreach (var extudedPolygon in convexPolygons[i].Extrude(distance))
+                {
+                    extudedPolygon.ApplySabreCSGAutoUV0(Vector2.zero);
+                    brush.Add(extudedPolygon);
+                }
+
+                // add a flipped back polygon to the mesh.
+                var p = convexPolygons[i].flipped;
+                p.Translate(new Vector3(0f, 0f, distance));
+                // todo: parameter- can choose to mirror back by using SabreCSG AutoUV here.
+                brush.Add(p);
+            }
+
+            // have a collection of convex extruded brushes.
+            return polygonMeshes;
+        }
+
+        /// <summary>[Concave] Creates an extruded mesh out of convex polygons.</summary>
+        /// <param name="convexPolygons">The decomposed convex polygons.</param>
+        /// <param name="distance">The distance to extrude by.</param>
+        public static Mesh CreateExtrudedPolygonMesh(List<Polygon> convexPolygons, float distance)
+        {
+            var polygonMeshes = CreateExtrudedPolygonMeshes(convexPolygons, distance);
+
+            var polygonMesh = PolygonMesh.Combine(polygonMeshes);
+            var mesh = polygonMesh.ToMesh();
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
+
+            return mesh;
         }
 
         /// <summary>Creates a mesh by extrudes the convex polygons along a 3 point spline.</summary>
         /// <param name="convexPolygons">The decomposed convex polygons.</param>
         /// <param name="spline">The spline to be followed.</param>
         /// <param name="precision">The spline precision.</param>
-        public static Mesh CreateSplineExtrudeMesh(List<Polygon2D> convexPolygons, MathEx.Spline3 spline, int precision)
+        public static Mesh CreateSplineExtrudeMesh(List<Polygon> convexPolygons, MathEx.Spline3 spline, int precision)
         {
             var polygonMesh = new PolygonMesh();
-
+            /*
             foreach (var convexPolygon in convexPolygons)
             {
                 // create the front polygon.
-                var polygon3D = new Polygon3D(convexPolygon);
+                var polygon3D = new Polygon(convexPolygon);
 
                 // extrude it along the spline to build the sides.
                 foreach (var extrudedPolygon in polygon3D.ExtrudeAlongSpline(spline, precision))
                     polygonMesh.Add(extrudedPolygon);
-            }
+            }*/
 
             return polygonMesh.ToMesh();
         }
@@ -96,14 +109,15 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Creates an extruded mesh out of convex polygons.</summary>
         /// <param name="convexPolygons">The decomposed convex polygons.</param>
         /// <param name="distance">The distance to extrude by.</param>
-        public static Mesh CreateExtrudedPolygonAgainstPlaneMesh(List<Polygon2D> convexPolygons, Plane clippingPlane)
+        public static Mesh CreateExtrudedPolygonAgainstPlaneMesh(List<Polygon> convexPolygons, Plane clippingPlane)
         {
             var polygonMesh = new PolygonMesh();
 
+            /*
             foreach (var convexPolygon in convexPolygons)
             {
                 // create the front polygon.
-                var polygon3D = new Polygon3D(convexPolygon);
+                var polygon3D = new Polygon(convexPolygon);
                 polygonMesh.Add(polygon3D);
 
                 // extrude it to build the sides.
@@ -114,7 +128,7 @@ namespace AeternumGames.ShapeEditor
                 var back = polygon3D.flipped;
                 back.ProjectOnPlane(clippingPlane);
                 polygonMesh.Add(back);
-            }
+            }*/
 
             return polygonMesh.ToMesh();
         }
