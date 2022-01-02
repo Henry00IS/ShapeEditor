@@ -53,10 +53,10 @@ namespace AeternumGames.ShapeEditor
                 brush.Add(convexPolygons[i]);
 
                 // extrude the front polygon.
-                foreach (var extudedPolygon in convexPolygons[i].Extrude(distance))
+                foreach (var extrudedPolygon in convexPolygons[i].Extrude(distance))
                 {
-                    extudedPolygon.ApplySabreCSGAutoUV0(Vector2.zero);
-                    brush.Add(extudedPolygon);
+                    extrudedPolygon.ApplySabreCSGAutoUV0(new Vector2(0.5f, 0.5f));
+                    brush.Add(extrudedPolygon);
                 }
 
                 // add a flipped back polygon to the mesh.

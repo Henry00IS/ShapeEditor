@@ -76,8 +76,8 @@ namespace AeternumGames.ShapeEditor
             // sets the uv at each point to the position on the plane.
             for (int i = 0; i < count; i++)
             {
-                Vector2 uv = (cancellingRotation * this[i].position);
-                this[i] = new Vertex(this[i].position, offset + uv);
+                Vector2 uv = (cancellingRotation * (new Vector3(offset.x, offset.y) + this[i].position));
+                this[i] = new Vertex(this[i].position, uv);
             }
         }
 
