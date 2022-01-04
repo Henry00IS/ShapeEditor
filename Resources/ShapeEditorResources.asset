@@ -48,6 +48,8 @@ MonoBehaviour:
   shapeEditorSelectBox: {fileID: 2800000, guid: 11bd4eebd3f0df646899c8a9671d559f, type: 3}
   shapeEditorShapeCreate: {fileID: 2800000, guid: e4c14eb60e41b5047914244525a107fa, type: 3}
   shapeEditorShapeDuplicate: {fileID: 2800000, guid: 88f6d48a2764a9d42b790eae3790de86, type: 3}
+  shapeEditorSnapping: {fileID: 2800000, guid: b9583346a112e23489dfa5339c0813b3, type: 3}
+  shapeEditorSnappingDisabled: {fileID: 2800000, guid: 42ce6902341ca3d42815b739eb0d87e9, type: 3}
   shapeEditorTranslate: {fileID: 2800000, guid: 29ace29ff0a46a94fbdcf2d319acd416, type: 3}
   shapeEditorVertexSelect: {fileID: 2800000, guid: 39a55776995e72b4d8e7286baf55163c, type: 3}
   shapeEditorZoomIn: {fileID: 2800000, guid: 4680d936fb0455f4f99c0d94155d38df, type: 3}

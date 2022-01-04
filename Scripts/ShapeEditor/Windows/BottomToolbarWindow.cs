@@ -14,9 +14,11 @@ namespace AeternumGames.ShapeEditor
         private GuiLabel gridSnapLabel;
         private GuiFloatTextbox angleSnapTextbox;
         private GuiLabel angleSnapLabel;
+        private GuiButton snappingToggleButton;
 
         public BottomToolbarWindow(float2 position, float2 size) : base(position, size)
         {
+            var resources = ShapeEditorResources.Instance;
             colorWindowBackground = new Color(0.192f, 0.192f, 0.192f);
 
             Add(statusLabel = new GuiLabel("", new float2(7f, 4f), new float2(200, 20)));
@@ -27,10 +29,14 @@ namespace AeternumGames.ShapeEditor
             Add(gridSnapLabel = new GuiLabel("Snap:", new float2(0f, 0f), new float2(30, 20)));
             Add(angleSnapTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)) { allowNegativeNumbers = false });
             Add(angleSnapLabel = new GuiLabel("Angle:", new float2(0f, 0f), new float2(32, 20)));
+
+            Add(snappingToggleButton = new GuiButton(resources.shapeEditorSnapping, 20, editor.UserToggleGridSnapping));
         }
 
         public override void OnRender()
         {
+            var resources = ShapeEditorResources.Instance;
+
             // stretch over the width of the window.
             position = new float2(0f, editor.position.height - 22f);
             size = new float2(editor.position.width, 22f);
@@ -65,6 +71,12 @@ namespace AeternumGames.ShapeEditor
             // angle snap label:
             xpos -= angleSnapLabel.size.x + 3f;
             angleSnapLabel.position = new float2(xpos, 4f);
+
+            // snapping toggle:
+            xpos -= snappingToggleButton.size.x + 3f;
+            snappingToggleButton.position = new float2(xpos, 1f);
+            snappingToggleButton.isChecked = editor.snapEnabled;
+            snappingToggleButton.icon = editor.snapEnabled ? resources.shapeEditorSnapping : resources.shapeEditorSnappingDisabled;
 
             base.OnRender();
         }

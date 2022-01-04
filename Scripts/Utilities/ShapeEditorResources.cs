@@ -75,6 +75,8 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorSelectBox;
         public Texture2D shapeEditorShapeCreate;
         public Texture2D shapeEditorShapeDuplicate;
+        public Texture2D shapeEditorSnapping;
+        public Texture2D shapeEditorSnappingDisabled;
         public Texture2D shapeEditorTranslate;
         public Texture2D shapeEditorVertexSelect;
         public Texture2D shapeEditorZoomIn;

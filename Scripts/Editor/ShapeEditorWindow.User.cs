@@ -306,6 +306,12 @@ namespace AeternumGames.ShapeEditor
             GridResetOffset();
             GridResetZoom();
         }
+
+        /// <summary>Toggles whether grid snapping is enabled by default.</summary>
+        internal void UserToggleGridSnapping()
+        {
+            snapEnabled = !snapEnabled;
+        }
     }
 }
 
