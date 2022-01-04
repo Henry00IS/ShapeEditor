@@ -106,7 +106,7 @@ namespace AeternumGames.ShapeEditor
                 // extrude it along the spline building brushes
                 foreach (var extrudedPolygon in convexPolygons[i].ExtrudeAlongSpline(spline, precision))
                 {
-                    extrudedPolygon.ApplySabreCSGAutoUV0(new Vector2(0.5f, 0.5f));
+                    extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
                     brush.Add(extrudedPolygon);
                 }
             }

@@ -190,6 +190,130 @@ namespace AeternumGames.ShapeEditor
 
             return results;
         }
+
+        /// <summary>
+        /// [3D] A simple UV algorithm that takes the largest change between vertex local positions,
+        /// so XY, XZ or YZ and converts them to U and V coordinates. Since the 2D Shape Editor
+        /// works in the metric scale, textures will also cover 1m² in 3D space.
+        /// </summary>
+        /// <param name="offset">The offset to be added to the UV coordinates.</param>
+        public void ApplyPositionBasedUV0(Vector2 offset)
+        {
+            int count = Count;
+            if (count < 1) return;
+
+            var xavg = 0f;
+            var yavg = 0f;
+            var zavg = 0f;
+            for (int i = 1; i < count; i++)
+            {
+                var vertex1 = this[0];
+                var vertex2 = this[i];
+                xavg += Mathf.Abs(vertex2.x - vertex1.x);
+                yavg += Mathf.Abs(vertex2.y - vertex1.y);
+                zavg += Mathf.Abs(vertex2.z - vertex1.z);
+            }
+
+            if (xavg > yavg && xavg > zavg && yavg > zavg)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    var vertex = this[i];
+                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.y));
+                }
+            }
+            else if (xavg >= yavg && xavg >= zavg && zavg >= yavg)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    var vertex = this[i];
+                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.z));
+                }
+            }
+            else if (yavg > xavg && yavg > zavg && xavg > zavg)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    var vertex = this[i];
+                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.y));
+                }
+            }
+            else if (yavg >= xavg && yavg >= zavg && zavg >= xavg)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    var vertex = this[i];
+                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.z, offset.y + vertex.position.y));
+                }
+            }
+            else if (zavg > xavg && zavg > yavg && xavg > yavg)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    var vertex = this[i];
+                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.z));
+                }
+            }
+            else if (zavg >= xavg && zavg >= yavg && yavg >= xavg)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    var vertex = this[i];
+                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.z, offset.y + vertex.position.y));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    var vertex = this[i];
+                    this[i] = new Vertex(vertex.position, Vector2.zero);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Maps all 3D vertices (x, y, z) of the polygon to 2D (x, z). Useful for 2D polygon algorithms.
+        /// <para>Returns the matrix used for the 3D to 2D operation for use with <see cref="MapTo3D"/>.</para>
+        /// <para>You may have to call <see cref="CalculatePlane"/> first if you modified the polygon.</para>
+        /// </summary>
+        /// <remarks>
+        /// Special thanks to jwatte from http://xboxforums.create.msdn.com/forums/t/16529.aspx for
+        /// the algorithm.
+        /// </remarks>
+        /// <returns>The matrix used for the 3D to 2D operation so it can be used in <see cref="MapTo3D"/>.</returns>
+        public Matrix4x4 MapTo2D()
+        {
+            RecalculatePlane();
+            // calculate a 3d to 2d matrix.
+            Vector3 right, backward;
+            if (Mathf.Abs(plane.normal.x) > Mathf.Abs(plane.normal.z))
+                right = Vector3.Cross(plane.normal, new Vector3(0, 0, 1));
+            else
+                right = Vector3.Cross(plane.normal, new Vector3(1, 0, 0));
+            right = Vector3.Normalize(right);
+            backward = Vector3.Cross(right, plane.normal);
+            Matrix4x4 m = new Matrix4x4(new Vector4(right.x, plane.normal.x, backward.x, 0), new Vector4(right.y, plane.normal.y, backward.y, 0), new Vector4(right.z, plane.normal.z, backward.z, 0), new Vector4(0, 0, 0, 1));
+            // multiply all vertices by the matrix.
+            var count = Count;
+            for (int p = 0; p < count; p++)
+                this[p] = new Vertex(m * this[p].position, this[p].uv0);
+            return m;
+        }
+
+        /// <summary>
+        /// Maps all 2D vertices (x, z) of the polygon to 3D (x, y, z). Requires matrix from <see cref="MapTo2D"/>.
+        /// </summary>
+        /// <param name="matrix">The matrix from the <see cref="MapTo2D"/> operation.</param>
+        public void MapTo3D(Matrix4x4 matrix)
+        {
+            // inverse the 3d to 2d matrix.
+            Matrix4x4 m = matrix.inverse;
+            // multiply all vertices by the matrix.
+            var count = Count;
+            for (int p = 0; p < count; p++)
+                this[p] = new Vertex(m * this[p].position, this[p].uv0);
+        }
     }
 }
 
