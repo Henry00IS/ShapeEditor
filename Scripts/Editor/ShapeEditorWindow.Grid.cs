@@ -21,6 +21,17 @@ namespace AeternumGames.ShapeEditor
         internal int renderTextureWidth = 1;
         internal int renderTextureHeight = 1;
 
+        /// <summary>
+        /// Whether grid snapping is enabled by default. When not enabled the user has to hold down
+        /// the control key to temporarily snap objects to grid increments.
+        /// </summary>
+        internal bool snapEnabled = true;
+
+        /// <summary>
+        /// Gets whether the user is currently snapping. Through settings or the control key.
+        /// </summary>
+        internal bool isSnapping => snapEnabled ? !isCtrlPressed : isCtrlPressed;
+
         /// <summary>After rendering the pivots this variable holds the total number of segments.</summary>
         internal int totalSegmentsCount;
 

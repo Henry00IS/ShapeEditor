@@ -132,7 +132,7 @@ namespace AeternumGames.ShapeEditor
 
         private void ToolOnRotation(float2 pivot, float degrees)
         {
-            if (editor.isCtrlPressed)
+            if (editor.isSnapping)
             {
                 degrees = degrees.Snap(editor.angleSnap);
             }

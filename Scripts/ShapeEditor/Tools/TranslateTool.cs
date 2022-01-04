@@ -125,8 +125,8 @@ namespace AeternumGames.ShapeEditor
 
             foreach (var segment in editor.ForEachSelectedObject())
             {
-                // snap to the grid when the control key is being held down.
-                if (editor.isCtrlPressed)
+                // optionally snap to the grid.
+                if (editor.isSnapping)
                     position = position.Snap(editor.gridSnap);
 
                 segment.position = segment.gpVector1 + position;

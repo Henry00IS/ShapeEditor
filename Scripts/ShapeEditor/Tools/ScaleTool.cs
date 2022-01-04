@@ -138,8 +138,8 @@ namespace AeternumGames.ShapeEditor
 
         private void ToolOnMouseDrag(float2 pivot, float2 scale)
         {
-            // snap the scale to grid increments when the control key is being held down.
-            if (editor.isCtrlPressed)
+            // optionally snap the scale to grid increments.
+            if (editor.isSnapping)
                 scale = scale.Snap(editor.gridSnap);
 
             // scale the selected segments using their initial position.

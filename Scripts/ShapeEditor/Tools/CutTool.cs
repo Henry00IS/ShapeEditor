@@ -20,8 +20,8 @@ namespace AeternumGames.ShapeEditor
 
             var mousePosition = editor.mousePosition;
 
-            // snap to the grid when the control key is being held down.
-            if (editor.isCtrlPressed)
+            // optionally snap to the grid.
+            if (editor.isSnapping)
             {
                 mousePosition = editor.GridPointToScreen(editor.mouseGridPosition.Snap(editor.gridSnap));
             }
