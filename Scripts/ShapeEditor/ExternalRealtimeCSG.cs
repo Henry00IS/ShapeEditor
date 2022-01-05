@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -108,6 +109,9 @@ namespace AeternumGames.ShapeEditor
         public static MonoBehaviour CreateBrushFromPlanes(string brushName, Plane[] planes)
         {
             if (!IsAvailable()) return null;
+
+            // this fixes some of the errors, but I don't like it:
+            planes = planes.Distinct().ToArray();
 
             var brush = createBrushFromPlanesMethod.Invoke(null, new object[] { brushName, planes, null, null, null, null, 0 });
             if (brush == null) return null;
