@@ -110,8 +110,8 @@ namespace AeternumGames.ShapeEditor
             var transform = Selection.activeTransform;
             if (transform)
             {
-                var target = transform.GetComponent<ShapeEditorTarget>();
-                if (target)
+                var target = transform.GetComponent<IShapeEditorTarget>();
+                if (target != null)
                 {
                     target.OnShapeEditorUpdateProject(project);
                 }
@@ -135,7 +135,7 @@ namespace AeternumGames.ShapeEditor
         {
             GameObject go = new GameObject("Extruded Shape");
             var target = go.AddComponent<ShapeEditorTarget>();
-            target.targetMode = TargetMode.FixedExtrude;
+            target.targetMode = ShapeEditorTargetMode.FixedExtrude;
             target.OnShapeEditorUpdateProject(project);
             Selection.activeGameObject = go;
         }
@@ -159,7 +159,7 @@ namespace AeternumGames.ShapeEditor
             p3.transform.parent = go.transform;
             p3.transform.localPosition = new Vector3(1f, 0f, 1f);
 
-            target.targetMode = TargetMode.SplineExtrude;
+            target.targetMode = ShapeEditorTargetMode.SplineExtrude;
             target.OnShapeEditorUpdateProject(project);
             Selection.activeGameObject = go;
         }

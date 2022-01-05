@@ -3,7 +3,7 @@
 namespace AeternumGames.ShapeEditor
 {
     /// <summary>The operating mode of the target object.</summary>
-    public enum TargetMode
+    public enum ShapeEditorTargetMode
     {
         Polygon,
         FixedExtrude,

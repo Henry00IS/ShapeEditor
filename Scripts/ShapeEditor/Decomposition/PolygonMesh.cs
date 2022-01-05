@@ -49,6 +49,26 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>
+        /// Creates a set of planes out of the polygons. A convex mesh can consist out of several
+        /// faces, each of which can be defined by a plane (of which there must be at least four).
+        /// Each plane defines a half space, that is, an infinite set of points that is bounded by a
+        /// plane. The intersection of these half spaces forms a convex polyhedron.
+        /// </summary>
+        /// <returns>The planes that represent the convex mesh.</returns>
+        public Plane[] ToPlanes()
+        {
+            var count = Count;
+            var planes = new Plane[count];
+            for (int i = 0; i < count; i++)
+            {
+                var polygon = this[i];
+                polygon.RecalculatePlane();
+                planes[i] = polygon.plane.flipped;
+            }
+            return planes;
+        }
+
+        /// <summary>
         /// Combines the given collection of polygon meshes into a single concave polygon mesh.
         /// </summary>
         /// <param name="polygonMeshes">The collection of polygon meshes to be combined.</param>

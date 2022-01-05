@@ -38,7 +38,7 @@ namespace AeternumGames.ShapeEditor
             if (transform)
             {
                 var target = transform.AddComponent<ShapeEditorTarget>();
-                target.targetMode = TargetMode.FixedExtrude;
+                target.targetMode = ShapeEditorTargetMode.FixedExtrude;
                 target.OnShapeEditorUpdateProject(project);
                 ctx.AddObjectToAsset("Mesh", target.GetComponent<MeshFilter>().sharedMesh);
             }

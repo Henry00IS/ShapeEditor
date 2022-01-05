@@ -8,35 +8,26 @@ namespace AeternumGames.ShapeEditor
     /// <summary>
     /// Represents a mesh target that, when selected, can receive meshes created by the 2D Shape Editor.
     /// </summary>
-    [CustomEditor(typeof(ShapeEditorTarget))]
-    public class ShapeEditorTargetInspector : Editor
+    [CustomEditor(typeof(RealtimeCSGTarget))]
+    public class RealtimeCSGTargetInspector : Editor
     {
         private SerializedProperty spTargetMode => serializedObject.FindProperty("targetMode");
         private SerializedProperty spFixedExtrudeDistance => serializedObject.FindProperty("fixedExtrudeDistance");
-        private SerializedProperty spSplineExtrudePrecision => serializedObject.FindProperty("splineExtrudePrecision");
 
         public override void OnInspectorGUI()
         {
             ShapeEditorMenu_OnGUI();
 
-            var shapeEditorTarget = (ShapeEditorTarget)target;
+            var shapeEditorTarget = (RealtimeCSGTarget)target;
 
             bool rebuild = GUILayout.Button("Rebuild");
 
             EditorGUILayout.PropertyField(spTargetMode);
 
-            switch ((ShapeEditorTargetMode)spTargetMode.enumValueIndex)
+            switch ((RealtimeCSGTargetMode)spTargetMode.enumValueIndex)
             {
-                case ShapeEditorTargetMode.Polygon:
-                    Polygon_OnGUI();
-                    break;
-
-                case ShapeEditorTargetMode.FixedExtrude:
+                case RealtimeCSGTargetMode.FixedExtrude:
                     FixedExtrude_OnGUI();
-                    break;
-
-                case ShapeEditorTargetMode.SplineExtrude:
-                    SplineExtrude_OnGUI();
                     break;
             }
 
@@ -46,23 +37,14 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        private void Polygon_OnGUI()
-        {
-        }
-
         private void FixedExtrude_OnGUI()
         {
             EditorGUILayout.PropertyField(spFixedExtrudeDistance);
         }
 
-        private void SplineExtrude_OnGUI()
-        {
-            EditorGUILayout.PropertyField(spSplineExtrudePrecision);
-        }
-
         private void ShapeEditorMenu_OnGUI()
         {
-            var shapeEditorTarget = (ShapeEditorTarget)target;
+            var shapeEditorTarget = (RealtimeCSGTarget)target;
 
             GUILayout.BeginHorizontal(EditorStyles.toolbar);
             GUIStyle createBrushStyle = ShapeEditorResources.toolbarButtonStyle;

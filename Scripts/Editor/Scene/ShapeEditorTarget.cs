@@ -11,7 +11,7 @@ namespace AeternumGames.ShapeEditor
     /// </summary>
     [RequireComponent(typeof(MeshFilter))]
     [RequireComponent(typeof(MeshRenderer))]
-    public partial class ShapeEditorTarget : MonoBehaviour
+    public partial class ShapeEditorTarget : MonoBehaviour, IShapeEditorTarget
     {
         /// <summary>The shape editor project that last assigned polygons to this target.</summary>
         [SerializeField]
@@ -22,10 +22,8 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>The operating mode.</summary>
         [SerializeField]
-        internal TargetMode targetMode = TargetMode.Polygon;
+        internal ShapeEditorTargetMode targetMode = ShapeEditorTargetMode.Polygon;
 
-        /// <summary>Called by the shape editor when a target gets assigned.</summary>
-        /// <param name="project">The shape editor project to be used.</param>
         public void OnShapeEditorUpdateProject(Project project)
         {
             convexPolygons2D = null;
@@ -44,7 +42,6 @@ namespace AeternumGames.ShapeEditor
                 meshRenderer.sharedMaterial = ShapeEditorResources.Instance.shapeEditorDefaultMaterial;
         }
 
-        /// <summary>Rebuilds the mesh with the current configuration.</summary>
         public void Rebuild()
         {
             // get the convex project polygons.
@@ -58,15 +55,15 @@ namespace AeternumGames.ShapeEditor
 
             switch (targetMode)
             {
-                case TargetMode.Polygon:
+                case ShapeEditorTargetMode.Polygon:
                     Polygon_Rebuild();
                     break;
 
-                case TargetMode.FixedExtrude:
+                case ShapeEditorTargetMode.FixedExtrude:
                     FixedExtrude_Rebuild();
                     break;
 
-                case TargetMode.SplineExtrude:
+                case ShapeEditorTargetMode.SplineExtrude:
                     SplineExtrude_Rebuild();
                     break;
             }
@@ -74,7 +71,7 @@ namespace AeternumGames.ShapeEditor
 
         private void OnDrawGizmosSelected()
         {
-            if (targetMode == TargetMode.SplineExtrude)
+            if (targetMode == ShapeEditorTargetMode.SplineExtrude)
             {
                 // make sure we have enough points to visualize a spline.
                 var splinePoints = GetChildPointsAndDrawGizmos(out var hash);
@@ -103,7 +100,7 @@ namespace AeternumGames.ShapeEditor
 
         private void OnDrawGizmos()
         {
-            if (targetMode == TargetMode.SplineExtrude)
+            if (targetMode == ShapeEditorTargetMode.SplineExtrude)
             {
                 if (Selection.activeGameObject != gameObject && Selection.activeTransform?.parent == transform)
                     OnDrawGizmosSelected();
