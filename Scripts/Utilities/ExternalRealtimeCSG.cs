@@ -56,6 +56,16 @@ namespace AeternumGames.ShapeEditor
         private static ConstructorInfo csgPlaneConstructorMethod = null;
 
         /// <summary>
+        /// The cached CSGOperation component type after initialization.
+        /// </summary>
+        private static Type csgOperation;
+
+        /// <summary>
+        /// The cached CSGoperation HandleAsOne field after initialization.
+        /// </summary>
+        private static FieldInfo csgOperationHandleAsOneField;
+
+        /// <summary>
         /// Used to store whether an initialization error occured.
         /// </summary>
         private static bool initializationError;
@@ -100,6 +110,12 @@ namespace AeternumGames.ShapeEditor
 
             csgPlaneConstructorMethod = csgPlane.GetConstructor(new Type[] { typeof(Plane) });
             if (csgPlaneConstructorMethod == null) { initializationError = true; return false; }
+
+            csgOperation = GetType("RealtimeCSG.Components.CSGOperation");
+            if (csgOperation == null) { initializationError = true; return false; }
+
+            csgOperationHandleAsOneField = csgOperation.GetField("HandleAsOne");
+            if (csgOperationHandleAsOneField == null) { initializationError = true; return false; }
 
             initializationSuccess = true;
             return true;
@@ -203,6 +219,21 @@ namespace AeternumGames.ShapeEditor
             var brush = createBrushFromPlanesMethod.Invoke(null, new object[] { brushName, planes, null, null, null, null, 0 });
             if (brush == null) return null;
             return (MonoBehaviour)brush;
+        }
+
+        /// <summary>
+        /// Adds a CSG operation component to the specified game object.
+        /// </summary>
+        /// <param name="gameObject">The game object to receive the component.</param>
+        public static void AddCSGOperationComponent(GameObject gameObject)
+        {
+            if (!IsAvailable()) return;
+
+            var component = gameObject.GetComponent(csgOperation);
+            if (!component)
+                component = gameObject.AddComponent(csgOperation);
+
+            csgOperationHandleAsOneField.SetValue(component, true);
         }
     }
 }
