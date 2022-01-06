@@ -160,18 +160,17 @@ namespace AeternumGames.ShapeEditor
             return null;
         }
 
-        public static object NewCSGPlane(Plane plane)
+        private static object NewCSGPlane(Plane plane)
         {
             return csgPlaneConstructorMethod.Invoke(new object[] { plane });
         }
 
-        public static List<MonoBehaviour> CreateExtrudedBrushesFromPolygon(string brushName, Vector2[] vertices, float distance)
+        public static void CreateExtrudedBrushesFromPolygon(Transform parent, string brushName, Vector2[] vertices, float distance)
         {
-            var results = new List<MonoBehaviour>();
-            if (!IsAvailable()) return null;
+            if (!IsAvailable()) return;
 
             // create a list of RealtimeCSG.ShapePolygon out of the input vertices.
-            var listShapePolygon = (IEnumerable<object>)createCleanSubPolygonsFromVerticesMethod.Invoke(null, new object[] { vertices, NewCSGPlane(new Plane(Vector3.forward, 1f)) });
+            var listShapePolygon = (IEnumerable<object>)createCleanSubPolygonsFromVerticesMethod.Invoke(null, new object[] { vertices, NewCSGPlane(new Plane(Vector3.forward, 0f)) });
 
             // for every shape polygon:
             foreach (var shapePolygon in listShapePolygon)
@@ -190,12 +189,8 @@ namespace AeternumGames.ShapeEditor
                 var shape = args[8];
 
                 // create a brush.
-                var brush = (MonoBehaviour)createBrushMethod.Invoke(null, new object[] { null, brushName, controlMesh, shape });
-                if (brush != null)
-                    results.Add(brush);
+                createBrushMethod.Invoke(null, new object[] { parent, brushName, controlMesh, shape });
             }
-
-            return results;
         }
 
         public static MonoBehaviour CreateBrushFromPlanes(string brushName, Plane[] planes)
