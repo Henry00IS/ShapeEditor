@@ -119,6 +119,17 @@ namespace AeternumGames.ShapeEditor
                 this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.y));
             }
         }
+
+        /// <summary>[2D] Converts the vertex positions to an array of vectors.</summary>
+        /// <returns>The array of vectors.</returns>
+        public Vector2[] GetVertices2D()
+        {
+            int count = Count;
+            var vertices = new Vector2[count];
+            for (int i = 0; i < count; i++)
+                vertices[i] = this[i].position;
+            return vertices;
+        }
     }
 }
 

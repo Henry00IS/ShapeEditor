@@ -26,6 +26,36 @@ namespace AeternumGames.ShapeEditor
         private static MethodInfo createBrushFromPlanesMethod = null;
 
         /// <summary>
+        /// The cached create brush method after initialization.
+        /// </summary>
+        private static MethodInfo createBrushMethod = null;
+
+        /// <summary>
+        /// The cached RealtimeCSG.ShapePolygonUtility type after initialization.
+        /// </summary>
+        private static Type shapePolygonUtility = null;
+
+        /// <summary>
+        /// The cached create clean sub polygons from vertices method after initialization.
+        /// </summary>
+        private static MethodInfo createCleanSubPolygonsFromVerticesMethod = null;
+
+        /// <summary>
+        /// The cached generate control mesh from vertices method after initialization.
+        /// </summary>
+        private static MethodInfo generateControlMeshFromVerticesMethod = null;
+
+        /// <summary>
+        /// The cached RealtimeCSG.Legacy.CSGPlane type after initialization.
+        /// </summary>
+        private static Type csgPlane = null;
+
+        /// <summary>
+        /// The cached CSGPlane constructor method after initialization.
+        /// </summary>
+        private static ConstructorInfo csgPlaneConstructorMethod = null;
+
+        /// <summary>
         /// Used to store whether an initialization error occured.
         /// </summary>
         private static bool initializationError;
@@ -47,11 +77,29 @@ namespace AeternumGames.ShapeEditor
             // if already available we also stop here.
             if (initializationSuccess) return true;
 
-            brushFactory = GetBrushFactory();
+            brushFactory = GetType("RealtimeCSG.Legacy.BrushFactory");
             if (brushFactory == null) { initializationError = true; return false; }
 
-            createBrushFromPlanesMethod = GetBrushFactoryCreateBrushFromPlanesMethod();
+            createBrushFromPlanesMethod = GetMethod(brushFactory, "CreateBrushFromPlanes", "brushName", "planes", "tangents", "binormals", "materials", "textureMatrices", "textureMatrixSpace");
             if (createBrushFromPlanesMethod == null) { initializationError = true; return false; }
+
+            createBrushMethod = GetMethod(brushFactory, "CreateBrush", "parent", "brushName", "controlMesh", "shape");
+            if (createBrushMethod == null) { initializationError = true; return false; }
+
+            shapePolygonUtility = GetType("RealtimeCSG.ShapePolygonUtility");
+            if (shapePolygonUtility == null) { initializationError = true; return false; }
+
+            createCleanSubPolygonsFromVerticesMethod = GetMethod(shapePolygonUtility, "CreateCleanSubPolygonsFromVertices", "vertices2d", "buildPlane");
+            if (createCleanSubPolygonsFromVerticesMethod == null) { initializationError = true; return false; }
+
+            generateControlMeshFromVerticesMethod = GetMethod(shapePolygonUtility, "GenerateControlMeshFromVertices", "shape2DPolygon", "localToWorld", "direction", "height", "capTexgen", "smooth", "singleSurfaceEnds", "controlMesh", "shape");
+            if (generateControlMeshFromVerticesMethod == null) { initializationError = true; return false; }
+
+            csgPlane = GetType("RealtimeCSG.Legacy.CSGPlane");
+            if (csgPlane == null) { initializationError = true; return false; }
+
+            csgPlaneConstructorMethod = csgPlane.GetConstructor(new Type[] { typeof(Plane) });
+            if (csgPlaneConstructorMethod == null) { initializationError = true; return false; }
 
             initializationSuccess = true;
             return true;
@@ -69,41 +117,85 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>
-        /// Gets the RealtimeCSG.Legacy.BrushFactory type.
+        /// Gets the type of a RealtimeCSG type by full name.
         /// </summary>
+        /// <param name="name">The name to find in the assets assemblies.</param>
         /// <returns>Returns the type or null if not found.</returns>
-        private static Type GetBrushFactory()
+        private static Type GetType(string name)
         {
             foreach (var assembly in GetUserAssetsAssemblies())
             {
-                var type = assembly.GetType("RealtimeCSG.Legacy.BrushFactory");
+                var type = assembly.GetType(name);
                 if (type != null)
                     return type;
             }
             return null;
         }
 
-        // public static CSGBrush CreateBrushFromPlanes(string brushName, UnityEngine.Plane[]
-        // planes, UnityEngine.Vector3[] tangents = null, UnityEngine.Vector3[] binormals = null,
-        // UnityEngine.Material[] materials = null, UnityEngine.Matrix4x4[] textureMatrices = null,
-        // TextureMatrixSpace textureMatrixSpace = TextureMatrixSpace.WorldSpace)
-        private static MethodInfo GetBrushFactoryCreateBrushFromPlanesMethod()
+        /// <summary>
+        /// Gets a method by name in a type that matche all of the parameter names.
+        /// </summary>
+        /// <param name="type">The type to search inside of.</param>
+        /// <param name="name">The name of the method.</param>
+        /// <param name="parameterNames">The parameter names to match.</param>
+        /// <returns>Returns the method or null if not found.</returns>
+        private static MethodInfo GetMethod(Type type, string name, params string[] parameterNames)
         {
-            foreach (var method in brushFactory.GetMethods())
+            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
             {
+                // method names must match.
+                if (method.Name != name) continue;
+
+                // the amount of parameters must match.
                 var parameters = method.GetParameters();
-                if (parameters.Length == 7
-                    && parameters[0].Name == "brushName"
-                    && parameters[1].Name == "planes"
-                    && parameters[2].Name == "tangents"
-                    && parameters[3].Name == "binormals"
-                    && parameters[4].Name == "materials"
-                    && parameters[5].Name == "textureMatrices"
-                    && parameters[6].Name == "textureMatrixSpace")
-                    return method;
+                if (parameters.Length != parameterNames.Length) continue;
+
+                // the individual parameter names must match.
+                for (int i = 0; i < parameters.Length; i++)
+                    if (parameters[i].Name != parameterNames[i]) continue;
+
+                return method;
             }
 
             return null;
+        }
+
+        public static object NewCSGPlane(Plane plane)
+        {
+            return csgPlaneConstructorMethod.Invoke(new object[] { plane });
+        }
+
+        public static List<MonoBehaviour> CreateExtrudedBrushesFromPolygon(string brushName, Vector2[] vertices, float distance)
+        {
+            var results = new List<MonoBehaviour>();
+            if (!IsAvailable()) return null;
+
+            // create a list of RealtimeCSG.ShapePolygon out of the input vertices.
+            var listShapePolygon = (IEnumerable<object>)createCleanSubPolygonsFromVerticesMethod.Invoke(null, new object[] { vertices, NewCSGPlane(new Plane(Vector3.forward, 1f)) });
+
+            // for every shape polygon:
+            foreach (var shapePolygon in listShapePolygon)
+            {
+                // generate a control mesh and shape.
+                var m = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(new Vector3(270f, 180f, 180f)), Vector3.one);
+                var args = new object[] { shapePolygon, m, Vector3.up, -distance, null, false, true, null, null };
+                if (!(bool)generateControlMeshFromVerticesMethod.Invoke(null, args))
+                {
+                    Debug.LogWarning("Failed to generate a control mesh.");
+                    continue;
+                }
+
+                // get the out parameters.
+                var controlMesh = args[7];
+                var shape = args[8];
+
+                // create a brush.
+                var brush = (MonoBehaviour)createBrushMethod.Invoke(null, new object[] { null, brushName, controlMesh, shape });
+                if (brush != null)
+                    results.Add(brush);
+            }
+
+            return results;
         }
 
         public static MonoBehaviour CreateBrushFromPlanes(string brushName, Plane[] planes)
