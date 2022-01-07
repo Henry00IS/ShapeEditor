@@ -130,6 +130,87 @@ namespace AeternumGames.ShapeEditor
                 vertices[i] = this[i].position;
             return vertices;
         }
+
+        /// <summary>[2D] Checks whether the vertices form a simple polygon by checking for edge crossings.</summary>
+        public bool IsSimple()
+        {
+            var count = Count;
+
+            // the simplest polygon which can exist in the euclidean plane has 3 sides.
+            if (count < 3)
+                return false;
+
+            for (int i = 0; i < count; ++i)
+            {
+                var a1 = this[i];
+                var a2 = NextVertex(i);
+                for (int j = i + 1; j < Count; ++j)
+                {
+                    var b1 = this[j];
+                    var b2 = NextVertex(j);
+
+                    if (MathEx.LineIntersect2(a1.position, a2.position, b1.position, b2.position, out _))
+                        return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>[2D] Returns an AABB that fully contains this polygon.</summary>
+        public Bounds GetAABB()
+        {
+            var count = Count;
+            var lowerBound = new Vector2(float.MaxValue, float.MaxValue);
+            var upperBound = new Vector2(float.MinValue, float.MinValue);
+
+            for (int i = 0; i < count; i++)
+            {
+                var x = this[i].x;
+                if (x < lowerBound.x)
+                    lowerBound.x = x;
+                if (x > upperBound.x)
+                    upperBound.x = x;
+
+                var y = this[i].y;
+                if (y < lowerBound.y)
+                    lowerBound.y = y;
+                if (y > upperBound.y)
+                    upperBound.y = y;
+            }
+
+            var aabb = new Bounds();
+            aabb.SetMinMax(lowerBound, upperBound);
+            return aabb;
+        }
+
+        /// <summary>[2D] Removes all collinear points on the polygon.</summary>
+        /// <param name="collinearityTolerance">The collinearity tolerance.</param>
+        public void CollinearSimplify(float collinearityTolerance = 0)
+        {
+            var count = Count;
+
+            // the simplest polygon which can exist in the euclidean plane has 3 sides.
+            if (count < 3)
+                return;
+
+            Polygon simplified = new Polygon(count);
+
+            for (int i = 0; i < count; i++)
+            {
+                Vector2 prev = PreviousVertex(i).position;
+                Vector2 current = this[i].position;
+                Vector2 next = NextVertex(i).position;
+
+                // if they are collinear, continue.
+                if (MathEx.IsCollinear(ref prev, ref current, ref next, collinearityTolerance))
+                    continue;
+
+                simplified.Add(this[i]);
+            }
+
+            Clear();
+            AddRange(simplified);
+        }
     }
 }
 

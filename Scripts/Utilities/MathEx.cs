@@ -11,14 +11,21 @@ namespace AeternumGames.ShapeEditor
     {
         /// <summary>Since floating-point math is imprecise we use a smaller value of 0.00001 (1e-5f).</summary>
         public const float EPSILON_5 = 1e-5f;
+
         /// <summary>Since floating-point math is imprecise we use a smaller value of 0.0001 (1e-4f).</summary>
         public const float EPSILON_4 = 1e-4f;
+
         /// <summary>Since floating-point math is imprecise we use a smaller value of 0.001 (1e-3f).</summary>
         public const float EPSILON_3 = 1e-3f;
+
         /// <summary>Since floating-point math is imprecise we use a smaller value of 0.01 (1e-2f).</summary>
         public const float EPSILON_2 = 1e-2f;
+
         /// <summary>Since floating-point math is imprecise we use a smaller value of 0.1 (1e-1f).</summary>
         public const float EPSILON_1 = 1e-1f;
+
+        /// <summary>Since floating-point math is imprecise we use a smaller value (VelcroPhysics).</summary>
+        public const float EPSILON_VELCRO = 1.192092896e-07f;
 
         /// <summary>
         /// Determines whether two floats are equal, allowing for floating point differences with
@@ -303,6 +310,191 @@ namespace AeternumGames.ShapeEditor
                 3f * OneMinusT * OneMinusT * t * p1 +
                 3f * OneMinusT * t * t * p2 +
                 t * t * t * p3;
+        }
+
+        // From Eric Jordan's convex decomposition library
+        /// <summary>
+        /// Check if the lines a0->a1 and b0->b1 cross. If they do, intersectionPoint will be filled with the point of
+        /// crossing. Grazing lines should not return true.
+        /// </summary>
+        public static bool LineIntersect2(Vector2 a0, Vector2 a1, Vector2 b0, Vector2 b1, out Vector2 intersectionPoint)
+        {
+            intersectionPoint = Vector2.zero;
+
+            if (a0 == b0 || a0 == b1 || a1 == b0 || a1 == b1)
+                return false;
+
+            float x1 = a0.x;
+            float y1 = a0.y;
+            float x2 = a1.x;
+            float y2 = a1.y;
+            float x3 = b0.x;
+            float y3 = b0.y;
+            float x4 = b1.x;
+            float y4 = b1.y;
+
+            //AABB early exit
+            if (Mathf.Max(x1, x2) < Mathf.Min(x3, x4) || Mathf.Max(x3, x4) < Mathf.Min(x1, x2))
+                return false;
+
+            if (Mathf.Max(y1, y2) < Mathf.Min(y3, y4) || Mathf.Max(y3, y4) < Mathf.Min(y1, y2))
+                return false;
+
+            float ua = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3);
+            float ub = (x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3);
+            float denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+            if (Mathf.Abs(denom) < EPSILON_VELCRO)
+            {
+                //Lines are too close to parallel to call
+                return false;
+            }
+            ua /= denom;
+            ub /= denom;
+
+            if (0 < ua && ua < 1 && 0 < ub && ub < 1)
+            {
+                intersectionPoint.x = x1 + ua * (x2 - x1);
+                intersectionPoint.y = y1 + ua * (y2 - y1);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>Determines if three vertices are collinear (ie. on a straight line).</summary>
+        public static bool IsCollinear(ref Vector2 a, ref Vector2 b, ref Vector2 c, float tolerance = 0)
+        {
+            return FloatInRange(Area(ref a, ref b, ref c), -tolerance, tolerance);
+        }
+
+        /// <summary>Checks if a floating point Value is within a specified range of values (inclusive).</summary>
+        /// <param name="value">The Value to check.</param>
+        /// <param name="min">The minimum Value.</param>
+        /// <param name="max">The maximum Value.</param>
+        /// <returns>True if the Value is within the range specified, false otherwise.</returns>
+        public static bool FloatInRange(float value, float min, float max)
+        {
+            return value >= min && value <= max;
+        }
+
+        /// <summary>
+        /// This method detects if two line segments (or lines) intersect, and, if so, the point of intersection. Use the
+        /// <paramref name="firstIsSegment" /> and <paramref name="secondIsSegment" /> parameters to set whether the intersection
+        /// point must be on the first and second line segments. Setting these both to true means you are doing a line-segment to
+        /// line-segment intersection. Setting one of them to true means you are doing a line to line-segment intersection test,
+        /// and so on. Note: If two line segments are coincident, then no intersection is detected (there are actually infinite
+        /// intersection points). Author: Jeremy Bell
+        /// </summary>
+        /// <param name="point1">The first point of the first line segment.</param>
+        /// <param name="point2">The second point of the first line segment.</param>
+        /// <param name="point3">The first point of the second line segment.</param>
+        /// <param name="point4">The second point of the second line segment.</param>
+        /// <param name="point">This is set to the intersection point if an intersection is detected.</param>
+        /// <param name="firstIsSegment">Set this to true to require that the intersection point be on the first line segment.</param>
+        /// <param name="secondIsSegment">Set this to true to require that the intersection point be on the second line segment.</param>
+        /// <returns>True if an intersection is detected, false otherwise.</returns>
+        public static bool LineIntersect(ref Vector2 point1, ref Vector2 point2, ref Vector2 point3, ref Vector2 point4, bool firstIsSegment, bool secondIsSegment, out Vector2 point)
+        {
+            point = new Vector2();
+
+            // these are reused later.
+            // each lettered sub-calculation is used twice, except
+            // for b and d, which are used 3 times
+            float a = point4.y - point3.y;
+            float b = point2.x - point1.x;
+            float c = point4.x - point3.x;
+            float d = point2.y - point1.y;
+
+            // denominator to solution of linear system
+            float denom = (a * b) - (c * d);
+
+            // if denominator is 0, then lines are parallel
+            if (!(denom >= -EPSILON_VELCRO && denom <= EPSILON_VELCRO))
+            {
+                float e = point1.y - point3.y;
+                float f = point1.x - point3.x;
+                float oneOverDenom = 1.0f / denom;
+
+                // numerator of first equation
+                float ua = (c * e) - (a * f);
+                ua *= oneOverDenom;
+
+                // check if intersection point of the two lines is on line segment 1
+                if (!firstIsSegment || ua >= 0.0f && ua <= 1.0f)
+                {
+                    // numerator of second equation
+                    float ub = (b * e) - (d * f);
+                    ub *= oneOverDenom;
+
+                    // check if intersection point of the two lines is on line segment 2
+                    // means the line segments intersect, since we know it is on
+                    // segment 1 as well.
+                    if (!secondIsSegment || ub >= 0.0f && ub <= 1.0f)
+                    {
+                        // check if they are coincident (no collision in this case)
+                        if (ua != 0f || ub != 0f)
+                        {
+                            //There is an intersection
+                            point.x = point1.x + ua * b;
+                            point.y = point1.y + ua * d;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// This method detects if two line segments (or lines) intersect, and, if so, the point of intersection. Use the
+        /// <paramref name="firstIsSegment" /> and <paramref name="secondIsSegment" /> parameters to set whether the intersection
+        /// point must be on the first and second line segments. Setting these both to true means you are doing a line-segment to
+        /// line-segment intersection. Setting one of them to true means you are doing a line to line-segment intersection test,
+        /// and so on. Note: If two line segments are coincident, then no intersection is detected (there are actually infinite
+        /// intersection points). Author: Jeremy Bell
+        /// </summary>
+        /// <param name="point1">The first point of the first line segment.</param>
+        /// <param name="point2">The second point of the first line segment.</param>
+        /// <param name="point3">The first point of the second line segment.</param>
+        /// <param name="point4">The second point of the second line segment.</param>
+        /// <param name="intersectionPoint">This is set to the intersection point if an intersection is detected.</param>
+        /// <param name="firstIsSegment">Set this to true to require that the intersection point be on the first line segment.</param>
+        /// <param name="secondIsSegment">Set this to true to require that the intersection point be on the second line segment.</param>
+        /// <returns>True if an intersection is detected, false otherwise.</returns>
+        public static bool LineIntersect(Vector2 point1, Vector2 point2, Vector2 point3, Vector2 point4, bool firstIsSegment, bool secondIsSegment, out Vector2 intersectionPoint)
+        {
+            return LineIntersect(ref point1, ref point2, ref point3, ref point4, firstIsSegment, secondIsSegment, out intersectionPoint);
+        }
+
+        /// <summary>
+        /// This method detects if two line segments intersect, and, if so, the point of intersection. Note: If two line
+        /// segments are coincident, then no intersection is detected (there are actually infinite intersection points).
+        /// </summary>
+        /// <param name="point1">The first point of the first line segment.</param>
+        /// <param name="point2">The second point of the first line segment.</param>
+        /// <param name="point3">The first point of the second line segment.</param>
+        /// <param name="point4">The second point of the second line segment.</param>
+        /// <param name="intersectionPoint">This is set to the intersection point if an intersection is detected.</param>
+        /// <returns>True if an intersection is detected, false otherwise.</returns>
+        public static bool LineIntersect(ref Vector2 point1, ref Vector2 point2, ref Vector2 point3, ref Vector2 point4, out Vector2 intersectionPoint)
+        {
+            return LineIntersect(ref point1, ref point2, ref point3, ref point4, true, true, out intersectionPoint);
+        }
+
+        /// <summary>
+        /// This method detects if two line segments intersect, and, if so, the point of intersection. Note: If two line
+        /// segments are coincident, then no intersection is detected (there are actually infinite intersection points).
+        /// </summary>
+        /// <param name="point1">The first point of the first line segment.</param>
+        /// <param name="point2">The second point of the first line segment.</param>
+        /// <param name="point3">The first point of the second line segment.</param>
+        /// <param name="point4">The second point of the second line segment.</param>
+        /// <param name="intersectionPoint">This is set to the intersection point if an intersection is detected.</param>
+        /// <returns>True if an intersection is detected, false otherwise.</returns>
+        public static bool LineIntersect(Vector2 point1, Vector2 point2, Vector2 point3, Vector2 point4, out Vector2 intersectionPoint)
+        {
+            return LineIntersect(ref point1, ref point2, ref point3, ref point4, true, true, out intersectionPoint);
         }
 
         /// <summary>Represents a spline that uses 3 points.</summary>
