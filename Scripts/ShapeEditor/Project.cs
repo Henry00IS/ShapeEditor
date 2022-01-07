@@ -74,17 +74,29 @@ namespace AeternumGames.ShapeEditor
         /// <returns>The collection of convex polygons.</returns>
         public List<Polygon> GenerateConvexPolygons()
         {
-            var convexPolygons = new List<Polygon>();
-
             var shapesCount = shapes.Count;
+
+            // generate concave polygons for all of the shapes.
+            var concavePolygons = new List<Polygon>(shapesCount);
+            for (int i = 0; i < shapesCount; i++)
+                concavePolygons.Add(shapes[i].GenerateConcavePolygon(true));
+
+            // apply csg operations on the concave polygons.
+            var finalPolygons = new List<Polygon>(shapesCount);
             for (int i = 0; i < shapesCount; i++)
             {
-                // generate the concave polygon.
-                var concavePolygon = shapes[i].GenerateConcavePolygon(true);
+                /*finalPolygons.AddRange(
+                    YuPengClipper.Union(concavePolygons[i], new Shape().GenerateConcavePolygon(true), out var error)
+                );*/
 
-                // decompose the concave polygon.
-                convexPolygons.AddRange(BayazitDecomposer.ConvexPartition(concavePolygon));
+                finalPolygons.Add(concavePolygons[i]);
             }
+
+            // use convex decomposition to build convex polygons out of the final polygons.
+            var convexPolygons = new List<Polygon>();
+            var finalPolygonsCount = finalPolygons.Count;
+            for (int i = 0; i < finalPolygonsCount; i++)
+                convexPolygons.AddRange(BayazitDecomposer.ConvexPartition(finalPolygons[i]));
 
             return convexPolygons;
         }
