@@ -102,6 +102,10 @@ namespace AeternumGames.ShapeEditor
 
             // add the child to the container.
             children.Add(child);
+
+            // activate the child.
+            child.OnActivate();
+
             return child;
         }
 
@@ -138,12 +142,6 @@ namespace AeternumGames.ShapeEditor
             return false;
         }
 
-        public GuiContainer()
-        {
-            // ensure the editor is always assigned.
-            editor = ShapeEditorWindow.Instance;
-        }
-
         public virtual bool IsBusy()
         {
             return false;
@@ -151,6 +149,21 @@ namespace AeternumGames.ShapeEditor
 
         public virtual void OnActivate()
         {
+            // ensure the editor is always assigned.
+            if (editor == null)
+            {
+                // find the editor reference in one of the parents.
+                var current = parent;
+                while (current != null)
+                {
+                    if (current.editor != null)
+                    {
+                        editor = current.editor;
+                        break;
+                    }
+                    current = current.parent;
+                }
+            }
         }
 
         public virtual void OnDeactivate()

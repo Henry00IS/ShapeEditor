@@ -16,8 +16,12 @@ namespace AeternumGames.ShapeEditor
         private GuiLabel angleSnapLabel;
         private GuiButton snappingToggleButton;
 
-        public BottomToolbarWindow(float2 position, float2 size) : base(position, size)
+        public BottomToolbarWindow(float2 position, float2 size) : base(position, size) { }
+
+        public override void OnActivate()
         {
+            base.OnActivate();
+
             var resources = ShapeEditorResources.Instance;
             colorWindowBackground = new Color(0.192f, 0.192f, 0.192f);
 

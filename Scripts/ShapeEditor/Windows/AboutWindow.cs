@@ -8,12 +8,17 @@ namespace AeternumGames.ShapeEditor
     /// <summary>The about window that displays the 2D Shape Editor credits.</summary>
     public class AboutWindow : GuiWindow
     {
-        private static float2 windowSize = new float2(300, 200);
+        private static readonly float2 windowSize = new float2(300, 200);
         private GuiButton patreonButton;
 
-        public AboutWindow() : base(GetCenterPosition(), windowSize)
+        public AboutWindow() : base(float2.zero, windowSize) { }
+
+        public override void OnActivate()
         {
+            base.OnActivate();
+
             colorWindowBackground = new Color(0.192f, 0.192f, 0.192f);
+            position = GetCenterPosition();
 
             Add(patreonButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorAboutPatreon, new float2(71, 99), new float2(158, 50), () =>
             {
@@ -21,11 +26,11 @@ namespace AeternumGames.ShapeEditor
             }));
         }
 
-        private static float2 GetCenterPosition()
+        private float2 GetCenterPosition()
         {
             return new float2(
-                Mathf.RoundToInt((ShapeEditorWindow.Instance.position.width / 2f) - (windowSize.x / 2f)),
-                Mathf.RoundToInt((ShapeEditorWindow.Instance.position.height / 2f) - (windowSize.y / 2f))
+                Mathf.RoundToInt((editor.position.width / 2f) - (windowSize.x / 2f)),
+                Mathf.RoundToInt((editor.position.height / 2f) - (windowSize.y / 2f))
             );
         }
 

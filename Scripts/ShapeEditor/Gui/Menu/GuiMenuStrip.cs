@@ -13,6 +13,7 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Horizontal layout helper to place the menu items in a row.</summary>
         private GuiHorizontalLayout horizontalLayout;
+
         /// <summary>The menu window used when a menu item is open.</summary>
         private GuiMenuWindow activeMenuWindow;
 
@@ -77,7 +78,7 @@ namespace AeternumGames.ShapeEditor
             CloseMenu();
 
             activeMenuWindow = new GuiMenuWindow(item);
-            activeMenuWindow.Open();
+            editor.OpenWindow(activeMenuWindow);
         }
 
         /// <summary>Closes the active menu.</summary>

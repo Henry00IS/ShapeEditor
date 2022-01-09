@@ -11,23 +11,6 @@ namespace AeternumGames.ShapeEditor
     /// </summary>
     public partial class ShapeEditorWindow : EditorWindow
     {
-        private static ShapeEditorWindow s_Instance;
-
-        /// <summary>Gets the singleton shape editor window instance or creates it.</summary>
-        public static ShapeEditorWindow Instance
-        {
-            get
-            {
-                // if known, immediately return the instance.
-                if (s_Instance) return s_Instance;
-
-                // load the shape editor window.
-                Init();
-
-                return s_Instance;
-            }
-        }
-
         /// <summary>The currently loaded project.</summary>
         [SerializeField]
         internal Project project = new Project();
@@ -40,7 +23,6 @@ namespace AeternumGames.ShapeEditor
         {
             // get existing open window or if none, make a new one:
             ShapeEditorWindow window = GetWindow<ShapeEditorWindow>();
-            s_Instance = window;
             window.minSize = new float2(800, 600);
             window.Show();
             window.titleContent = new GUIContent("Shape Editor", ShapeEditorResources.Instance.shapeEditorIcon);

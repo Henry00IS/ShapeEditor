@@ -28,7 +28,6 @@ namespace AeternumGames.ShapeEditor
 
         private void Sine_DrawPivots()
         {
-            var editor = ShapeEditorWindow.Instance;
             float2 p1 = editor.GridPointToScreen(sinePivot1.position);
 
             GLUtilities.DrawSolidRectangleWithOutline(p1.x - ShapeEditorWindow.halfPivotScale, p1.y - ShapeEditorWindow.halfPivotScale, ShapeEditorWindow.pivotScale, ShapeEditorWindow.pivotScale, sinePivot1.selected ? ShapeEditorWindow.segmentPivotSelectedColor : Color.white, sinePivot1.selected ? ShapeEditorWindow.segmentPivotOutlineColor : Color.black);
@@ -42,7 +41,6 @@ namespace AeternumGames.ShapeEditor
 
         private void Sine_DrawSegments()
         {
-            var editor = ShapeEditorWindow.Instance;
             DrawSegments(Sine_ForEachSegmentPoint());
 
             var p1 = editor.GridPointToScreen(segment.position);

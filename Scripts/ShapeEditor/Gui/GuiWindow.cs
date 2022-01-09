@@ -26,13 +26,6 @@ namespace AeternumGames.ShapeEditor
             this.size = size;
         }
 
-        /// <summary>Opens the window inside of the shape editor window.</summary>
-        /// <param name="focus">Whether to try and give the window input focus.</param>
-        public void Open(bool focus = true)
-        {
-            editor.OpenWindow(this, focus);
-        }
-
         /// <summary>
         /// Marks the window as ready to be removed, removing it as soon as possible.
         /// </summary>

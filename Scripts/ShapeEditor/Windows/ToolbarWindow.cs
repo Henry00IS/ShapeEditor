@@ -19,6 +19,8 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnActivate()
         {
+            base.OnActivate();
+
             verticalLayout = new GuiVerticalLayout(this);
 
             verticalLayout.Add(selectBoxButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorSelectBox, 28, editor.UserSwitchToBoxSelectTool));

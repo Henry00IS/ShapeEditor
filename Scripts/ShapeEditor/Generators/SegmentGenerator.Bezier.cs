@@ -29,7 +29,6 @@ namespace AeternumGames.ShapeEditor
 
         private void Bezier_DrawPivots()
         {
-            var editor = ShapeEditorWindow.Instance;
             float2 p1 = editor.GridPointToScreen(bezierPivot1.position);
             float2 p2 = editor.GridPointToScreen(bezierPivot2.position);
 
@@ -51,7 +50,6 @@ namespace AeternumGames.ShapeEditor
 
         private void Bezier_DrawSegments()
         {
-            var editor = ShapeEditorWindow.Instance;
             var p1 = editor.GridPointToScreen(segment.position);
             var p2 = editor.GridPointToScreen(bezierPivot1.position);
             var p3 = editor.GridPointToScreen(bezierPivot2.position);

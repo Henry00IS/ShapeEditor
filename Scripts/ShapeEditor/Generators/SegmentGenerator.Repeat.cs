@@ -18,7 +18,6 @@ namespace AeternumGames.ShapeEditor
 
         private void Repeat_DrawSegments()
         {
-            var editor = ShapeEditorWindow.Instance;
             DrawSegments(Repeat_ForEachSegmentPoint());
 
             // draw the direction arrow:

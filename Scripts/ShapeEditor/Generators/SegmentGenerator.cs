@@ -21,7 +21,12 @@ namespace AeternumGames.ShapeEditor
         [NonSerialized]
         public Segment segment;
 
+        /// <summary>The shape editor window.</summary>
+        [NonSerialized]
+        public ShapeEditorWindow editor;
+
         /// <summary>Creates the default linear generator that builds straight lines.</summary>
+        /// <param name="segment">The segment that has the modifier.</param>
         public SegmentGenerator(Segment segment)
         {
             this.segment = segment;
@@ -75,8 +80,11 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Draws the modifier segments to the screen.</summary>
-        public void DrawSegments()
+        /// <param name="editor">The shape editor window.</param>
+        public void DrawSegments(ShapeEditorWindow editor)
         {
+            this.editor = editor;
+
             switch (type)
             {
                 case SegmentGeneratorType.Linear:
@@ -98,8 +106,11 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Draws the modifier pivots to the screen.</summary>
-        public void DrawPivots()
+        /// <param name="editor">The shape editor window.</param>
+        public void DrawPivots(ShapeEditorWindow editor)
         {
+            this.editor = editor;
+
             switch (type)
             {
                 case SegmentGeneratorType.Linear:
@@ -144,8 +155,6 @@ namespace AeternumGames.ShapeEditor
         /// <param name="iterator">The generated segment points in grid coordinates.</param>
         private void DrawSegments(IEnumerable<float2> iterator)
         {
-            var editor = ShapeEditorWindow.Instance;
-
             float2 last = editor.GridPointToScreen(segment.position);
             GL.Color((segment.selected && segment.next.selected) ? ShapeEditorWindow.segmentPivotOutlineColor : ShapeEditorWindow.segmentColor);
 

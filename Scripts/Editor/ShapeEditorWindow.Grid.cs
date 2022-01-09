@@ -101,7 +101,7 @@ namespace AeternumGames.ShapeEditor
                     for (int j = 0; j < segmentsCount; j++)
                     {
                         // have the segment generator draw the segments.
-                        shape.segments[j].generator.DrawSegments();
+                        shape.segments[j].generator.DrawSegments(this);
                     }
                 }
             });
@@ -139,7 +139,7 @@ namespace AeternumGames.ShapeEditor
                         }
 
                         // have the segment generator draw additional pivots.
-                        segment.generator.DrawPivots();
+                        segment.generator.DrawPivots(this);
                     }
                 }
             });

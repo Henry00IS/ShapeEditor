@@ -21,6 +21,11 @@ namespace AeternumGames.ShapeEditor
         public GuiWindowTitle(string title) : base(new float2(1f, 1f), new float2(1f, height))
         {
             this.title = title;
+        }
+
+        public override void OnActivate()
+        {
+            base.OnActivate();
 
             Add(closeButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorDelete, 20, OnCloseButtonClicked));
         }

@@ -16,17 +16,22 @@ namespace AeternumGames.ShapeEditor
         public GuiMenuWindow(GuiMenuItem item) : base(0f, 2f)
         {
             parentMenu = item;
+        }
+
+        public override void OnActivate()
+        {
+            base.OnActivate();
 
             colorWindowBackground = colorMenuBackground;
 
             // calculate the menu position.
-            position = new float2(item.drawRect.x, item.drawRect.yMax);
+            position = new float2(parentMenu.drawRect.x, parentMenu.drawRect.yMax);
 
             // calculate the required menu size.
-            size = new float2(item.GetLargestWidthOfChildren(), item.GetMenuHeight() + 2f);
+            size = new float2(parentMenu.GetLargestWidthOfChildren(), parentMenu.GetMenuHeight() + 2f);
 
             // add the menu items.
-            foreach (var child in item.children)
+            foreach (var child in parentMenu.children)
             {
                 child.size = new float2(size.x - 2f, child.size.y);
                 Add(child);

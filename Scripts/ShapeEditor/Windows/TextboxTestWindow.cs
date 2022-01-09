@@ -8,8 +8,12 @@ namespace AeternumGames.ShapeEditor
     {
         private GuiTextbox textbox;
 
-        public TextboxTestWindow(float2 position, float2 size) : base(position, size)
+        public TextboxTestWindow(float2 position, float2 size) : base(position, size) { }
+
+        public override void OnActivate()
         {
+            base.OnActivate();
+
             Add(new GuiWindowTitle("Textbox Test Window"));
 
             Add(textbox = new GuiFloatTextbox(new float2(10f, 25f), new float2(200, 20))

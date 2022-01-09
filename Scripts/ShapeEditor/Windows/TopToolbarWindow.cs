@@ -19,6 +19,8 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnActivate()
         {
+            base.OnActivate();
+
             var resources = ShapeEditorResources.Instance;
             colorWindowBackground = new Color(0.192f, 0.192f, 0.192f);
 
