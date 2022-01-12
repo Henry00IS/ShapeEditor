@@ -76,27 +76,94 @@ namespace AeternumGames.ShapeEditor
         {
             var shapesCount = shapes.Count;
 
-            // generate concave polygons for all of the shapes.
-            var concavePolygons = new List<Polygon>(shapesCount);
-            for (int i = 0; i < shapesCount; i++)
-                concavePolygons.Add(shapes[i].GenerateConcavePolygon(true));
-
-            // apply csg operations on the concave polygons.
-            var finalPolygons = new List<Polygon>(shapesCount);
+            // detect whether we are trying to use boolean operations:
+            var useBooleanOperations = false;
             for (int i = 0; i < shapesCount; i++)
             {
-                /*finalPolygons.AddRange(
-                    YuPengClipper.Union(concavePolygons[i], new Shape().GenerateConcavePolygon(true), out var error)
-                );*/
-
-                finalPolygons.Add(concavePolygons[i]);
+                if (shapes[i].csgMode == PolyClipType.Difference)
+                {
+                    useBooleanOperations = true;
+                    break;
+                }
             }
 
-            // use convex decomposition to build convex polygons out of the final polygons.
+            // not using boolean operations, use the stable bayazit path:
+            if (!useBooleanOperations)
+            {
+                // use bayazit convex decomposition to build convex polygons for every shape.
+                var bayazitConvexPolygons = new List<Polygon>(shapesCount);
+                for (int i = 0; i < shapesCount; i++)
+                    bayazitConvexPolygons.AddRange(BayazitDecomposer.ConvexPartition(shapes[i].GenerateConcavePolygon(true)));
+                return bayazitConvexPolygons;
+            }
+
+            // using boolean operations:
+
+            Debug.LogWarning("2D Shape Editor: Booleans are an experimental feature and not stable!");
+
+            // generate concave polygons for all of the shapes.
+            var concavePolygons = new List<Polygon>(shapesCount);
+
+            for (int i = 0; i < shapesCount; i++)
+            {
+                var shape = shapes[i];
+                var shapePolygon = shape.GenerateConcavePolygon(true);
+
+                var tempPolygons = new List<Polygon>(concavePolygons);
+                var tempPolygonsCount = tempPolygons.Count;
+                concavePolygons.Clear();
+
+                if (tempPolygonsCount == 0)
+                {
+                    concavePolygons.Add(shapePolygon);
+                }
+                else
+                {
+                    if (shape.csgMode == PolyClipType.Union)
+                    {
+                        concavePolygons.AddRange(tempPolygons);
+                        concavePolygons.Add(shapePolygon);
+
+                        //for (int j = 0; j < tempPolygonsCount; j++)
+                        //{
+                        //    concavePolygons.AddRange(YuPengClipper.Union(tempPolygons[j], shapePolygon, out var error));
+                        //    if (error != PolyClipError.None)
+                        //        Debug.Log(error);
+                        //}
+                    }
+                    else
+                    {
+                        for (int j = 0; j < tempPolygonsCount; j++)
+                        {
+                            concavePolygons.AddRange(YuPengClipper.Difference(tempPolygons[j], shapePolygon, out var error));
+                            if (error != PolyClipError.None)
+                                Debug.Log(error);
+                        }
+                    }
+                }
+            }
+
+            var concavePolygonsCount = concavePolygons.Count;
+
+            // find clockwise polygons (holes):
+            var holes = new List<Polygon>();
+            for (int i = 0; i < concavePolygonsCount; i++)
+                if (!concavePolygons[i].IsCounterClockWise2D())
+                    holes.Add(concavePolygons[i]);
+            var hasHoles = holes.Count > 0;
+
+            // use convex decomposition to build convex polygons out of the concave polygons.
             var convexPolygons = new List<Polygon>();
-            var finalPolygonsCount = finalPolygons.Count;
-            for (int i = 0; i < finalPolygonsCount; i++)
-                convexPolygons.AddRange(BayazitDecomposer.ConvexPartition(finalPolygons[i]));
+            for (int i = 0; i < concavePolygonsCount; i++)
+            {
+                if (concavePolygons[i].IsCounterClockWise2D())
+                {
+                    // if there are holes, provide every polygon with the list of holes.
+                    if (hasHoles) concavePolygons[i].Holes = holes;
+
+                    convexPolygons.AddRange(Delaunay.DelaunayDecomposer.ConvexPartition(concavePolygons[i]));
+                }
+            }
 
             return convexPolygons;
         }

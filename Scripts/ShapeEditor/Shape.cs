@@ -14,6 +14,10 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         public List<Segment> segments = new List<Segment>();
 
+        /// <summary>The CSG mode of the shape.</summary>
+        [SerializeField]
+        public PolyClipType csgMode = PolyClipType.Union;
+
         /// <summary>Creates a new shape.</summary>
         public Shape()
         {
@@ -182,7 +186,7 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        /// <summary>[2D] Generates the vertices representing this shape for convex decomposition.</summary>
+        /// <summary>[2D] Generates the concave polygon representing this shape.</summary>
         /// <param name="flipY">Whether to flip the shape on the Y-axis.</param>
         /// <returns>The collection of vertices.</returns>
         public Polygon GenerateConcavePolygon(bool flipY)

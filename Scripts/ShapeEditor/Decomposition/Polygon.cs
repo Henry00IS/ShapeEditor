@@ -31,6 +31,9 @@ namespace AeternumGames.ShapeEditor
         /// <param name="vertices">The initial vertices to add to the polygon.</param>
         public Polygon(IEnumerable<Vertex> vertices) : base(vertices) { }
 
+        /// <summary>[2D/3D] Gets or sets the collection of holes that will be used during triangulation.</summary>
+        public List<Polygon> Holes { get; set; }
+
         /// <summary>[2D/3D] Gets the next index. Used for iterating all the edges with wrap-around.</summary>
         /// <param name="index">The current index</param>
         public int NextIndex(int index)

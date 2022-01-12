@@ -27,6 +27,8 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Since floating-point math is imprecise we use a smaller value (VelcroPhysics).</summary>
         public const float EPSILON_VELCRO = 1.192092896e-07f;
 
+        public const float TwoPi = Mathf.PI * 2.0f;
+
         /// <summary>
         /// Determines whether two floats are equal, allowing for floating point differences with
         /// an Epsilon value taken into account in per component comparisons

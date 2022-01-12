@@ -44,16 +44,23 @@ namespace AeternumGames.ShapeEditor
             editMenu.Add("Delete Selection", resources.shapeEditorDelete, editor.UserDeleteSelection);
             editMenu.Separator();
             editMenu.Add("Snap Selection To Grid", editor.UserSnapSelectionToGrid);
-            editMenu.Separator();
-            editMenu.Add("Reset Edge To Linear", resources.shapeEditorSegmentLinear, editor.UserResetSegmentGeneratorForSelectedEdges);
-            editMenu.Add("Toggle Bezier Generator", resources.shapeEditorSegmentBezier, editor.UserToggleBezierSegmentGeneratorForSelectedEdges);
-            editMenu.Add("Toggle Sine Generator", resources.shapeEditorSegmentSine, editor.UserToggleSineSegmentGeneratorForSelectedEdges);
-            editMenu.Add("Toggle Repeat Generator", resources.shapeEditorSegmentRepeat, editor.UserToggleRepeatSegmentGeneratorForSelectedEdges);
-            editMenu.Separator();
-            editMenu.Add("Apply Selected Generators", resources.shapeEditorSegmentApply, editor.UserApplyGeneratorForSelectedEdges);
 
-            var projectMenu = menu.Add("Project");
-            projectMenu.Add("Add Shape", resources.shapeEditorShapeCreate, editor.UserAddShapeToProject);
+            var edgeMenu = menu.Add("Edge");
+            edgeMenu.Add("Reset Edge To Linear", resources.shapeEditorSegmentLinear, editor.UserResetSegmentGeneratorForSelectedEdges);
+            edgeMenu.Add("Toggle Bezier Generator", resources.shapeEditorSegmentBezier, editor.UserToggleBezierSegmentGeneratorForSelectedEdges);
+            edgeMenu.Add("Toggle Sine Generator", resources.shapeEditorSegmentSine, editor.UserToggleSineSegmentGeneratorForSelectedEdges);
+            edgeMenu.Add("Toggle Repeat Generator", resources.shapeEditorSegmentRepeat, editor.UserToggleRepeatSegmentGeneratorForSelectedEdges);
+            edgeMenu.Separator();
+            edgeMenu.Add("Apply Selected Generators", resources.shapeEditorSegmentApply, editor.UserApplyGeneratorForSelectedEdges);
+
+            var shapeMenu = menu.Add("Shape");
+            shapeMenu.Add("Add Shape", resources.shapeEditorShapeCreate, editor.UserAddShapeToProject);
+            shapeMenu.Separator();
+            shapeMenu.Add("Set Additive", editor.UserSetSelectedShapesAdditive);
+            shapeMenu.Add("Set Subtractive", editor.UserSetSelectedShapesSubtractive);
+            shapeMenu.Separator();
+            shapeMenu.Add("Push To Front", () => { });
+            shapeMenu.Add("Push To Back", () => { });
 
             var sceneMenu = menu.Add("Scene");
             sceneMenu.Add("Assign Project To Targets", resources.shapeEditorExtrudeShape, editor.UserAssignProjectToTargets);

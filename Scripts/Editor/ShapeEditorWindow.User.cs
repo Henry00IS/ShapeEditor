@@ -312,6 +312,22 @@ namespace AeternumGames.ShapeEditor
         {
             snapEnabled = !snapEnabled;
         }
+
+        /// <summary>Sets the selected shapes as additive.</summary>
+        internal void UserSetSelectedShapesAdditive()
+        {
+            // todo: replace with ForEachSelected...Vertex or actually Shape.
+            foreach (var edge in ForEachSelectedEdge())
+                edge.shape.csgMode = PolyClipType.Union;
+        }
+
+        /// <summary>Sets the selected shapes as subtractive.</summary>
+        internal void UserSetSelectedShapesSubtractive()
+        {
+            // todo: replace with ForEachSelected...Vertex or actually Shape.
+            foreach (var edge in ForEachSelectedEdge())
+                edge.shape.csgMode = PolyClipType.Difference;
+        }
     }
 }
 
