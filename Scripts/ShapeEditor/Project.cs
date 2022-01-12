@@ -159,7 +159,17 @@ namespace AeternumGames.ShapeEditor
                 if (concavePolygons[i].IsCounterClockWise2D())
                 {
                     // if there are holes, provide every polygon with the list of holes.
-                    if (hasHoles) concavePolygons[i].Holes = holes;
+                    if (hasHoles)
+                    {
+                        concavePolygons[i].Holes = new List<Polygon>();
+                        foreach (var hole in holes)
+                        {
+                            if (concavePolygons[i].ConvexContains(hole))
+                            {
+                                concavePolygons[i].Holes.Add(hole);
+                            }
+                        }
+                    }
 
                     convexPolygons.AddRange(Delaunay.DelaunayDecomposer.ConvexPartition(concavePolygons[i]));
                 }

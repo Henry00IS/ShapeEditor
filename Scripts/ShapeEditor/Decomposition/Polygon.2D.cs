@@ -211,6 +211,23 @@ namespace AeternumGames.ShapeEditor
             Clear();
             AddRange(simplified);
         }
+
+        /// <summary>
+        /// [2D] Assuming the polygon is convex, checks whether it fully contains another polygon.
+        /// </summary>
+        /// <param name="other">The other polygon to check.</param>
+        /// <returns>True when the other polygon is fully contained, else false.</returns>
+        public bool ConvexContains(Polygon other)
+        {
+            var otherCount = other.Count;
+            for (int i = 0; i < otherCount; i++)
+            {
+                var pos = other[i].position;
+                if (ContainsPoint2D(ref pos) == -1)
+                    return false;
+            }
+            return true;
+        }
     }
 }
 
