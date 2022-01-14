@@ -50,6 +50,13 @@ namespace AeternumGames.ShapeEditor
                 list[i] = list[i - 1];
             list[0] = item;
         }
+
+        public static List<T> Splice<T>(this List<T> source, int index, int count)
+        {
+            var items = source.GetRange(index, count);
+            source.RemoveRange(index, count);
+            return items;
+        }
     }
 }
 

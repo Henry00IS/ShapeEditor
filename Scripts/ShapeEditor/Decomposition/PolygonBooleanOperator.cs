@@ -2,14 +2,15 @@
 
 // contains source code from https://github.com/Genbox/VelcroPhysics (see Licenses/VelcroPhysics.txt).
 
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace AeternumGames.ShapeEditor
 {
-    public enum PolyClipError
+    public enum PolygonBooleanOperator
     {
-        None,
-        DegeneratedOutput,
-        NonSimpleInput,
-        BrokenResult
+        Union,
+        Difference
     }
 }
 

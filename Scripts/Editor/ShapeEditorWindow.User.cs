@@ -318,7 +318,7 @@ namespace AeternumGames.ShapeEditor
         {
             // todo: replace with ForEachSelected...Vertex or actually Shape.
             foreach (var edge in ForEachSelectedEdge())
-                edge.shape.csgMode = PolyClipType.Union;
+                edge.shape.booleanOperator = PolygonBooleanOperator.Union;
         }
 
         /// <summary>Sets the selected shapes as subtractive.</summary>
@@ -326,7 +326,7 @@ namespace AeternumGames.ShapeEditor
         {
             // todo: replace with ForEachSelected...Vertex or actually Shape.
             foreach (var edge in ForEachSelectedEdge())
-                edge.shape.csgMode = PolyClipType.Difference;
+                edge.shape.booleanOperator = PolygonBooleanOperator.Difference;
         }
     }
 }

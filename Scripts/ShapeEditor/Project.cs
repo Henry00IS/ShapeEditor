@@ -76,11 +76,12 @@ namespace AeternumGames.ShapeEditor
         {
             var shapesCount = shapes.Count;
 
+            /*
             // detect whether we are trying to use boolean operations:
-            var useBooleanOperations = false;
+            var useBooleanOperations = true;
             for (int i = 0; i < shapesCount; i++)
             {
-                if (shapes[i].csgMode == PolyClipType.Difference)
+                if (shapes[i].booleanOperator == PolygonBooleanOperator.Difference)
                 {
                     useBooleanOperations = true;
                     break;
@@ -95,54 +96,38 @@ namespace AeternumGames.ShapeEditor
                 for (int i = 0; i < shapesCount; i++)
                     bayazitConvexPolygons.AddRange(BayazitDecomposer.ConvexPartition(shapes[i].GenerateConcavePolygon(true)));
                 return bayazitConvexPolygons;
-            }
+            }*/
 
             // using boolean operations:
 
-            Debug.LogWarning("2D Shape Editor: Booleans are an experimental feature and not stable!");
-
             // generate concave polygons for all of the shapes.
-            var concavePolygons = new List<Polygon>(shapesCount);
+
+            var polyBool = new PolyBoolCS.PolyBool();
+            var finalSegmentList = new PolyBoolCS.SegmentList();
 
             for (int i = 0; i < shapesCount; i++)
             {
                 var shape = shapes[i];
                 var shapePolygon = shape.GenerateConcavePolygon(true);
 
-                var tempPolygons = new List<Polygon>(concavePolygons);
-                var tempPolygonsCount = tempPolygons.Count;
-                concavePolygons.Clear();
+                var shapePolyboolPolygon = shapePolygon.ToPolyboolCS();
 
-                if (tempPolygonsCount == 0)
+                if (shape.booleanOperator == PolygonBooleanOperator.Union)
                 {
-                    concavePolygons.Add(shapePolygon);
+                    var seg2 = polyBool.segments(shapePolyboolPolygon);
+                    var comb = polyBool.combine(finalSegmentList, seg2);
+                    finalSegmentList = polyBool.selectUnion(comb);
                 }
                 else
                 {
-                    if (shape.csgMode == PolyClipType.Union)
-                    {
-                        concavePolygons.AddRange(tempPolygons);
-                        concavePolygons.Add(shapePolygon);
-
-                        //for (int j = 0; j < tempPolygonsCount; j++)
-                        //{
-                        //    concavePolygons.AddRange(YuPengClipper.Union(tempPolygons[j], shapePolygon, out var error));
-                        //    if (error != PolyClipError.None)
-                        //        Debug.Log(error);
-                        //}
-                    }
-                    else
-                    {
-                        for (int j = 0; j < tempPolygonsCount; j++)
-                        {
-                            concavePolygons.AddRange(YuPengClipper.Difference(tempPolygons[j], shapePolygon, out var error));
-                            if (error != PolyClipError.None)
-                                Debug.Log(error);
-                        }
-                    }
+                    var seg2 = polyBool.segments(shapePolyboolPolygon);
+                    var comb = polyBool.combine(finalSegmentList, seg2);
+                    finalSegmentList = polyBool.selectDifference(comb);
                 }
             }
 
+            PolyboolToPolygon polyboolToPolygon = new PolyboolToPolygon();
+            var concavePolygons = polyboolToPolygon.FromPolyboolPolygon(polyBool, polyBool.polygon(finalSegmentList));
             var concavePolygonsCount = concavePolygons.Count;
 
             // find clockwise polygons (holes):
@@ -151,6 +136,8 @@ namespace AeternumGames.ShapeEditor
                 if (!concavePolygons[i].IsCounterClockWise2D())
                     holes.Add(concavePolygons[i]);
             var hasHoles = holes.Count > 0;
+
+            Debug.Log(holes.Count + " holes detected!");
 
             // use convex decomposition to build convex polygons out of the concave polygons.
             var convexPolygons = new List<Polygon>();
@@ -164,7 +151,7 @@ namespace AeternumGames.ShapeEditor
                         concavePolygons[i].Holes = new List<Polygon>();
                         foreach (var hole in holes)
                         {
-                            if (concavePolygons[i].ConvexContains(hole))
+                            if (concavePolygons[i].ConvexContains(hole)) // fixme: this is surely wrong?
                             {
                                 concavePolygons[i].Holes.Add(hole);
                             }

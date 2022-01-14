@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace AeternumGames.ShapeEditor
 {
@@ -14,9 +15,9 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         public List<Segment> segments = new List<Segment>();
 
-        /// <summary>The CSG mode of the shape.</summary>
+        /// <summary>The boolean operator of the shape.</summary>
         [SerializeField]
-        public PolyClipType csgMode = PolyClipType.Union;
+        public PolygonBooleanOperator booleanOperator = PolygonBooleanOperator.Union;
 
         /// <summary>Creates a new shape.</summary>
         public Shape()
