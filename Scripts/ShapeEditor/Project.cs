@@ -154,7 +154,15 @@ namespace AeternumGames.ShapeEditor
                         }
                     }
 
-                    convexPolygons.AddRange(Delaunay.DelaunayDecomposer.ConvexPartition(concavePolygons[i]));
+                    if (concavePolygons[i].Holes?.Count > 0)
+                    {
+                        convexPolygons.AddRange(Delaunay.DelaunayDecomposer.ConvexPartition(concavePolygons[i]));
+                    }
+                    else
+                    {
+                        // use bayazit whenever we can because it's fast and gives great results.
+                        convexPolygons.AddRange(BayazitDecomposer.ConvexPartition(concavePolygons[i]));
+                    }
                 }
             }
 
