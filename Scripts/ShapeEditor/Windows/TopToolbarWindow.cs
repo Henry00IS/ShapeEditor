@@ -59,8 +59,8 @@ namespace AeternumGames.ShapeEditor
             shapeMenu.Add("Set Additive", editor.UserSetSelectedShapesAdditive);
             shapeMenu.Add("Set Subtractive", editor.UserSetSelectedShapesSubtractive);
             shapeMenu.Separator();
-            shapeMenu.Add("Push To Front", () => { });
-            shapeMenu.Add("Push To Back", () => { });
+            shapeMenu.Add("Push To Front", editor.UserPushSelectedShapesToFront);
+            shapeMenu.Add("Push To Back", editor.UserPushSelectedShapesToBack);
 
             var sceneMenu = menu.Add("Scene");
             sceneMenu.Add("Assign Project To Targets", resources.shapeEditorExtrudeShape, editor.UserAssignProjectToTargets);

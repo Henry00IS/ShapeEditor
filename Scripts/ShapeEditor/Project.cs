@@ -109,8 +109,7 @@ namespace AeternumGames.ShapeEditor
             {
                 var shape = shapes[i];
                 var shapePolygon = shape.GenerateConcavePolygon(true);
-
-                var shapePolyboolPolygon = shapePolygon.ToPolyboolCS();
+                var shapePolyboolPolygon = shapePolygon.ToPolybool();
 
                 if (shape.booleanOperator == PolygonBooleanOperator.Union)
                 {
@@ -126,8 +125,7 @@ namespace AeternumGames.ShapeEditor
                 }
             }
 
-            PolyboolToPolygon polyboolToPolygon = new PolyboolToPolygon();
-            var concavePolygons = polyboolToPolygon.FromPolyboolPolygon(polyBool, polyBool.polygon(finalSegmentList));
+            var concavePolygons = polyBool.polygon(finalSegmentList).ToPolygons(polyBool);
             var concavePolygonsCount = concavePolygons.Count;
 
             // find clockwise polygons (holes):
@@ -136,8 +134,6 @@ namespace AeternumGames.ShapeEditor
                 if (!concavePolygons[i].IsCounterClockWise2D())
                     holes.Add(concavePolygons[i]);
             var hasHoles = holes.Count > 0;
-
-            Debug.Log(holes.Count + " holes detected!");
 
             // use convex decomposition to build convex polygons out of the concave polygons.
             var convexPolygons = new List<Polygon>();

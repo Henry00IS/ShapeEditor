@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
@@ -316,17 +317,47 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Sets the selected shapes as additive.</summary>
         internal void UserSetSelectedShapesAdditive()
         {
-            // todo: replace with ForEachSelected...Vertex or actually Shape.
-            foreach (var edge in ForEachSelectedEdge())
-                edge.shape.booleanOperator = PolygonBooleanOperator.Union;
+            foreach (var shape in project.shapes)
+                if (shape.IsSelected())
+                    shape.booleanOperator = PolygonBooleanOperator.Union;
         }
 
         /// <summary>Sets the selected shapes as subtractive.</summary>
         internal void UserSetSelectedShapesSubtractive()
         {
-            // todo: replace with ForEachSelected...Vertex or actually Shape.
-            foreach (var edge in ForEachSelectedEdge())
-                edge.shape.booleanOperator = PolygonBooleanOperator.Difference;
+            foreach (var shape in project.shapes)
+                if (shape.IsSelected())
+                    shape.booleanOperator = PolygonBooleanOperator.Difference;
+        }
+
+        /// <summary>Pushes the selected shapes to the front (for boolean operations).</summary>
+        internal void UserPushSelectedShapesToFront()
+        {
+            var shapesToMove = new List<Shape>();
+            foreach (var shape in project.shapes)
+                if (shape.IsSelected())
+                    shapesToMove.Add(shape);
+
+            foreach (var shape in shapesToMove)
+            {
+                project.shapes.Remove(shape);
+                project.shapes.Add(shape);
+            }
+        }
+
+        /// <summary>Pushes the selected shapes to the back (for boolean operations).</summary>
+        internal void UserPushSelectedShapesToBack()
+        {
+            var shapesToMove = new List<Shape>();
+            foreach (var shape in project.shapes)
+                if (shape.IsSelected())
+                    shapesToMove.Add(shape);
+
+            foreach (var shape in shapesToMove)
+            {
+                project.shapes.Remove(shape);
+                project.shapes.Insert(0, shape);
+            }
         }
     }
 }
