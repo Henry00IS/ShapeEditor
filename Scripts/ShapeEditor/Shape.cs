@@ -235,6 +235,20 @@ namespace AeternumGames.ShapeEditor
             // create a copy of the given shape using JSON.
             return JsonUtility.FromJson<Shape>(JsonUtility.ToJson(this));
         }
+
+        /// <summary>Gets the default segment color for segments in this shape.</summary>
+        public Color segmentColor
+        {
+            get
+            {
+                switch (booleanOperator)
+                {
+                    case PolygonBooleanOperator.Difference:
+                        return ShapeEditorWindow.segmentColorDifference;
+                }
+                return ShapeEditorWindow.segmentColor;
+            }
+        }
     }
 }
 

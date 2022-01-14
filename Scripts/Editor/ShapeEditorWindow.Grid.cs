@@ -12,6 +12,7 @@ namespace AeternumGames.ShapeEditor
         internal const float pivotScale = 9f;
         internal const float halfPivotScale = pivotScale / 2f;
         internal static readonly Color segmentColor = new Color(0.7f, 0.7f, 0.7f);
+        internal static readonly Color segmentColorDifference = new Color(1.0f, 0.5f, 0.5f);
         internal static readonly Color segmentPivotSelectedColor = new Color(0.9f, 0.45f, 0.0f);
         internal static readonly Color segmentPivotOutlineColor = new Color(1.0f, 0.5f, 0.0f);
         private float2 gridOffset;

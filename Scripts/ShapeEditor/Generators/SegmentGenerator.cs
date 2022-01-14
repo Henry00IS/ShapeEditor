@@ -156,7 +156,7 @@ namespace AeternumGames.ShapeEditor
         private void DrawSegments(IEnumerable<float2> iterator)
         {
             float2 last = editor.GridPointToScreen(segment.position);
-            GL.Color((segment.selected && segment.next.selected) ? ShapeEditorWindow.segmentPivotOutlineColor : ShapeEditorWindow.segmentColor);
+            GL.Color((segment.selected && segment.next.selected) ? ShapeEditorWindow.segmentPivotOutlineColor : segment.shape.segmentColor);
 
             foreach (var point in iterator)
             {

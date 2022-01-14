@@ -11,7 +11,7 @@ namespace AeternumGames.ShapeEditor
             // we just draw manually here.
             var p1 = editor.GridPointToScreen(segment.position);
             var p2 = editor.GridPointToScreen(segment.next.position);
-            GLUtilities.DrawLine(1.0f, p1.x, p1.y, p2.x, p2.y, segment.selected ? ShapeEditorWindow.segmentPivotOutlineColor : ShapeEditorWindow.segmentColor, segment.next.selected ? ShapeEditorWindow.segmentPivotOutlineColor : ShapeEditorWindow.segmentColor);
+            GLUtilities.DrawLine(1.0f, p1.x, p1.y, p2.x, p2.y, segment.selected ? ShapeEditorWindow.segmentPivotOutlineColor : segment.shape.segmentColor, segment.next.selected ? ShapeEditorWindow.segmentPivotOutlineColor : segment.shape.segmentColor);
         }
     }
 }
