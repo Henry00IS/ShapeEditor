@@ -7,6 +7,8 @@ using Region = AeternumGames.ShapeEditor.PolyBoolCS.PointList;
 
 namespace AeternumGames.ShapeEditor
 {
+    // contains source code from https://github.com/velipso/polybooljs (see Licenses/PolyBoolJS.txt).
+
     public static class PolyboolExtensions
     {
         public static PolyboolPolygon ToPolybool(this Polygon polygon)
