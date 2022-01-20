@@ -41,8 +41,10 @@ namespace AeternumGames.ShapeEditor
             editMenu.Separator();
             editMenu.Add("Select All", editor.UserSelectAll);
             editMenu.Add("Clear Selection", editor.UserClearSelection);
-            editMenu.Add("Duplicate Selected Shapes", resources.shapeEditorShapeDuplicate, editor.UserDuplicateSelectedShapes);
             editMenu.Add("Delete Selection", resources.shapeEditorDelete, editor.UserDeleteSelection);
+            editMenu.Separator();
+            editMenu.Add("Flip Horizontally", resources.shapeEditorFlipHorizontally, editor.UserFlipSelectionHorizonally);
+            editMenu.Add("Flip Vertically", resources.shapeEditorFlipVertically, editor.UserFlipSelectionVertically);
             editMenu.Separator();
             editMenu.Add("Snap Selection To Grid", editor.UserSnapSelectionToGrid);
 
@@ -56,6 +58,8 @@ namespace AeternumGames.ShapeEditor
 
             var shapeMenu = menu.Add("Shape");
             shapeMenu.Add("Add Shape", resources.shapeEditorShapeCreate, editor.UserAddShapeToProject);
+            shapeMenu.Separator();
+            shapeMenu.Add("Duplicate Selection", resources.shapeEditorShapeDuplicate, editor.UserDuplicateSelectedShapes);
             shapeMenu.Separator();
             shapeMenu.Add("Set Additive", editor.UserSetSelectedShapesAdditive);
             shapeMenu.Add("Set Subtractive", editor.UserSetSelectedShapesSubtractive);

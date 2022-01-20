@@ -233,7 +233,9 @@ namespace AeternumGames.ShapeEditor
         public Shape Clone()
         {
             // create a copy of the given shape using JSON.
-            return JsonUtility.FromJson<Shape>(JsonUtility.ToJson(this));
+            var clone = JsonUtility.FromJson<Shape>(JsonUtility.ToJson(this));
+            clone.Validate();
+            return clone;
         }
 
         /// <summary>Gets the default segment color for segments in this shape.</summary>

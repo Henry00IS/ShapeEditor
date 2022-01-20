@@ -385,6 +385,32 @@ namespace AeternumGames.ShapeEditor
                 UseTool(new TranslateTool());
             }
         }
+
+        internal void UserFlipSelectionHorizonally()
+        {
+            RegisterUndo("Flip Selection Horizonally");
+
+            var left = float.MaxValue;
+            foreach (var segment in ForEachSelectedObject())
+                if (segment.position.x < left)
+                    left = segment.position.x;
+
+            foreach (var segment in ForEachSelectedObject())
+                segment.position = new float2(-segment.position.x + (left * 2), segment.position.y);
+        }
+
+        internal void UserFlipSelectionVertically()
+        {
+            RegisterUndo("Flip Selection Vertically");
+
+            var top = float.MaxValue;
+            foreach (var segment in ForEachSelectedObject())
+                if (segment.position.y < top)
+                    top = segment.position.y;
+
+            foreach (var segment in ForEachSelectedObject())
+                segment.position = new float2(segment.position.x, -segment.position.y + (top * 2));
+        }
     }
 }
 
