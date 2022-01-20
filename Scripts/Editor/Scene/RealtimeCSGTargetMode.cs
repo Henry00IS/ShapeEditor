@@ -6,6 +6,7 @@ namespace AeternumGames.ShapeEditor
     public enum RealtimeCSGTargetMode
     {
         FixedExtrude,
+        SplineExtrude,
     }
 }
 

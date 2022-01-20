@@ -192,6 +192,83 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>
+        /// Extrudes this polygon along a 3 point spline and returns all of the brushes for use with
+        /// CSG algorithms. This function may crack quads depending on how the spline moves.
+        /// </summary>
+        /// <param name="spline">The spline to be followed.</param>
+        /// <param name="precision">The spline precision.</param>
+        public List<PolygonMesh> ExtrudeBrushesAlongSpline(MathEx.Spline3 spline, int precision)
+        {
+            int count = Count;
+            var results = new List<PolygonMesh>(precision);
+
+            // attempted to extrude a 3D polygon with less than 3 vertices.
+            if (count < 3)
+                return results;
+
+            // keep track of the last polygon target.
+            var lastPoly = new Polygon(this);
+            {
+                var there = 0f;
+                var tnext = 1f / precision;
+                var avgforward = (spline.GetForward(there) + spline.GetForward(tnext)).normalized;
+
+                // position and rotate it to the desired target.
+                lastPoly.Rotate(Quaternion.LookRotation(avgforward, -spline.GetUp(there)));
+                lastPoly.Translate(spline.GetPoint(there));
+            }
+
+            for (int p = 1; p < precision + 1; p++)
+            {
+                var polygons = new List<Polygon>();
+
+                // clone the initial polygon.
+                var poly = new Polygon(this);
+                var there = p / (float)precision;
+                var tnext = (p + 1) / (float)precision;
+                var avgforward = (spline.GetForward(there) + spline.GetForward(tnext)).normalized;
+
+                // position and rotate it to the desired target.
+                poly.Rotate(Quaternion.LookRotation(avgforward, -spline.GetUp(there)));
+                poly.Translate(spline.GetPoint(there));
+
+                // add the front face.
+                polygons.Add(lastPoly);
+
+                // fill the gap with quads "extruding" the shape.
+                for (int i = 0; i < count - 1; i++)
+                {
+                    polygons.Add(new Polygon(new Vertex[] {
+                        lastPoly[i],
+                        poly[i],
+                        poly[i + 1],
+                        lastPoly[i + 1],
+                    }));
+                }
+
+                // one more face that wraps around to index 0.
+                polygons.Add(new Polygon(new Vertex[] {
+                    lastPoly[count - 1],
+                    poly[count - 1],
+                    poly[0],
+                    lastPoly[0],
+                }));
+
+                // add the back face.
+                var back = new Polygon(poly);
+                back.Reverse();
+                polygons.Add(back);
+
+                // add the polygon mesh brush.
+                results.Add(new PolygonMesh(polygons));
+
+                lastPoly = poly;
+            }
+
+            return results;
+        }
+
+        /// <summary>
         /// [3D] A simple UV algorithm that takes the largest change between vertex local positions,
         /// so XY, XZ or YZ and converts them to U and V coordinates. Since the 2D Shape Editor
         /// works in the metric scale, textures will also cover 1m² in 3D space.

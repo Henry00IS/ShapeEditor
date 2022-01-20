@@ -13,6 +13,7 @@ namespace AeternumGames.ShapeEditor
     {
         private SerializedProperty spTargetMode => serializedObject.FindProperty("targetMode");
         private SerializedProperty spFixedExtrudeDistance => serializedObject.FindProperty("fixedExtrudeDistance");
+        private SerializedProperty spSplineExtrudePrecision => serializedObject.FindProperty("splineExtrudePrecision");
 
         public override void OnInspectorGUI()
         {
@@ -29,6 +30,10 @@ namespace AeternumGames.ShapeEditor
                 case RealtimeCSGTargetMode.FixedExtrude:
                     FixedExtrude_OnGUI();
                     break;
+
+                case RealtimeCSGTargetMode.SplineExtrude:
+                    SplineExtrude_OnGUI();
+                    break;
             }
 
             if (serializedObject.ApplyModifiedProperties() || rebuild)
@@ -40,6 +45,11 @@ namespace AeternumGames.ShapeEditor
         private void FixedExtrude_OnGUI()
         {
             EditorGUILayout.PropertyField(spFixedExtrudeDistance);
+        }
+
+        private void SplineExtrude_OnGUI()
+        {
+            EditorGUILayout.PropertyField(spSplineExtrudePrecision);
         }
 
         private void ShapeEditorMenu_OnGUI()

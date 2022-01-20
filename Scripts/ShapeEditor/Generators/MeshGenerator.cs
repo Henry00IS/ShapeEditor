@@ -85,11 +85,32 @@ namespace AeternumGames.ShapeEditor
             return mesh;
         }
 
+        /// <summary>[Convex] Creates meshes by extruding the convex polygons along a 3 point spline.</summary>
+        /// <param name="convexPolygons">The decomposed convex polygons.</param>
+        /// <param name="spline">The spline to be followed.</param>
+        /// <param name="precision">The spline precision.</param>
+        public static List<PolygonMesh> CreateSplineExtrudedPolygonMeshes(List<Polygon> convexPolygons, MathEx.Spline3 spline, int precision)
+        {
+            var polygonMeshes = new List<PolygonMesh>();
+
+            var convexPolygonsCount = convexPolygons.Count;
+            for (int i = 0; i < convexPolygonsCount; i++)
+            {
+                // calculate 2D UV coordinates for the front polygon.
+                convexPolygons[i].ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
+
+                // extrude it along the spline building brushes.
+                polygonMeshes.AddRange(convexPolygons[i].ExtrudeBrushesAlongSpline(spline, precision));
+            }
+
+            return polygonMeshes;
+        }
+
         /// <summary>[Concave] Creates a mesh by extruding the convex polygons along a 3 point spline.</summary>
         /// <param name="convexPolygons">The decomposed convex polygons.</param>
         /// <param name="spline">The spline to be followed.</param>
         /// <param name="precision">The spline precision.</param>
-        public static Mesh CreateSplineExtrudeMesh(List<Polygon> convexPolygons, MathEx.Spline3 spline, int precision)
+        public static Mesh CreateSplineExtrudedMesh(List<Polygon> convexPolygons, MathEx.Spline3 spline, int precision)
         {
             var polygonMeshes = new List<PolygonMesh>();
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
-    public partial class ShapeEditorTarget
+    public partial class RealtimeCSGTarget
     {
         // builds an extruded polygon following a spline.
 
@@ -21,8 +21,19 @@ namespace AeternumGames.ShapeEditor
             var spline = GetSpline3();
             if (spline == null) return;
 
-            var mesh = MeshGenerator.CreateSplineExtrudedMesh(convexPolygons2D, spline, splineExtrudePrecision);
-            OnShapeEditorMesh(mesh);
+            var parent = CleanAndGetBrushParent();
+
+            var polygonMeshes = MeshGenerator.CreateSplineExtrudedPolygonMeshes(convexPolygons2D, spline, splineExtrudePrecision);
+            var polygonMeshesCount = polygonMeshes.Count;
+            for (int i = 0; i < polygonMeshesCount; i++)
+            {
+                var polygonMesh = polygonMeshes[i];
+                var brush = ExternalRealtimeCSG.CreateBrushFromPlanes("Shape Editor Brush", polygonMesh.ToPlanes());
+                if (brush != null)
+                    brush.transform.SetParent(parent, false);
+            }
+
+            ExternalRealtimeCSG.AddCSGOperationComponent(gameObject);
         }
 
         /// <summary>Calculates and gets a 3 point spline or returns null on failure.</summary>
