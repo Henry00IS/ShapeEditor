@@ -293,6 +293,11 @@ namespace AeternumGames.ShapeEditor
                                 UserClearSelection();
                                 return true;
                             }
+                            else if (isCtrlPressed)
+                            {
+                                UserDuplicateSelectedShapes();
+                                return true;
+                            }
                             return false;
 
                         case KeyCode.S:

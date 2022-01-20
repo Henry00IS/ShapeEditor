@@ -41,6 +41,7 @@ namespace AeternumGames.ShapeEditor
             editMenu.Separator();
             editMenu.Add("Select All", editor.UserSelectAll);
             editMenu.Add("Clear Selection", editor.UserClearSelection);
+            editMenu.Add("Duplicate Selected Shapes", resources.shapeEditorShapeDuplicate, editor.UserDuplicateSelectedShapes);
             editMenu.Add("Delete Selection", resources.shapeEditorDelete, editor.UserDeleteSelection);
             editMenu.Separator();
             editMenu.Add("Snap Selection To Grid", editor.UserSnapSelectionToGrid);

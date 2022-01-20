@@ -359,6 +359,32 @@ namespace AeternumGames.ShapeEditor
                 project.shapes.Insert(0, shape);
             }
         }
+
+        /// <summary>
+        /// Finds all fully selected shapes, if there are new shapes, clears the current selection,
+        /// adds a copy of the shapes to the project, selects the new shapes, and switches to a
+        /// single-use translation tool.
+        /// </summary>
+        internal void UserDuplicateSelectedShapes()
+        {
+            var shapesToDuplicate = new List<Shape>();
+            foreach (var shape in project.shapes)
+                if (shape.IsSelected())
+                    shapesToDuplicate.Add(shape);
+
+            if (shapesToDuplicate.Count > 0)
+            {
+                project.ClearSelection();
+
+                foreach (var shape in shapesToDuplicate)
+                {
+                    project.shapes.Add(shape.Clone());
+                    shape.SelectAll();
+                }
+
+                UseTool(new TranslateTool());
+            }
+        }
     }
 }
 
