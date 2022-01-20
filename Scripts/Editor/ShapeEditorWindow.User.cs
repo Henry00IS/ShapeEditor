@@ -378,7 +378,9 @@ namespace AeternumGames.ShapeEditor
 
                 foreach (var shape in shapesToDuplicate)
                 {
-                    project.shapes.Add(shape.Clone());
+                    var clone = shape.Clone();
+                    clone.Validate();
+                    project.shapes.Add(clone);
                     shape.SelectAll();
                 }
 
