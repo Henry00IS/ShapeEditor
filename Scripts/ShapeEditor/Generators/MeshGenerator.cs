@@ -97,7 +97,7 @@ namespace AeternumGames.ShapeEditor
             for (int i = 0; i < convexPolygonsCount; i++)
             {
                 // calculate 2D UV coordinates for the front polygon.
-                convexPolygons[i].ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
+                // (RealtimeCSG doesn't need this) convexPolygons[i].ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
 
                 // extrude it along the spline building brushes.
                 polygonMeshes.AddRange(convexPolygons[i].ExtrudeBrushesAlongSpline(spline, precision));
@@ -153,7 +153,7 @@ namespace AeternumGames.ShapeEditor
             for (int i = 0; i < convexPolygonsCount; i++)
             {
                 // calculate 2D UV coordinates for the front polygon.
-                convexPolygons[i].ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
+                // (RealtimeCSG doesn't need this) convexPolygons[i].ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
 
                 for (int j = 0; j < precision; j++)
                 {
@@ -187,7 +187,7 @@ namespace AeternumGames.ShapeEditor
                             poly[k + 1],
                         });
 
-                        extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
+                        // (RealtimeCSG doesn't need this) extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
                         brush.Add(extrudedPolygon);
                     }
 
@@ -199,7 +199,7 @@ namespace AeternumGames.ShapeEditor
                         poly[0],
                     });
 
-                    extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
+                    // (RealtimeCSG doesn't need this) extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
                     brush.Add(extrudedPolygon);
                 }
             }
@@ -240,8 +240,8 @@ namespace AeternumGames.ShapeEditor
                         nextPoly[v] = new Vertex(MathEx.RotatePointAroundPivot(nextPoly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, (j + 1) / (float)precision), 0.0f)), nextPoly[v].uv0);
                     }
 
-                    brush.Add(poly);
-                    brush.Add(nextPoly.flipped);
+                    if (j == 0) brush.Add(poly);
+                    if (j == precision - 1) brush.Add(nextPoly.flipped);
 
                     // fill the gap with quads "extruding" the shape.
                     Polygon extrudedPolygon;
