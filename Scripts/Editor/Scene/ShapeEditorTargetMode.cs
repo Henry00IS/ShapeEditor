@@ -8,6 +8,7 @@ namespace AeternumGames.ShapeEditor
         Polygon,
         FixedExtrude,
         SplineExtrude,
+        RevolveExtrude
     }
 }
 

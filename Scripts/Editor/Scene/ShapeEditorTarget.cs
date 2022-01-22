@@ -66,6 +66,10 @@ namespace AeternumGames.ShapeEditor
                 case ShapeEditorTargetMode.SplineExtrude:
                     SplineExtrude_Rebuild();
                     break;
+
+                case ShapeEditorTargetMode.RevolveExtrude:
+                    RevolveExtrude_Rebuild();
+                    break;
             }
         }
 

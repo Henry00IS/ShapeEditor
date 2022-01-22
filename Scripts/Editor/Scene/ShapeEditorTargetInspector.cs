@@ -11,9 +11,12 @@ namespace AeternumGames.ShapeEditor
     [CustomEditor(typeof(ShapeEditorTarget))]
     public class ShapeEditorTargetInspector : Editor
     {
-        private SerializedProperty spTargetMode => serializedObject.FindProperty("targetMode");
-        private SerializedProperty spFixedExtrudeDistance => serializedObject.FindProperty("fixedExtrudeDistance");
-        private SerializedProperty spSplineExtrudePrecision => serializedObject.FindProperty("splineExtrudePrecision");
+        private SerializedProperty spTargetMode => serializedObject.FindProperty(nameof(ShapeEditorTarget.targetMode));
+        private SerializedProperty spFixedExtrudeDistance => serializedObject.FindProperty(nameof(ShapeEditorTarget.fixedExtrudeDistance));
+        private SerializedProperty spSplineExtrudePrecision => serializedObject.FindProperty(nameof(ShapeEditorTarget.splineExtrudePrecision));
+        private SerializedProperty spRevolveExtrudePrecision => serializedObject.FindProperty(nameof(ShapeEditorTarget.revolveExtrudePrecision));
+        private SerializedProperty spRevolveExtrudeDegrees => serializedObject.FindProperty(nameof(ShapeEditorTarget.revolveExtrudeDegrees));
+        private SerializedProperty spRevolveExtrudeRadius => serializedObject.FindProperty(nameof(ShapeEditorTarget.revolveExtrudeRadius));
 
         public override void OnInspectorGUI()
         {
@@ -38,6 +41,10 @@ namespace AeternumGames.ShapeEditor
                 case ShapeEditorTargetMode.SplineExtrude:
                     SplineExtrude_OnGUI();
                     break;
+
+                case ShapeEditorTargetMode.RevolveExtrude:
+                    RevolveExtrude_OnGUI();
+                    break;
             }
 
             if (serializedObject.ApplyModifiedProperties() || rebuild)
@@ -58,6 +65,13 @@ namespace AeternumGames.ShapeEditor
         private void SplineExtrude_OnGUI()
         {
             EditorGUILayout.PropertyField(spSplineExtrudePrecision);
+        }
+
+        private void RevolveExtrude_OnGUI()
+        {
+            EditorGUILayout.PropertyField(spRevolveExtrudePrecision);
+            EditorGUILayout.PropertyField(spRevolveExtrudeDegrees);
+            EditorGUILayout.PropertyField(spRevolveExtrudeRadius);
         }
 
         private void ShapeEditorMenu_OnGUI()

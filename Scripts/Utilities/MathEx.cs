@@ -222,6 +222,11 @@ namespace AeternumGames.ShapeEditor
             return point;
         }
 
+        public static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles)
+        {
+            return Quaternion.Euler(angles) * (point - pivot) + pivot;
+        }
+
         public static float2 ScaleAroundPivot(float2 point, float2 pivot, float2 scale)
         {
             point -= pivot;
