@@ -6,7 +6,9 @@ namespace AeternumGames.ShapeEditor
     public enum RealtimeCSGTargetMode
     {
         FixedExtrude,
+        [UnityEngine.InspectorName("Spline Extrude (Experimental!)")]
         SplineExtrude,
+        RevolveExtrude,
     }
 }
 
