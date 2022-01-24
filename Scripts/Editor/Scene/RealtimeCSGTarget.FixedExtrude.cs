@@ -19,7 +19,7 @@ namespace AeternumGames.ShapeEditor
             for (int i = 0; i < polygonsCount; i++)
             {
                 var polygon = convexPolygons2D[i];
-                ExternalRealtimeCSG.CreateExtrudedBrushesFromPolygon(parent, "Shape Editor Brush", polygon.GetVertices2D(), fixedExtrudeDistance);
+                ExternalRealtimeCSG.CreateExtrudedBrushesFromPolygon(parent, "Shape Editor Brush", polygon.GetVertices2D(), fixedExtrudeDistance, polygon.booleanOperator);
             }
 
             ExternalRealtimeCSG.AddCSGOperationComponent(gameObject);

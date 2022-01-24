@@ -71,32 +71,17 @@ namespace AeternumGames.ShapeEditor
         /// [2D] Decomposes all shapes into convex polygons representing this project.
         /// <para>The Y coordinate will be flipped to match X and Y in 3D space.</para>
         /// </summary>
+        /// <param name="useHoles">
+        /// Whether holes are used in the convex decomposition algorithm. If false then holes will
+        /// be added to the result with their boolean operator set to <see
+        /// cref="PolygonBooleanOperator.Difference"/> for use by CSG targets. The use of holes with
+        /// convex decomposition leads to many brushes, which can be avoided by using the
+        /// subtractive brushes of the CSG algorithm.
+        /// </param>
         /// <returns>The collection of convex polygons.</returns>
-        public List<Polygon> GenerateConvexPolygons()
+        public List<Polygon> GenerateConvexPolygons(bool useHoles = true)
         {
             var shapesCount = shapes.Count;
-
-            /*
-            // detect whether we are trying to use boolean operations:
-            var useBooleanOperations = true;
-            for (int i = 0; i < shapesCount; i++)
-            {
-                if (shapes[i].booleanOperator == PolygonBooleanOperator.Difference)
-                {
-                    useBooleanOperations = true;
-                    break;
-                }
-            }
-
-            // not using boolean operations, use the stable bayazit path:
-            if (!useBooleanOperations)
-            {
-                // use bayazit convex decomposition to build convex polygons for every shape.
-                var bayazitConvexPolygons = new List<Polygon>(shapesCount);
-                for (int i = 0; i < shapesCount; i++)
-                    bayazitConvexPolygons.AddRange(BayazitDecomposer.ConvexPartition(shapes[i].GenerateConcavePolygon(true)));
-                return bayazitConvexPolygons;
-            }*/
 
             // using boolean operations:
 
@@ -141,27 +126,59 @@ namespace AeternumGames.ShapeEditor
             {
                 if (concavePolygons[i].IsCounterClockWise2D())
                 {
-                    // if there are holes, provide every polygon with the list of holes.
-                    if (hasHoles)
+                    if (useHoles)
                     {
-                        concavePolygons[i].Holes = new List<Polygon>();
-                        foreach (var hole in holes)
+                        // if there are holes, provide every polygon with the list of holes.
+                        if (hasHoles)
                         {
-                            if (concavePolygons[i].ConvexContains(hole)) // fixme: this is surely wrong?
+                            concavePolygons[i].Holes = new List<Polygon>();
+                            foreach (var hole in holes)
                             {
-                                concavePolygons[i].Holes.Add(hole);
+                                if (concavePolygons[i].ConvexContains(hole)) // fixme: this is surely wrong?
+                                {
+                                    concavePolygons[i].Holes.Add(hole);
+                                }
                             }
                         }
-                    }
 
-                    if (concavePolygons[i].Holes?.Count > 0)
-                    {
-                        convexPolygons.AddRange(Delaunay.DelaunayDecomposer.ConvexPartition(concavePolygons[i]));
+                        if (concavePolygons[i].Holes?.Count > 0)
+                        {
+                            convexPolygons.AddRange(Delaunay.DelaunayDecomposer.ConvexPartition(concavePolygons[i]));
+                        }
+                        else
+                        {
+                            // use bayazit whenever we can because it's fast and gives great results.
+                            convexPolygons.AddRange(BayazitDecomposer.ConvexPartition(concavePolygons[i]));
+                        }
                     }
                     else
                     {
-                        // use bayazit whenever we can because it's fast and gives great results.
                         convexPolygons.AddRange(BayazitDecomposer.ConvexPartition(concavePolygons[i]));
+                    }
+                }
+            }
+
+            if (!useHoles)
+            {
+                // for every hole:
+                var holesCount = holes.Count;
+                for (int i = 0; i < holesCount; i++)
+                {
+                    // holes are guaranteed to be clockwise, but we need them counter-clockwise.
+                    holes[i].Reverse();
+
+                    // decompose the hole into convex polygons:
+                    var holeConvexPolygons = new List<Polygon>();
+                    holeConvexPolygons.AddRange(BayazitDecomposer.ConvexPartition(holes[i]));
+                    var holeConvexPolygonsCount = holeConvexPolygons.Count;
+
+                    for (int j = 0; j < holeConvexPolygonsCount; j++)
+                    {
+                        // set the boolean operator for the CSG target:
+                        holeConvexPolygons[j].booleanOperator = PolygonBooleanOperator.Difference;
+
+                        // add it to the results.
+                        convexPolygons.Add(holeConvexPolygons[j]);
                     }
                 }
             }

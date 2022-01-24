@@ -19,6 +19,10 @@ namespace AeternumGames.ShapeEditor
         {
         }
 
+        /// <summary>The boolean operator of the polygon mesh used by CSG targets.</summary>
+        [SerializeField]
+        public PolygonBooleanOperator booleanOperator = PolygonBooleanOperator.Union;
+
         /// <summary>Creates a mesh out of the polygons.</summary>
         public Mesh ToMesh()
         {

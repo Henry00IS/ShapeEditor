@@ -260,7 +260,12 @@ namespace AeternumGames.ShapeEditor
                 polygons.Add(back);
 
                 // add the polygon mesh brush.
-                results.Add(new PolygonMesh(polygons));
+                var brush = new PolygonMesh(polygons);
+
+                // copy the boolean operator of the 2D polygon into the polygon mesh.
+                brush.booleanOperator = booleanOperator;
+
+                results.Add(brush);
 
                 lastPoly = poly;
             }

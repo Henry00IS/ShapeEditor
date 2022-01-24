@@ -46,6 +46,26 @@ namespace AeternumGames.ShapeEditor
         private static MethodInfo generateControlMeshFromVerticesMethod = null;
 
         /// <summary>
+        /// The cached RealtimeCSG.Components.CSGBrush type after initialization.
+        /// </summary>
+        private static Type csgBrush = null;
+
+        /// <summary>
+        /// The cached CSGBrush OperationType field after initialization.
+        /// </summary>
+        private static FieldInfo csgBrushOperationType = null;
+
+        /// <summary>
+        /// The cached RealtimeCSG.Foundation.CSGOperationType type after initialization.
+        /// </summary>
+        private static Type csgOperationType = null;
+
+        /// <summary>
+        /// The cached CSGOperationType.Subtractive enum value after initialization.
+        /// </summary>
+        private static object csgOperationTypeSubtractive = null;
+
+        /// <summary>
         /// The cached RealtimeCSG.Legacy.CSGPlane type after initialization.
         /// </summary>
         private static Type csgPlane = null;
@@ -58,12 +78,12 @@ namespace AeternumGames.ShapeEditor
         /// <summary>
         /// The cached CSGOperation component type after initialization.
         /// </summary>
-        private static Type csgOperation;
+        private static Type csgOperation = null;
 
         /// <summary>
-        /// The cached CSGoperation HandleAsOne field after initialization.
+        /// The cached CSGOperation HandleAsOne field after initialization.
         /// </summary>
-        private static FieldInfo csgOperationHandleAsOneField;
+        private static FieldInfo csgOperationHandleAsOneField = null;
 
         /// <summary>
         /// Used to store whether an initialization error occured.
@@ -104,6 +124,18 @@ namespace AeternumGames.ShapeEditor
 
             generateControlMeshFromVerticesMethod = GetMethod(shapePolygonUtility, "GenerateControlMeshFromVertices", "shape2DPolygon", "localToWorld", "direction", "height", "capTexgen", "smooth", "singleSurfaceEnds", "controlMesh", "shape");
             if (generateControlMeshFromVerticesMethod == null) { initializationError = true; return false; }
+
+            csgBrush = GetType("RealtimeCSG.Components.CSGBrush");
+            if (csgBrush == null) { initializationError = true; return false; }
+
+            csgBrushOperationType = csgBrush.GetField("OperationType");
+            if (csgBrushOperationType == null) { initializationError = true; return false; }
+
+            csgOperationType = GetType("RealtimeCSG.Foundation.CSGOperationType");
+            if (csgOperationType == null) { initializationError = true; return false; }
+
+            csgOperationTypeSubtractive = Enum.Parse(csgOperationType, "Subtractive");
+            if (csgOperationTypeSubtractive == null) { initializationError = true; return false; }
 
             csgPlane = GetType("RealtimeCSG.Legacy.CSGPlane");
             if (csgPlane == null) { initializationError = true; return false; }
@@ -181,7 +213,7 @@ namespace AeternumGames.ShapeEditor
             return csgPlaneConstructorMethod.Invoke(new object[] { plane });
         }
 
-        public static void CreateExtrudedBrushesFromPolygon(Transform parent, string brushName, Vector2[] vertices, float distance)
+        public static void CreateExtrudedBrushesFromPolygon(Transform parent, string brushName, Vector2[] vertices, float distance, PolygonBooleanOperator booleanOperator)
         {
             if (!IsAvailable()) return;
 
@@ -205,11 +237,15 @@ namespace AeternumGames.ShapeEditor
                 var shape = args[8];
 
                 // create a brush.
-                createBrushMethod.Invoke(null, new object[] { parent, brushName, controlMesh, shape });
+                var brush = (MonoBehaviour)createBrushMethod.Invoke(null, new object[] { parent, brushName, controlMesh, shape });
+
+                // optionally make the brush subtractive.
+                if (booleanOperator == PolygonBooleanOperator.Difference)
+                    csgBrushOperationType.SetValue(brush, csgOperationTypeSubtractive);
             }
         }
 
-        public static MonoBehaviour CreateBrushFromPlanes(string brushName, Plane[] planes)
+        public static MonoBehaviour CreateBrushFromPlanes(string brushName, Plane[] planes, PolygonBooleanOperator booleanOperator)
         {
             if (!IsAvailable()) return null;
 
@@ -218,6 +254,11 @@ namespace AeternumGames.ShapeEditor
 
             var brush = createBrushFromPlanesMethod.Invoke(null, new object[] { brushName, planes, null, null, null, null, 0 });
             if (brush == null) return null;
+
+            // optionally make the brush subtractive.
+            if (booleanOperator == PolygonBooleanOperator.Difference)
+                csgBrushOperationType.SetValue(brush, csgOperationTypeSubtractive);
+
             return (MonoBehaviour)brush;
         }
 

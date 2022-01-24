@@ -34,6 +34,14 @@ namespace AeternumGames.ShapeEditor
         /// <summary>[2D/3D] Gets or sets the collection of holes that will be used during triangulation.</summary>
         public List<Polygon> Holes { get; set; }
 
+        /// <summary>
+        /// [2D/3D] The boolean operator of the polygon used by CSG targets <see
+        /// cref="Project.GenerateConvexPolygons"/>. The use of holes with convex decomposition
+        /// leads to many brushes, which can be avoided by using the subtractive brushes of the CSG algorithm.
+        /// </summary>
+        [SerializeField]
+        public PolygonBooleanOperator booleanOperator = PolygonBooleanOperator.Union;
+
         /// <summary>[2D/3D] Gets the next index. Used for iterating all the edges with wrap-around.</summary>
         /// <param name="index">The current index</param>
         public int NextIndex(int index)

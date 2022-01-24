@@ -36,7 +36,7 @@ namespace AeternumGames.ShapeEditor
                 // ensure the project data is ready.
                 project.Validate();
 
-                convexPolygons2D = project.GenerateConvexPolygons();
+                convexPolygons2D = project.GenerateConvexPolygons(false);
             }
 
             switch (targetMode)

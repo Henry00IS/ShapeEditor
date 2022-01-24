@@ -161,6 +161,9 @@ namespace AeternumGames.ShapeEditor
                     var brush = new PolygonMesh();
                     polygonMeshes.Add(brush);
 
+                    // copy the boolean operator of the 2D polygon into the polygon mesh.
+                    brush.booleanOperator = convexPolygons[i].booleanOperator;
+
                     var poly = new Polygon(convexPolygons[i]);
                     var nextPoly = new Polygon(convexPolygons[i]);
                     var polyVertexCount = poly.Count;
