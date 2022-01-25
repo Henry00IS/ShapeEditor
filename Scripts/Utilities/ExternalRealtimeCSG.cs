@@ -66,6 +66,11 @@ namespace AeternumGames.ShapeEditor
         private static object csgOperationTypeSubtractive = null;
 
         /// <summary>
+        /// The cached RealtimeCSG.Components.CSGNode type after initialization.
+        /// </summary>
+        private static Type csgNode = null;
+
+        /// <summary>
         /// The cached RealtimeCSG.Legacy.CSGPlane type after initialization.
         /// </summary>
         private static Type csgPlane = null;
@@ -139,6 +144,9 @@ namespace AeternumGames.ShapeEditor
 
             csgPlane = GetType("RealtimeCSG.Legacy.CSGPlane");
             if (csgPlane == null) { initializationError = true; return false; }
+
+            csgNode = GetType("RealtimeCSG.Components.CSGNode");
+            if (csgNode == null) { initializationError = true; return false; }
 
             csgPlaneConstructorMethod = csgPlane.GetConstructor(new Type[] { typeof(Plane) });
             if (csgPlaneConstructorMethod == null) { initializationError = true; return false; }
@@ -262,6 +270,13 @@ namespace AeternumGames.ShapeEditor
             return (MonoBehaviour)brush;
         }
 
+        private static void DestroyCSGNodeComponent(GameObject gameObject)
+        {
+            var component = gameObject.GetComponent(csgNode);
+            if (component && component.GetType() != csgOperation)
+                UnityEngine.Object.DestroyImmediate(component);
+        }
+
         /// <summary>
         /// Adds a CSG operation component to the specified game object.
         /// </summary>
@@ -269,6 +284,10 @@ namespace AeternumGames.ShapeEditor
         public static void AddCSGOperationComponent(GameObject gameObject)
         {
             if (!IsAvailable()) return;
+
+            // always try to remove an existing CSGNode, as the user may have added a brush to the
+            // scene and subsequently added a RealtimeCSGTarget to it.
+            DestroyCSGNodeComponent(gameObject);
 
             var component = gameObject.GetComponent(csgOperation);
             if (!component)
