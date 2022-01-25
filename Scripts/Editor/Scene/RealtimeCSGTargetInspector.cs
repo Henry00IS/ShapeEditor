@@ -17,6 +17,7 @@ namespace AeternumGames.ShapeEditor
         private SerializedProperty spRevolveExtrudePrecision => serializedObject.FindProperty(nameof(RealtimeCSGTarget.revolveExtrudePrecision));
         private SerializedProperty spRevolveExtrudeDegrees => serializedObject.FindProperty(nameof(RealtimeCSGTarget.revolveExtrudeDegrees));
         private SerializedProperty spRevolveExtrudeRadius => serializedObject.FindProperty(nameof(RealtimeCSGTarget.revolveExtrudeRadius));
+        private SerializedProperty spRevolveExtrudeHeight => serializedObject.FindProperty(nameof(RealtimeCSGTarget.revolveExtrudeHeight));
 
         public override void OnInspectorGUI()
         {
@@ -61,9 +62,10 @@ namespace AeternumGames.ShapeEditor
 
         private void RevolveExtrude_OnGUI()
         {
-            EditorGUILayout.PropertyField(spRevolveExtrudePrecision);
-            EditorGUILayout.PropertyField(spRevolveExtrudeDegrees);
-            EditorGUILayout.PropertyField(spRevolveExtrudeRadius);
+            EditorGUILayout.PropertyField(spRevolveExtrudePrecision, new GUIContent("Precision"));
+            EditorGUILayout.PropertyField(spRevolveExtrudeDegrees, new GUIContent("Degrees"));
+            EditorGUILayout.PropertyField(spRevolveExtrudeRadius, new GUIContent("Radius"));
+            EditorGUILayout.PropertyField(spRevolveExtrudeHeight, new GUIContent("Target Height"));
         }
 
         private void ShapeEditorMenu_OnGUI()
