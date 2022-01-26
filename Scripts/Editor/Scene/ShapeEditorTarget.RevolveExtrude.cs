@@ -13,7 +13,7 @@ namespace AeternumGames.ShapeEditor
         internal int revolveExtrudePrecision = 8;
 
         [SerializeField]
-        [Range(0.0f, 360.0f)]
+        [Range(0.1f, 360.0f)]
         internal float revolveExtrudeDegrees = 90f;
 
         [SerializeField]
