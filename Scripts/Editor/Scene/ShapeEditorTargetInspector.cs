@@ -12,6 +12,7 @@ namespace AeternumGames.ShapeEditor
     public class ShapeEditorTargetInspector : Editor
     {
         private SerializedProperty spTargetMode => serializedObject.FindProperty(nameof(ShapeEditorTarget.targetMode));
+        private SerializedProperty spPolygonDoubleSided => serializedObject.FindProperty(nameof(ShapeEditorTarget.polygonDoubleSided));
         private SerializedProperty spFixedExtrudeDistance => serializedObject.FindProperty(nameof(ShapeEditorTarget.fixedExtrudeDistance));
         private SerializedProperty spSplineExtrudePrecision => serializedObject.FindProperty(nameof(ShapeEditorTarget.splineExtrudePrecision));
         private SerializedProperty spRevolveExtrudePrecision => serializedObject.FindProperty(nameof(ShapeEditorTarget.revolveExtrudePrecision));
@@ -57,16 +58,17 @@ namespace AeternumGames.ShapeEditor
 
         private void Polygon_OnGUI()
         {
+            EditorGUILayout.PropertyField(spPolygonDoubleSided, new GUIContent("Double Sided"));
         }
 
         private void FixedExtrude_OnGUI()
         {
-            EditorGUILayout.PropertyField(spFixedExtrudeDistance);
+            EditorGUILayout.PropertyField(spFixedExtrudeDistance, new GUIContent("Distance"));
         }
 
         private void SplineExtrude_OnGUI()
         {
-            EditorGUILayout.PropertyField(spSplineExtrudePrecision);
+            EditorGUILayout.PropertyField(spSplineExtrudePrecision, new GUIContent("Precision"));
         }
 
         private void RevolveExtrude_OnGUI()
@@ -75,7 +77,7 @@ namespace AeternumGames.ShapeEditor
             EditorGUILayout.PropertyField(spRevolveExtrudeDegrees, new GUIContent("Degrees"));
             EditorGUILayout.PropertyField(spRevolveExtrudeRadius, new GUIContent("Radius"));
             EditorGUILayout.PropertyField(spRevolveExtrudeHeight, new GUIContent("Spiral Height"));
-            EditorGUILayout.PropertyField(spRevolveExtrudeSloped, new GUIContent("Spiral Sloped (Non-Planar)"));
+            EditorGUILayout.PropertyField(spRevolveExtrudeSloped, new GUIContent("Spiral Sloped"));
         }
 
         private void ShapeEditorMenu_OnGUI()

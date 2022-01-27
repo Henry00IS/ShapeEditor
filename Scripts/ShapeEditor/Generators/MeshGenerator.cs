@@ -12,7 +12,8 @@ namespace AeternumGames.ShapeEditor
     {
         /// <summary>Creates a flat mesh out of convex polygons.</summary>
         /// <param name="convexPolygons">The decomposed convex polygons.</param>
-        public static Mesh CreatePolygonMesh(List<Polygon> convexPolygons)
+        /// <param name="doubleSided">Whether the polygon is double sided.</param>
+        public static Mesh CreatePolygonMesh(List<Polygon> convexPolygons, bool doubleSided)
         {
             var polygonMesh = new PolygonMesh();
 
@@ -23,6 +24,12 @@ namespace AeternumGames.ShapeEditor
                 convexPolygons[i].ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
                 // add the front polygon.
                 polygonMesh.Add(convexPolygons[i]);
+
+                if (doubleSided)
+                {
+                    // add the back polygon.
+                    polygonMesh.Add(convexPolygons[i].flipped);
+                }
             }
 
             var mesh = polygonMesh.ToMesh();
