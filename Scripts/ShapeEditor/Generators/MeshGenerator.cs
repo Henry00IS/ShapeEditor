@@ -222,9 +222,17 @@ namespace AeternumGames.ShapeEditor
         /// <param name="degrees">The revolve degrees between -360 to 360.</param>
         /// <param name="diameter">The inner diameter to revolve around.</param>
         /// <param name="height">The target height to be reached by offsetting the individual meshes.</param>
-        public static Mesh CreateRevolveExtrudedMesh(List<Polygon> convexPolygons, int precision, float degrees, float diameter, float height)
+        /// <param name="sloped">Whether the individual meshes are sloped towards the target height.</param>
+        public static Mesh CreateRevolveExtrudedMesh(List<Polygon> convexPolygons, int precision, float degrees, float diameter, float height, bool sloped)
         {
             var polygonMeshes = new List<PolygonMesh>();
+
+            var slopedHeightOffset = new Vector3();
+            if (sloped && precision >= 2)
+                slopedHeightOffset = new Vector3(0.0f, height / precision, 0.0f);
+
+            // the ending height has to be reduced so that it aligns perfectly with the non-sloped version.
+            height -= slopedHeightOffset.y;
 
             var convexPolygonsCount = convexPolygons.Count;
             for (int i = 0; i < convexPolygonsCount; i++)
@@ -252,10 +260,10 @@ namespace AeternumGames.ShapeEditor
                             heightOffset.y = (j / ((float)precision - 1)) * height;
 
                         poly[v] = new Vertex(heightOffset + MathEx.RotatePointAroundPivot(poly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, j / (float)precision), 0.0f)), poly[v].uv0);
-                        nextPoly[v] = new Vertex(heightOffset + MathEx.RotatePointAroundPivot(nextPoly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, (j + 1) / (float)precision), 0.0f)), nextPoly[v].uv0);
+                        nextPoly[v] = new Vertex(heightOffset + slopedHeightOffset + MathEx.RotatePointAroundPivot(nextPoly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, (j + 1) / (float)precision), 0.0f)), nextPoly[v].uv0);
                     }
 
-                    if (height == 0f)
+                    if (height == 0f || sloped)
                     {
                         if (j == 0) brush.Add(poly);
                         if (j == precision - 1) brush.Add(nextPoly.flipped);
