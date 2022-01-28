@@ -76,6 +76,20 @@ namespace AeternumGames.ShapeEditor
             return planes;
         }
 
+        /// <summary>Converts the polygons to a list of points (point cloud).</summary>
+        /// <returns>The vertex positions of the convex mesh.</returns>
+        public List<Vector3> ToPoints()
+        {
+            var count = Count;
+            var points = new List<Vector3>();
+            for (int i = 0; i < count; i++)
+            {
+                var polygon = this[i];
+                points.AddRange(polygon.GetVertices());
+            }
+            return points;
+        }
+
         /// <summary>
         /// Combines the given collection of polygon meshes into a single concave polygon mesh.
         /// </summary>
