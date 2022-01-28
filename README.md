@@ -10,6 +10,12 @@ This tool has been integrated directly into the Unity editor to ensure a seamles
 
 The controls and user interface were inspired by the popular modeling program Blender. Many of the shortcuts and tricks also work in this program. Special tools have been provided to allow a non-destructive workflow with generators that can be easily modified.
 
+## Constructive Solid Geometry:
+
+The shape editor can generate boolean brushes for constructive solid geometry. These brushes let you add and subtract arbitrary shapes to quickly create walls and rooms or cut out doors and windows.
+
+It automatically detects and supports [RealtimeCSG](https://github.com/LogicalError/realtime-CSG-for-unity) and [Chisel Editor](https://github.com/RadicalCSG/Chisel.Prototype) by using convex decomposition to create multiple convex brushes that accurately represent the concave shape.
+
 ## Installation Instructions:
 
 Add the following line to your Unity Package Manager:
