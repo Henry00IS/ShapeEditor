@@ -182,8 +182,48 @@ namespace AeternumGames.ShapeEditor
                     }
                 }
             }
+            else
+            {
+                // mark hidden edges in 2d to prevent building interior 3d polygons. in the extrude
+                // functions the vertices are always visited from index zero upwards, so we can mark
+                // the first vertex of an edge as being a hidden surface.
+                MarkHiddenSurfaces(convexPolygons);
+            }
 
             return convexPolygons;
+        }
+
+        /// <summary>
+        /// The hidden surface removal algorithm, preventing interior 3D polygons. It iterates over
+        /// all convex polygons and marks whether this and the next vertex are part of a hidden edge
+        /// that should not be extruded.
+        /// </summary>
+        private void MarkHiddenSurfaces(List<Polygon> convexPolygons2D)
+        {
+            var convexPolygons2DCount = convexPolygons2D.Count;
+            for (int j = 0; j < convexPolygons2DCount; j++)
+            {
+                var polyA = convexPolygons2D[j];
+                var polyACount = polyA.Count;
+                for (int i = 0; i < polyACount; i++)
+                {
+                    var thisVertex = polyA[i];
+                    var nextVertex = polyA.NextVertex(i);
+                    var center = Vector3.Lerp(thisVertex.position, nextVertex.position, 0.5f);
+
+                    foreach (var polyB in convexPolygons2D)
+                    {
+                        if (polyA == polyB) continue;
+
+                        if (polyB.ContainsPoint2D(ref center) >= 0)
+                        {
+                            convexPolygons2D[j][i] = new Vertex(convexPolygons2D[j][i].position, convexPolygons2D[j][i].uv0, true);
+                            thisVertex.hidden = true;
+                            break;
+                        }
+                    }
+                }
+            }
         }
     }
 }

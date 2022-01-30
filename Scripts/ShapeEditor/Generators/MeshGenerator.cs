@@ -269,8 +269,8 @@ namespace AeternumGames.ShapeEditor
                         if (precision >= 2)
                             heightOffset.y = (j / ((float)precision - 1)) * height;
 
-                        poly[v] = new Vertex(heightOffset + MathEx.RotatePointAroundPivot(poly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, j / (float)precision), 0.0f)), poly[v].uv0);
-                        nextPoly[v] = new Vertex(heightOffset + slopedHeightOffset + MathEx.RotatePointAroundPivot(nextPoly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, (j + 1) / (float)precision), 0.0f)), nextPoly[v].uv0);
+                        poly[v] = new Vertex(heightOffset + MathEx.RotatePointAroundPivot(poly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, j / (float)precision), 0.0f)), poly[v].uv0, poly[v].hidden);
+                        nextPoly[v] = new Vertex(heightOffset + slopedHeightOffset + MathEx.RotatePointAroundPivot(nextPoly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, (j + 1) / (float)precision), 0.0f)), nextPoly[v].uv0, nextPoly[v].hidden);
                     }
 
                     if (height == 0f || sloped)
@@ -288,6 +288,8 @@ namespace AeternumGames.ShapeEditor
                     Polygon extrudedPolygon;
                     for (int k = 0; k < polyVertexCount - 1; k++)
                     {
+                        if (poly[k].hidden) continue;
+
                         extrudedPolygon = new Polygon(new Vertex[] {
                             poly[k],
                             nextPoly[k],
@@ -300,15 +302,18 @@ namespace AeternumGames.ShapeEditor
                     }
 
                     // one more face that wraps around to index 0.
-                    extrudedPolygon = new Polygon(new Vertex[] {
-                        poly[polyVertexCount - 1],
-                        nextPoly[polyVertexCount - 1],
-                        nextPoly[0],
-                        poly[0],
-                    });
+                    if (!poly[polyVertexCount - 1].hidden)
+                    {
+                        extrudedPolygon = new Polygon(new Vertex[] {
+                            poly[polyVertexCount - 1],
+                            nextPoly[polyVertexCount - 1],
+                            nextPoly[0],
+                            poly[0],
+                        });
 
-                    extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
-                    brush.Add(extrudedPolygon);
+                        extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
+                        brush.Add(extrudedPolygon);
+                    }
                 }
             }
 

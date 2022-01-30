@@ -62,7 +62,7 @@ namespace AeternumGames.ShapeEditor
         {
             int count = Count;
             for (int i = 0; i < count; i++)
-                this[i] = new Vertex(rotation * this[i].position, this[i].uv0);
+                this[i] = new Vertex(rotation * this[i].position, this[i].uv0, this[i].hidden);
         }
 
         /// <summary>[3D] Generates UV0 coordinates using the AutoUV algorithm of SabreCSG.</summary>
@@ -82,7 +82,7 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>
-        /// Extrudes this polygon by the specified distance along its normal and returns the
+        /// [3D] Extrudes this polygon by the specified distance along its normal and returns the
         /// extruded polygons.
         /// </summary>
         /// <param name="distance">The distance to extrude by.</param>
@@ -101,6 +101,8 @@ namespace AeternumGames.ShapeEditor
 
             for (int i = 0; i < count - 1; i++)
             {
+                if (this[i].hidden) continue;
+
                 results.Add(new Polygon(new Vertex[] {
                     this[i],
                     new Vertex(this[i].position + normal * distance, this[i].uv0),
@@ -110,18 +112,21 @@ namespace AeternumGames.ShapeEditor
             }
 
             // one more face that wraps around to index 0.
-            results.Add(new Polygon(new Vertex[] {
-                this[count - 1],
-                new Vertex(this[count - 1].position + normal * distance, this[count - 1].uv0),
-                new Vertex(this[0].position + normal * distance, this[0].uv0),
-                this[0],
-            }));
+            if (!this[count - 1].hidden)
+            {
+                results.Add(new Polygon(new Vertex[] {
+                    this[count - 1],
+                    new Vertex(this[count - 1].position + normal * distance, this[count - 1].uv0),
+                    new Vertex(this[0].position + normal * distance, this[0].uv0),
+                    this[0],
+                }));
+            }
 
             return results;
         }
 
         /// <summary>
-        /// Extrudes this polygon along a 3 point spline and returns all of the polygons. This
+        /// [3D] Extrudes this polygon along a 3 point spline and returns all of the polygons. This
         /// function may crack quads depending on how the spline moves.
         /// </summary>
         /// <param name="spline">The spline to be followed.</param>
@@ -165,6 +170,8 @@ namespace AeternumGames.ShapeEditor
                 // fill the gap with quads "extruding" the shape.
                 for (int i = 0; i < count - 1; i++)
                 {
+                    if (poly[i].hidden) continue;
+
                     results.Add(new Polygon(new Vertex[] {
                         lastPoly[i],
                         poly[i],
@@ -174,12 +181,15 @@ namespace AeternumGames.ShapeEditor
                 }
 
                 // one more face that wraps around to index 0.
-                results.Add(new Polygon(new Vertex[] {
-                    lastPoly[count - 1],
-                    poly[count - 1],
-                    poly[0],
-                    lastPoly[0],
-                }));
+                if (!poly[count - 1].hidden)
+                {
+                    results.Add(new Polygon(new Vertex[] {
+                        lastPoly[count - 1],
+                        poly[count - 1],
+                        poly[0],
+                        lastPoly[0],
+                    }));
+                }
 
                 lastPoly = poly;
             }
@@ -192,8 +202,8 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>
-        /// Extrudes this polygon along a 3 point spline and returns all of the brushes for use with
-        /// CSG algorithms. This function may crack quads depending on how the spline moves.
+        /// [3D] Extrudes this polygon along a 3 point spline and returns all of the brushes for use
+        /// with CSG algorithms. This function may crack quads depending on how the spline moves.
         /// </summary>
         /// <param name="spline">The spline to be followed.</param>
         /// <param name="precision">The spline precision.</param>

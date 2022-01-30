@@ -16,6 +16,12 @@ namespace AeternumGames.ShapeEditor
         /// <summary>The UV channel 0 coordinates of the vertex.</summary>
         public Vector2 uv0;
 
+        /// <summary>
+        /// Whether this and the next vertex are part of a hidden edge that should not be extruded.
+        /// This is used for the hidden surface removal algorithm, preventing interior 3D polygons.
+        /// </summary>
+        public bool hidden;
+
         /// <summary>Gets the x-coordinate of the vertex position.</summary>
         public float x => position.x;
 
@@ -38,6 +44,18 @@ namespace AeternumGames.ShapeEditor
         {
             this.position = position;
             this.uv0 = uv0;
+            hidden = false;
+        }
+
+        /// <summary>Creates a new vertex located at the specified position.</summary>
+        /// <param name="position">The vertex position.</param>
+        /// <param name="uv0">The UV channel 0 coordinates of the vertex.</param>
+        /// <param name="hidden">Whether this and the next vertex are part of a hidden edge.</param>
+        public Vertex(Vector3 position, Vector2 uv0, bool hidden)
+        {
+            this.position = position;
+            this.uv0 = uv0;
+            this.hidden = hidden;
         }
 
         /// <summary>Creates a new vertex located at the specified position.</summary>
