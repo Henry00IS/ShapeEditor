@@ -1,6 +1,5 @@
 ﻿#if UNITY_EDITOR
 
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -12,7 +11,7 @@ namespace AeternumGames.ShapeEditor
         internal Project project;
 
         /// <summary>The convex polygons set by the shape editor.</summary>
-        private List<Polygon> convexPolygons2D;
+        private PolygonMesh convexPolygons2D;
 
         /// <summary>The operating mode.</summary>
         [SerializeField]
@@ -36,6 +35,7 @@ namespace AeternumGames.ShapeEditor
                 project.Validate();
 
                 convexPolygons2D = project.GenerateConvexPolygons(false);
+                convexPolygons2D.CalculateBounds2D();
             }
 
             switch (targetMode)

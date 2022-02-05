@@ -156,9 +156,13 @@ namespace AeternumGames.ShapeEditor
         /// <param name="degrees">The revolve degrees between -360 to 360.</param>
         /// <param name="diameter">The inner diameter to revolve around.</param>
         /// <param name="height">The target height to be reached by offsetting the individual meshes.</param>
-        public static List<PolygonMesh> CreateRevolveExtrudedPolygonMeshes(List<Polygon> convexPolygons, int precision, float degrees, float diameter, float height)
+        public static List<PolygonMesh> CreateRevolveExtrudedPolygonMeshes(PolygonMesh convexPolygons, int precision, float degrees, float diameter, float height)
         {
             var polygonMeshes = new List<PolygonMesh>();
+
+            // offset the polygons by the the vertical project center line as this will let us
+            // rotate left or right without self-intersecting or inverting the mesh.
+            var projectCenterOffset = degrees > 0f ? new Vector3(-convexPolygons.bounds2D.max.x, 0f) : new Vector3(-convexPolygons.bounds2D.min.x, 0f);
 
             var convexPolygonsCount = convexPolygons.Count;
             for (int i = 0; i < convexPolygonsCount; i++)
@@ -176,10 +180,15 @@ namespace AeternumGames.ShapeEditor
                     brush.booleanOperator = convexPolygons[i].booleanOperator;
 
                     var poly = new Polygon(convexPolygons[i]);
-                    var nextPoly = new Polygon(convexPolygons[i]);
+
+                    // ensure that the polygon is always on one side of the vertical project center line.
+                    poly.Translate(projectCenterOffset);
+
+                    var nextPoly = new Polygon(poly);
                     var polyVertexCount = poly.Count;
 
-                    Vector3 pivot = new Vector3(diameter, 0.0f, 0.0f);
+                    // flip the pivot on negative degrees to rotate left.
+                    Vector3 pivot = new Vector3(degrees > 0f ? diameter : -diameter, 0.0f, 0.0f);
 
                     for (int v = 0; v < polyVertexCount; v++)
                     {
@@ -220,6 +229,9 @@ namespace AeternumGames.ShapeEditor
 
                     // (RealtimeCSG doesn't need this) extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
                     brush.Add(extrudedPolygon);
+
+                    // undo the polygon translation ensuring they were always on one side of the center line.
+                    brush.Translate(-projectCenterOffset);
                 }
             }
 
