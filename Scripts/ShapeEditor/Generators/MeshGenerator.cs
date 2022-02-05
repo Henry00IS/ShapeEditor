@@ -233,7 +233,7 @@ namespace AeternumGames.ShapeEditor
         /// <param name="diameter">The inner diameter to revolve around.</param>
         /// <param name="height">The target height to be reached by offsetting the individual meshes.</param>
         /// <param name="sloped">Whether the individual meshes are sloped towards the target height.</param>
-        public static Mesh CreateRevolveExtrudedMesh(List<Polygon> convexPolygons, int precision, float degrees, float diameter, float height, bool sloped)
+        public static Mesh CreateRevolveExtrudedMesh(PolygonMesh convexPolygons, int precision, float degrees, float diameter, float height, bool sloped)
         {
             var polygonMeshes = new List<PolygonMesh>();
 
@@ -243,6 +243,10 @@ namespace AeternumGames.ShapeEditor
 
             // the ending height has to be reduced so that it aligns perfectly with the non-sloped version.
             height -= slopedHeightOffset.y;
+
+            // offset the polygons by the the vertical project center line as this will let us
+            // rotate left or right without self-intersecting or inverting the mesh.
+            var projectCenterOffset = degrees > 0f ? new Vector3(-convexPolygons.bounds2D.max.x, 0f) : new Vector3(-convexPolygons.bounds2D.min.x, 0f);
 
             var convexPolygonsCount = convexPolygons.Count;
             for (int i = 0; i < convexPolygonsCount; i++)
@@ -257,10 +261,15 @@ namespace AeternumGames.ShapeEditor
                     polygonMeshes.Add(brush);
 
                     var poly = new Polygon(convexPolygons[i]);
-                    var nextPoly = new Polygon(convexPolygons[i]);
+
+                    // ensure that the polygon is always on one side of the vertical project center line.
+                    poly.Translate(projectCenterOffset);
+
+                    var nextPoly = new Polygon(poly);
                     var polyVertexCount = poly.Count;
 
-                    Vector3 pivot = new Vector3(diameter, 0.0f, 0.0f);
+                    // flip the pivot on negative degrees to rotate left.
+                    Vector3 pivot = new Vector3(degrees > 0f ? diameter : -diameter, 0.0f, 0.0f);
 
                     for (int v = 0; v < polyVertexCount; v++)
                     {
@@ -318,6 +327,10 @@ namespace AeternumGames.ShapeEditor
             }
 
             var polygonMesh = PolygonMesh.Combine(polygonMeshes);
+
+            // undo the polygon translation ensuring they were always on one side of the center line.
+            polygonMesh.Translate(-projectCenterOffset);
+
             var mesh = polygonMesh.ToMesh();
             mesh.RecalculateNormals();
             mesh.RecalculateTangents();

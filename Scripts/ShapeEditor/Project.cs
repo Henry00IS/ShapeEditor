@@ -79,7 +79,7 @@ namespace AeternumGames.ShapeEditor
         /// subtractive brushes of the CSG algorithm.
         /// </param>
         /// <returns>The collection of convex polygons.</returns>
-        public List<Polygon> GenerateConvexPolygons(bool useHoles = true)
+        public PolygonMesh GenerateConvexPolygons(bool useHoles = true)
         {
             var shapesCount = shapes.Count;
 
@@ -121,7 +121,7 @@ namespace AeternumGames.ShapeEditor
             var hasHoles = holes.Count > 0;
 
             // use convex decomposition to build convex polygons out of the concave polygons.
-            var convexPolygons = new List<Polygon>();
+            var convexPolygons = new PolygonMesh();
             for (int i = 0; i < concavePolygonsCount; i++)
             {
                 if (concavePolygons[i].IsCounterClockWise2D())
