@@ -7,6 +7,7 @@ namespace AeternumGames.ShapeEditor
     {
         FixedExtrude,
         RevolveExtrude,
+        LinearStaircase
     }
 }
 
