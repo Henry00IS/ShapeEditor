@@ -90,7 +90,11 @@ namespace AeternumGames.ShapeEditor
 
         private void LinearStaircase_OnGUI()
         {
-            EditorGUILayout.PropertyField(spLinearStaircasePrecision, new GUIContent("Precision"));
+            // sloped linear staircases always use a precision of 1.
+            if (spLinearStaircaseSloped.boolValue)
+                EditorGUILayout.LabelField("Precision (= 1)");
+            else
+                EditorGUILayout.PropertyField(spLinearStaircasePrecision, new GUIContent("Precision"));
             EditorGUILayout.PropertyField(spLinearStaircaseDistance, new GUIContent("Distance"));
             EditorGUILayout.PropertyField(spLinearStaircaseHeight, new GUIContent("Height"));
             EditorGUILayout.PropertyField(spLinearStaircaseSloped, new GUIContent("Sloped"));

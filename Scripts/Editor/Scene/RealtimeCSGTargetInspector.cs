@@ -18,6 +18,10 @@ namespace AeternumGames.ShapeEditor
         private SerializedProperty spRevolveExtrudeDegrees => serializedObject.FindProperty(nameof(RealtimeCSGTarget.revolveExtrudeDegrees));
         private SerializedProperty spRevolveExtrudeRadius => serializedObject.FindProperty(nameof(RealtimeCSGTarget.revolveExtrudeRadius));
         private SerializedProperty spRevolveExtrudeHeight => serializedObject.FindProperty(nameof(RealtimeCSGTarget.revolveExtrudeHeight));
+        private SerializedProperty spLinearStaircasePrecision => serializedObject.FindProperty(nameof(RealtimeCSGTarget.linearStaircasePrecision));
+        private SerializedProperty spLinearStaircaseDistance => serializedObject.FindProperty(nameof(RealtimeCSGTarget.linearStaircaseDistance));
+        private SerializedProperty spLinearStaircaseHeight => serializedObject.FindProperty(nameof(RealtimeCSGTarget.linearStaircaseHeight));
+        private SerializedProperty spLinearStaircaseSloped => serializedObject.FindProperty(nameof(RealtimeCSGTarget.linearStaircaseSloped));
 
         public override void OnInspectorGUI()
         {
@@ -41,6 +45,10 @@ namespace AeternumGames.ShapeEditor
 
                 case RealtimeCSGTargetMode.RevolveExtrude:
                     RevolveExtrude_OnGUI();
+                    break;
+
+                case RealtimeCSGTargetMode.LinearStaircase:
+                    LinearStaircase_OnGUI();
                     break;
             }
 
@@ -66,6 +74,18 @@ namespace AeternumGames.ShapeEditor
             EditorGUILayout.PropertyField(spRevolveExtrudeDegrees, new GUIContent("Degrees"));
             EditorGUILayout.PropertyField(spRevolveExtrudeRadius, new GUIContent("Radius"));
             EditorGUILayout.PropertyField(spRevolveExtrudeHeight, new GUIContent("Target Height"));
+        }
+
+        private void LinearStaircase_OnGUI()
+        {
+            // sloped linear staircases always use a precision of 1.
+            if (spLinearStaircaseSloped.boolValue)
+                EditorGUILayout.LabelField("Precision (= 1)");
+            else
+                EditorGUILayout.PropertyField(spLinearStaircasePrecision, new GUIContent("Precision"));
+            EditorGUILayout.PropertyField(spLinearStaircaseDistance, new GUIContent("Distance"));
+            EditorGUILayout.PropertyField(spLinearStaircaseHeight, new GUIContent("Height"));
+            EditorGUILayout.PropertyField(spLinearStaircaseSloped, new GUIContent("Sloped"));
         }
 
         private void ShapeEditorMenu_OnGUI()

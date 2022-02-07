@@ -52,6 +52,10 @@ namespace AeternumGames.ShapeEditor
                 case RealtimeCSGTargetMode.RevolveExtrude:
                     RevolveExtrude_Rebuild();
                     break;
+
+                case RealtimeCSGTargetMode.LinearStaircase:
+                    LinearStaircase_Rebuild();
+                    break;
             }
         }
 

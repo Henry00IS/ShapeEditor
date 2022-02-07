@@ -9,6 +9,7 @@ namespace AeternumGames.ShapeEditor
         [UnityEngine.InspectorName("Spline Extrude (Experimental!)")]
         SplineExtrude,
         RevolveExtrude,
+        LinearStaircase
     }
 }
 
