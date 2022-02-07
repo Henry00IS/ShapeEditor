@@ -20,6 +20,10 @@ namespace AeternumGames.ShapeEditor
         private SerializedProperty spRevolveExtrudeRadius => serializedObject.FindProperty(nameof(ShapeEditorTarget.revolveExtrudeRadius));
         private SerializedProperty spRevolveExtrudeHeight => serializedObject.FindProperty(nameof(ShapeEditorTarget.revolveExtrudeHeight));
         private SerializedProperty spRevolveExtrudeSloped => serializedObject.FindProperty(nameof(ShapeEditorTarget.revolveExtrudeSloped));
+        private SerializedProperty spLinearStaircasePrecision => serializedObject.FindProperty(nameof(ShapeEditorTarget.linearStaircasePrecision));
+        private SerializedProperty spLinearStaircaseDistance => serializedObject.FindProperty(nameof(ShapeEditorTarget.linearStaircaseDistance));
+        private SerializedProperty spLinearStaircaseHeight => serializedObject.FindProperty(nameof(ShapeEditorTarget.linearStaircaseHeight));
+        private SerializedProperty spLinearStaircaseSloped => serializedObject.FindProperty(nameof(ShapeEditorTarget.linearStaircaseSloped));
 
         public override void OnInspectorGUI()
         {
@@ -47,6 +51,10 @@ namespace AeternumGames.ShapeEditor
 
                 case ShapeEditorTargetMode.RevolveExtrude:
                     RevolveExtrude_OnGUI();
+                    break;
+
+                case ShapeEditorTargetMode.LinearStaircase:
+                    LinearStaircase_OnGUI();
                     break;
             }
 
@@ -78,6 +86,14 @@ namespace AeternumGames.ShapeEditor
             EditorGUILayout.PropertyField(spRevolveExtrudeRadius, new GUIContent("Radius"));
             EditorGUILayout.PropertyField(spRevolveExtrudeHeight, new GUIContent("Spiral Height"));
             EditorGUILayout.PropertyField(spRevolveExtrudeSloped, new GUIContent("Spiral Sloped"));
+        }
+
+        private void LinearStaircase_OnGUI()
+        {
+            EditorGUILayout.PropertyField(spLinearStaircasePrecision, new GUIContent("Precision"));
+            EditorGUILayout.PropertyField(spLinearStaircaseDistance, new GUIContent("Distance"));
+            EditorGUILayout.PropertyField(spLinearStaircaseHeight, new GUIContent("Height"));
+            EditorGUILayout.PropertyField(spLinearStaircaseSloped, new GUIContent("Sloped"));
         }
 
         private void ShapeEditorMenu_OnGUI()

@@ -70,6 +70,10 @@ namespace AeternumGames.ShapeEditor
                 case ShapeEditorTargetMode.RevolveExtrude:
                     RevolveExtrude_Rebuild();
                     break;
+
+                case ShapeEditorTargetMode.LinearStaircase:
+                    LinearStaircase_Rebuild();
+                    break;
             }
         }
 

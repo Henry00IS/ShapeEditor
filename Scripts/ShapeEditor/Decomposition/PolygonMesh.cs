@@ -13,6 +13,12 @@ namespace AeternumGames.ShapeEditor
         {
         }
 
+        /// <summary>Creates a new empty polygon mesh with the specified initial capacity.</summary>
+        /// <param name="capacity">The number of polygons the polygon mesh can hold without resizing.</param>
+        public PolygonMesh(int capacity) : base(capacity)
+        {
+        }
+
         /// <summary>Creates a new polygon mesh containing the specified polygons.</summary>
         /// <param name="polygons">The initial polygons to add to the new polygon mesh.</param>
         public PolygonMesh(List<Polygon> polygons) : base(polygons)
