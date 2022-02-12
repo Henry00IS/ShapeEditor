@@ -540,6 +540,144 @@ namespace AeternumGames.ShapeEditor
             mesh.RecalculateTangents();
             return mesh;
         }
+
+        /// <summary>[Convex] Creates a mesh by scaling extruded convex polygons to a point or clipped.</summary>
+        /// <param name="convexPolygons">The decomposed convex polygons.</param>
+        /// <param name="distance">The distance to extrude by.</param>
+        /// <param name="beginScale">The scale of the front polygon.</param>
+        /// <param name="endScale">The scale of the back polygon.</param>
+        /// <param name="offset">The offset from the center to scale towards.</param>
+        public static List<PolygonMesh> CreateScaleExtrudedMeshes(PolygonMesh convexPolygons, float distance, float beginScale, float endScale, Vector2 offset)
+        {
+            if (beginScale == 0f && endScale == 0f)
+                return new List<PolygonMesh>();
+
+            var convexPolygonsCount = convexPolygons.Count;
+            var polygonMeshes = new List<PolygonMesh>();
+
+            for (int i = 0; i < convexPolygonsCount; i++)
+            {
+                // create a new polygon mesh for the front polygon.
+                var brush = new PolygonMesh();
+                polygonMeshes.Add(brush);
+
+                // copy the boolean operator of the 2D polygon into the polygon mesh.
+                brush.booleanOperator = convexPolygons[i].booleanOperator;
+
+                var poly = new Polygon(convexPolygons[i]);
+                poly.Scale(new Vector3(beginScale, beginScale, 1.0f));
+
+                var nextPoly = new Polygon(convexPolygons[i]);
+                nextPoly.Scale(new Vector3(endScale, endScale, 1.0f));
+                nextPoly.Translate(new Vector3(offset.x, offset.y) + new Vector3(0.0f, 0.0f, distance));
+
+                if (beginScale != 0.0f) brush.Add(poly);
+                if (endScale != 0.0f) brush.Add(nextPoly.flipped);
+
+                // fill the gap with quads "extruding" the shape.
+                Polygon extrudedPolygon;
+                var polyVertexCount = poly.Count;
+                for (int k = 0; k < polyVertexCount - 1; k++)
+                {
+                    extrudedPolygon = new Polygon(new Vertex[] {
+                        poly[k],
+                        nextPoly[k],
+                        nextPoly[k + 1],
+                        poly[k + 1],
+                    });
+
+                    brush.Add(extrudedPolygon);
+                }
+
+                // one more face that wraps around to index 0.
+                extrudedPolygon = new Polygon(new Vertex[] {
+                    poly[polyVertexCount - 1],
+                    nextPoly[polyVertexCount - 1],
+                    nextPoly[0],
+                    poly[0],
+                });
+
+                brush.Add(extrudedPolygon);
+            }
+
+            return polygonMeshes;
+        }
+
+        /// <summary>[Concave] Creates a mesh by scaling extruded convex polygons to a point or clipped.</summary>
+        /// <param name="convexPolygons">The decomposed convex polygons.</param>
+        /// <param name="distance">The distance to extrude by.</param>
+        /// <param name="beginScale">The scale of the front polygon.</param>
+        /// <param name="endScale">The scale of the back polygon.</param>
+        /// <param name="offset">The offset from the center to scale towards.</param>
+        public static Mesh CreateScaleExtrudedMesh(PolygonMesh convexPolygons, float distance, float beginScale, float endScale, Vector2 offset)
+        {
+            if (beginScale == 0f && endScale == 0f)
+                return new Mesh();
+
+            var convexPolygonsCount = convexPolygons.Count;
+            var polygonMeshes = new List<PolygonMesh>();
+
+            for (int i = 0; i < convexPolygonsCount; i++)
+            {
+                // create a new polygon mesh for the front polygon.
+                var brush = new PolygonMesh();
+                polygonMeshes.Add(brush);
+
+                var poly = new Polygon(convexPolygons[i]);
+                poly.Scale(new Vector3(beginScale, beginScale, 1.0f));
+
+                // calculate 2D UV coordinates for the front polygon.
+                poly.ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
+
+                var nextPoly = new Polygon(convexPolygons[i]);
+                nextPoly.Scale(new Vector3(endScale, endScale, 1.0f));
+                nextPoly.Translate(new Vector3(offset.x, offset.y) + new Vector3(0.0f, 0.0f, distance));
+
+                // calculate 2D UV coordinates for the back polygon.
+                nextPoly.ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
+
+                if (beginScale != 0.0f) brush.Add(poly);
+                if (endScale != 0.0f) brush.Add(nextPoly.flipped);
+
+                // fill the gap with quads "extruding" the shape.
+                Polygon extrudedPolygon;
+                var polyVertexCount = poly.Count;
+                for (int k = 0; k < polyVertexCount - 1; k++)
+                {
+                    if (poly[k].hidden) continue;
+
+                    extrudedPolygon = new Polygon(new Vertex[] {
+                        poly[k],
+                        nextPoly[k],
+                        nextPoly[k + 1],
+                        poly[k + 1],
+                    });
+
+                    extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
+                    brush.Add(extrudedPolygon);
+                }
+
+                // one more face that wraps around to index 0.
+                if (!poly[polyVertexCount - 1].hidden)
+                {
+                    extrudedPolygon = new Polygon(new Vertex[] {
+                        poly[polyVertexCount - 1],
+                        nextPoly[polyVertexCount - 1],
+                        nextPoly[0],
+                        poly[0],
+                    });
+
+                    extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
+                    brush.Add(extrudedPolygon);
+                }
+            }
+
+            var polygonMesh = PolygonMesh.Combine(polygonMeshes);
+            var mesh = polygonMesh.ToMesh();
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
+            return mesh;
+        }
     }
 }
 

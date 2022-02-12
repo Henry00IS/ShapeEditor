@@ -5,9 +5,10 @@ namespace AeternumGames.ShapeEditor
     /// <summary>The operating mode of the target object.</summary>
     public enum ChiselTargetMode
     {
-        FixedExtrude,
-        RevolveExtrude,
-        LinearStaircase
+        FixedExtrude = 0,
+        ScaledExtrude = 3,
+        RevolveExtrude = 1,
+        LinearStaircase = 2,
     }
 }
 

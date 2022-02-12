@@ -24,6 +24,10 @@ namespace AeternumGames.ShapeEditor
         private SerializedProperty spLinearStaircaseDistance => serializedObject.FindProperty(nameof(ShapeEditorTarget.linearStaircaseDistance));
         private SerializedProperty spLinearStaircaseHeight => serializedObject.FindProperty(nameof(ShapeEditorTarget.linearStaircaseHeight));
         private SerializedProperty spLinearStaircaseSloped => serializedObject.FindProperty(nameof(ShapeEditorTarget.linearStaircaseSloped));
+        private SerializedProperty spScaledExtrudeDistance => serializedObject.FindProperty(nameof(ShapeEditorTarget.scaledExtrudeDistance));
+        private SerializedProperty spScaledExtrudeFrontScale => serializedObject.FindProperty(nameof(ShapeEditorTarget.scaledExtrudeFrontScale));
+        private SerializedProperty spScaledExtrudeBackScale => serializedObject.FindProperty(nameof(ShapeEditorTarget.scaledExtrudeBackScale));
+        private SerializedProperty spScaledExtrudeOffset => serializedObject.FindProperty(nameof(ShapeEditorTarget.scaledExtrudeOffset));
 
         public override void OnInspectorGUI()
         {
@@ -55,6 +59,10 @@ namespace AeternumGames.ShapeEditor
 
                 case ShapeEditorTargetMode.LinearStaircase:
                     LinearStaircase_OnGUI();
+                    break;
+
+                case ShapeEditorTargetMode.ScaledExtrude:
+                    ScaledExtrude_OnGUI();
                     break;
             }
 
@@ -98,6 +106,16 @@ namespace AeternumGames.ShapeEditor
             EditorGUILayout.PropertyField(spLinearStaircaseDistance, new GUIContent("Distance"));
             EditorGUILayout.PropertyField(spLinearStaircaseHeight, new GUIContent("Height"));
             EditorGUILayout.PropertyField(spLinearStaircaseSloped, new GUIContent("Sloped"));
+        }
+
+        private void ScaledExtrude_OnGUI()
+        {
+            EditorGUILayout.PropertyField(spScaledExtrudeDistance, new GUIContent("Distance"));
+            EditorGUILayout.PropertyField(spScaledExtrudeFrontScale, new GUIContent("Front Scale"));
+            EditorGUILayout.PropertyField(spScaledExtrudeBackScale, new GUIContent("Back Scale"));
+            EditorGUIUtility.wideMode = true;
+            EditorGUILayout.PropertyField(spScaledExtrudeOffset, new GUIContent("Back Offset"));
+            EditorGUIUtility.wideMode = false;
         }
 
         private void ShapeEditorMenu_OnGUI()

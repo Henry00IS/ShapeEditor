@@ -74,6 +74,10 @@ namespace AeternumGames.ShapeEditor
                 case ShapeEditorTargetMode.LinearStaircase:
                     LinearStaircase_Rebuild();
                     break;
+
+                case ShapeEditorTargetMode.ScaledExtrude:
+                    ScaledExtrude_Rebuild();
+                    break;
             }
         }
 

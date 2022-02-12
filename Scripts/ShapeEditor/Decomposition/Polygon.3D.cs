@@ -28,16 +28,35 @@ namespace AeternumGames.ShapeEditor
             // try using alternative vertices to construct the plane.
             if (plane.normal == Vector3.zero && count > 3)
             {
-                // iterate through the available vertices.
-                for (int i = 1; i < count; i++)
-                {
-                    if (i + 1 >= count || i + 2 >= count) break;
+                Vector3 pos1 = this[0].position;
+                Vector3 pos2 = this[1].position;
 
-                    // use the next 3 vertices construct a new plane.
-                    plane = new Plane(this[i].position, this[i + 1].position, this[i + 2].position);
-                    // stop once we found a valid normal.
-                    if (plane.normal != Vector3.zero)
-                        break;
+                // if the first two vertices are not the same:
+                if (pos1 != pos2)
+                {
+                    // iterate through the available vertices.
+                    for (int i = 3; i < count; i++)
+                    {
+                        // use the first two and the current vertex construct a new plane.
+                        plane = new Plane(pos1, pos2, this[i].position);
+                        // stop once we found a valid normal.
+                        if (plane.normal != Vector3.zero)
+                            break;
+                    }
+                }
+                else
+                {
+                    // iterate through the available vertices.
+                    for (int i = 1; i < count; i++)
+                    {
+                        if (i + 1 >= count || i + 2 >= count) break;
+
+                        // use the next 3 vertices construct a new plane.
+                        plane = new Plane(this[i].position, this[i + 1].position, this[i + 2].position);
+                        // stop once we found a valid normal.
+                        if (plane.normal != Vector3.zero)
+                            break;
+                    }
                 }
             }
 
