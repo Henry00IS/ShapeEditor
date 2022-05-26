@@ -168,8 +168,11 @@ namespace AeternumGames.ShapeEditor
         private static IEnumerable<Assembly> GetUserAssetsAssemblies()
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-                if (assembly.FullName.ToLowerInvariant().StartsWith("assembly-csharp"))
+            {
+                var assemblyName = assembly.FullName.ToLowerInvariant();
+                if (assemblyName.StartsWith("realtimecsg") || assemblyName.StartsWith("assembly-csharp"))
                     yield return assembly;
+            }
         }
 
         /// <summary>
