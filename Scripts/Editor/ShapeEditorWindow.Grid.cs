@@ -11,6 +11,11 @@ namespace AeternumGames.ShapeEditor
         private const float screenScale = 200f;
         internal const float pivotScale = 9f;
         internal const float halfPivotScale = pivotScale / 2f;
+        internal static readonly Color gridBackgroundColor = new Color(0.118f, 0.118f, 0.118f);
+        internal static readonly Color gridLinesColor = new Color(0.206f, 0.206f, 0.206f);
+        internal static readonly Color gridSectionLinesColor = new Color(0.250f, 0.250f, 0.250f);
+        internal static readonly Color gridCenterLineXColor = new Color(0.400f, 0.218f, 0.218f);
+        internal static readonly Color gridCenterLineYColor = new Color(0.218f, 0.400f, 0.218f);
         internal static readonly Color segmentColor = new Color(0.7f, 0.7f, 0.7f);
         internal static readonly Color segmentColorDifference = new Color(1.0f, 0.5f, 0.5f);
         internal static readonly Color segmentPivotSelectedColor = new Color(0.9f, 0.45f, 0.0f);
@@ -73,18 +78,35 @@ namespace AeternumGames.ShapeEditor
 
         private void DrawGrid()
         {
-            var gridMaterial = ShapeEditorResources.temporaryGridMaterial;
-            gridMaterial.SetFloat("_offsetX", gridOffset.x);
-            gridMaterial.SetFloat("_offsetY", gridOffset.y);
-            gridMaterial.SetFloat("_viewportWidth", renderTextureWidth);
-            gridMaterial.SetFloat("_viewportHeight", renderTextureHeight);
-            gridMaterial.SetFloat("_zoom", gridZoom);
-            gridMaterial.SetFloat("_snap", gridSnap);
-            gridMaterial.SetPass(0);
+            var gridSnap_x4 = gridSnap * 4f;
+            var bounds = new float4(ScreenPointToGrid(new float2(0f, 0f)), ScreenPointToGrid(new float2(renderTextureWidth, renderTextureHeight)));
+            float x = bounds.x.Snap(gridSnap);
+            float y = bounds.y.Snap(gridSnap);
 
-            GL.Begin(GL.QUADS);
-            GLUtilities.DrawUvRectangle(docked ? -1 : 0, 0, renderTextureWidth + (docked ? 2 : 0), renderTextureHeight);
-            GL.End();
+            GLUtilities.DrawGui(() =>
+            {
+                if (gridSnap > 0f) // prevent infinite loops.
+                {
+                    while (x < bounds.z)
+                    {
+                        GL.Color(math.fmod(x, gridSnap_x4) == 0f ? gridSectionLinesColor : gridLinesColor);
+                        GLUtilities.DrawLine(1.0f, GridPointToScreen(new float2(x, bounds.w)), GridPointToScreen(new float2(x, bounds.y)));
+                        x += gridSnap;
+                    }
+
+                    while (y < bounds.w)
+                    {
+                        GL.Color(math.fmod(y, gridSnap_x4) == 0f ? gridSectionLinesColor : gridLinesColor);
+                        GLUtilities.DrawLine(1.0f, GridPointToScreen(new float2(bounds.x, y)), GridPointToScreen(new float2(bounds.z, y)));
+                        y += gridSnap;
+                    }
+                }
+
+                GL.Color(gridCenterLineXColor);
+                GLUtilities.DrawLine(1.0f, GridPointToScreen(new float2(bounds.x, 0f)), GridPointToScreen(new float2(bounds.z, 0f)));
+                GL.Color(gridCenterLineYColor);
+                GLUtilities.DrawLine(1.0f, GridPointToScreen(new float2(0f, bounds.w)), GridPointToScreen(new float2(0f, bounds.y)));
+            });
         }
 
         private void DrawSegments()
@@ -179,7 +201,7 @@ namespace AeternumGames.ShapeEditor
             ShapeEditorResources.temporaryGuiMaterial.SetVector("_viewport", new Vector2(renderTextureWidth, renderTextureHeight));
 
             // draw everything to the render texture.
-            GL.Clear(true, true, Color.red);
+            GL.Clear(true, true, gridBackgroundColor);
             GL.PushMatrix();
             GL.LoadPixelMatrix(0f, renderTextureWidth, renderTextureHeight, 0f);
             DrawGrid();

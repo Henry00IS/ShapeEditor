@@ -88,20 +88,7 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorFontSegoeUI14;
 
         public Material shapeEditorDefaultMaterial;
-        public Material shapeEditorGridMaterial;
         public Material shapeEditorGuiMaterial;
-
-        private static Material _temporaryGridMaterial;
-
-        public static Material temporaryGridMaterial
-        {
-            get
-            {
-                if (!_temporaryGridMaterial)
-                    _temporaryGridMaterial = new Material(Instance.shapeEditorGridMaterial);
-                return _temporaryGridMaterial;
-            }
-        }
 
         private static Material _temporaryGuiMaterial;
 
