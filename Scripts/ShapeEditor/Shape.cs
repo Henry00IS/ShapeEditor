@@ -66,6 +66,21 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        /// <summary>Inverts the selection of all selectable objects in the shape.</summary>
+        public void InvertSelection()
+        {
+            var segmentsCount = segments.Count;
+            for (int i = 0; i < segmentsCount; i++)
+            {
+                var segment = segments[i];
+                segment.selected = !segment.selected;
+
+                if (segment.generator.type != SegmentGeneratorType.Linear)
+                    foreach (var modifierSelectable in segment.generator.ForEachSelectableObject())
+                        modifierSelectable.selected = !modifierSelectable.selected;
+            }
+        }
+
         /// <summary>Checks whether all selectable objects in the shape are selected.</summary>
         public bool IsSelected()
         {

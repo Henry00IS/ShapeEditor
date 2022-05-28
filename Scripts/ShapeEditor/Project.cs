@@ -49,6 +49,14 @@ namespace AeternumGames.ShapeEditor
                 shapes[i].ClearSelection();
         }
 
+        /// <summary>Inverts the selection all of the selectable objects in the project.</summary>
+        public void InvertSelection()
+        {
+            var shapesCount = shapes.Count;
+            for (int i = 0; i < shapesCount; i++)
+                shapes[i].InvertSelection();
+        }
+
         [NonSerialized]
         private bool isValid = false;
 

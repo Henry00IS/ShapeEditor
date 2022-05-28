@@ -190,6 +190,12 @@ namespace AeternumGames.ShapeEditor
             project.SelectAll();
         }
 
+        /// <summary>Inverts the selection all of the selectable objects in the project.</summary>
+        internal void UserInvertSelection()
+        {
+            project.InvertSelection();
+        }
+
         /// <summary>Switches to the box select tool unless already active.</summary>
         internal void UserSwitchToBoxSelectTool() => SwitchTool(boxSelectTool);
 
