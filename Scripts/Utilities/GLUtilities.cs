@@ -395,6 +395,15 @@ namespace AeternumGames.ShapeEditor
             DrawLine(thickness, arrowFromRight, to);
         }
 
+        /// <summary>Simplified grid line rendering for horizontal and vertical lines.</summary>
+        public static void DrawGridLine(float2 from, float2 to)
+        {
+            GL.Vertex3(from.x - 0.5f, from.y - 0.5f, 0f);
+            GL.Vertex3(from.x + 0.5f, from.y + 0.5f, 0f);
+            GL.Vertex3(to.x + 0.5f, to.y + 0.5f, 0f);
+            GL.Vertex3(to.x - 0.5f, to.y - 0.5f, 0f);
+        }
+
         public static void DrawCircle(float thickness, float2 position, float radius, Color color, int segments = 32)
         {
             float angle = 0f;

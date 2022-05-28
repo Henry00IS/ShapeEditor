@@ -90,22 +90,22 @@ namespace AeternumGames.ShapeEditor
                     while (x < bounds.z)
                     {
                         GL.Color(math.fmod(x, gridSnap_x4) == 0f ? gridSectionLinesColor : gridLinesColor);
-                        GLUtilities.DrawLine(1.0f, GridPointToScreen(new float2(x, bounds.w)), GridPointToScreen(new float2(x, bounds.y)));
+                        GLUtilities.DrawGridLine(GridPointToScreen(new float2(x, bounds.w)), GridPointToScreen(new float2(x, bounds.y)));
                         x += gridSnap;
                     }
 
                     while (y < bounds.w)
                     {
                         GL.Color(math.fmod(y, gridSnap_x4) == 0f ? gridSectionLinesColor : gridLinesColor);
-                        GLUtilities.DrawLine(1.0f, GridPointToScreen(new float2(bounds.x, y)), GridPointToScreen(new float2(bounds.z, y)));
+                        GLUtilities.DrawGridLine(GridPointToScreen(new float2(bounds.x, y)), GridPointToScreen(new float2(bounds.z, y)));
                         y += gridSnap;
                     }
                 }
 
                 GL.Color(gridCenterLineXColor);
-                GLUtilities.DrawLine(1.0f, GridPointToScreen(new float2(bounds.x, 0f)), GridPointToScreen(new float2(bounds.z, 0f)));
+                GLUtilities.DrawGridLine(GridPointToScreen(new float2(bounds.x, 0f)), GridPointToScreen(new float2(bounds.z, 0f)));
                 GL.Color(gridCenterLineYColor);
-                GLUtilities.DrawLine(1.0f, GridPointToScreen(new float2(0f, bounds.w)), GridPointToScreen(new float2(0f, bounds.y)));
+                GLUtilities.DrawGridLine(GridPointToScreen(new float2(0f, bounds.w)), GridPointToScreen(new float2(0f, bounds.y)));
             });
         }
 
