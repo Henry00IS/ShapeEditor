@@ -396,8 +396,9 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Simplified grid line rendering for horizontal and vertical lines.</summary>
-        public static void DrawGridLine(float2 from, float2 to)
+        public static void DrawGridLine(float2 from, float2 to, Color color)
         {
+            GL.Color(color);
             GL.Vertex3(from.x - 0.5f, from.y - 0.5f, 0f);
             GL.Vertex3(from.x + 0.5f, from.y + 0.5f, 0f);
             GL.Vertex3(to.x + 0.5f, to.y + 0.5f, 0f);

@@ -78,34 +78,62 @@ namespace AeternumGames.ShapeEditor
 
         private void DrawGrid()
         {
-            var gridSnap_x4 = gridSnap * 4f;
+            if (gridSnap <= 0f) return; // prevent infinite loop.
+
+            // an adaptive grid that can be enlarged indefinitely. Lines that become too small are
+            // hidden at the right time, so that the outer lines become the inner ones again.
+
+            var modifiedGridSnap = gridSnap;
+            var screenPoint1 = GridPointToScreen(modifiedGridSnap);
+            var screenPoint2 = GridPointToScreen(modifiedGridSnap * 2f);
+            var factor = Mathf.Clamp01(Mathf.Round(screenPoint2.x - screenPoint1.x) / 8f);
+            while (factor <= 0.25f)
+            {
+                modifiedGridSnap *= 4f;
+
+                screenPoint1 = GridPointToScreen(modifiedGridSnap);
+                screenPoint2 = GridPointToScreen(modifiedGridSnap * 2f);
+                factor = Mathf.Clamp01(Mathf.Round(screenPoint2.x - screenPoint1.x) / 8f);
+            }
+
+            // an interpolant to determine when the next grid size has been reached. the zoom
+            // formula never gets to 0.25f so we switch to 0.0f earlier.
+            factor = Mathf.InverseLerp(0.35f, 1.0f, factor);
+
             var bounds = new float4(ScreenPointToGrid(new float2(0f, 0f)), ScreenPointToGrid(new float2(renderTextureWidth, renderTextureHeight)));
-            float x = bounds.x.Snap(gridSnap);
-            float y = bounds.y.Snap(gridSnap);
+            float x = bounds.x.Snap(modifiedGridSnap);
+            float y = bounds.y.Snap(modifiedGridSnap);
+            var gridSnap_x4 = modifiedGridSnap * 4f;
+            var gridSnap_x8 = modifiedGridSnap * 8f;
+
+            Color sectionLinesColor = Color.Lerp(gridSectionLinesColor, gridLinesColor, 1f - factor);
+            Color smallLinesColor = new Color(gridLinesColor.r, gridLinesColor.g, gridLinesColor.b, factor);
+            Color nextSectionLinesColor = Color.Lerp(gridSectionLinesColor, gridLinesColor, factor);
 
             GLUtilities.DrawGui(() =>
             {
-                if (gridSnap > 0f) // prevent infinite loops.
+                while (x < bounds.z)
                 {
-                    while (x < bounds.z)
-                    {
-                        GL.Color(math.fmod(x, gridSnap_x4) == 0f ? gridSectionLinesColor : gridLinesColor);
-                        GLUtilities.DrawGridLine(GridPointToScreen(new float2(x, bounds.w)), GridPointToScreen(new float2(x, bounds.y)));
-                        x += gridSnap;
-                    }
+                    var mainColor = math.fmod(x, gridSnap_x4) == 0f ? sectionLinesColor : smallLinesColor;
+                    var nextColor = math.fmod(x, gridSnap_x8) == 0f ? nextSectionLinesColor : mainColor;
+                    mainColor = Color.Lerp(mainColor, nextColor, 0.5f);
 
-                    while (y < bounds.w)
-                    {
-                        GL.Color(math.fmod(y, gridSnap_x4) == 0f ? gridSectionLinesColor : gridLinesColor);
-                        GLUtilities.DrawGridLine(GridPointToScreen(new float2(bounds.x, y)), GridPointToScreen(new float2(bounds.z, y)));
-                        y += gridSnap;
-                    }
+                    GLUtilities.DrawGridLine(GridPointToScreen(new float2(x, bounds.w)), GridPointToScreen(new float2(x, bounds.y)), mainColor);
+                    x += modifiedGridSnap;
                 }
 
-                GL.Color(gridCenterLineXColor);
-                GLUtilities.DrawGridLine(GridPointToScreen(new float2(bounds.x, 0f)), GridPointToScreen(new float2(bounds.z, 0f)));
-                GL.Color(gridCenterLineYColor);
-                GLUtilities.DrawGridLine(GridPointToScreen(new float2(0f, bounds.w)), GridPointToScreen(new float2(0f, bounds.y)));
+                while (y < bounds.w)
+                {
+                    var mainColor = math.fmod(y, gridSnap_x4) == 0f ? sectionLinesColor : smallLinesColor;
+                    var nextColor = math.fmod(y, gridSnap_x8) == 0f ? nextSectionLinesColor : mainColor;
+                    mainColor = Color.Lerp(mainColor, nextColor, 0.5f);
+
+                    GLUtilities.DrawGridLine(GridPointToScreen(new float2(bounds.x, y)), GridPointToScreen(new float2(bounds.z, y)), mainColor);
+                    y += modifiedGridSnap;
+                }
+
+                GLUtilities.DrawGridLine(GridPointToScreen(new float2(bounds.x, 0f)), GridPointToScreen(new float2(bounds.z, 0f)), gridCenterLineXColor);
+                GLUtilities.DrawGridLine(GridPointToScreen(new float2(0f, bounds.w)), GridPointToScreen(new float2(0f, bounds.y)), gridCenterLineYColor);
             });
         }
 

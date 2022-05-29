@@ -189,6 +189,36 @@ namespace AeternumGames.ShapeEditor
         /// <param name="snap">The multiple to snap against.</param>
         public static float Snap(this float value, float snap) => Snapping.Snap(value, snap);
 
+        /// <summary>
+        /// Linearly interpolates through a and b and c by t.
+        /// </summary>
+        /// <param name="a">The start value.</param>
+        /// <param name="b">The second value.</param>
+        /// <param name="c">The end value.</param>
+        /// <param name="t">The interpolation value between the three floats.</param>
+        public static float Lerp3(float a, float b, float c, float t)
+        {
+            if (t <= 0.5f)
+                return Mathf.Lerp(a, b, t * 2.0f);
+            else
+                return Mathf.Lerp(b, c, (t - 0.5f) * 2.0f);
+        }
+
+        /// <summary>
+        /// Linearly interpolates through a and b and c by t.
+        /// </summary>
+        /// <param name="a">The start color.</param>
+        /// <param name="b">The second color.</param>
+        /// <param name="c">The end color.</param>
+        /// <param name="t">The interpolation value between the three colors.</param>
+        public static Color Lerp3(Color a, Color b, Color c, float t)
+        {
+            if (t <= 0.5f)
+                return Color.Lerp(a, b, t * 2.0f);
+            else
+                return Color.Lerp(b, c, (t - 0.5f) * 2.0f);
+        }
+
         public static Rect RectXYXY(float x1, float y1, float x2, float y2)
         {
             var mx1 = math.min(x1, x2);
