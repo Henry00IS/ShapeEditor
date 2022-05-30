@@ -9,6 +9,7 @@ namespace AeternumGames.ShapeEditor
     {
         private bool isSingleUseDone = false;
         private TranslationWidget translationWidget = new TranslationWidget();
+        protected bool registerTranslateUndoOperation = true;
 
         public override void OnActivate()
         {
@@ -109,7 +110,8 @@ namespace AeternumGames.ShapeEditor
 
         private void ToolOnBeginTranslating(ShapeEditorWindow editor)
         {
-            editor.RegisterUndo("Translate Selection");
+            if (registerTranslateUndoOperation)
+                editor.RegisterUndo("Translate Selection");
 
             deltaAccumulator = float2.zero;
 

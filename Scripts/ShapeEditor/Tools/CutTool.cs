@@ -16,8 +16,6 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnRender()
         {
-            base.OnRender();
-
             var mousePosition = editor.mousePosition;
 
             // optionally snap to the grid.

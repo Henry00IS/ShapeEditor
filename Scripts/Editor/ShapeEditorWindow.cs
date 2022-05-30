@@ -306,7 +306,8 @@ namespace AeternumGames.ShapeEditor
                                 UserSaveProjectAs();
                                 return true;
                             }
-                            return false;
+                            UserSwitchToScaleTool();
+                            return true;
 
                         case KeyCode.H:
                             UserResetCamera();
@@ -320,12 +321,8 @@ namespace AeternumGames.ShapeEditor
                             UserSwitchToTranslateTool();
                             return true;
 
-                        case KeyCode.E:
-                            UserSwitchToRotateTool();
-                            return true;
-
                         case KeyCode.R:
-                            UserSwitchToScaleTool();
+                            UserSwitchToRotateTool();
                             return true;
 
                         case KeyCode.Delete:
