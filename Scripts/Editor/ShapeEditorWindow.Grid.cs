@@ -163,6 +163,8 @@ namespace AeternumGames.ShapeEditor
             totalSegmentsCount = 0;
             selectedSegmentsCount = 0;
             selectedSegmentsAveragePosition = float2.zero;
+            var previousGridPosition = new float2(float.NegativeInfinity);
+            List<float2> duplicateSegmentPositions = null;
 
             GLUtilities.DrawGui(() =>
             {
@@ -171,22 +173,37 @@ namespace AeternumGames.ShapeEditor
                 for (int i = 0; i < shapesCount; i++)
                 {
                     var shape = project.shapes[i];
+                    var segmentsCount = shape.segments.Count;
+
+                    // begin detecting duplicate segments from the last segment.
+                    if (segmentsCount > 0)
+                        previousGridPosition = shape.segments[0].previous.position;
 
                     // for every segment in the project:
-                    var segmentsCount = shape.segments.Count;
                     for (int j = 0; j < segmentsCount; j++)
                     {
                         // get the current segment and the next segment (wrapping around).
                         var segment = shape.segments[j];
 
-                        float2 pos = GridPointToScreen(segment.position);
-                        GLUtilities.DrawSolidRectangleWithOutline(pos.x - halfPivotScale, pos.y - halfPivotScale, pivotScale, pivotScale, segment.selected ? segmentPivotSelectedColor : Color.white, segment.selected ? segmentPivotOutlineColor : Color.black);
+                        float2 gridPosition = segment.position;
+                        float2 screenPosition = GridPointToScreen(gridPosition);
+                        GLUtilities.DrawSolidRectangleWithOutline(screenPosition.x - halfPivotScale, screenPosition.y - halfPivotScale, pivotScale, pivotScale, segment.selected ? segmentPivotSelectedColor : Color.white, segment.selected ? segmentPivotOutlineColor : Color.black);
+
+                        // detect duplicate segments at the same position as the last segment.
+                        if (gridPosition.Equals(previousGridPosition))
+                        {
+                            // only allocate a list when this condition occurs.
+                            if (duplicateSegmentPositions == null) duplicateSegmentPositions = new List<float2>();
+                            var normal = math.normalize(gridPosition - segment.previous.previous.position);
+                            duplicateSegmentPositions.Add(math.floor(screenPosition + normal * 10f));
+                        }
+                        previousGridPosition = gridPosition;
 
                         totalSegmentsCount++;
                         if (segment.selected)
                         {
                             selectedSegmentsCount++;
-                            selectedSegmentsAveragePosition += pos;
+                            selectedSegmentsAveragePosition += screenPosition;
                         }
 
                         // have the segment generator draw additional pivots.
@@ -194,6 +211,20 @@ namespace AeternumGames.ShapeEditor
                     }
                 }
             });
+
+            // draw warning icons at duplicate segments.
+            if (duplicateSegmentPositions != null)
+            {
+                GLUtilities.DrawGuiTextured(ShapeEditorResources.Instance.shapeEditorSegmentDuplicateWarning, () =>
+                {
+                    var duplicateSegmentPositionsCount = duplicateSegmentPositions.Count;
+                    for (int i = 0; i < duplicateSegmentPositionsCount; i++)
+                    {
+                        var duplicateSegmentPosition = duplicateSegmentPositions[i];
+                        GLUtilities.DrawFlippedUvRectangle(duplicateSegmentPosition.x - 4, duplicateSegmentPosition.y - 4, 7, 7);
+                    }
+                });
+            }
 
             if (selectedSegmentsCount != 0)
                 selectedSegmentsAveragePosition /= selectedSegmentsCount;
