@@ -224,6 +224,9 @@ namespace AeternumGames.ShapeEditor
             customMouseHotspot = hotspot;
             desiredMouseCursorTimer = 1;
         }
+
+        /// <summary>Whether the Ctrl or Shift key is pressed.</summary>
+        internal bool isModifierPressed => isCtrlPressed || isShiftPressed;
     }
 }
 

@@ -306,6 +306,11 @@ namespace AeternumGames.ShapeEditor
                                 UserSaveProjectAs();
                                 return true;
                             }
+                            else if (isShiftPressed)
+                            {
+                                UserSnapSelectionToGrid();
+                                return true;
+                            }
                             UserSwitchToScaleTool();
                             return true;
 
