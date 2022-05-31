@@ -130,21 +130,20 @@ namespace AeternumGames.ShapeEditor
         /// <returns>The array of triangles.</returns>
         public int[] GetTriangles(int offset = 0)
         {
-            List<int> triangles = new List<int>();
             var count = Count;
+            var triangles = new int[Mathf.Max(0, (count - 2) * 3)];
 
-            var first = 0;
-            int next = 1;
+            var index = 0;
+            var next = 1;
             for (int i = 2; i < count; i++)
             {
-                triangles.Add(offset + next);
-                triangles.Add(offset + first);
-                triangles.Add(offset + first + i);
-                next = first + i;
+                triangles[index++] = offset + next;
+                triangles[index++] = offset;
+                triangles[index++] = offset + i;
+                next = i;
             }
 
-            // todo: replace this with an array, we can know the amount of entries, right? math? anyone?
-            return triangles.ToArray();
+            return triangles;
         }
     }
 }
