@@ -387,7 +387,7 @@ namespace AeternumGames.ShapeEditor
                     var clone = shape.Clone();
                     clone.Validate();
                     project.shapes.Add(clone);
-                    shape.SelectAll();
+                    clone.SelectAll();
                 }
 
                 UseTool(new TranslateTool());
