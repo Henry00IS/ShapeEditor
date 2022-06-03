@@ -31,7 +31,7 @@ namespace AeternumGames.ShapeEditor
                 ExternalChisel.CreateBrushFromPoints(parent, "Shape Editor Brush", polygonMesh.ToPoints().ToArray(), polygonMesh.booleanOperator);
             }
 
-            ExternalRealtimeCSG.AddCSGOperationComponent(gameObject);
+            ExternalChisel.AddChiselCompositeComponent(gameObject);
         }
     }
 }

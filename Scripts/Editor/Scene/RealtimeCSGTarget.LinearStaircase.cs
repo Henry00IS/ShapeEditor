@@ -37,6 +37,7 @@ namespace AeternumGames.ShapeEditor
             }
 
             ExternalRealtimeCSG.AddCSGOperationComponent(gameObject);
+            ExternalRealtimeCSG.UpdateSelection();
         }
     }
 }

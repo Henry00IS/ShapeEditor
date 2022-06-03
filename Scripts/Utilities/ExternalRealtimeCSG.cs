@@ -91,6 +91,16 @@ namespace AeternumGames.ShapeEditor
         private static FieldInfo csgOperationHandleAsOneField = null;
 
         /// <summary>
+        /// The cached EditModeManager type after initialization.
+        /// </summary>
+        private static Type editModeManager = null;
+
+        /// <summary>
+        /// The cached update selection method after initialization.
+        /// </summary>
+        private static MethodInfo updateSelectionMethod = null;
+
+        /// <summary>
         /// Used to store whether an initialization error occured.
         /// </summary>
         private static bool initializationError;
@@ -156,6 +166,12 @@ namespace AeternumGames.ShapeEditor
 
             csgOperationHandleAsOneField = csgOperation.GetField("HandleAsOne");
             if (csgOperationHandleAsOneField == null) { initializationError = true; return false; }
+
+            editModeManager = GetType("RealtimeCSG.EditModeManager");
+            if (editModeManager == null) { initializationError = true; return false; }
+
+            updateSelectionMethod = GetMethod(editModeManager, "UpdateSelection", "forceUpdate");
+            if (updateSelectionMethod == null) { initializationError = true; return false; }
 
             initializationSuccess = true;
             return true;
@@ -297,6 +313,17 @@ namespace AeternumGames.ShapeEditor
                 component = gameObject.AddComponent(csgOperation);
 
             csgOperationHandleAsOneField.SetValue(component, true);
+        }
+
+        /// <summary>
+        /// Forces RealtimeCSG tools to update their selection. This will prevent hundreds of errors
+        /// in the console when brushes get removed.
+        /// </summary>
+        public static void UpdateSelection()
+        {
+            if (!IsAvailable()) return;
+
+            updateSelectionMethod.Invoke(null, new object[] { true });
         }
     }
 }

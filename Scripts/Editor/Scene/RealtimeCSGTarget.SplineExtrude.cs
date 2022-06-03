@@ -34,6 +34,7 @@ namespace AeternumGames.ShapeEditor
             }
 
             ExternalRealtimeCSG.AddCSGOperationComponent(gameObject);
+            ExternalRealtimeCSG.UpdateSelection();
         }
 
         /// <summary>Calculates and gets a 3 point spline or returns null on failure.</summary>
