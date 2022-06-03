@@ -14,14 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shapeEditorAbout: {fileID: 2800000, guid: 546586d856de70b4ebcdb76994f7e739, type: 3}
   shapeEditorAboutPatreon: {fileID: 2800000, guid: 17b6c9730b35ab24f9e388ab44ce96ef, type: 3}
-  shapeEditorCreatePolygon: {fileID: 2800000, guid: 2e7ea28a97ddc00478361b08f10aecc5, type: 3}
+  shapeEditorCreatePolygon: {fileID: 2800000, guid: e75ef525809c0e34cbfc71c8aae44202, type: 3}
   shapeEditorCut: {fileID: 2800000, guid: ba6aee88efca1344bacb0e0f82e2a395, type: 3}
   shapeEditorDelete: {fileID: 2800000, guid: 5efe46f796cdc1b438c1a2b21d3ea154, type: 3}
   shapeEditorEdgeSelect: {fileID: 2800000, guid: c837781f9e5f2c34a83aa4d169761d3b, type: 3}
-  shapeEditorExtrudeBevel: {fileID: 2800000, guid: 83f4159c0236d0e4a9c4615884a4c7f4, type: 3}
-  shapeEditorExtrudePoint: {fileID: 2800000, guid: 8d61963e1a756f748aac6c2d773ad121, type: 3}
-  shapeEditorExtrudeRevolve: {fileID: 2800000, guid: 9ce7aa50860214e4da8999216b99bb8a, type: 3}
-  shapeEditorExtrudeShape: {fileID: 2800000, guid: 857ef677c5d21454fb5587a2d5ec394f, type: 3}
+  shapeEditorExtrudeBevel: {fileID: 2800000, guid: bb52e962aebc2ed429c1e9376afb8cae, type: 3}
+  shapeEditorExtrudeCurvedStaircase: {fileID: 2800000, guid: 80c872aa6d963114ba18a6678ffb3ab8, type: 3}
+  shapeEditorExtrudeFixed: {fileID: 2800000, guid: 2f7e2003afe0d344d93399b3b8c9ef13, type: 3}
+  shapeEditorExtrudeLinearStaircase: {fileID: 2800000, guid: a4b4d41dd2eeda9488f83ef9413055dc, type: 3}
+  shapeEditorExtrudePoint: {fileID: 2800000, guid: 74376502bee3a6d49a8e538af3a9ec2d, type: 3}
+  shapeEditorExtrudeRevolve: {fileID: 2800000, guid: b6b91882ebb694048a551a127584fa06, type: 3}
+  shapeEditorExtrudeShape: {fileID: 2800000, guid: 91394dd74b9c8564ca1d1c914f2b18e8, type: 3}
+  shapeEditorExtrudeSlope: {fileID: 2800000, guid: 8fcabf11cc873da4ea3807c921f921b5, type: 3}
+  shapeEditorExtrudeSpiral: {fileID: 2800000, guid: dfbaf59f80008a84b96100fb089c7f5f, type: 3}
+  shapeEditorExtrudeSpline: {fileID: 2800000, guid: e862e09b866932041b196e70bf7ac225, type: 3}
   shapeEditorFaceSelect: {fileID: 2800000, guid: 70271061b970f6142bc1c570451d1331, type: 3}
   shapeEditorFlipHorizontally: {fileID: 2800000, guid: f3869c58b7571c04bb3d92c15d2b6881, type: 3}
   shapeEditorFlipVertically: {fileID: 2800000, guid: 620c7febb2a0936488a0f70141a5ecb8, type: 3}

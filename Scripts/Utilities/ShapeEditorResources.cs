@@ -48,9 +48,15 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorDelete;
         public Texture2D shapeEditorEdgeSelect;
         public Texture2D shapeEditorExtrudeBevel;
+        public Texture2D shapeEditorExtrudeCurvedStaircase;
+        public Texture2D shapeEditorExtrudeFixed;
+        public Texture2D shapeEditorExtrudeLinearStaircase;
         public Texture2D shapeEditorExtrudePoint;
         public Texture2D shapeEditorExtrudeRevolve;
         public Texture2D shapeEditorExtrudeShape;
+        public Texture2D shapeEditorExtrudeSlope;
+        public Texture2D shapeEditorExtrudeSpiral;
+        public Texture2D shapeEditorExtrudeSpline;
         public Texture2D shapeEditorFaceSelect;
         public Texture2D shapeEditorFlipHorizontally;
         public Texture2D shapeEditorFlipVertically;

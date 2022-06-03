@@ -153,6 +153,21 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Creates a scaled target in the scene and selects it.</summary>
         internal void UserCreateScaledExtrudeTarget() => UserCreateShapeEditorTarget("Scaled Extrude", ShapeEditorTargetMode.ScaledExtrude);
 
+        /// <summary>Creates a revolved target in the scene and selects it.</summary>
+        internal void UserCreateRevolvedExtrudeTarget() => UserCreateShapeEditorTarget("Revolve Extrude", ShapeEditorTargetMode.RevolveExtrude);
+
+        /// <summary>Creates a curved staircase target in the scene and selects it.</summary>
+        internal void UserCreateCurvedStaircaseExtrudeTarget() => UserCreateShapeEditorTarget("Curved Staircase", ShapeEditorTargetMode.RevolveExtrude, (g, t) => t.revolveExtrudeHeight = 0.75f);
+
+        /// <summary>Creates a linear staircase target in the scene and selects it.</summary>
+        internal void UserCreateLinearStaircaseExtrudeTarget() => UserCreateShapeEditorTarget("Linear Staircase", ShapeEditorTargetMode.LinearStaircase);
+
+        /// <summary>Creates a slope target in the scene and selects it.</summary>
+        internal void UserCreateSlopeExtrudeTarget() => UserCreateShapeEditorTarget("Slope Extrude", ShapeEditorTargetMode.LinearStaircase, (g, t) => t.linearStaircaseSloped = true);
+
+        /// <summary>Creates a spiral target in the scene and selects it.</summary>
+        internal void UserCreateSpiralExtrudeTarget() => UserCreateShapeEditorTarget("Spiral Extrude", ShapeEditorTargetMode.RevolveExtrude, (g, t) => { t.revolveExtrudeHeight = 0.75f; t.revolveExtrudeSloped = true; });
+
         /// <summary>Creates a spline target in the scene and selects it.</summary>
         internal void UserCreateSplineExtrudeTarget()
         {
@@ -169,18 +184,6 @@ namespace AeternumGames.ShapeEditor
                 p3.transform.localPosition = new Vector3(1f, 0f, 1f);
             });
         }
-
-        /// <summary>Creates a revolved target in the scene and selects it.</summary>
-        internal void UserCreateRevolvedExtrudeTarget() => UserCreateShapeEditorTarget("Revolve Extrude", ShapeEditorTargetMode.RevolveExtrude);
-
-        /// <summary>Creates a curved staircase target in the scene and selects it.</summary>
-        internal void UserCreateCurvedStaircaseExtrudeTarget() => UserCreateShapeEditorTarget("Curved Staircase", ShapeEditorTargetMode.RevolveExtrude, (g, t) => t.revolveExtrudeHeight = 0.75f);
-
-        /// <summary>Creates a linear staircase target in the scene and selects it.</summary>
-        internal void UserCreateLinearStaircaseExtrudeTarget() => UserCreateShapeEditorTarget("Linear Staircase", ShapeEditorTargetMode.LinearStaircase);
-
-        /// <summary>Creates a slope target in the scene and selects it.</summary>
-        internal void UserCreateSlopeExtrudeTarget() => UserCreateShapeEditorTarget("Slope Extrude", ShapeEditorTargetMode.LinearStaircase, (g, t) => t.linearStaircaseSloped = true);
 
         /// <summary>
         /// Creates a <see cref="RealtimeCSGTarget"/> with the specified <paramref name="mode"/> in
