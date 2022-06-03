@@ -1,6 +1,13 @@
 {
-  "description": "2D Shape Editor for Unity",
+  "author": {
+    "name": "Henry de Jongh",
+    "url": "https://github.com/Henry00IS"
+  },
+  "description": "The 2D Shape Editor is a versatile tool to create complex 3D meshes out of 2D shapes.\n\nWith this program you can easily create a design cross-section in a two-dimensional view and then expand it to a 3D mesh.\n\nWhen you need a special design, such as curved pipes, an underground channel or a baroque arch, this is the tool for the job.\n\nThe controls and user interface were inspired by the popular modeling program Blender. Many of the shortcuts and tricks also work in this program. Special tools have been provided to allow a non-destructive workflow with generators that can be easily modified.",
   "displayName": "2D Shape Editor",
+  "documentationUrl": "https://github.com/Henry00IS/ShapeEditor/wiki",
+  "changelogUrl": "https://github.com/Henry00IS/ShapeEditor/commits/master",
+  "licensesUrl": "https://github.com/Henry00IS/ShapeEditor/blob/master/LICENSE.md",
   "name": "com.aeternumgames.shapeeditor",
   "keywords": [
     "level design",
@@ -10,10 +17,11 @@
     "Boolean",
 	"2D",
 	"Shape",
+	"Editor",
 	"CAD"
   ],
   "unity": "2018.3",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "dependencies": {
     "com.unity.mathematics": "1.1.0"
   }

@@ -300,6 +300,14 @@ namespace AeternumGames.ShapeEditor
                             }
                             return false;
 
+                        case KeyCode.I:
+                            if (isCtrlPressed)
+                            {
+                                UserInvertSelection();
+                                return true;
+                            }
+                            return false;
+
                         case KeyCode.S:
                             if (isCtrlPressed)
                             {
