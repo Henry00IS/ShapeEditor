@@ -1,6 +1,8 @@
 ﻿#if UNITY_EDITOR
 
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
@@ -56,6 +58,22 @@ namespace AeternumGames.ShapeEditor
             var items = source.GetRange(index, count);
             source.RemoveRange(index, count);
             return items;
+        }
+
+        /// <summary>Parents this transform as a sibling of the active editor transform.</summary>
+        public static void SetSiblingOfActiveTransform(this Transform transform)
+        {
+            // place the new game object below the current selection in the editor.
+            var parent = Selection.activeTransform;
+            if (parent && parent.parent)
+            {
+                transform.SetParent(parent.parent);
+                transform.SetSiblingIndex(parent.GetSiblingIndex() + 1);
+            }
+            else if (parent)
+            {
+                transform.SetSiblingIndex(parent.GetSiblingIndex() + 1);
+            }
         }
     }
 }

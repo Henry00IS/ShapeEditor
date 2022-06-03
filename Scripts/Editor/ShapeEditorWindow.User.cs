@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEditor;
@@ -119,51 +120,168 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        /// <summary>Created a polygon in the scene, assign the project and select it.</summary>
-        internal void UserCreatePolygonTarget()
+        /// <summary>
+        /// Creates a <see cref="ShapeEditorTarget"/> with the specified <paramref name="mode"/> in
+        /// the scene, calls <paramref name="init"/> to apply additional parameters and logic,
+        /// assigns the project to the target and then selects the game object.
+        /// </summary>
+        /// <param name="name">The name of the game object to be created.</param>
+        /// <param name="mode">The operating mode of the target.</param>
+        /// <param name="init">Callback to apply additional parameters and logic.</param>
+        private void UserCreateShapeEditorTarget(string name, ShapeEditorTargetMode mode, Action<GameObject, ShapeEditorTarget> init = null)
         {
-            GameObject go = new GameObject("Polygon");
+            GameObject go = new GameObject(name);
+            go.transform.SetSiblingOfActiveTransform();
+
             var target = go.AddComponent<ShapeEditorTarget>();
+            target.targetMode = mode;
+            init?.Invoke(go, target);
             target.OnShapeEditorUpdateProject(project);
+
             Selection.activeGameObject = go;
         }
 
-        /// <summary>
-        /// Created a polygon in the scene, assign the project, set the mode to fixed extrude and
-        /// select it.
-        /// </summary>
-        internal void UserCreateFixedExtrudeTarget()
-        {
-            GameObject go = new GameObject("Extruded Shape");
-            var target = go.AddComponent<ShapeEditorTarget>();
-            target.targetMode = ShapeEditorTargetMode.FixedExtrude;
-            target.OnShapeEditorUpdateProject(project);
-            Selection.activeGameObject = go;
-        }
+        /// <summary>Creates a polygon target in the scene and selects it.</summary>
+        internal void UserCreatePolygonTarget() => UserCreateShapeEditorTarget("Polygon", ShapeEditorTargetMode.Polygon);
 
-        /// <summary>
-        /// Created a polygon in the scene, assign the project, set the mode to spline extrude and
-        /// select it.
-        /// </summary>
+        /// <summary>Creates a fixed extrude target in the scene and selects it.</summary>
+        internal void UserCreateFixedExtrudeTarget() => UserCreateShapeEditorTarget("Fixed Extrude", ShapeEditorTargetMode.FixedExtrude);
+
+        /// <summary>Creates a bevel target in the scene and selects it.</summary>
+        internal void UserCreateBevelExtrudeTarget() => UserCreateShapeEditorTarget("Bevel Extrude", ShapeEditorTargetMode.ScaledExtrude, (g, t) => t.scaledExtrudeBackScale = 0.5f);
+
+        /// <summary>Creates a scaled target in the scene and selects it.</summary>
+        internal void UserCreateScaledExtrudeTarget() => UserCreateShapeEditorTarget("Scaled Extrude", ShapeEditorTargetMode.ScaledExtrude);
+
+        /// <summary>Creates a spline target in the scene and selects it.</summary>
         internal void UserCreateSplineExtrudeTarget()
         {
-            GameObject go = new GameObject("Spline Extruded Shape");
-            var target = go.AddComponent<ShapeEditorTarget>();
+            UserCreateShapeEditorTarget("Spline Extrude", ShapeEditorTargetMode.SplineExtrude, (g, t) =>
+            {
+                GameObject p1 = new GameObject("Point");
+                p1.transform.parent = g.transform;
+                p1.transform.localPosition = new Vector3(0f, 0f, 0f);
+                GameObject p2 = new GameObject("Point");
+                p2.transform.parent = g.transform;
+                p2.transform.localPosition = new Vector3(0f, 0f, 1f);
+                GameObject p3 = new GameObject("Point");
+                p3.transform.parent = g.transform;
+                p3.transform.localPosition = new Vector3(1f, 0f, 1f);
+            });
+        }
 
-            GameObject p1 = new GameObject("Point");
-            p1.transform.parent = go.transform;
-            p1.transform.localPosition = new Vector3(0f, 0f, 0f);
-            GameObject p2 = new GameObject("Point");
-            p2.transform.parent = go.transform;
-            p2.transform.localPosition = new Vector3(0f, 0f, 1f);
-            GameObject p3 = new GameObject("Point");
-            p3.transform.parent = go.transform;
-            p3.transform.localPosition = new Vector3(1f, 0f, 1f);
+        /// <summary>Creates a revolved target in the scene and selects it.</summary>
+        internal void UserCreateRevolvedExtrudeTarget() => UserCreateShapeEditorTarget("Revolve Extrude", ShapeEditorTargetMode.RevolveExtrude);
 
-            target.targetMode = ShapeEditorTargetMode.SplineExtrude;
+        /// <summary>Creates a curved staircase target in the scene and selects it.</summary>
+        internal void UserCreateCurvedStaircaseExtrudeTarget() => UserCreateShapeEditorTarget("Curved Staircase", ShapeEditorTargetMode.RevolveExtrude, (g, t) => t.revolveExtrudeHeight = 0.75f);
+
+        /// <summary>Creates a linear staircase target in the scene and selects it.</summary>
+        internal void UserCreateLinearStaircaseExtrudeTarget() => UserCreateShapeEditorTarget("Linear Staircase", ShapeEditorTargetMode.LinearStaircase);
+
+        /// <summary>Creates a slope target in the scene and selects it.</summary>
+        internal void UserCreateSlopeExtrudeTarget() => UserCreateShapeEditorTarget("Slope Extrude", ShapeEditorTargetMode.LinearStaircase, (g, t) => t.linearStaircaseSloped = true);
+
+        /// <summary>
+        /// Creates a <see cref="RealtimeCSGTarget"/> with the specified <paramref name="mode"/> in
+        /// the scene, calls <paramref name="init"/> to apply additional parameters and logic,
+        /// assigns the project to the target and then selects the game object.
+        /// </summary>
+        /// <param name="name">The name of the game object to be created.</param>
+        /// <param name="mode">The operating mode of the target.</param>
+        /// <param name="init">Callback to apply additional parameters and logic.</param>
+        private void UserCreateRealtimeCSGTarget(string name, RealtimeCSGTargetMode mode, Action<GameObject, RealtimeCSGTarget> init = null)
+        {
+            GameObject go = new GameObject(name);
+            go.transform.SetSiblingOfActiveTransform();
+
+            var target = go.AddComponent<RealtimeCSGTarget>();
+            target.targetMode = mode;
+            init?.Invoke(go, target);
             target.OnShapeEditorUpdateProject(project);
+
             Selection.activeGameObject = go;
         }
+
+        /// <summary>Creates a fixed extrude target in the scene and selects it.</summary>
+        internal void UserCreateRealtimeCsgFixedExtrudeTarget() => UserCreateRealtimeCSGTarget("Fixed Extrude", RealtimeCSGTargetMode.FixedExtrude);
+
+        /// <summary>Creates a bevel target in the scene and selects it.</summary>
+        internal void UserCreateRealtimeCsgBevelExtrudeTarget() => UserCreateRealtimeCSGTarget("Bevel Extrude", RealtimeCSGTargetMode.ScaledExtrude, (g, t) => t.scaledExtrudeBackScale = 0.5f);
+
+        /// <summary>Creates a scaled target in the scene and selects it.</summary>
+        internal void UserCreateRealtimeCsgScaledExtrudeTarget() => UserCreateRealtimeCSGTarget("Scaled Extrude", RealtimeCSGTargetMode.ScaledExtrude);
+
+        /// <summary>Creates a revolved target in the scene and selects it.</summary>
+        internal void UserCreateRealtimeCsgRevolvedExtrudeTarget() => UserCreateRealtimeCSGTarget("Revolve Extrude", RealtimeCSGTargetMode.RevolveExtrude);
+
+        /// <summary>Creates a curved staircase target in the scene and selects it.</summary>
+        internal void UserCreateRealtimeCsgCurvedStaircaseExtrudeTarget() => UserCreateRealtimeCSGTarget("Curved Staircase", RealtimeCSGTargetMode.RevolveExtrude, (g, t) => t.revolveExtrudeHeight = 0.75f);
+
+        /// <summary>Creates a linear staircase target in the scene and selects it.</summary>
+        internal void UserCreateRealtimeCsgLinearStaircaseExtrudeTarget() => UserCreateRealtimeCSGTarget("Linear Staircase", RealtimeCSGTargetMode.LinearStaircase);
+
+        /// <summary>Creates a slope target in the scene and selects it.</summary>
+        internal void UserCreateRealtimeCsgSlopeExtrudeTarget() => UserCreateRealtimeCSGTarget("Slope Extrude", RealtimeCSGTargetMode.LinearStaircase, (g, t) => t.linearStaircaseSloped = true);
+
+        /// <summary>Creates a spline target in the scene and selects it.</summary>
+        internal void UserCreateRealtimeCsgSplineExtrudeTarget()
+        {
+            UserCreateRealtimeCSGTarget("Spline Extrude", RealtimeCSGTargetMode.SplineExtrude, (g, t) =>
+            {
+                GameObject p1 = new GameObject("Point");
+                p1.transform.parent = g.transform;
+                p1.transform.localPosition = new Vector3(1f, 0f, 1f);
+                GameObject p2 = new GameObject("Point");
+                p2.transform.parent = g.transform;
+                p2.transform.localPosition = new Vector3(0f, 0f, 1f);
+                GameObject p3 = new GameObject("Point");
+                p3.transform.parent = g.transform;
+                p3.transform.localPosition = new Vector3(0f, 0f, 0f);
+            });
+        }
+
+        /// <summary>
+        /// Creates a <see cref="ChiselTarget"/> with the specified <paramref name="mode"/> in
+        /// the scene, calls <paramref name="init"/> to apply additional parameters and logic,
+        /// assigns the project to the target and then selects the game object.
+        /// </summary>
+        /// <param name="name">The name of the game object to be created.</param>
+        /// <param name="mode">The operating mode of the target.</param>
+        /// <param name="init">Callback to apply additional parameters and logic.</param>
+        private void UserCreateChiselTarget(string name, ChiselTargetMode mode, Action<GameObject, ChiselTarget> init = null)
+        {
+            GameObject go = new GameObject(name);
+            go.transform.SetSiblingOfActiveTransform();
+
+            var target = go.AddComponent<ChiselTarget>();
+            target.targetMode = mode;
+            init?.Invoke(go, target);
+            target.OnShapeEditorUpdateProject(project);
+
+            Selection.activeGameObject = go;
+        }
+
+        /// <summary>Creates a fixed extrude target in the scene and selects it.</summary>
+        internal void UserCreateChiselFixedExtrudeTarget() => UserCreateChiselTarget("Fixed Extrude", ChiselTargetMode.FixedExtrude);
+
+        /// <summary>Creates a bevel target in the scene and selects it.</summary>
+        internal void UserCreateChiselBevelExtrudeTarget() => UserCreateChiselTarget("Bevel Extrude", ChiselTargetMode.ScaledExtrude, (g, t) => t.scaledExtrudeBackScale = 0.5f);
+
+        /// <summary>Creates a scaled target in the scene and selects it.</summary>
+        internal void UserCreateChiselScaledExtrudeTarget() => UserCreateChiselTarget("Scaled Extrude", ChiselTargetMode.ScaledExtrude);
+
+        /// <summary>Creates a revolved target in the scene and selects it.</summary>
+        internal void UserCreateChiselRevolvedExtrudeTarget() => UserCreateChiselTarget("Revolve Extrude", ChiselTargetMode.RevolveExtrude);
+
+        /// <summary>Creates a curved staircase target in the scene and selects it.</summary>
+        internal void UserCreateChiselCurvedStaircaseExtrudeTarget() => UserCreateChiselTarget("Curved Staircase", ChiselTargetMode.RevolveExtrude, (g, t) => t.revolveExtrudeHeight = 0.75f);
+
+        /// <summary>Creates a linear staircase target in the scene and selects it.</summary>
+        internal void UserCreateChiselLinearStaircaseExtrudeTarget() => UserCreateChiselTarget("Linear Staircase", ChiselTargetMode.LinearStaircase);
+
+        /// <summary>Creates a slope target in the scene and selects it.</summary>
+        internal void UserCreateChiselSlopeExtrudeTarget() => UserCreateChiselTarget("Slope Extrude", ChiselTargetMode.LinearStaircase, (g, t) => t.linearStaircaseSloped = true);
 
         /// <summary>Clears the selection, adds a new shape and selects it.</summary>
         internal void UserAddShapeToProject()
