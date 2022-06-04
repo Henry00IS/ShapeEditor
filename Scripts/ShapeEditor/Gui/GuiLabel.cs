@@ -15,6 +15,11 @@ namespace AeternumGames.ShapeEditor
             this.text = text;
         }
 
+        public GuiLabel(string text, float2 size) : base(float2.zero, size)
+        {
+            this.text = text;
+        }
+
         public GuiLabel(string text) : base(float2.zero, 20f)
         {
             this.text = text;

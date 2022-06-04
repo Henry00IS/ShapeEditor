@@ -27,12 +27,12 @@ namespace AeternumGames.ShapeEditor
 
             Add(statusLabel = new GuiLabel("", new float2(7f, 4f), new float2(200, 20)));
 
-            Add(gridZoomTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)) { allowNegativeNumbers = false });
-            Add(gridZoomLabel = new GuiLabel("Zoom:", new float2(0f, 0f), new float2(32, 20)));
-            Add(gridSnapTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)) { allowNegativeNumbers = false });
-            Add(gridSnapLabel = new GuiLabel("Snap:", new float2(0f, 0f), new float2(30, 20)));
-            Add(angleSnapTextbox = new GuiFloatTextbox(new float2(0f, 0f), new float2(50, 16)) { allowNegativeNumbers = false });
-            Add(angleSnapLabel = new GuiLabel("Angle:", new float2(0f, 0f), new float2(32, 20)));
+            Add(gridZoomTextbox = new GuiFloatTextbox(new float2(50, 16)) { allowNegativeNumbers = false });
+            Add(gridZoomLabel = new GuiLabel("Zoom:", new float2(32, 20)));
+            Add(gridSnapTextbox = new GuiFloatTextbox(new float2(50, 16)) { allowNegativeNumbers = false });
+            Add(gridSnapLabel = new GuiLabel("Snap:", new float2(30, 20)));
+            Add(angleSnapTextbox = new GuiFloatTextbox(new float2(50, 16)) { allowNegativeNumbers = false });
+            Add(angleSnapLabel = new GuiLabel("Angle:", new float2(32, 20)));
 
             Add(snappingToggleButton = new GuiButton(resources.shapeEditorSnapping, 20, editor.UserToggleGridSnapping));
         }

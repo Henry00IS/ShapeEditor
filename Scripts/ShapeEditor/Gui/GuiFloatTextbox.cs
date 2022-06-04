@@ -36,6 +36,10 @@ namespace AeternumGames.ShapeEditor
         {
         }
 
+        public GuiFloatTextbox(float2 size) : base(float2.zero, size)
+        {
+        }
+
         /// <summary>
         /// Updates the textbox value and when the user makes an edit returns the new value once.
         /// <para>Intended to be used like: value = textbox.UpdateValue(value);</para>

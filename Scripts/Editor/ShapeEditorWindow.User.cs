@@ -390,10 +390,10 @@ namespace AeternumGames.ShapeEditor
             OpenWindow(new AboutWindow());
         }
 
-        /// <summary>Displays the inspector window.</summary>
-        internal void UserShowInspectorWindow()
+        /// <summary>Displays the bezier inspector window.</summary>
+        internal void UserShowBezierInspectorWindow()
         {
-            OpenWindow(new InspectorWindow());
+            OpenWindow(new BezierInspectorWindow());
         }
 
         /// <summary>Opens the GitHub repository in a browser window.</summary>

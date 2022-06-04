@@ -120,7 +120,7 @@ namespace AeternumGames.ShapeEditor
 
             var viewMenu = menu.Add("View");
             viewMenu.Add("Textbox Test Window", editor.UserShowTextboxTestWindow);
-            viewMenu.Add("Inspector Window", editor.UserShowInspectorWindow);
+            viewMenu.Add("Bezier Inspector Window", resources.shapeEditorSegmentBezier, editor.UserShowBezierInspectorWindow);
             viewMenu.Separator();
             viewMenu.Add("Reset Camera", editor.UserResetCamera);
 
