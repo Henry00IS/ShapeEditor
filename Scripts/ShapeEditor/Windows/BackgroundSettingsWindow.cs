@@ -71,16 +71,13 @@ namespace AeternumGames.ShapeEditor
             string path = EditorUtility.OpenFilePanelWithFilters("Load Background Image", "", new string[] { "Image Files", "png,jpg,jpeg" });
             if (path.Length != 0)
             {
+                // when the file can not be read, LoadImage() will display a question mark.
+                byte[] fileBytes = null;
+                try { fileBytes = File.ReadAllBytes(path); } catch (System.Exception) { }
+
                 var backgroundImage = new Texture2D(1, 1, TextureFormat.ARGB32, false);
-                try
-                {
-                    backgroundImage.LoadImage(File.ReadAllBytes(path));
-                    editor.gridBackgroundImage = backgroundImage;
-                }
-                catch (System.Exception ex)
-                {
-                    EditorUtility.DisplayDialog("2D Shape Editor", "An exception occured while loading the image:\r\n" + ex.Message, "Ohno!");
-                }
+                backgroundImage.LoadImage(fileBytes);
+                editor.gridBackgroundImage = backgroundImage;
             }
         }
     }
