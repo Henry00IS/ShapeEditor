@@ -25,28 +25,27 @@ namespace AeternumGames.ShapeEditor
 
             var layout = new GuiTableLayout(this, 5, 24);
 
-            layout.AddHorizontal(new GuiLabel("Detail Level"));
+            layout.Add(new GuiLabel("Detail Level"));
             layout.Space(100);
-            layout.AddHorizontal(bezierDetailTextbox = new GuiFloatTextbox(new float2(40, 16)) { allowNegativeNumbers = false, minValue = 1 });
-            bezierDetailTextbox.UpdateValue(8);
+            layout.Add(bezierDetailTextbox = new GuiFloatTextbox(new float2(40, 16)) { allowNegativeNumbers = false, minValue = 1 });
 
-            layout.NextRow(16);
+            layout.NextRow(1);
 
             for (int y = 0; y < 4; y++)
             {
                 for (int x = 1; x <= 8; x++)
                 {
                     var i = (y * 8) + x;
-                    layout.AddHorizontal(new GuiButton(i.ToString(), 20, () =>
+                    layout.Add(new GuiButton(i.ToString(), 20, () =>
                     {
                         bezierDetail = i;
                         ApplyBezierDetailToSelectedEdges();
                     }));
                 }
-                layout.NextRow(20);
+                layout.NextRow();
             }
 
-            layout.AddHorizontal(new GuiButton("Apply", new float2(windowSize.x - 10, 20), ApplyBezierDetailToSelectedEdges));
+            layout.Add(new GuiButton("Apply", new float2(windowSize.x - 10, 20), ApplyBezierDetailToSelectedEdges));
         }
 
         private float2 GetBottomRightPosition()

@@ -396,6 +396,12 @@ namespace AeternumGames.ShapeEditor
             OpenWindow(new BezierInspectorWindow());
         }
 
+        /// <summary>Displays the sine inspector window.</summary>
+        internal void UserShowSineInspectorWindow()
+        {
+            OpenWindow(new SineInspectorWindow());
+        }
+
         /// <summary>Opens the GitHub repository in a browser window.</summary>
         internal void UserOpenGitHubRepository()
         {

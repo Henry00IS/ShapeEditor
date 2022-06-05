@@ -11,7 +11,7 @@ namespace AeternumGames.ShapeEditor
         private GuiContainer<GuiControl> container;
         private int xposition = 1;
         private int yposition = 1;
-        private GuiVerticalLayout verticalLayout;
+        private int nextRowPixels = 0;
         private GuiHorizontalLayout horizontalLayout;
 
         public GuiTableLayout(GuiContainer<GuiControl> container, int xposition = 1, int yposition = 1)
@@ -19,19 +19,21 @@ namespace AeternumGames.ShapeEditor
             this.container = container;
             this.xposition = xposition;
             this.yposition = yposition;
-            verticalLayout = new GuiVerticalLayout(container, xposition, yposition);
             horizontalLayout = new GuiHorizontalLayout(container, xposition, yposition);
         }
 
-        public void AddHorizontal(GuiControl control)
+        public void Add(GuiControl control)
         {
             horizontalLayout.Add(control);
+            if (control.size.y > nextRowPixels)
+                nextRowPixels = Mathf.FloorToInt(control.size.y);
         }
 
-        public void NextRow(int pixels)
+        public void NextRow(int pixels = 0)
         {
-            verticalLayout.Space(pixels);
-            horizontalLayout = new GuiHorizontalLayout(container, xposition, Mathf.FloorToInt(verticalLayout.windowSize.y));
+            yposition += nextRowPixels + pixels;
+            horizontalLayout = new GuiHorizontalLayout(container, xposition, yposition);
+            nextRowPixels = 0;
         }
 
         public void Space(int pixels)
