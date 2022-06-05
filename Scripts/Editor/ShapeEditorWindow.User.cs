@@ -379,11 +379,6 @@ namespace AeternumGames.ShapeEditor
             Close();
         }
 
-        internal void UserShowTextboxTestWindow()
-        {
-            OpenWindow(new TextboxTestWindow(new float2(300, 100), new float2(220, 80)), false);
-        }
-
         /// <summary>Displays the about window.</summary>
         internal void UserShowAboutWindow()
         {
@@ -400,6 +395,12 @@ namespace AeternumGames.ShapeEditor
         internal void UserShowSineInspectorWindow()
         {
             OpenWindow(new SineInspectorWindow());
+        }
+
+        /// <summary>Displays the background settings window.</summary>
+        internal void UserShowBackgroundSettingsWindow()
+        {
+            OpenWindow(new BackgroundSettingsWindow());
         }
 
         /// <summary>Opens the GitHub repository in a browser window.</summary>

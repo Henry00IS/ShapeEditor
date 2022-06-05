@@ -176,6 +176,21 @@ namespace AeternumGames.ShapeEditor
             GL.Vertex3(w, y, 0);
         }
 
+        public static void DrawFlippedUvRectangle(float x, float y, float w, float h, Color color)
+        {
+            GL.Color(color);
+            w += x;
+            h += y;
+            GL.TexCoord2(0, 1);
+            GL.Vertex3(x, y, 0);
+            GL.TexCoord2(0, 0);
+            GL.Vertex3(x, h, 0);
+            GL.TexCoord2(1, 0);
+            GL.Vertex3(w, h, 0);
+            GL.TexCoord2(1, 1);
+            GL.Vertex3(w, y, 0);
+        }
+
         public static void DrawSolidRectangleWithOutline(float x, float y, float w, float h, Color faceColor, Color outlineColor)
         {
             GL.Color(outlineColor);

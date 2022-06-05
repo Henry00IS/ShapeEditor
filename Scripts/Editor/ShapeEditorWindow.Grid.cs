@@ -40,6 +40,18 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         internal bool isSnapping => snapEnabled ? !isCtrlPressed : isCtrlPressed;
 
+        /// <summary>
+        /// The background image that will be displayed behind the grid when it is activated and
+        /// loaded by the user.
+        /// </summary>
+        internal Texture2D gridBackgroundImage;
+
+        /// <summary>The scale of the background image.</summary>
+        internal float gridBackgroundScale = 1f;
+
+        /// <summary>The alpha transparency of the background image.</summary>
+        internal float gridBackgroundAlpha = 0.25f;
+
         /// <summary>After rendering the pivots this variable holds the total number of segments.</summary>
         internal int totalSegmentsCount;
 
@@ -76,6 +88,24 @@ namespace AeternumGames.ShapeEditor
         {
             float2 result = (point / screenScale / gridZoom) - (gridOffset / screenScale / gridZoom);
             return new float2(result.x, result.y);
+        }
+
+        private void DrawBackground()
+        {
+            if (gridBackgroundImage == null || gridBackgroundScale == 0f || gridBackgroundAlpha == 0f) return;
+
+            var bounds = new float4(GridPointToScreen(new float2(-0.5f * gridBackgroundScale)), GridPointToScreen(new float2(0.5f * gridBackgroundScale)));
+            var boundsWidth = bounds.z - bounds.x;
+            var boundsHeight = bounds.w - bounds.y;
+
+            var ratio = math.min(1f / gridBackgroundImage.width, 1f / gridBackgroundImage.height);
+            var width = gridBackgroundImage.width * ratio * boundsWidth;
+            var height = gridBackgroundImage.height * ratio * boundsHeight;
+
+            GLUtilities.DrawGuiTextured(gridBackgroundImage, () =>
+            {
+                GLUtilities.DrawFlippedUvRectangle(bounds.x + (boundsWidth / 2f) - (width / 2f), bounds.y + (boundsHeight / 2f) - (height / 2f), width, height, new Color(1f, 1f, 1f, gridBackgroundAlpha));
+            });
         }
 
         private void DrawGrid()
@@ -265,6 +295,7 @@ namespace AeternumGames.ShapeEditor
             GL.Clear(true, true, gridBackgroundColor);
             GL.PushMatrix();
             GL.LoadPixelMatrix(0f, renderTextureWidth, renderTextureHeight, 0f);
+            DrawBackground();
             DrawGrid();
             DrawSegments();
             DrawPivots();
