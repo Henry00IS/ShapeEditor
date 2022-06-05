@@ -24,8 +24,6 @@ namespace AeternumGames.ShapeEditor
         protected bool registerTranslateUndoOperation = true;
 
         private Constraints constraint = Constraints.None;
-        private static readonly Color constraintGlobalXColor = new Color(1.000f, 0.486f, 0.549f);
-        private static readonly Color constraintGlobalYColor = new Color(0.486f, 0.886f, 0.392f);
 
         public override void OnActivate()
         {
@@ -55,11 +53,11 @@ namespace AeternumGames.ShapeEditor
                 switch (constraint)
                 {
                     case Constraints.GlobalX:
-                        GLUtilities.DrawGui(() => GLUtilities.DrawGridLine(new float2(bounds.x, editor.selectedSegmentsAveragePosition.y), new float2(bounds.width, editor.selectedSegmentsAveragePosition.y), constraintGlobalXColor));
+                        GLUtilities.DrawGui(() => GLUtilities.DrawGridLine(new float2(bounds.x, editor.selectedSegmentsAveragePosition.y), new float2(bounds.width, editor.selectedSegmentsAveragePosition.y), ShapeEditorWindow.constraintGlobalXColor));
                         break;
 
                     case Constraints.GlobalY:
-                        GLUtilities.DrawGui(() => GLUtilities.DrawGridLine(new float2(editor.selectedSegmentsAveragePosition.x, bounds.y), new float2(editor.selectedSegmentsAveragePosition.x, bounds.height), constraintGlobalYColor));
+                        GLUtilities.DrawGui(() => GLUtilities.DrawGridLine(new float2(editor.selectedSegmentsAveragePosition.x, bounds.y), new float2(editor.selectedSegmentsAveragePosition.x, bounds.height), ShapeEditorWindow.constraintGlobalYColor));
                         break;
                 }
             }

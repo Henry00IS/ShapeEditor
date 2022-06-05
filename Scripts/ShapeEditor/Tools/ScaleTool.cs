@@ -8,11 +8,23 @@ namespace AeternumGames.ShapeEditor
 {
     public class ScaleTool : BoxSelectTool
     {
+        /// <summary>The constraints during single-use mode.</summary>
+        private enum Constraints
+        {
+            /// <summary>No scale constraint (default behaviour).</summary>
+            None,
+            /// <summary>Constrains all scaling to the global X-Axis.</summary>
+            GlobalX,
+            /// <summary>Constrains all scaling to the global Y-Axis.</summary>
+            GlobalY,
+        }
+
         private bool isSingleUseDone = false;
         private float2 initialGridPosition;
         private float initialDistance;
 
         private ScaleWidget scaleWidget = new ScaleWidget();
+        private Constraints constraint = Constraints.None;
 
         public override void OnActivate()
         {
@@ -38,10 +50,24 @@ namespace AeternumGames.ShapeEditor
 
             if (isSingleUse)
             {
+                var initialPosition = editor.GridPointToScreen(initialGridPosition);
+
                 GLUtilities.DrawGui(() =>
                 {
                     GL.Color(Color.gray);
-                    GLUtilities.DrawDottedLine(1.0f, editor.mousePosition, editor.GridPointToScreen(initialGridPosition));
+                    GLUtilities.DrawDottedLine(1.0f, editor.mousePosition, initialPosition);
+
+                    var bounds = editor.GetViewportRect();
+                    switch (constraint)
+                    {
+                        case Constraints.GlobalX:
+                            GLUtilities.DrawGridLine(new float2(bounds.x, initialPosition.y), new float2(bounds.width, initialPosition.y), ShapeEditorWindow.constraintGlobalXColor);
+                            break;
+
+                        case Constraints.GlobalY:
+                            GLUtilities.DrawGridLine(new float2(initialPosition.x, bounds.y), new float2(initialPosition.x, bounds.height), ShapeEditorWindow.constraintGlobalYColor);
+                            break;
+                    }
                 });
 
                 editor.SetMouseCursor(MouseCursor.ScaleArrow);
@@ -127,6 +153,24 @@ namespace AeternumGames.ShapeEditor
             return false;
         }
 
+        public override bool OnKeyDown(KeyCode keyCode)
+        {
+            if (isSingleUse)
+            {
+                switch (keyCode)
+                {
+                    case KeyCode.X:
+                        constraint = constraint == Constraints.GlobalX ? Constraints.None : Constraints.GlobalX;
+                        return true;
+
+                    case KeyCode.Y:
+                        constraint = constraint == Constraints.GlobalY ? Constraints.None : Constraints.GlobalY;
+                        return true;
+                }
+            }
+            return base.OnKeyDown(keyCode);
+        }
+
         private void ToolOnBeginScaling()
         {
             editor.RegisterUndo("Scale Selection");
@@ -144,7 +188,23 @@ namespace AeternumGames.ShapeEditor
 
             // scale the selected segments using their initial position.
             foreach (var segment in editor.ForEachSelectedObject())
+            {
                 segment.position = MathEx.ScaleAroundPivot(segment.gpVector1, pivot, scale);
+
+                switch (constraint)
+                {
+                    case Constraints.GlobalX:
+                        segment.position = new float2(segment.position.x, segment.gpVector1.y);
+                        break;
+
+                    case Constraints.GlobalY:
+                        segment.position = new float2(segment.gpVector1.x, segment.position.y);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
         }
     }
 }

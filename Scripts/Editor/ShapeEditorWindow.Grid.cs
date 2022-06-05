@@ -20,6 +20,8 @@ namespace AeternumGames.ShapeEditor
         internal static readonly Color segmentColorDifference = new Color(1.0f, 0.5f, 0.5f);
         internal static readonly Color segmentPivotSelectedColor = new Color(0.9f, 0.45f, 0.0f);
         internal static readonly Color segmentPivotOutlineColor = new Color(1.0f, 0.5f, 0.0f);
+        internal static readonly Color constraintGlobalXColor = new Color(1.000f, 0.486f, 0.549f);
+        internal static readonly Color constraintGlobalYColor = new Color(0.486f, 0.886f, 0.392f);
         private float2 gridOffset;
         internal float gridZoom = 1f;
         internal float gridSnap = 0.125f;
