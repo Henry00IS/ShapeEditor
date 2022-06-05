@@ -17,6 +17,9 @@ namespace AeternumGames.ShapeEditor
         public float sineFrequency = -3.5f;
 
         [SerializeField]
+        public float sineGridSnapSize = 0f;
+
+        [SerializeField]
         public Pivot sinePivot1 = new Pivot();
 
         private void Sine_Constructor()
@@ -75,7 +78,7 @@ namespace AeternumGames.ShapeEditor
                 pos.x += curve * cross.x;
                 pos.y += curve * cross.y;
 
-                yield return pos;
+                yield return pos.Snap(sineGridSnapSize);
             }
         }
     }

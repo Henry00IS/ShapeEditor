@@ -14,6 +14,9 @@ namespace AeternumGames.ShapeEditor
         public int bezierDetail = 8;
 
         [SerializeField]
+        public float bezierGridSnapSize = 0f;
+
+        [SerializeField]
         public Pivot bezierPivot1 = new Pivot();
 
         [SerializeField]
@@ -55,9 +58,12 @@ namespace AeternumGames.ShapeEditor
             var p3 = editor.GridPointToScreen(bezierPivot2.position);
             var p4 = editor.GridPointToScreen(segment.next.position);
 
-            // draw manually in screen space because we have a function for it.
+            // without snapping draw manually in screen space because we have a function for it.
             GL.Color((segment.selected && segment.next.selected) ? ShapeEditorWindow.segmentPivotOutlineColor : segment.shape.segmentColor);
-            GLUtilities.DrawBezierLine(1.0f, p1, p2, p3, p4, bezierDetail);
+            if (bezierGridSnapSize == 0f)
+                GLUtilities.DrawBezierLine(1.0f, p1, p2, p3, p4, bezierDetail);
+            else
+                DrawSegments(Bezier_ForEachSegmentPoint());
 
             GL.Color(Color.blue);
             GLUtilities.DrawLine(1.0f, p1, p2);
@@ -79,7 +85,7 @@ namespace AeternumGames.ShapeEditor
 
             for (int i = 1; i <= bezierDetail - 1; i++)
             {
-                yield return MathEx.BezierGetPoint(p1, p2, p3, p4, i / (float)bezierDetail);
+                yield return MathEx.BezierGetPoint(p1, p2, p3, p4, i / (float)bezierDetail).Snap(bezierGridSnapSize);
             }
         }
     }

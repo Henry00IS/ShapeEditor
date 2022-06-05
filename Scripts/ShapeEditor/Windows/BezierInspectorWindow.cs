@@ -11,6 +11,8 @@ namespace AeternumGames.ShapeEditor
         private static readonly float2 windowSize = new float2(170, 146);
         private GuiFloatTextbox bezierDetailTextbox;
         private int bezierDetail = 8;
+        private GuiFloatTextbox bezierGridSnapSizeTextbox;
+        private float bezierGridSnapSize = 0f;
 
         public BezierInspectorWindow() : base(float2.zero, windowSize) { }
 
@@ -26,8 +28,9 @@ namespace AeternumGames.ShapeEditor
             var layout = new GuiTableLayout(this, 5, 24);
 
             layout.Add(new GuiLabel("Detail Level"));
-            layout.Space(100);
+            layout.Space(60);
             layout.Add(bezierDetailTextbox = new GuiFloatTextbox(new float2(40, 16)) { allowNegativeNumbers = false, minValue = 1 });
+            layout.Add(new GuiButton("Apply", new float2(40, 16), ApplyBezierDetailToSelectedEdges));
 
             layout.NextRow(1);
 
@@ -45,7 +48,12 @@ namespace AeternumGames.ShapeEditor
                 layout.NextRow();
             }
 
-            layout.Add(new GuiButton("Apply", new float2(windowSize.x - 10, 20), ApplyBezierDetailToSelectedEdges));
+            layout.NextRow(4);
+
+            layout.Add(new GuiLabel("Grid Snap Size"));
+            layout.Space(60);
+            layout.Add(bezierGridSnapSizeTextbox = new GuiFloatTextbox(new float2(40, 16)) { allowNegativeNumbers = false, minValue = 0f });
+            layout.Add(new GuiButton("Apply", new float2(40, 16), ApplyGridSnapSizeToSelectedEdges));
         }
 
         private float2 GetBottomRightPosition()
@@ -58,8 +66,8 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnRender()
         {
-            // bezier detail textbox:
             bezierDetail = Mathf.RoundToInt(bezierDetailTextbox.UpdateValue(bezierDetail));
+            bezierGridSnapSize = bezierGridSnapSizeTextbox.UpdateValue(bezierGridSnapSize);
 
             base.OnRender();
         }
@@ -71,6 +79,15 @@ namespace AeternumGames.ShapeEditor
             foreach (var segment in editor.ForEachSelectedEdge())
                 if (segment.generator.type == SegmentGeneratorType.Bezier)
                     segment.generator.bezierDetail = bezierDetail;
+        }
+
+        private void ApplyGridSnapSizeToSelectedEdges()
+        {
+            editor.RegisterUndo("Apply Bezier Grid Snap Size");
+
+            foreach (var segment in editor.ForEachSelectedEdge())
+                if (segment.generator.type == SegmentGeneratorType.Bezier)
+                    segment.generator.bezierGridSnapSize = bezierGridSnapSize;
         }
     }
 }
