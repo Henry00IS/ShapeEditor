@@ -71,7 +71,7 @@ namespace AeternumGames.ShapeEditor
         /// -1 if the winding number is zero and the point is outside the polygon, 1 if the point is inside the polygon,
         /// and 0 if the point is on the polygons edge.
         /// </returns>
-        public int ContainsPoint2D(ref Vector3 point)
+        public int ContainsPoint2D(ref Vector3 point, float collinearEpsilon = 0f)
         {
             int count = Count;
 
@@ -92,7 +92,7 @@ namespace AeternumGames.ShapeEditor
                 // Test if a point is directly on the edge
                 var edge = p2.position - p1.position;
                 float area = MathEx.Area2D(ref p1.position, ref p2.position, ref point);
-                if (area == 0f && Vector2.Dot(point - p1.position, edge) >= 0f && Vector2.Dot(point - p2.position, edge) <= 0f)
+                if (Mathf.Abs(area) <= collinearEpsilon && Vector2.Dot(point - p1.position, edge) >= 0f && Vector2.Dot(point - p2.position, edge) <= 0f)
                     return 0;
 
                 // Test edge for intersection with ray from point
