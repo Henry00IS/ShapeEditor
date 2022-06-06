@@ -44,14 +44,11 @@ namespace AeternumGames.ShapeEditor
         /// <param name="distance">The distance to extrude by.</param>
         public static List<PolygonMesh> CreateExtrudedPolygonMeshes(List<Polygon> convexPolygons, float distance)
         {
+            var convexPolygonsCount = convexPolygons.Count;
             var polygonMeshes = new List<PolygonMesh>();
 
-            var convexPolygonsCount = convexPolygons.Count;
             for (int i = 0; i < convexPolygonsCount; i++)
             {
-                // calculate 2D UV coordinates for the front polygon.
-                convexPolygons[i].ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
-
                 // create a new polygon mesh for the front polygon.
                 var brush = new PolygonMesh();
                 polygonMeshes.Add(brush);
@@ -59,24 +56,40 @@ namespace AeternumGames.ShapeEditor
                 // copy the boolean operator of the 2D polygon into the polygon mesh.
                 brush.booleanOperator = convexPolygons[i].booleanOperator;
 
-                // add the front polygon to the mesh.
-                brush.Add(new Polygon(convexPolygons[i]));
+                var poly = new Polygon(convexPolygons[i]);
 
-                // extrude the front polygon.
-                foreach (var extrudedPolygon in convexPolygons[i].Extrude(distance))
+                var nextPoly = new Polygon(convexPolygons[i]);
+                nextPoly.Translate(new Vector3(0.0f, 0.0f, distance));
+
+                brush.Add(poly);
+                brush.Add(nextPoly.flipped);
+
+                // fill the gap with quads "extruding" the shape.
+                Polygon extrudedPolygon;
+                var polyVertexCount = poly.Count;
+                for (int k = 0; k < polyVertexCount - 1; k++)
                 {
-                    extrudedPolygon.ApplySabreCSGAutoUV0(new Vector2(0.5f, 0.5f));
+                    extrudedPolygon = new Polygon(new Vertex[] {
+                        poly[k],
+                        nextPoly[k],
+                        nextPoly[k + 1],
+                        poly[k + 1],
+                    });
+
                     brush.Add(extrudedPolygon);
                 }
 
-                // add a flipped back polygon to the mesh.
-                var p = convexPolygons[i].flipped;
-                p.Translate(new Vector3(0f, 0f, distance));
-                // todo: parameter- can choose to mirror back by using SabreCSG AutoUV here.
-                brush.Add(p);
+                // one more face that wraps around to index 0.
+                extrudedPolygon = new Polygon(new Vertex[] {
+                    poly[polyVertexCount - 1],
+                    nextPoly[polyVertexCount - 1],
+                    nextPoly[0],
+                    poly[0],
+                });
+
+                brush.Add(extrudedPolygon);
             }
 
-            // have a collection of convex extruded brushes.
             return polygonMeshes;
         }
 
@@ -85,13 +98,66 @@ namespace AeternumGames.ShapeEditor
         /// <param name="distance">The distance to extrude by.</param>
         public static Mesh CreateExtrudedPolygonMesh(List<Polygon> convexPolygons, float distance)
         {
-            var polygonMeshes = CreateExtrudedPolygonMeshes(convexPolygons, distance);
+            var convexPolygonsCount = convexPolygons.Count;
+            var polygonMeshes = new List<PolygonMesh>();
+
+            for (int i = 0; i < convexPolygonsCount; i++)
+            {
+                // create a new polygon mesh for the front polygon.
+                var brush = new PolygonMesh();
+                polygonMeshes.Add(brush);
+
+                var poly = new Polygon(convexPolygons[i]);
+
+                // calculate 2D UV coordinates for the front polygon.
+                poly.ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
+
+                var nextPoly = new Polygon(convexPolygons[i]);
+                nextPoly.Translate(new Vector3(0.0f, 0.0f, distance));
+
+                // calculate 2D UV coordinates for the back polygon.
+                nextPoly.ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
+
+                brush.Add(poly);
+                brush.Add(nextPoly.flipped);
+
+                // fill the gap with quads "extruding" the shape.
+                Polygon extrudedPolygon;
+                var polyVertexCount = poly.Count;
+                for (int k = 0; k < polyVertexCount - 1; k++)
+                {
+                    if (poly[k].hidden) continue;
+
+                    extrudedPolygon = new Polygon(new Vertex[] {
+                        poly[k],
+                        nextPoly[k],
+                        nextPoly[k + 1],
+                        poly[k + 1],
+                    });
+
+                    extrudedPolygon.ApplySabreCSGAutoUV0(new Vector2(0.5f, 0.5f));
+                    brush.Add(extrudedPolygon);
+                }
+
+                // one more face that wraps around to index 0.
+                if (!poly[polyVertexCount - 1].hidden)
+                {
+                    extrudedPolygon = new Polygon(new Vertex[] {
+                        poly[polyVertexCount - 1],
+                        nextPoly[polyVertexCount - 1],
+                        nextPoly[0],
+                        poly[0],
+                    });
+
+                    extrudedPolygon.ApplySabreCSGAutoUV0(new Vector2(0.5f, 0.5f));
+                    brush.Add(extrudedPolygon);
+                }
+            }
 
             var polygonMesh = PolygonMesh.Combine(polygonMeshes);
             var mesh = polygonMesh.ToMesh();
             mesh.RecalculateNormals();
             mesh.RecalculateTangents();
-
             return mesh;
         }
 
