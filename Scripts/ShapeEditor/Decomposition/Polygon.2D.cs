@@ -73,11 +73,17 @@ namespace AeternumGames.ShapeEditor
         /// </returns>
         public int ContainsPoint2D(ref Vector3 point)
         {
+            int count = Count;
+
+            // the simplest polygon which can exist in the euclidean plane has 3 sides.
+            if (count < 3)
+                return -1;
+
             // Winding number
             int wn = 0;
 
             // Iterate through polygon's edges
-            for (int i = 0; i < Count; i++)
+            for (int i = 0; i < count; i++)
             {
                 // Get points
                 var p1 = this[i];
