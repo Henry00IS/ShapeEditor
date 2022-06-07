@@ -397,6 +397,12 @@ namespace AeternumGames.ShapeEditor
             OpenWindow(new SineInspectorWindow());
         }
 
+        /// <summary>Displays the shape inspector window.</summary>
+        internal void UserShowShapeInspectorWindow()
+        {
+            OpenWindow(new ShapeInspectorWindow());
+        }
+
         /// <summary>Displays the background settings window.</summary>
         internal void UserShowBackgroundSettingsWindow()
         {
@@ -451,26 +457,23 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Sets the selected shapes as additive.</summary>
         internal void UserSetSelectedShapesAdditive()
         {
-            foreach (var shape in project.shapes)
-                if (shape.IsSelected())
-                    shape.booleanOperator = PolygonBooleanOperator.Union;
+            foreach (var shape in ForEachSelectedShape())
+                shape.booleanOperator = PolygonBooleanOperator.Union;
         }
 
         /// <summary>Sets the selected shapes as subtractive.</summary>
         internal void UserSetSelectedShapesSubtractive()
         {
-            foreach (var shape in project.shapes)
-                if (shape.IsSelected())
-                    shape.booleanOperator = PolygonBooleanOperator.Difference;
+            foreach (var shape in ForEachSelectedShape())
+                shape.booleanOperator = PolygonBooleanOperator.Difference;
         }
 
         /// <summary>Pushes the selected shapes to the front (for boolean operations).</summary>
         internal void UserPushSelectedShapesToFront()
         {
             var shapesToMove = new List<Shape>();
-            foreach (var shape in project.shapes)
-                if (shape.IsSelected())
-                    shapesToMove.Add(shape);
+            foreach (var shape in ForEachSelectedShape())
+                shapesToMove.Add(shape);
 
             foreach (var shape in shapesToMove)
             {
@@ -483,9 +486,8 @@ namespace AeternumGames.ShapeEditor
         internal void UserPushSelectedShapesToBack()
         {
             var shapesToMove = new List<Shape>();
-            foreach (var shape in project.shapes)
-                if (shape.IsSelected())
-                    shapesToMove.Add(shape);
+            foreach (var shape in ForEachSelectedShape())
+                shapesToMove.Add(shape);
 
             foreach (var shape in shapesToMove)
             {
@@ -502,9 +504,8 @@ namespace AeternumGames.ShapeEditor
         internal void UserDuplicateSelectedShapes()
         {
             var shapesToDuplicate = new List<Shape>();
-            foreach (var shape in project.shapes)
-                if (shape.IsSelected())
-                    shapesToDuplicate.Add(shape);
+            foreach (var shape in ForEachSelectedShape())
+                shapesToDuplicate.Add(shape);
 
             if (shapesToDuplicate.Count > 0)
             {

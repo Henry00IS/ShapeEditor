@@ -501,6 +501,14 @@ namespace AeternumGames.ShapeEditor
                     if (segment.selected && segment.next.selected)
                         yield return segment;
         }
+
+        /// <summary>Iterates over all fully selected shapes.</summary>
+        internal IEnumerable<Shape> ForEachSelectedShape()
+        {
+            foreach (var shape in project.shapes)
+                if (shape.IsSelected())
+                    yield return shape;
+        }
     }
 }
 

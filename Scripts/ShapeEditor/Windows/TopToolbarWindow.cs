@@ -122,6 +122,7 @@ namespace AeternumGames.ShapeEditor
             viewMenu.Add("Background Settings", editor.UserShowBackgroundSettingsWindow);
             viewMenu.Separator();
             viewMenu.Add("Bezier Inspector", resources.shapeEditorSegmentBezier, editor.UserShowBezierInspectorWindow);
+            viewMenu.Add("Shape Inspector", resources.shapeEditorShapeCreate, editor.UserShowShapeInspectorWindow);
             viewMenu.Add("Sine Inspector", resources.shapeEditorSegmentSine, editor.UserShowSineInspectorWindow);
             viewMenu.Separator();
             viewMenu.Add("Reset Camera", editor.UserResetCamera);

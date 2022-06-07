@@ -9,9 +9,7 @@ namespace AeternumGames.ShapeEditor
         private void Linear_DrawSegments()
         {
             // we just draw manually here.
-            var p1 = editor.GridPointToScreen(segment.position);
-            var p2 = editor.GridPointToScreen(segment.next.position);
-            GLUtilities.DrawLine(1.0f, p1.x, p1.y, p2.x, p2.y, segment.selected ? ShapeEditorWindow.segmentPivotOutlineColor : segment.shape.segmentColor, segment.next.selected ? ShapeEditorWindow.segmentPivotOutlineColor : segment.shape.segmentColor);
+            DrawGridLine(1.0f, segment.position, segment.next.position, segment.selected ? ShapeEditorWindow.segmentPivotOutlineColor : segment.shape.segmentColor, segment.next.selected ? ShapeEditorWindow.segmentPivotOutlineColor : segment.shape.segmentColor);
         }
     }
 }

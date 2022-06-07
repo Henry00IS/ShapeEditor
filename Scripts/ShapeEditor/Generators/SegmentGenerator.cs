@@ -155,18 +155,103 @@ namespace AeternumGames.ShapeEditor
         /// <param name="iterator">The generated segment points in grid coordinates.</param>
         private void DrawSegments(IEnumerable<float2> iterator)
         {
-            float2 last = editor.GridPointToScreen(segment.position);
-            GL.Color((segment.selected && segment.next.selected) ? ShapeEditorWindow.segmentPivotOutlineColor : segment.shape.segmentColor);
+            float2 last = segment.position;
+            var color = (segment.selected && segment.next.selected) ? ShapeEditorWindow.segmentPivotOutlineColor : segment.shape.segmentColor;
 
             foreach (var point in iterator)
             {
-                float2 next = editor.GridPointToScreen(point);
-                GLUtilities.DrawLine(1.0f, last.x, last.y, next.x, next.y);
-                last = next;
+                DrawGridLine(1.0f, last, point, color);
+                last = point;
             }
 
-            float2 final = editor.GridPointToScreen(segment.next.position);
-            GLUtilities.DrawLine(1.0f, last.x, last.y, final.x, final.y);
+            DrawGridLine(1.0f, last, segment.next.position, color);
+        }
+
+        private static readonly float2 mirrorXY = new float2(-1f, -1f);
+        private static readonly float2 mirrorX = new float2(-1f, 1f);
+        private static readonly float2 mirrorY = new float2(1f, -1f);
+
+        /// <summary>
+        /// <see cref="GLUtilities.DrawLine"/> in grid coordinates that takes shape symmetry into account.
+        /// </summary>
+        private void DrawGridLine(float thickness, float2 from, float2 to, Color beginColor, Color endColor)
+        {
+            var p1 = editor.GridPointToScreen(from);
+            var p2 = editor.GridPointToScreen(to);
+            GLUtilities.DrawLine(thickness, p1.x, p1.y, p2.x, p2.y, beginColor, endColor);
+
+            var symmetry = segment.shape.symmetryAxes;
+            if (symmetry != SimpleGlobalAxis.None)
+            {
+                bool flipX = symmetry.HasFlag(SimpleGlobalAxis.Horizontal);
+                bool flipY = symmetry.HasFlag(SimpleGlobalAxis.Vertical);
+
+                beginColor.a = 0.75f;
+                endColor.a = 0.75f;
+
+                if (flipX && flipY)
+                {
+                    p1 = editor.GridPointToScreen(from * mirrorXY);
+                    p2 = editor.GridPointToScreen(to * mirrorXY);
+                    GLUtilities.DrawLine(thickness, p1.x, p1.y, p2.x, p2.y, beginColor, endColor);
+                }
+
+                if (flipX)
+                {
+                    p1 = editor.GridPointToScreen(from * mirrorX);
+                    p2 = editor.GridPointToScreen(to * mirrorX);
+                    GLUtilities.DrawLine(thickness, p1.x, p1.y, p2.x, p2.y, beginColor, endColor);
+                }
+
+                if (flipY)
+                {
+                    p1 = editor.GridPointToScreen(from * mirrorY);
+                    p2 = editor.GridPointToScreen(to * mirrorY);
+                    GLUtilities.DrawLine(thickness, p1.x, p1.y, p2.x, p2.y, beginColor, endColor);
+                }
+            }
+        }
+
+        /// <summary>
+        /// <see cref="GLUtilities.DrawLine"/> in grid coordinates that takes shape symmetry into account.
+        /// </summary>
+        private void DrawGridLine(float thickness, float2 from, float2 to, Color color)
+        {
+            var p1 = editor.GridPointToScreen(from);
+            var p2 = editor.GridPointToScreen(to);
+            GL.Color(color);
+            GLUtilities.DrawLine(thickness, p1.x, p1.y, p2.x, p2.y);
+
+            var symmetry = segment.shape.symmetryAxes;
+            if (symmetry != SimpleGlobalAxis.None)
+            {
+                bool flipX = symmetry.HasFlag(SimpleGlobalAxis.Horizontal);
+                bool flipY = symmetry.HasFlag(SimpleGlobalAxis.Vertical);
+
+                color.a = 0.75f;
+                GL.Color(color);
+
+                if (flipX && flipY)
+                {
+                    p1 = editor.GridPointToScreen(from * mirrorXY);
+                    p2 = editor.GridPointToScreen(to * mirrorXY);
+                    GLUtilities.DrawLine(thickness, p1.x, p1.y, p2.x, p2.y);
+                }
+
+                if (flipX)
+                {
+                    p1 = editor.GridPointToScreen(from * mirrorX);
+                    p2 = editor.GridPointToScreen(to * mirrorX);
+                    GLUtilities.DrawLine(thickness, p1.x, p1.y, p2.x, p2.y);
+                }
+
+                if (flipY)
+                {
+                    p1 = editor.GridPointToScreen(from * mirrorY);
+                    p2 = editor.GridPointToScreen(to * mirrorY);
+                    GLUtilities.DrawLine(thickness, p1.x, p1.y, p2.x, p2.y);
+                }
+            }
         }
 
         /// <summary>Applies a generator by inserting the generated points as new segments.</summary>

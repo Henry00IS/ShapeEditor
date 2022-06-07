@@ -58,9 +58,9 @@ namespace AeternumGames.ShapeEditor
             var p3 = editor.GridPointToScreen(bezierPivot2.position);
             var p4 = editor.GridPointToScreen(segment.next.position);
 
-            // without snapping draw manually in screen space because we have a function for it.
+            // without snapping and symmetry draw manually in screen space because we have a function for it.
             GL.Color((segment.selected && segment.next.selected) ? ShapeEditorWindow.segmentPivotOutlineColor : segment.shape.segmentColor);
-            if (bezierGridSnapSize == 0f)
+            if (bezierGridSnapSize == 0f && segment.shape.symmetryAxes == SimpleGlobalAxis.None)
                 GLUtilities.DrawBezierLine(1.0f, p1, p2, p3, p4, bezierDetail);
             else
                 DrawSegments(Bezier_ForEachSegmentPoint());

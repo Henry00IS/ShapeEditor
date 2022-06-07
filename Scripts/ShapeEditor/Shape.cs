@@ -19,6 +19,10 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         public PolygonBooleanOperator booleanOperator = PolygonBooleanOperator.Union;
 
+        /// <summary>The global symmetry axes of the shape (horizontal and/or vertical).</summary>
+        [SerializeField]
+        public SimpleGlobalAxis symmetryAxes = SimpleGlobalAxis.None;
+
         /// <summary>Creates a new shape.</summary>
         public Shape()
         {
@@ -203,12 +207,14 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>[2D] Generates the concave polygon representing this shape.</summary>
-        /// <param name="flipY">Whether to flip the shape on the Y-axis.</param>
+        /// <param name="mirror">Whether to mirror the shape horizontally and/or vertically.</param>
         /// <returns>The collection of vertices.</returns>
-        public Polygon GenerateConcavePolygon(bool flipY)
+        public Polygon GenerateConcavePolygon(SimpleGlobalAxis mirror = SimpleGlobalAxis.None)
         {
             Polygon vertices = new Polygon();
-            float flip = flipY ? -1.0f : 1.0f;
+
+            float flipX = mirror.HasFlag(SimpleGlobalAxis.Horizontal) ? -1.0f : 1.0f;
+            float flipY = mirror.HasFlag(SimpleGlobalAxis.Vertical) ? -1.0f : 1.0f;
 
             // for every segment in the shape:
             var segmentsCount = segments.Count;
@@ -216,17 +222,39 @@ namespace AeternumGames.ShapeEditor
             {
                 // add the segment point.
                 var segment = segments[j];
-                vertices.Add(new Vertex(segment.position.x, flip * segment.position.y));
+                vertices.Add(new Vertex(flipX * segment.position.x, flipY * segment.position.y));
 
                 // have the segment generator add additional points.
                 foreach (var point in segments[j].generator.ForEachAdditionalSegmentPoint())
-                    vertices.Add(new Vertex(point.x, flip * point.y));
+                    vertices.Add(new Vertex(flipX * point.x, flipY * point.y));
             }
 
             // ensure the vertices are counter clockwise.
             vertices.ForceCounterClockWise2D();
 
             return vertices;
+        }
+
+        /// <summary>
+        /// [2D] For symmetry generates multiple concave polygons representing this shape.
+        /// </summary>
+        /// <param name="flipY">Whether to mirror the shapes vertically.</param>
+        /// <returns>The collections of vertices.</returns>
+        public Polygon[] GenerateConcavePolygons(bool flipY)
+        {
+            Polygon original = GenerateConcavePolygon(flipY ? SimpleGlobalAxis.Vertical : SimpleGlobalAxis.None);
+            Polygon mirrorX = symmetryAxes.HasFlag(SimpleGlobalAxis.Horizontal) ? GenerateConcavePolygon(SimpleGlobalAxis.Horizontal | (flipY ? SimpleGlobalAxis.Vertical : SimpleGlobalAxis.None)) : null;
+            Polygon mirrorY = symmetryAxes.HasFlag(SimpleGlobalAxis.Vertical) ? GenerateConcavePolygon(flipY ? SimpleGlobalAxis.None : SimpleGlobalAxis.Vertical) : null;
+            Polygon mirrorXY = symmetryAxes.HasFlag(SimpleGlobalAxis.Horizontal | SimpleGlobalAxis.Vertical) ? GenerateConcavePolygon(SimpleGlobalAxis.Horizontal | (flipY ? SimpleGlobalAxis.None : SimpleGlobalAxis.Vertical)) : null;
+
+            if (mirrorX != null && mirrorY != null)
+                return new Polygon[] { original, mirrorX, mirrorY, mirrorXY };
+            if (mirrorX != null)
+                return new Polygon[] { original, mirrorX };
+            if (mirrorY != null)
+                return new Polygon[] { original, mirrorY };
+
+            return new Polygon[] { original };
         }
 
         // original source code from https://github.com/Genbox/VelcroPhysics/ (see Licenses/VelcroPhysics.txt).
@@ -239,7 +267,7 @@ namespace AeternumGames.ShapeEditor
         /// </returns>
         public int ContainsPoint(Vector3 point)
         {
-            var polygon = GenerateConcavePolygon(false);
+            var polygon = GenerateConcavePolygon();
             return polygon.ContainsPoint2D(ref point);
         }
 

@@ -101,20 +101,24 @@ namespace AeternumGames.ShapeEditor
             for (int i = 0; i < shapesCount; i++)
             {
                 var shape = shapes[i];
-                var shapePolygon = shape.GenerateConcavePolygon(true);
-                var shapePolyboolPolygon = shapePolygon.ToPolybool();
+                var shapePolygons = shape.GenerateConcavePolygons(true);
+                for (int j = 0; j < shapePolygons.Length; j++)
+                {
+                    var shapePolygon = shapePolygons[j];
+                    var shapePolyboolPolygon = shapePolygon.ToPolybool();
 
-                if (shape.booleanOperator == PolygonBooleanOperator.Union)
-                {
-                    var seg2 = polyBool.segments(shapePolyboolPolygon);
-                    var comb = polyBool.combine(finalSegmentList, seg2);
-                    finalSegmentList = polyBool.selectUnion(comb);
-                }
-                else
-                {
-                    var seg2 = polyBool.segments(shapePolyboolPolygon);
-                    var comb = polyBool.combine(finalSegmentList, seg2);
-                    finalSegmentList = polyBool.selectDifference(comb);
+                    if (shape.booleanOperator == PolygonBooleanOperator.Union)
+                    {
+                        var seg2 = polyBool.segments(shapePolyboolPolygon);
+                        var comb = polyBool.combine(finalSegmentList, seg2);
+                        finalSegmentList = polyBool.selectUnion(comb);
+                    }
+                    else
+                    {
+                        var seg2 = polyBool.segments(shapePolyboolPolygon);
+                        var comb = polyBool.combine(finalSegmentList, seg2);
+                        finalSegmentList = polyBool.selectDifference(comb);
+                    }
                 }
             }
 
