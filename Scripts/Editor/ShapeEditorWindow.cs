@@ -270,6 +270,18 @@ namespace AeternumGames.ShapeEditor
                             }
                             return false;
 
+                        case KeyCode.C:
+                            if (isCtrlPressed)
+                            {
+                                UserCopy();
+                                return true;
+                            }
+                            return false;
+
+                        case KeyCode.Delete:
+                            UserDeleteSelection();
+                            return true;
+
                         case KeyCode.D:
                             if (isShiftPressed)
                             {
@@ -283,6 +295,10 @@ namespace AeternumGames.ShapeEditor
                             }
                             return false;
 
+                        case KeyCode.H:
+                            UserResetCamera();
+                            return true;
+
                         case KeyCode.I:
                             if (isCtrlPressed)
                             {
@@ -290,6 +306,14 @@ namespace AeternumGames.ShapeEditor
                                 return true;
                             }
                             return false;
+
+                        case KeyCode.Q:
+                            UserSwitchToBoxSelectTool();
+                            return true;
+
+                        case KeyCode.R:
+                            UserSwitchToRotateTool();
+                            return true;
 
                         case KeyCode.S:
                             if (isCtrlPressed)
@@ -305,24 +329,16 @@ namespace AeternumGames.ShapeEditor
                             UserSwitchToScaleTool();
                             return true;
 
-                        case KeyCode.H:
-                            UserResetCamera();
-                            return true;
-
-                        case KeyCode.Q:
-                            UserSwitchToBoxSelectTool();
-                            return true;
+                        case KeyCode.V:
+                            if (isCtrlPressed)
+                            {
+                                UserPaste();
+                                return true;
+                            }
+                            return false;
 
                         case KeyCode.W:
                             UserSwitchToTranslateTool();
-                            return true;
-
-                        case KeyCode.R:
-                            UserSwitchToRotateTool();
-                            return true;
-
-                        case KeyCode.Delete:
-                            UserDeleteSelection();
                             return true;
 
                         case KeyCode.Y:

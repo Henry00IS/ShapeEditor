@@ -548,6 +548,47 @@ namespace AeternumGames.ShapeEditor
             foreach (var segment in ForEachSelectedObject())
                 segment.position = new float2(segment.position.x, -segment.position.y + (top * 2));
         }
+
+        internal void UserCopy()
+        {
+            var clipboard = new ClipboardData();
+
+            // add all fully selected shapes to the clipboard.
+            foreach (var shape in ForEachSelectedShape())
+                clipboard.shapes.Add(shape);
+
+            EditorGUIUtility.systemCopyBuffer = JsonUtility.ToJson(clipboard);
+        }
+
+        internal void UserPaste()
+        {
+            string json = EditorGUIUtility.systemCopyBuffer;
+            if (json.Length > 0)
+            {
+                ClipboardData clipboard = null;
+                try
+                {
+                    clipboard = JsonUtility.FromJson<ClipboardData>(json);
+                }
+                catch (Exception)
+                {
+                    // silently fail on invalid clipboard data.
+                }
+
+                if (clipboard != null)
+                {
+                    project.ClearSelection();
+
+                    // add all clipboard shapes to the project.
+                    foreach (var shape in clipboard.shapes)
+                    {
+                        project.shapes.Add(shape);
+                        shape.Validate();
+                        shape.SelectAll();
+                    }
+                }
+            }
+        }
     }
 }
 
