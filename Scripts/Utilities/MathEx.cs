@@ -277,6 +277,12 @@ namespace AeternumGames.ShapeEditor
             return math.abs(math.distance(from, point) + math.distance(to, point) - math.distance(from, to));
         }
 
+        public static bool IsPointOnLine2(float2 point, float2 from, float2 to, float maxDistance)
+        {
+            var nearest = FindNearestPointOnLine(point, from, to);
+            return math.distance(nearest, point) <= maxDistance;
+        }
+
         /// <summary>Returns a positive number if c is to the left of the line going from a to b.</summary>
         /// <returns>Positive number if point is left, negative if point is right, and 0 if points are collinear.</returns>
         public static float Area(float2 a, float2 b, float2 c)

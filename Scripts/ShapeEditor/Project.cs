@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -199,7 +200,7 @@ namespace AeternumGames.ShapeEditor
                 // mark hidden edges in 2d to prevent building interior 3d polygons. in the extrude
                 // functions the vertices are always visited from index zero upwards, so we can mark
                 // the first vertex of an edge as being a hidden surface.
-                MarkHiddenSurfaces(convexPolygons);
+                MarkHiddenSurfaces(convexPolygons, finalSegmentList);
             }
 
             // cleanup step that removes degenerate polygons and polygons with less than 3 sides.
@@ -243,7 +244,7 @@ namespace AeternumGames.ShapeEditor
         /// that should not be extruded.
         /// </summary>
         /// <param name="convexPolygons">The collection of 2D polygons of <see cref="GenerateConvexPolygons"/></param>
-        private void MarkHiddenSurfaces(List<Polygon> convexPolygons)
+        private void MarkHiddenSurfaces(List<Polygon> convexPolygons, PolyBoolCS.SegmentList segmentList)
         {
             // iterate over every 2d convex polygon:
             var convexPolygonsCount = convexPolygons.Count;
@@ -259,20 +260,23 @@ namespace AeternumGames.ShapeEditor
                     var nextVertex = vertices.NextVertex(i);
                     var center = Vector3.Lerp(thisVertex.position, nextVertex.position, 0.5f);
 
-                    // iterate over every 2d convex polygon:
-                    for (int k = 0; k < convexPolygonsCount; k++)
+                    bool hide = true;
+                    foreach (var segment in segmentList)
                     {
-                        // skip if we are about to compare the polygon against the same polygon.
-                        if (j == k) continue;
-
-                        // check whether the other polygon contains the center point.
-                        if (convexPolygons[k].ContainsPoint2D(ref center, 0.00000001f) >= 0)
+                        if (MathEx.IsPointOnLine2(
+                            new float2(center.x, center.y),
+                            new float2((float)segment.start.x, (float)segment.start.y),
+                            new float2((float)segment.end.x, (float)segment.end.y),
+                            0.0001403269f
+                        ))
                         {
-                            // mark the edge as hidden.
-                            convexPolygons[j][i] = new Vertex(thisVertex.position, thisVertex.uv0, true);
+                            hide = false;
                             break;
                         }
                     }
+                    // mark the edge as hidden.
+                    if (hide)
+                        convexPolygons[j][i] = new Vertex(thisVertex.position, thisVertex.uv0, true);
                 }
             }
         }
