@@ -113,9 +113,18 @@ namespace AeternumGames.ShapeEditor
 
         public override bool OnKeyDown(KeyCode keyCode)
         {
-            // these single-use tools are not available while in single-use mode.
-            if (isSingleUse) return false;
+            if (isSingleUse)
+            {
+                switch (keyCode)
+                {
+                    case KeyCode.Escape:
+                        ToolOnCancel();
+                        return true;
+                }
+                return false;
+            }
 
+            // these single-use tools are not available while in single-use mode.
             switch (keyCode)
             {
                 case KeyCode.G:
@@ -127,6 +136,14 @@ namespace AeternumGames.ShapeEditor
                     return false;
             }
             return false;
+        }
+
+        /// <summary>Cancels the single-use tool operation.</summary>
+        private void ToolOnCancel()
+        {
+            // exit the tool.
+            isSingleUseDone = true;
+            editor.SwitchTool(parent);
         }
     }
 }

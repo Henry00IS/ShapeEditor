@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
@@ -25,6 +26,17 @@ namespace AeternumGames.ShapeEditor
             // remove history that exceeds the maximum depth.
             while (undoStack.Count > undoStackDepth)
                 undoStack.RemoveAt(undoStack.Count - 1);
+        }
+
+        /// <summary>Discards a single <see cref="RegisterUndo"/> operation (e.g. for tool cancel).</summary>
+        internal void DiscardUndo()
+        {
+            // prevent future mistakes.
+            if (redoStack.Count > 0)
+                Debug.LogWarning("Attempted to discard an undo operation that was not on top of the undo/redo stack.");
+
+            // pop a project from the undo stack.
+            undoStack.Pop();
         }
 
         /// <summary>Called on CTRL+Z when the editor window has focus.</summary>

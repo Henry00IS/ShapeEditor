@@ -121,6 +121,20 @@ namespace AeternumGames.ShapeEditor
             return false;
         }
 
+        public override bool OnKeyDown(KeyCode keyCode)
+        {
+            if (isSingleUse)
+            {
+                switch (keyCode)
+                {
+                    case KeyCode.Escape:
+                        ToolOnCancel();
+                        return true;
+                }
+            }
+            return base.OnKeyDown(keyCode);
+        }
+
         private void ToolOnBeginRotating()
         {
             editor.RegisterUndo("Rotate Selection");
@@ -140,6 +154,21 @@ namespace AeternumGames.ShapeEditor
             // rotate the selected segments using their initial position.
             foreach (var segment in editor.ForEachSelectedObject())
                 segment.position = MathEx.RotatePointAroundPivot(segment.gpVector1, pivot, degrees);
+        }
+
+        /// <summary>Cancels the single-use tool operation and undoes all changes.</summary>
+        private void ToolOnCancel()
+        {
+            // undo rotation.
+            foreach (var segment in editor.ForEachSelectedObject())
+                segment.position = segment.gpVector1;
+
+            // discard undo operation.
+            editor.DiscardUndo();
+
+            // exit the tool.
+            isSingleUseDone = true;
+            editor.SwitchTool(parent);
         }
     }
 }

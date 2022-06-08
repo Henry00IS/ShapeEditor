@@ -19,7 +19,7 @@ namespace AeternumGames.ShapeEditor
             GlobalY,
         }
 
-        private bool isSingleUseDone = false;
+        protected bool isSingleUseDone = false;
         private TranslationWidget translationWidget = new TranslationWidget();
         protected bool registerTranslateUndoOperation = true;
 
@@ -138,6 +138,10 @@ namespace AeternumGames.ShapeEditor
             {
                 switch (keyCode)
                 {
+                    case KeyCode.Escape:
+                        ToolOnCancel();
+                        return true;
+
                     case KeyCode.X:
                         constraint = constraint == Constraints.GlobalX ? Constraints.None : Constraints.GlobalX;
                         return true;
@@ -191,6 +195,21 @@ namespace AeternumGames.ShapeEditor
 
                 segment.position = segment.gpVector1 + position;
             }
+        }
+
+        /// <summary>Cancels the single-use tool operation and undoes all changes.</summary>
+        protected virtual void ToolOnCancel()
+        {
+            // undo translation.
+            foreach (var segment in editor.ForEachSelectedObject())
+                segment.position = segment.gpVector1;
+
+            // discard undo operation.
+            editor.DiscardUndo();
+
+            // exit the tool.
+            isSingleUseDone = true;
+            editor.SwitchTool(parent);
         }
     }
 }
