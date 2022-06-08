@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
@@ -8,6 +9,7 @@ namespace AeternumGames.ShapeEditor
 {
     public partial class ShapeEditorWindow
     {
+        internal double lastInteraction;
         internal float lastRenderTime;
         internal bool isLeftMousePressed;
         private bool isRightMousePressed;
@@ -73,6 +75,8 @@ namespace AeternumGames.ShapeEditor
             {
                 if (IsMousePositionInViewport(eMousePosition))
                 {
+                    UpdateLastInteractedTime();
+
                     // ensure we have input focus (e.g. not some imgui textbox).
                     GUI.FocusControl(null);
 
@@ -101,6 +105,8 @@ namespace AeternumGames.ShapeEditor
 
                 if (IsMousePositionInViewport(eMousePosition))
                 {
+                    UpdateLastInteractedTime();
+
                     // reset the hot control.
                     GUIUtility.hotControl = 0;
 
@@ -116,6 +122,8 @@ namespace AeternumGames.ShapeEditor
 
             if (e.type != EventType.MouseUp && e.rawType == EventType.MouseUp)
             {
+                UpdateLastInteractedTime();
+
                 // reset the hot control.
                 GUIUtility.hotControl = 0;
 
@@ -151,6 +159,8 @@ namespace AeternumGames.ShapeEditor
             {
                 if (IsMousePositionInViewport(eMousePosition))
                 {
+                    UpdateLastInteractedTime();
+
                     mousePosition = eMousePosition;
                     mouseGridPosition = ScreenPointToGrid(mousePosition);
                     OnMouseScroll(e.delta.y);
@@ -161,6 +171,8 @@ namespace AeternumGames.ShapeEditor
 
             if (e.type == EventType.KeyDown)
             {
+                UpdateLastInteractedTime();
+
                 isCtrlPressed = e.modifiers.HasFlag(EventModifiers.Control);
                 isShiftPressed = e.modifiers.HasFlag(EventModifiers.Shift);
 
@@ -185,6 +197,8 @@ namespace AeternumGames.ShapeEditor
 
             if (e.type == EventType.DragPerform)
             {
+                UpdateLastInteractedTime();
+
                 DragAndDrop.AcceptDrag();
 
                 if (DragAndDrop.paths.Length > 0)
@@ -194,6 +208,72 @@ namespace AeternumGames.ShapeEditor
 
                 e.Use();
             }
+        }
+
+        /// <summary>Records the time of the last interaction with this window.</summary>
+        private void UpdateLastInteractedTime()
+        {
+            lastInteraction = Time.realtimeSinceStartupAsDouble;
+        }
+
+        /// <summary>Called when a new 2D Shape Editor window is created.</summary>
+        private void OnEnable()
+        {
+            titleContent = new GUIContent("Shape Editor", ShapeEditorResources.Instance.shapeEditorIcon);
+
+            // this window has just been created and is thus the last interacted one.
+            UpdateLastInteractedTime();
+        }
+
+        /// <summary>
+        /// Called by the "Window/2D Shape Editor" entry in the main menu and opens it.
+        /// </summary>
+        [MenuItem("Window/2D Shape Editor")]
+        public static void Init()
+        {
+            // get existing open window or if none, make a new one:
+            ShapeEditorWindow window = GetWindow<ShapeEditorWindow>();
+            window.minSize = new float2(800, 600);
+            window.Show();
+            window.minSize = new float2(128, 128);
+        }
+
+        /// <summary>Gets an existing open window or if none, make a new one and opens it.</summary>
+        public static ShapeEditorWindow InitAndGetHandle()
+        {
+            // find all shape editor windows.
+            var windows = Resources.FindObjectsOfTypeAll<ShapeEditorWindow>();
+
+            // find the candidate window that was last interacted with.
+            ShapeEditorWindow candidate = null;
+            double highestInteractionTime = double.NegativeInfinity;
+            for (int i = 0; i < windows.Length; i++)
+            {
+                var window = windows[i];
+                if (window.lastInteraction > highestInteractionTime)
+                {
+                    highestInteractionTime = window.lastInteraction;
+                    candidate = windows[i];
+                }
+            }
+
+            // return the most likely candidate window if found.
+            if (candidate)
+            {
+                candidate.Focus();
+                return candidate;
+            }
+
+            // else create and return a new window.
+            Init();
+            return GetWindow<ShapeEditorWindow>();
+        }
+
+        /// <summary>Adds additional items to the "Add Tab" menu.</summary>
+        public override IEnumerable<System.Type> GetExtraPaneTypes()
+        {
+            // allow the user to create multiple shape editor windows.
+            return new System.Type[] { typeof(ShapeEditorWindow) };
         }
 
         internal Rect GetViewportRect()

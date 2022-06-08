@@ -18,23 +18,6 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Whether the mouse is actively in use by a widget or pressed.</summary>
         internal bool isMouseBusy => isLeftMousePressed || isRightMousePressed || isToolBusy;
 
-        [MenuItem("Window/2D Shape Editor")]
-        public static void Init()
-        {
-            // get existing open window or if none, make a new one:
-            ShapeEditorWindow window = GetWindow<ShapeEditorWindow>();
-            window.minSize = new float2(800, 600);
-            window.Show();
-            window.titleContent = new GUIContent("Shape Editor", ShapeEditorResources.Instance.shapeEditorIcon);
-            window.minSize = new float2(128, 128);
-        }
-
-        public static ShapeEditorWindow InitAndGetHandle()
-        {
-            Init();
-            return GetWindow<ShapeEditorWindow>();
-        }
-
         private void OnRepaint()
         {
             // check for and delete unused string meshes.
