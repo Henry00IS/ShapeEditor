@@ -18,6 +18,8 @@ namespace AeternumGames.ShapeEditor
 
         private void SplineExtrude_Rebuild()
         {
+            RequireConvexPolygons2D();
+
             var spline = GetSpline3();
             if (spline == null) return;
 

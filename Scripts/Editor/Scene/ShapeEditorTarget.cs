@@ -19,6 +19,9 @@ namespace AeternumGames.ShapeEditor
         /// <summary>The convex polygons set by the shape editor.</summary>
         private PolygonMesh convexPolygons2D;
 
+        /// <summary>The chopped polygons set by the shape editor.</summary>
+        private PolygonMesh[] choppedPolygons2D;
+
         /// <summary>The operating mode.</summary>
         [SerializeField]
         internal ShapeEditorTargetMode targetMode = ShapeEditorTargetMode.Polygon;
@@ -26,6 +29,7 @@ namespace AeternumGames.ShapeEditor
         public void OnShapeEditorUpdateProject(Project project)
         {
             convexPolygons2D = null;
+            choppedPolygons2D = null;
 
             this.project = project.Clone();
 
@@ -41,7 +45,8 @@ namespace AeternumGames.ShapeEditor
                 meshRenderer.sharedMaterial = ShapeEditorResources.Instance.shapeEditorDefaultMaterial;
         }
 
-        public void Rebuild()
+        /// <summary>Must be called when <see cref="convexPolygons2D"/> is required.</summary>
+        private void RequireConvexPolygons2D()
         {
             // get the convex project polygons.
             if (convexPolygons2D == null)
@@ -52,7 +57,26 @@ namespace AeternumGames.ShapeEditor
                 convexPolygons2D = project.GenerateConvexPolygons();
                 convexPolygons2D.CalculateBounds2D();
             }
+        }
 
+        /// <summary>Must be called when <see cref="choppedPolygons2D"/> is required.</summary>
+        /// <param name="chopCount">The amount of chops the project will be cut into.</param>
+        private void RequireChoppedPolygons2D(int chopCount)
+        {
+            // get the chopped project polygons.
+            if (choppedPolygons2D == null || choppedPolygons2D.Length != chopCount)
+            {
+                // ensure the project data is ready.
+                project.Validate();
+
+                choppedPolygons2D = project.GenerateChoppedConvexPolygons(chopCount);
+                for (int i = 0; i < choppedPolygons2D.Length; i++)
+                    choppedPolygons2D[i].CalculateBounds2D();
+            }
+        }
+
+        public void Rebuild()
+        {
             switch (targetMode)
             {
                 case ShapeEditorTargetMode.Polygon:
@@ -77,6 +101,10 @@ namespace AeternumGames.ShapeEditor
 
                 case ShapeEditorTargetMode.ScaledExtrude:
                     ScaledExtrude_Rebuild();
+                    break;
+
+                case ShapeEditorTargetMode.RevolveChopped:
+                    RevolveChopped_Rebuild();
                     break;
             }
         }

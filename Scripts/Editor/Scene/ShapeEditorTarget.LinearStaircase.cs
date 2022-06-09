@@ -24,6 +24,8 @@ namespace AeternumGames.ShapeEditor
 
         private void LinearStaircase_Rebuild()
         {
+            RequireConvexPolygons2D();
+
             var mesh = MeshGenerator.CreateLinearStaircaseMesh(convexPolygons2D, linearStaircasePrecision, linearStaircaseDistance, linearStaircaseHeight, linearStaircaseSloped);
             OnShapeEditorMesh(mesh);
         }

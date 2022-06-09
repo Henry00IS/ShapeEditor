@@ -21,6 +21,8 @@ namespace AeternumGames.ShapeEditor
 
         private void ScaledExtrude_Rebuild()
         {
+            RequireConvexPolygons2D();
+
             var mesh = MeshGenerator.CreateScaleExtrudedMesh(convexPolygons2D, scaledExtrudeDistance, scaledExtrudeFrontScale, scaledExtrudeBackScale, scaledExtrudeOffset);
             OnShapeEditorMesh(mesh);
         }

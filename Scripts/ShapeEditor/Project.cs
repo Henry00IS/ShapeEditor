@@ -58,6 +58,22 @@ namespace AeternumGames.ShapeEditor
                 shapes[i].InvertSelection();
         }
 
+        /// <summary>Gets an AABB that fully contains the project's segments.</summary>
+        public Bounds GetAABB()
+        {
+            Bounds bounds = default;
+            var shapesCount = shapes.Count;
+            for (int i = 0; i < shapesCount; i++)
+            {
+                var shape = shapes[i];
+                if (i == 0)
+                    bounds = shape.GetAABB();
+                else
+                    bounds.Encapsulate(shape.GetAABB());
+            }
+            return bounds;
+        }
+
         [NonSerialized]
         private bool isValid = false;
 
@@ -77,53 +93,50 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>
-        /// [2D] Decomposes all shapes into convex polygons representing this project.
-        /// <para>The Y coordinate will be flipped to match X and Y in 3D space.</para>
+        /// Generates concave polygons for all shapes and applies their boolean operators into a
+        /// segment list representing this project.
         /// </summary>
-        /// <param name="useHoles">
-        /// Whether holes are used in the convex decomposition algorithm. If false then holes will
-        /// be added to the result with their boolean operator set to <see
-        /// cref="PolygonBooleanOperator.Difference"/> for use by CSG targets. The use of holes with
-        /// convex decomposition leads to many brushes, which can be avoided by using the
-        /// subtractive brushes of the CSG algorithm.
-        /// </param>
-        /// <returns>The collection of convex polygons.</returns>
-        public PolygonMesh GenerateConvexPolygons(bool useHoles = true)
+        private PolyBoolCS.SegmentList GenerateConcaveSegmentList(PolyBoolCS.PolyBool polyBool)
         {
+            var result = new PolyBoolCS.SegmentList();
+
+            // iterate over every shape in the project:
             var shapesCount = shapes.Count;
-
-            // using boolean operations:
-
-            // generate concave polygons for all of the shapes.
-
-            var polyBool = new PolyBoolCS.PolyBool();
-            var finalSegmentList = new PolyBoolCS.SegmentList();
-
             for (int i = 0; i < shapesCount; i++)
             {
                 var shape = shapes[i];
+
+                // generate concave polygons:
                 var shapePolygons = shape.GenerateConcavePolygons(true);
                 for (int j = 0; j < shapePolygons.Length; j++)
                 {
+                    // turn the concave polygons into a polybool segment list:
                     var shapePolygon = shapePolygons[j];
                     var shapePolyboolPolygon = shapePolygon.ToPolybool();
 
+                    // apply the boolean operation (union or difference) on the final result.
                     if (shape.booleanOperator == PolygonBooleanOperator.Union)
                     {
                         var seg2 = polyBool.segments(shapePolyboolPolygon);
-                        var comb = polyBool.combine(finalSegmentList, seg2);
-                        finalSegmentList = polyBool.selectUnion(comb);
+                        var comb = polyBool.combine(result, seg2);
+                        result = polyBool.selectUnion(comb);
                     }
                     else
                     {
                         var seg2 = polyBool.segments(shapePolyboolPolygon);
-                        var comb = polyBool.combine(finalSegmentList, seg2);
-                        finalSegmentList = polyBool.selectDifference(comb);
+                        var comb = polyBool.combine(result, seg2);
+                        result = polyBool.selectDifference(comb);
                     }
                 }
             }
 
-            var concavePolygons = polyBool.polygon(finalSegmentList).ToPolygons(polyBool);
+            return result;
+        }
+
+        /// <summary>Decomposes a segment list into multiple convex polygons.</summary>
+        private PolygonMesh SegmentListToConvexPolygonMesh(PolyBoolCS.PolyBool polyBool, PolyBoolCS.SegmentList segmentList, bool useHoles)
+        {
+            var concavePolygons = polyBool.polygon(segmentList).ToPolygons(polyBool);
             var concavePolygonsCount = concavePolygons.Count;
 
             // find clockwise polygons (holes):
@@ -200,13 +213,86 @@ namespace AeternumGames.ShapeEditor
                 // mark hidden edges in 2d to prevent building interior 3d polygons. in the extrude
                 // functions the vertices are always visited from index zero upwards, so we can mark
                 // the first vertex of an edge as being a hidden surface.
-                MarkHiddenSurfaces(convexPolygons, finalSegmentList);
+                MarkHiddenSurfaces(convexPolygons, segmentList);
             }
 
             // cleanup step that removes degenerate polygons and polygons with less than 3 sides.
             CleanupPolygons(convexPolygons);
 
             return convexPolygons;
+        }
+
+        /// <summary>
+        /// [2D] Decomposes all shapes into convex polygons representing this project.
+        /// <para>The Y coordinate will be flipped to match X and Y in 3D space.</para>
+        /// </summary>
+        /// <param name="useHoles">
+        /// Whether holes are used in the convex decomposition algorithm. If false then holes will
+        /// be added to the result with their boolean operator set to <see
+        /// cref="PolygonBooleanOperator.Difference"/> for use by CSG targets. The use of holes with
+        /// convex decomposition leads to many brushes, which can be avoided by using the
+        /// subtractive brushes of the CSG algorithm.
+        /// </param>
+        /// <returns>The collection of convex polygons.</returns>
+        public PolygonMesh[] GenerateChoppedConvexPolygons(int chopCount, bool useHoles = true)
+        {
+            var meshes = new PolygonMesh[chopCount];
+
+            // build a segment list representing this project.
+            var polyBool = new PolyBoolCS.PolyBool();
+            //var projectSegmentList = GenerateConcaveSegmentList(polyBool);
+
+            // we chop it horizontally by using multiple intersect operations.
+            var projectBounds = GetAABB();
+            var chopWidth = projectBounds.size.x / chopCount;
+
+            for (int i = 0; i < chopCount; i++)
+            {
+                var chopX1 = projectBounds.min.x + (chopWidth * i);
+                var chopX2 = projectBounds.min.x + (chopWidth * (i + 1)); // todo: couldn't you do chopX1 + chopWidth?
+
+                var intersectPolygon = new PolyBoolCS.Polygon()
+                {
+                    regions = new List<PolyBoolCS.PointList>() {
+                        new PolyBoolCS.PointList() {
+                            new PolyBoolCS.Point(chopX1, projectBounds.min.y),
+                            new PolyBoolCS.Point(chopX2, projectBounds.min.y),
+                            new PolyBoolCS.Point(chopX2, projectBounds.max.y),
+                            new PolyBoolCS.Point(chopX1, projectBounds.max.y),
+                        }
+                    }
+                };
+
+                var projectSegmentList = GenerateConcaveSegmentList(polyBool); // todo: why is this data lost when not called again?
+                var combine = polyBool.combine(projectSegmentList, polyBool.segments(intersectPolygon));
+
+                // build convex polygons out of the intersect segment list.
+                meshes[i] = SegmentListToConvexPolygonMesh(polyBool, polyBool.selectIntersect(combine), useHoles);
+            }
+
+            return meshes;
+        }
+
+        /// <summary>
+        /// [2D] Decomposes all shapes into convex polygons representing this project.
+        /// <para>The Y coordinate will be flipped to match X and Y in 3D space.</para>
+        /// </summary>
+        /// <param name="useHoles">
+        /// Whether holes are used in the convex decomposition algorithm. If false then holes will
+        /// be added to the result with their boolean operator set to <see
+        /// cref="PolygonBooleanOperator.Difference"/> for use by CSG targets. The use of holes with
+        /// convex decomposition leads to many brushes, which can be avoided by using the
+        /// subtractive brushes of the CSG algorithm.
+        /// </param>
+        /// <returns>The collection of convex polygons.</returns>
+        public PolygonMesh GenerateConvexPolygons(bool useHoles = true)
+        {
+            // build a segment list representing this project.
+            var polyBool = new PolyBoolCS.PolyBool();
+            var projectSegmentList = GenerateConcaveSegmentList(polyBool);
+
+            // build convex polygons out of the segment list.
+            return SegmentListToConvexPolygonMesh(polyBool, projectSegmentList, useHoles);
         }
 
         /// <summary>
