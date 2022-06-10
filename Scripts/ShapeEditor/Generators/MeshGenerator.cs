@@ -758,19 +758,36 @@ namespace AeternumGames.ShapeEditor
             var outerDiameter = diameter + distance;
             var circumference = diameter * 2f * Mathf.PI;
 
+            Bounds projectBounds = default;
+            for (int i = 0; i < precision; i++)
+            {
+                if (i == 0)
+                {
+                    projectBounds = choppedPolygons[i].bounds2D;
+                }
+                else
+                {
+                    projectBounds.Encapsulate(choppedPolygons[i].bounds2D);
+                }
+            }
+
             // iterate over all chops in the project:
             for (int i = 0; i < precision; i++)
             {
                 var original = choppedPolygons[i];
                 var originalCount = original.Count;
                 var originalBounds2D = original.bounds2D;
-                var transformed = new PolygonMesh(originalCount);
-                var stepLength = originalBounds2D.size.x;
+                var brush = new PolygonMesh(originalCount);
+                var stepLength = projectBounds.size.x / precision;
 
                 // iterate over all decomposed convex polygons of the chop:
                 for (int j = 0; j < originalCount; j++)
                 {
                     var poly = new Polygon(original[j]);
+
+                    // calculate 2D UV coordinates for the front polygon.
+                    poly.ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
+
                     var backPoly = new Polygon(original[j]);
                     var polyCount = poly.Count;
 
@@ -788,7 +805,9 @@ namespace AeternumGames.ShapeEditor
                             var outerCirclepos1 = MathEx.CirclePosition(outerDiameter, t1);
                             var outerCirclepos2 = MathEx.CirclePosition(outerDiameter, t2);
 
-                            //var forward = (circlepos2 - circlepos1).normalized;
+                            //var forward = (innerCirclepos2 - innerCirclepos1).normalized;
+                            //var right = Vector3.Cross(Vector3.up, forward);
+                            //Debug.DrawRay(innerCirclepos1, -right, Color.red, 2f);
 
                             var innerVertexPos = Vector3.Lerp(
                                 new Vector3(innerCirclepos1.x, vertex.position.y, innerCirclepos1.z),
@@ -807,80 +826,19 @@ namespace AeternumGames.ShapeEditor
                         }
                     }
 
-                    transformed.Add(poly);
-                    transformed.Add(backPoly);
-                }
-
-                polygonMeshes.Add(transformed);
-            }
-
-            /*
-            var slopedHeightOffset = new Vector3();
-            if (sloped && precision >= 2)
-                slopedHeightOffset = new Vector3(0.0f, height / precision, 0.0f);
-
-            // the ending height has to be reduced so that it aligns perfectly with the non-sloped version.
-            height -= slopedHeightOffset.y;
-
-            // offset the polygons by the the vertical project center line as this will let us
-            // rotate left or right without self-intersecting or inverting the mesh.
-            var projectCenterOffset = degrees > 0f ? new Vector3(-convexPolygons.bounds2D.max.x, 0f) : new Vector3(-convexPolygons.bounds2D.min.x, 0f);
-
-            var convexPolygonsCount = convexPolygons.Count;
-            for (int i = 0; i < convexPolygonsCount; i++)
-            {
-                // calculate 2D UV coordinates for the front polygon.
-                convexPolygons[i].ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
-
-                for (int j = 0; j < precision; j++)
-                {
-                    // create a new polygon mesh for the front polygon.
-                    var brush = new PolygonMesh();
-                    polygonMeshes.Add(brush);
-
-                    var poly = new Polygon(convexPolygons[i]);
-
-                    // ensure that the polygon is always on one side of the vertical project center line.
-                    poly.Translate(projectCenterOffset);
-
-                    var nextPoly = new Polygon(poly);
-                    var polyVertexCount = poly.Count;
-
-                    // flip the pivot on negative degrees to rotate left.
-                    Vector3 pivot = new Vector3(degrees > 0f ? diameter : -diameter, 0.0f, 0.0f);
-
-                    for (int v = 0; v < polyVertexCount; v++)
-                    {
-                        // calculate the step height.
-                        var heightOffset = new Vector3();
-                        if (precision >= 2)
-                            heightOffset.y = (j / ((float)precision - 1)) * height;
-
-                        poly[v] = new Vertex(heightOffset + MathEx.RotatePointAroundPivot(poly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, j / (float)precision), 0.0f)), poly[v].uv0, poly[v].hidden);
-                        nextPoly[v] = new Vertex(heightOffset + slopedHeightOffset + MathEx.RotatePointAroundPivot(nextPoly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, (j + 1) / (float)precision), 0.0f)), nextPoly[v].uv0, nextPoly[v].hidden);
-                    }
-
-                    if (height == 0f || sloped)
-                    {
-                        if (j == 0) brush.Add(poly);
-                        if (j == precision - 1) brush.Add(nextPoly.flipped);
-                    }
-                    else
-                    {
-                        brush.Add(poly);
-                        brush.Add(nextPoly.flipped);
-                    }
+                    brush.Add(poly);
+                    brush.Add(backPoly.flipped);
 
                     // fill the gap with quads "extruding" the shape.
                     Polygon extrudedPolygon;
-                    for (int k = 0; k < polyVertexCount - 1; k++)
+                    for (int k = 0; k < polyCount - 1; k++)
                     {
                         if (poly[k].hidden) continue;
 
                         extrudedPolygon = new Polygon(new Vertex[] {
                             poly[k],
-                            nextPoly[k],
-                            nextPoly[k + 1],
+                            backPoly[k],
+                            backPoly[k + 1],
                             poly[k + 1],
                         });
 
@@ -889,12 +847,12 @@ namespace AeternumGames.ShapeEditor
                     }
 
                     // one more face that wraps around to index 0.
-                    if (!poly[polyVertexCount - 1].hidden)
+                    if (!poly[polyCount - 1].hidden)
                     {
                         extrudedPolygon = new Polygon(new Vertex[] {
-                            poly[polyVertexCount - 1],
-                            nextPoly[polyVertexCount - 1],
-                            nextPoly[0],
+                            poly[polyCount - 1],
+                            backPoly[polyCount - 1],
+                            backPoly[0],
                             poly[0],
                         });
 
@@ -902,7 +860,9 @@ namespace AeternumGames.ShapeEditor
                         brush.Add(extrudedPolygon);
                     }
                 }
-            }*/
+
+                polygonMeshes.Add(brush);
+            }
 
             var polygonMesh = PolygonMesh.Combine(polygonMeshes);
 
