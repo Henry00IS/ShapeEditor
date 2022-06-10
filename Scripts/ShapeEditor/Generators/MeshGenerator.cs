@@ -744,6 +744,164 @@ namespace AeternumGames.ShapeEditor
             mesh.RecalculateTangents();
             return mesh;
         }
+
+        /// <summary>[Concave] Creates a mesh by revolving chopped convex polygons along a circle.</summary>
+        /// <param name="convexPolygons">The chopped and decomposed convex polygons.</param>
+        /// <param name="degrees">The revolve degrees between -360 to 360.</param>
+        /// <param name="diameter">The inner diameter to revolve around.</param>
+        /// <param name="height">The target height to be reached by offsetting the individual meshes.</param>
+        /// <param name="sloped">Whether the individual meshes are sloped towards the target height.</param>
+        public static Mesh CreateRevolveChoppedMesh(PolygonMesh[] choppedPolygons, float degrees, float diameter, float height, bool sloped)
+        {
+            var polygonMeshes = new List<PolygonMesh>();
+            int precision = choppedPolygons.Length;
+
+            var circumference = diameter * 2f * Mathf.PI;
+
+            // iterate over all chops in the project:
+            for (int i = 0; i < precision; i++)
+            {
+                var original = choppedPolygons[i];
+                var originalCount = original.Count;
+                var originalBounds2D = original.bounds2D;
+                var transformed = new PolygonMesh(originalCount);
+                var stepLength = originalBounds2D.size.x;
+
+                // iterate over all decomposed convex polygons of the chop:
+                for (int j = 0; j < originalCount; j++)
+                {
+                    var poly = new Polygon(original[j]);
+                    var polyCount = poly.Count;
+
+                    // iterate over all cloned vertices:
+                    for (int v = 0; v < polyCount; v++)
+                    {
+                        var vertex = poly[v];
+
+                        float t1 = i * stepLength / circumference;
+                        float t2 = (i + 1) * stepLength / circumference;
+
+                        var circlepos1 = MathEx.CirclePosition(diameter, t1);
+                        var circlepos2 = MathEx.CirclePosition(diameter, t2);
+
+                        var forward = (circlepos2 - circlepos1).normalized;
+
+                        var pos = Vector3.Lerp(
+                            new Vector3(circlepos1.x, vertex.position.y, circlepos1.z),
+                            new Vector3(circlepos2.x, vertex.position.y, circlepos2.z),
+                            Mathf.InverseLerp(originalBounds2D.min.x, originalBounds2D.max.x, vertex.position.x)
+                        );
+
+                        poly[v] = new Vertex(pos, poly[v].uv0, poly[v].hidden);
+                    }
+
+                    transformed.Add(poly);
+                }
+
+                polygonMeshes.Add(transformed);
+            }
+
+            /*
+            var slopedHeightOffset = new Vector3();
+            if (sloped && precision >= 2)
+                slopedHeightOffset = new Vector3(0.0f, height / precision, 0.0f);
+
+            // the ending height has to be reduced so that it aligns perfectly with the non-sloped version.
+            height -= slopedHeightOffset.y;
+
+            // offset the polygons by the the vertical project center line as this will let us
+            // rotate left or right without self-intersecting or inverting the mesh.
+            var projectCenterOffset = degrees > 0f ? new Vector3(-convexPolygons.bounds2D.max.x, 0f) : new Vector3(-convexPolygons.bounds2D.min.x, 0f);
+
+            var convexPolygonsCount = convexPolygons.Count;
+            for (int i = 0; i < convexPolygonsCount; i++)
+            {
+                // calculate 2D UV coordinates for the front polygon.
+                convexPolygons[i].ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
+
+                for (int j = 0; j < precision; j++)
+                {
+                    // create a new polygon mesh for the front polygon.
+                    var brush = new PolygonMesh();
+                    polygonMeshes.Add(brush);
+
+                    var poly = new Polygon(convexPolygons[i]);
+
+                    // ensure that the polygon is always on one side of the vertical project center line.
+                    poly.Translate(projectCenterOffset);
+
+                    var nextPoly = new Polygon(poly);
+                    var polyVertexCount = poly.Count;
+
+                    // flip the pivot on negative degrees to rotate left.
+                    Vector3 pivot = new Vector3(degrees > 0f ? diameter : -diameter, 0.0f, 0.0f);
+
+                    for (int v = 0; v < polyVertexCount; v++)
+                    {
+                        // calculate the step height.
+                        var heightOffset = new Vector3();
+                        if (precision >= 2)
+                            heightOffset.y = (j / ((float)precision - 1)) * height;
+
+                        poly[v] = new Vertex(heightOffset + MathEx.RotatePointAroundPivot(poly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, j / (float)precision), 0.0f)), poly[v].uv0, poly[v].hidden);
+                        nextPoly[v] = new Vertex(heightOffset + slopedHeightOffset + MathEx.RotatePointAroundPivot(nextPoly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, (j + 1) / (float)precision), 0.0f)), nextPoly[v].uv0, nextPoly[v].hidden);
+                    }
+
+                    if (height == 0f || sloped)
+                    {
+                        if (j == 0) brush.Add(poly);
+                        if (j == precision - 1) brush.Add(nextPoly.flipped);
+                    }
+                    else
+                    {
+                        brush.Add(poly);
+                        brush.Add(nextPoly.flipped);
+                    }
+
+                    // fill the gap with quads "extruding" the shape.
+                    Polygon extrudedPolygon;
+                    for (int k = 0; k < polyVertexCount - 1; k++)
+                    {
+                        if (poly[k].hidden) continue;
+
+                        extrudedPolygon = new Polygon(new Vertex[] {
+                            poly[k],
+                            nextPoly[k],
+                            nextPoly[k + 1],
+                            poly[k + 1],
+                        });
+
+                        extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
+                        brush.Add(extrudedPolygon);
+                    }
+
+                    // one more face that wraps around to index 0.
+                    if (!poly[polyVertexCount - 1].hidden)
+                    {
+                        extrudedPolygon = new Polygon(new Vertex[] {
+                            poly[polyVertexCount - 1],
+                            nextPoly[polyVertexCount - 1],
+                            nextPoly[0],
+                            poly[0],
+                        });
+
+                        extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
+                        brush.Add(extrudedPolygon);
+                    }
+                }
+            }*/
+
+            var polygonMesh = PolygonMesh.Combine(polygonMeshes);
+
+            // undo the polygon translation ensuring they were always on one side of the center line.
+            //polygonMesh.Translate(-projectCenterOffset);
+
+            var mesh = polygonMesh.ToMesh();
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
+
+            return mesh;
+        }
     }
 }
 

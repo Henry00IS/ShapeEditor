@@ -257,6 +257,15 @@ namespace AeternumGames.ShapeEditor
             return Quaternion.Euler(angles) * (point - pivot) + pivot;
         }
 
+        /// <summary>
+        /// Gets the position on a sphere of the given radius by linear interpolant t.
+        /// </summary>
+        public static Vector3 CirclePosition(float radius, float t)
+        {
+            t = Mathf.Repeat(t, 1.0f);
+            return new Vector3(Mathf.Sin(t * Mathf.PI * 2.0f) * radius, 0.0f, Mathf.Cos(t * Mathf.PI * 2.0f) * radius);
+        }
+
         public static float2 ScaleAroundPivot(float2 point, float2 pivot, float2 scale)
         {
             point -= pivot;
