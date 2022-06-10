@@ -31,6 +31,7 @@ namespace AeternumGames.ShapeEditor
         private SerializedProperty spRevolveChoppedPrecision => serializedObject.FindProperty(nameof(ShapeEditorTarget.revolveChoppedPrecision));
         private SerializedProperty spRevolveChoppedDegrees => serializedObject.FindProperty(nameof(ShapeEditorTarget.revolveChoppedDegrees));
         private SerializedProperty spRevolveChoppedRadius => serializedObject.FindProperty(nameof(ShapeEditorTarget.revolveChoppedRadius));
+        private SerializedProperty spRevolveChoppedDistance => serializedObject.FindProperty(nameof(ShapeEditorTarget.revolveChoppedDistance));
 
         public override void OnInspectorGUI()
         {
@@ -130,8 +131,7 @@ namespace AeternumGames.ShapeEditor
             EditorGUILayout.PropertyField(spRevolveChoppedPrecision, new GUIContent("Precision"));
             EditorGUILayout.PropertyField(spRevolveChoppedDegrees, new GUIContent("Degrees"));
             EditorGUILayout.PropertyField(spRevolveChoppedRadius, new GUIContent("Radius"));
-            //EditorGUILayout.PropertyField(spRevolveExtrudeHeight, new GUIContent("Spiral Height"));
-            //EditorGUILayout.PropertyField(spRevolveExtrudeSloped, new GUIContent("Spiral Sloped"));
+            EditorGUILayout.PropertyField(spRevolveChoppedDistance, new GUIContent("Distance"));
         }
 
         private void ShapeEditorMenu_OnGUI()

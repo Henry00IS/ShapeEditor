@@ -18,11 +18,15 @@ namespace AeternumGames.ShapeEditor
         [Min(0f)]
         internal float revolveChoppedRadius = 2f;
 
+        [SerializeField]
+        [Min(MathEx.EPSILON_3)]
+        internal float revolveChoppedDistance = 0.25f;
+
         private void RevolveChopped_Rebuild()
         {
             RequireChoppedPolygons2D(revolveChoppedPrecision);
 
-            var mesh = MeshGenerator.CreateRevolveChoppedMesh(choppedPolygons2D, revolveChoppedDegrees, revolveChoppedRadius, 0, false);
+            var mesh = MeshGenerator.CreateRevolveChoppedMesh(choppedPolygons2D, revolveChoppedDegrees, revolveChoppedRadius, revolveChoppedDistance);
             OnShapeEditorMesh(mesh);
         }
     }

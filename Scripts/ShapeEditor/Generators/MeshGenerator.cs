@@ -749,13 +749,13 @@ namespace AeternumGames.ShapeEditor
         /// <param name="convexPolygons">The chopped and decomposed convex polygons.</param>
         /// <param name="degrees">The revolve degrees between -360 to 360.</param>
         /// <param name="diameter">The inner diameter to revolve around.</param>
-        /// <param name="height">The target height to be reached by offsetting the individual meshes.</param>
-        /// <param name="sloped">Whether the individual meshes are sloped towards the target height.</param>
-        public static Mesh CreateRevolveChoppedMesh(PolygonMesh[] choppedPolygons, float degrees, float diameter, float height, bool sloped)
+        /// <param name="distance">The distance to extrude by.</param>
+        public static Mesh CreateRevolveChoppedMesh(PolygonMesh[] choppedPolygons, float degrees, float diameter, float distance)
         {
             var polygonMeshes = new List<PolygonMesh>();
             int precision = choppedPolygons.Length;
 
+            var outerDiameter = diameter + distance;
             var circumference = diameter * 2f * Mathf.PI;
 
             // iterate over all chops in the project:
@@ -771,6 +771,7 @@ namespace AeternumGames.ShapeEditor
                 for (int j = 0; j < originalCount; j++)
                 {
                     var poly = new Polygon(original[j]);
+                    var backPoly = new Polygon(original[j]);
                     var polyCount = poly.Count;
 
                     // iterate over all cloned vertices:
@@ -781,21 +782,33 @@ namespace AeternumGames.ShapeEditor
                         float t1 = i * stepLength / circumference;
                         float t2 = (i + 1) * stepLength / circumference;
 
-                        var circlepos1 = MathEx.CirclePosition(diameter, t1);
-                        var circlepos2 = MathEx.CirclePosition(diameter, t2);
+                        {
+                            var innerCirclepos1 = MathEx.CirclePosition(diameter, t1);
+                            var innerCirclepos2 = MathEx.CirclePosition(diameter, t2);
+                            var outerCirclepos1 = MathEx.CirclePosition(outerDiameter, t1);
+                            var outerCirclepos2 = MathEx.CirclePosition(outerDiameter, t2);
 
-                        var forward = (circlepos2 - circlepos1).normalized;
+                            //var forward = (circlepos2 - circlepos1).normalized;
 
-                        var pos = Vector3.Lerp(
-                            new Vector3(circlepos1.x, vertex.position.y, circlepos1.z),
-                            new Vector3(circlepos2.x, vertex.position.y, circlepos2.z),
-                            Mathf.InverseLerp(originalBounds2D.min.x, originalBounds2D.max.x, vertex.position.x)
-                        );
+                            var innerVertexPos = Vector3.Lerp(
+                                new Vector3(innerCirclepos1.x, vertex.position.y, innerCirclepos1.z),
+                                new Vector3(innerCirclepos2.x, vertex.position.y, innerCirclepos2.z),
+                                Mathf.InverseLerp(originalBounds2D.min.x, originalBounds2D.max.x, vertex.position.x)
+                            );
 
-                        poly[v] = new Vertex(pos, poly[v].uv0, poly[v].hidden);
+                            var outerVertexPos = Vector3.Lerp(
+                                new Vector3(outerCirclepos1.x, vertex.position.y, outerCirclepos1.z),
+                                new Vector3(outerCirclepos2.x, vertex.position.y, outerCirclepos2.z),
+                                Mathf.InverseLerp(originalBounds2D.min.x, originalBounds2D.max.x, vertex.position.x)
+                            );
+
+                            poly[v] = new Vertex(innerVertexPos, poly[v].uv0, poly[v].hidden);
+                            backPoly[v] = new Vertex(outerVertexPos, poly[v].uv0, poly[v].hidden);
+                        }
                     }
 
                     transformed.Add(poly);
+                    transformed.Add(backPoly);
                 }
 
                 polygonMeshes.Add(transformed);
