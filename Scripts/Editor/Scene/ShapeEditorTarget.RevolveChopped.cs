@@ -20,13 +20,13 @@ namespace AeternumGames.ShapeEditor
 
         private void RevolveChopped_Rebuild()
         {
+            RequireChoppedPolygons2D(revolveChoppedPrecision);
+
             // clamp the degrees to be at least between -0.1f and 0.1f but never 0.0f.
             if (revolveChoppedDegrees >= 0.0f && revolveChoppedDegrees < 0.1f)
                 revolveChoppedDegrees = 0.1f;
             else if (revolveChoppedDegrees < 0.0f && revolveChoppedDegrees > -0.1f)
                 revolveChoppedDegrees = -0.1f;
-
-            RequireChoppedPolygons2D(revolveChoppedPrecision);
 
             var mesh = MeshGenerator.CreateRevolveChoppedMesh(choppedPolygons2D, revolveChoppedDegrees, revolveChoppedDistance);
             OnShapeEditorMesh(mesh);

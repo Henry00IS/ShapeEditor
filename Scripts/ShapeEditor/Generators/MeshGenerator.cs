@@ -758,7 +758,7 @@ namespace AeternumGames.ShapeEditor
 
             // offset the polygons by the the vertical project center line as this will let us
             // rotate left or right without self-intersecting or inverting the mesh.
-            var projectCenterOffset = degrees < 0f ? new Vector3(-projectBounds.min.x, 0f) : new Vector3(-projectBounds.min.x, 0f);
+            var projectCenterOffset = new Vector3(projectBounds.min.x, 0f, 0f);
 
             var innerCircle = MathEx.Circle.GetCircleThatFitsCircumference(projectBounds.size.x * Mathf.Sign(degrees), Mathf.Abs(degrees) / 360f);
             var outerCircle = new MathEx.Circle(innerCircle.radius + distance * Mathf.Sign(degrees));
@@ -768,7 +768,6 @@ namespace AeternumGames.ShapeEditor
             {
                 var original = choppedPolygons[i];
                 var originalCount = original.Count;
-                var originalBounds2D = original.bounds2D;
                 var brush = new PolygonMesh(originalCount);
 
                 var stepLength = projectBounds.size.x / precision;
@@ -778,11 +777,11 @@ namespace AeternumGames.ShapeEditor
                 {
                     var poly = new Polygon(original[j]);
 
-                    // ensure that the polygon is always on one side of the vertical project center line.
-                    poly.Translate(projectCenterOffset);
-
                     // calculate 2D UV coordinates for the front polygon.
                     poly.ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
+
+                    // ensure that the polygon is always on one side of the vertical project center line.
+                    poly.Translate(-projectCenterOffset);
 
                     var backPoly = new Polygon(original[j]);
                     var polyCount = poly.Count;
@@ -797,10 +796,10 @@ namespace AeternumGames.ShapeEditor
                         float t1 = s1 / innerCircle.circumference;
                         float t2 = s2 / innerCircle.circumference;
 
-                        var innerCirclepos1 = innerCircle.GetCirclePosition(t1);
-                        var innerCirclepos2 = innerCircle.GetCirclePosition(t2);
-                        var outerCirclepos1 = outerCircle.GetCirclePosition(t1);
-                        var outerCirclepos2 = outerCircle.GetCirclePosition(t2);
+                        var innerCirclepos1 = innerCircle.GetCirclePosition(t1) + projectCenterOffset;
+                        var innerCirclepos2 = innerCircle.GetCirclePosition(t2) + projectCenterOffset;
+                        var outerCirclepos1 = outerCircle.GetCirclePosition(t1) + projectCenterOffset;
+                        var outerCirclepos2 = outerCircle.GetCirclePosition(t2) + projectCenterOffset;
 
                         var innerVertexPos = Vector3.Lerp(
                             new Vector3(innerCirclepos1.x, vertex.position.y, innerCirclepos1.z),
@@ -826,9 +825,6 @@ namespace AeternumGames.ShapeEditor
                         poly[v] = new Vertex(innerVertexPos, poly[v].uv0, poly[v].hidden);
                         backPoly[v] = new Vertex(outerVertexPos, poly[v].uv0, poly[v].hidden);
                     }
-
-                    // calculate 2D UV coordinates for the back polygon.
-                    backPoly.ApplySabreCSGAutoUV0(new Vector2(0.0f, 0.0f));
 
                     if (degrees < 0f)
                     {

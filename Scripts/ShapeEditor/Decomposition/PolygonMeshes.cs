@@ -32,15 +32,26 @@ namespace AeternumGames.ShapeEditor
         public Bounds CalculateBounds2D()
         {
             var count = Count;
-            if (count == 0)
-            {
-                bounds2D = default;
-                return bounds2D;
-            }
+            bounds2D = default;
 
-            bounds2D = this[0].CalculateBounds2D();
-            for (int i = 1; i < count; i++)
-                bounds2D.Encapsulate(this[i].CalculateBounds2D());
+            if (count == 0)
+                return bounds2D;
+
+            bool first = true;
+            for (int i = 0; i < count; i++)
+            {
+                // chopped polygon meshes may be empty.
+                if (this[i].Count > 0)
+                {
+                    if (first)
+                    {
+                        first = false;
+                        bounds2D = this[i].CalculateBounds2D();
+                        continue;
+                    }
+                    bounds2D.Encapsulate(this[i].CalculateBounds2D());
+                }
+            }
 
             return bounds2D;
         }
