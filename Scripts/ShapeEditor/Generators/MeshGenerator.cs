@@ -756,6 +756,10 @@ namespace AeternumGames.ShapeEditor
 
             Bounds projectBounds = choppedPolygons.bounds2D;
 
+            // offset the polygons by the the vertical project center line as this will let us
+            // rotate left or right without self-intersecting or inverting the mesh.
+            var projectCenterOffset = degrees < 0f ? new Vector3(-projectBounds.min.x, 0f) : new Vector3(-projectBounds.min.x, 0f);
+
             var innerCircle = MathEx.Circle.GetCircleThatFitsCircumference(projectBounds.size.x * Mathf.Sign(degrees), Mathf.Abs(degrees) / 360f);
             var outerCircle = new MathEx.Circle(innerCircle.radius + distance * Mathf.Sign(degrees));
 
@@ -766,12 +770,16 @@ namespace AeternumGames.ShapeEditor
                 var originalCount = original.Count;
                 var originalBounds2D = original.bounds2D;
                 var brush = new PolygonMesh(originalCount);
+
                 var stepLength = projectBounds.size.x / precision;
 
                 // iterate over all decomposed convex polygons of the chop:
                 for (int j = 0; j < originalCount; j++)
                 {
                     var poly = new Polygon(original[j]);
+
+                    // ensure that the polygon is always on one side of the vertical project center line.
+                    poly.Translate(projectCenterOffset);
 
                     // calculate 2D UV coordinates for the front polygon.
                     poly.ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
@@ -784,8 +792,10 @@ namespace AeternumGames.ShapeEditor
                     {
                         var vertex = poly[v];
 
-                        float t1 = i * stepLength / innerCircle.circumference;
-                        float t2 = (i + 1) * stepLength / innerCircle.circumference;
+                        float s1 = i * stepLength;
+                        float s2 = (i + 1) * stepLength;
+                        float t1 = s1 / innerCircle.circumference;
+                        float t2 = s2 / innerCircle.circumference;
 
                         var innerCirclepos1 = innerCircle.GetCirclePosition(t1);
                         var innerCirclepos2 = innerCircle.GetCirclePosition(t2);
@@ -795,13 +805,13 @@ namespace AeternumGames.ShapeEditor
                         var innerVertexPos = Vector3.Lerp(
                             new Vector3(innerCirclepos1.x, vertex.position.y, innerCirclepos1.z),
                             new Vector3(innerCirclepos2.x, vertex.position.y, innerCirclepos2.z),
-                            Mathf.InverseLerp(originalBounds2D.min.x, originalBounds2D.max.x, vertex.position.x)
+                            Mathf.InverseLerp(s1, s2, vertex.position.x)
                         );
 
                         var outerVertexPos = Vector3.Lerp(
                             new Vector3(outerCirclepos1.x, vertex.position.y, outerCirclepos1.z),
                             new Vector3(outerCirclepos2.x, vertex.position.y, outerCirclepos2.z),
-                            Mathf.InverseLerp(originalBounds2D.min.x, originalBounds2D.max.x, vertex.position.x)
+                            Mathf.InverseLerp(s1, s2, vertex.position.x)
                         );
 
                         innerVertexPos.z -= innerCircle.radius;
