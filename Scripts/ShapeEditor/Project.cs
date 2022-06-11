@@ -59,18 +59,17 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Gets an AABB that fully contains the project's segments.</summary>
-        public Bounds GetAABB()
+        /// <param name="flipY">Whether to mirror the shapes vertically.</param>
+        public Bounds GetAABB(bool flipY)
         {
-            Bounds bounds = default;
-            var shapesCount = shapes.Count;
-            for (int i = 0; i < shapesCount; i++)
-            {
-                var shape = shapes[i];
-                if (i == 0)
-                    bounds = shape.GetAABB();
-                else
-                    bounds.Encapsulate(shape.GetAABB());
-            }
+            var count = shapes.Count;
+            if (count == 0)
+                return default;
+
+            Bounds bounds = shapes[0].GetAABB(flipY);
+            for (int i = 1; i < count; i++)
+                bounds.Encapsulate(shapes[i].GetAABB(flipY));
+
             return bounds;
         }
 
@@ -233,23 +232,23 @@ namespace AeternumGames.ShapeEditor
         /// convex decomposition leads to many brushes, which can be avoided by using the
         /// subtractive brushes of the CSG algorithm.
         /// </param>
-        /// <returns>The collection of convex polygons.</returns>
-        public PolygonMesh[] GenerateChoppedConvexPolygons(int chopCount, bool useHoles = true)
+        /// <returns>The collection of convex polygon meshes.</returns>
+        public PolygonMeshes GenerateChoppedConvexPolygons(int chopCount, bool useHoles = true)
         {
-            var meshes = new PolygonMesh[chopCount];
+            var meshes = new PolygonMeshes(chopCount);
 
             // build a segment list representing this project.
             var polyBool = new PolyBoolCS.PolyBool();
             //var projectSegmentList = GenerateConcaveSegmentList(polyBool);
 
             // we chop it horizontally by using multiple intersect operations.
-            var projectBounds = GetAABB();
+            var projectBounds = GetAABB(true);
             var chopWidth = projectBounds.size.x / chopCount;
 
             for (int i = 0; i < chopCount; i++)
             {
                 var chopX1 = projectBounds.min.x + (chopWidth * i);
-                var chopX2 = projectBounds.min.x + (chopWidth * (i + 1)); // todo: couldn't you do chopX1 + chopWidth?
+                var chopX2 = chopX1 + chopWidth;
 
                 var intersectPolygon = new PolyBoolCS.Polygon()
                 {
@@ -267,7 +266,7 @@ namespace AeternumGames.ShapeEditor
                 var combine = polyBool.combine(projectSegmentList, polyBool.segments(intersectPolygon));
 
                 // build convex polygons out of the intersect segment list.
-                meshes[i] = SegmentListToConvexPolygonMesh(polyBool, polyBool.selectIntersect(combine), useHoles);
+                meshes.Add(SegmentListToConvexPolygonMesh(polyBool, polyBool.selectIntersect(combine), useHoles));
             }
 
             return meshes;

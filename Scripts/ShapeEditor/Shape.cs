@@ -272,18 +272,18 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Gets an AABB that fully contains the shape's segments (including symmetry).</summary>
-        public Bounds GetAABB()
+        /// <param name="flipY">Whether to mirror the shapes vertically.</param>
+        public Bounds GetAABB(bool flipY)
         {
-            Bounds bounds = default;
-            var polygons = GenerateConcavePolygons(false);
-            for (int i = 0; i < polygons.Length; i++)
-            {
-                var polygon = polygons[i];
-                if (i == 0)
-                    bounds = polygon.GetAABB();
-                else
-                    bounds.Encapsulate(polygon.GetAABB());
-            }
+            var polygons = GenerateConcavePolygons(flipY);
+
+            if (polygons.Length == 0)
+                return default;
+
+            Bounds bounds = polygons[0].GetAABB();
+            for (int i = 1; i < polygons.Length; i++)
+                    bounds.Encapsulate(polygons[i].GetAABB());
+
             return bounds;
         }
 

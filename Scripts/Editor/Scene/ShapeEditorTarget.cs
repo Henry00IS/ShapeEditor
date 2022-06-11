@@ -19,8 +19,8 @@ namespace AeternumGames.ShapeEditor
         /// <summary>The convex polygons set by the shape editor.</summary>
         private PolygonMesh convexPolygons2D;
 
-        /// <summary>The chopped polygons set by the shape editor.</summary>
-        private PolygonMesh[] choppedPolygons2D;
+        /// <summary>The chopped polygon meshes set by the shape editor.</summary>
+        private PolygonMeshes choppedPolygons2D;
 
         /// <summary>The operating mode.</summary>
         [SerializeField]
@@ -64,14 +64,13 @@ namespace AeternumGames.ShapeEditor
         private void RequireChoppedPolygons2D(int chopCount)
         {
             // get the chopped project polygons.
-            if (choppedPolygons2D == null || choppedPolygons2D.Length != chopCount)
+            if (choppedPolygons2D == null || choppedPolygons2D.Count != chopCount)
             {
                 // ensure the project data is ready.
                 project.Validate();
 
                 choppedPolygons2D = project.GenerateChoppedConvexPolygons(chopCount);
-                for (int i = 0; i < choppedPolygons2D.Length; i++)
-                    choppedPolygons2D[i].CalculateBounds2D();
+                choppedPolygons2D.CalculateBounds2D();
             }
         }
 

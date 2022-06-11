@@ -748,28 +748,16 @@ namespace AeternumGames.ShapeEditor
         /// <summary>[Concave] Creates a mesh by revolving chopped convex polygons along a circle.</summary>
         /// <param name="convexPolygons">The chopped and decomposed convex polygons.</param>
         /// <param name="degrees">The revolve degrees between -360 to 360.</param>
-        /// <param name="diameter">The inner diameter to revolve around.</param>
         /// <param name="distance">The distance to extrude by.</param>
-        public static Mesh CreateRevolveChoppedMesh(PolygonMesh[] choppedPolygons, float degrees, float diameter, float distance)
+        public static Mesh CreateRevolveChoppedMesh(PolygonMeshes choppedPolygons, float degrees, float distance)
         {
             var polygonMeshes = new List<PolygonMesh>();
-            int precision = choppedPolygons.Length;
+            int precision = choppedPolygons.Count;
 
-            var outerDiameter = diameter + distance;
-            var circumference = diameter * 2f * Mathf.PI;
+            Bounds projectBounds = choppedPolygons.bounds2D;
 
-            Bounds projectBounds = default;
-            for (int i = 0; i < precision; i++)
-            {
-                if (i == 0)
-                {
-                    projectBounds = choppedPolygons[i].bounds2D;
-                }
-                else
-                {
-                    projectBounds.Encapsulate(choppedPolygons[i].bounds2D);
-                }
-            }
+            var innerCircle = MathEx.Circle.GetCircleThatFitsCircumference(projectBounds.size.x * Mathf.Sign(degrees), Mathf.Abs(degrees) / 360f);
+            var outerCircle = new MathEx.Circle(innerCircle.radius + distance);
 
             // iterate over all chops in the project:
             for (int i = 0; i < precision; i++)
@@ -796,34 +784,35 @@ namespace AeternumGames.ShapeEditor
                     {
                         var vertex = poly[v];
 
-                        float t1 = i * stepLength / circumference;
-                        float t2 = (i + 1) * stepLength / circumference;
+                        float t1 = i * stepLength / innerCircle.circumference;
+                        float t2 = (i + 1) * stepLength / innerCircle.circumference;
 
-                        {
-                            var innerCirclepos1 = MathEx.CirclePosition(diameter, t1);
-                            var innerCirclepos2 = MathEx.CirclePosition(diameter, t2);
-                            var outerCirclepos1 = MathEx.CirclePosition(outerDiameter, t1);
-                            var outerCirclepos2 = MathEx.CirclePosition(outerDiameter, t2);
+                        var innerCirclepos1 = innerCircle.GetCirclePosition(t1);
+                        var innerCirclepos2 = innerCircle.GetCirclePosition(t2);
+                        var outerCirclepos1 = outerCircle.GetCirclePosition(t1);
+                        var outerCirclepos2 = outerCircle.GetCirclePosition(t2);
 
-                            //var forward = (innerCirclepos2 - innerCirclepos1).normalized;
-                            //var right = Vector3.Cross(Vector3.up, forward);
-                            //Debug.DrawRay(innerCirclepos1, -right, Color.red, 2f);
+                        //var forward = (innerCirclepos2 - innerCirclepos1).normalized;
+                        //var right = Vector3.Cross(Vector3.up, forward);
+                        //Debug.DrawRay(innerCirclepos1, -right, Color.red, 2f);
 
-                            var innerVertexPos = Vector3.Lerp(
-                                new Vector3(innerCirclepos1.x, vertex.position.y, innerCirclepos1.z),
-                                new Vector3(innerCirclepos2.x, vertex.position.y, innerCirclepos2.z),
-                                Mathf.InverseLerp(originalBounds2D.min.x, originalBounds2D.max.x, vertex.position.x)
-                            );
+                        var innerVertexPos = Vector3.Lerp(
+                            new Vector3(innerCirclepos1.x, vertex.position.y, innerCirclepos1.z),
+                            new Vector3(innerCirclepos2.x, vertex.position.y, innerCirclepos2.z),
+                            Mathf.InverseLerp(originalBounds2D.min.x, originalBounds2D.max.x, vertex.position.x)
+                        );
 
-                            var outerVertexPos = Vector3.Lerp(
-                                new Vector3(outerCirclepos1.x, vertex.position.y, outerCirclepos1.z),
-                                new Vector3(outerCirclepos2.x, vertex.position.y, outerCirclepos2.z),
-                                Mathf.InverseLerp(originalBounds2D.min.x, originalBounds2D.max.x, vertex.position.x)
-                            );
+                        var outerVertexPos = Vector3.Lerp(
+                            new Vector3(outerCirclepos1.x, vertex.position.y, outerCirclepos1.z),
+                            new Vector3(outerCirclepos2.x, vertex.position.y, outerCirclepos2.z),
+                            Mathf.InverseLerp(originalBounds2D.min.x, originalBounds2D.max.x, vertex.position.x)
+                        );
 
-                            poly[v] = new Vertex(innerVertexPos, poly[v].uv0, poly[v].hidden);
-                            backPoly[v] = new Vertex(outerVertexPos, poly[v].uv0, poly[v].hidden);
-                        }
+                        innerVertexPos.z -= innerCircle.radius;
+                        outerVertexPos.z -= innerCircle.radius;
+
+                        poly[v] = new Vertex(innerVertexPos, poly[v].uv0, poly[v].hidden);
+                        backPoly[v] = new Vertex(outerVertexPos, poly[v].uv0, poly[v].hidden);
                     }
 
                     brush.Add(poly);

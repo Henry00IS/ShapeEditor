@@ -15,18 +15,20 @@ namespace AeternumGames.ShapeEditor
         internal float revolveChoppedDegrees = 90f;
 
         [SerializeField]
-        [Min(0f)]
-        internal float revolveChoppedRadius = 2f;
-
-        [SerializeField]
         [Min(MathEx.EPSILON_3)]
         internal float revolveChoppedDistance = 0.25f;
 
         private void RevolveChopped_Rebuild()
         {
+            // clamp the degrees to be at least between -0.1f and 0.1f but never 0.0f.
+            if (revolveChoppedDegrees >= 0.0f && revolveChoppedDegrees < 0.1f)
+                revolveChoppedDegrees = 0.1f;
+            else if (revolveChoppedDegrees < 0.0f && revolveChoppedDegrees > -0.1f)
+                revolveChoppedDegrees = -0.1f;
+
             RequireChoppedPolygons2D(revolveChoppedPrecision);
 
-            var mesh = MeshGenerator.CreateRevolveChoppedMesh(choppedPolygons2D, revolveChoppedDegrees, revolveChoppedRadius, revolveChoppedDistance);
+            var mesh = MeshGenerator.CreateRevolveChoppedMesh(choppedPolygons2D, revolveChoppedDegrees, revolveChoppedDistance);
             OnShapeEditorMesh(mesh);
         }
     }
