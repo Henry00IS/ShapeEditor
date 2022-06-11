@@ -69,7 +69,7 @@ namespace AeternumGames.ShapeEditor
                 // ensure the project data is ready.
                 project.Validate();
 
-                choppedPolygons2D = project.GenerateChoppedConvexPolygons(chopCount);
+                choppedPolygons2D = project.GenerateChoppedPolygons(chopCount);
                 choppedPolygons2D.CalculateBounds2D();
             }
         }

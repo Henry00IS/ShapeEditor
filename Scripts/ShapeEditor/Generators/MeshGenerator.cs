@@ -751,13 +751,13 @@ namespace AeternumGames.ShapeEditor
         /// <param name="distance">The distance to extrude by.</param>
         public static Mesh CreateRevolveChoppedMesh(PolygonMeshes choppedPolygons, float degrees, float distance)
         {
-            var polygonMeshes = new List<PolygonMesh>();
             int precision = choppedPolygons.Count;
+            var polygonMeshes = new List<PolygonMesh>(precision);
 
             Bounds projectBounds = choppedPolygons.bounds2D;
 
             var innerCircle = MathEx.Circle.GetCircleThatFitsCircumference(projectBounds.size.x * Mathf.Sign(degrees), Mathf.Abs(degrees) / 360f);
-            var outerCircle = new MathEx.Circle(innerCircle.radius + distance);
+            var outerCircle = new MathEx.Circle(innerCircle.radius + distance * Mathf.Sign(degrees));
 
             // iterate over all chops in the project:
             for (int i = 0; i < precision; i++)
@@ -792,10 +792,6 @@ namespace AeternumGames.ShapeEditor
                         var outerCirclepos1 = outerCircle.GetCirclePosition(t1);
                         var outerCirclepos2 = outerCircle.GetCirclePosition(t2);
 
-                        //var forward = (innerCirclepos2 - innerCirclepos1).normalized;
-                        //var right = Vector3.Cross(Vector3.up, forward);
-                        //Debug.DrawRay(innerCirclepos1, -right, Color.red, 2f);
-
                         var innerVertexPos = Vector3.Lerp(
                             new Vector3(innerCirclepos1.x, vertex.position.y, innerCirclepos1.z),
                             new Vector3(innerCirclepos2.x, vertex.position.y, innerCirclepos2.z),
@@ -811,12 +807,29 @@ namespace AeternumGames.ShapeEditor
                         innerVertexPos.z -= innerCircle.radius;
                         outerVertexPos.z -= innerCircle.radius;
 
+                        if (degrees < 0f)
+                        {
+                            innerVertexPos.z += distance;
+                            outerVertexPos.z += distance;
+                        }
+
                         poly[v] = new Vertex(innerVertexPos, poly[v].uv0, poly[v].hidden);
                         backPoly[v] = new Vertex(outerVertexPos, poly[v].uv0, poly[v].hidden);
                     }
 
-                    brush.Add(poly);
-                    brush.Add(backPoly.flipped);
+                    // calculate 2D UV coordinates for the back polygon.
+                    backPoly.ApplySabreCSGAutoUV0(new Vector2(0.0f, 0.0f));
+
+                    if (degrees < 0f)
+                    {
+                        brush.Add(poly.flipped);
+                        brush.Add(backPoly);
+                    }
+                    else
+                    {
+                        brush.Add(poly);
+                        brush.Add(backPoly.flipped);
+                    }
 
                     // fill the gap with quads "extruding" the shape.
                     Polygon extrudedPolygon;
@@ -832,7 +845,7 @@ namespace AeternumGames.ShapeEditor
                         });
 
                         extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
-                        brush.Add(extrudedPolygon);
+                        brush.Add(degrees < 0f ? extrudedPolygon.flipped : extrudedPolygon);
                     }
 
                     // one more face that wraps around to index 0.
@@ -846,7 +859,7 @@ namespace AeternumGames.ShapeEditor
                         });
 
                         extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
-                        brush.Add(extrudedPolygon);
+                        brush.Add(degrees < 0f ? extrudedPolygon.flipped : extrudedPolygon);
                     }
                 }
 
@@ -854,14 +867,9 @@ namespace AeternumGames.ShapeEditor
             }
 
             var polygonMesh = PolygonMesh.Combine(polygonMeshes);
-
-            // undo the polygon translation ensuring they were always on one side of the center line.
-            //polygonMesh.Translate(-projectCenterOffset);
-
             var mesh = polygonMesh.ToMesh();
             mesh.RecalculateNormals();
             mesh.RecalculateTangents();
-
             return mesh;
         }
     }

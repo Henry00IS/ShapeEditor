@@ -222,7 +222,8 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>
-        /// [2D] Decomposes all shapes into convex polygons representing this project.
+        /// [2D] Decomposes all shapes into convex polygons representing this project. Then
+        /// horizontally chops the project into multiple slices using intersect operations.
         /// <para>The Y coordinate will be flipped to match X and Y in 3D space.</para>
         /// </summary>
         /// <param name="useHoles">
@@ -232,14 +233,15 @@ namespace AeternumGames.ShapeEditor
         /// convex decomposition leads to many brushes, which can be avoided by using the
         /// subtractive brushes of the CSG algorithm.
         /// </param>
-        /// <returns>The collection of convex polygon meshes.</returns>
-        public PolygonMeshes GenerateChoppedConvexPolygons(int chopCount, bool useHoles = true)
+        /// <returns>The collection of chopped polygon meshes with convex polygons.</returns>
+        public PolygonMeshes GenerateChoppedPolygons(int chopCount, bool useHoles = true)
         {
             var meshes = new PolygonMeshes(chopCount);
 
             // build a segment list representing this project.
             var polyBool = new PolyBoolCS.PolyBool();
-            //var projectSegmentList = GenerateConcaveSegmentList(polyBool);
+            var projectSegmentList = GenerateConcaveSegmentList(polyBool);
+            var projectPolygons = polyBool.polygon(projectSegmentList);
 
             // we chop it horizontally by using multiple intersect operations.
             var projectBounds = GetAABB(true);
@@ -262,10 +264,8 @@ namespace AeternumGames.ShapeEditor
                     }
                 };
 
-                var projectSegmentList = GenerateConcaveSegmentList(polyBool); // todo: why is this data lost when not called again?
-                var combine = polyBool.combine(projectSegmentList, polyBool.segments(intersectPolygon));
-
                 // build convex polygons out of the intersect segment list.
+                var combine = polyBool.combine(polyBool.segments(projectPolygons), polyBool.segments(intersectPolygon));
                 meshes.Add(SegmentListToConvexPolygonMesh(polyBool, polyBool.selectIntersect(combine), useHoles));
             }
 
