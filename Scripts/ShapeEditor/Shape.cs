@@ -271,6 +271,22 @@ namespace AeternumGames.ShapeEditor
             return polygon.ContainsPoint2D(ref point);
         }
 
+        /// <summary>Gets an AABB that fully contains the shape's segments (including symmetry).</summary>
+        /// <param name="flipY">Whether to mirror the shapes vertically.</param>
+        public Bounds GetAABB(bool flipY)
+        {
+            var polygons = GenerateConcavePolygons(flipY);
+
+            if (polygons.Length == 0)
+                return default;
+
+            Bounds bounds = polygons[0].GetAABB();
+            for (int i = 1; i < polygons.Length; i++)
+                    bounds.Encapsulate(polygons[i].GetAABB());
+
+            return bounds;
+        }
+
         /// <summary>Clones this shape and returns the copy.</summary>
         /// <returns>A copy of the shape.</returns>
         public Shape Clone()

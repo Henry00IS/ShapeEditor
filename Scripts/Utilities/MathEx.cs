@@ -277,6 +277,12 @@ namespace AeternumGames.ShapeEditor
             return math.abs(math.distance(from, point) + math.distance(to, point) - math.distance(from, to));
         }
 
+        public static bool IsPointOnLine2(float2 point, float2 from, float2 to, float maxDistance)
+        {
+            var nearest = FindNearestPointOnLine(point, from, to);
+            return math.distance(nearest, point) <= maxDistance;
+        }
+
         /// <summary>Returns a positive number if c is to the left of the line going from a to b.</summary>
         /// <returns>Positive number if point is left, negative if point is right, and 0 if points are collinear.</returns>
         public static float Area(float2 a, float2 b, float2 c)
@@ -690,6 +696,140 @@ namespace AeternumGames.ShapeEditor
                     }
                 }
                 return bestT;
+            }
+        }
+
+        /// <summary>Represents a mathematical circle or sphere.</summary>
+        [System.Serializable]
+        public class Circle
+        {
+            /// <summary>
+            /// Distance from the center of the circle or sphere to the circumference.
+            /// </summary>
+            public float radius { get; private set; }
+
+            /// <summary>
+            /// Distance through the center of the circle or sphere from one side to the other.
+            /// </summary>
+            public float diameter { get; private set; }
+
+            /// <summary>
+            /// The perimeter length of the circle as if straightened out to a line segment.
+            /// </summary>
+            public float circumference { get; private set; }
+
+            /// <summary>
+            /// The area enclosed by the circle.
+            /// </summary>
+            public float circleArea { get; private set; }
+
+            /// <summary>
+            /// The region covered by the outer surface in three-dimensional space.
+            /// </summary>
+            public float sphereSurfaceArea { get; private set; }
+
+            /// <summary>
+            /// The capacity the space occupied by the sphere.
+            /// </summary>
+            public float sphereVolume { get; private set; }
+
+            /// <summary>Creates a new circle.</summary>
+            public Circle()
+            {
+            }
+
+            /// <summary>Creates a new circle of the specified radius.</summary>
+            /// <param name="radius">Distance from the center of the circle or sphere to the circumference.</param>
+            public Circle(float radius)
+            {
+                SetRadius(radius);
+            }
+
+            /// <summary>Updates the circle or sphere radius and recalculates all other properties.</summary>
+            /// <param name="value">Distance from the center of the circle or sphere to the circumference.</param>
+            public void SetRadius(float value)
+            {
+                radius = value;
+                diameter = radius * 2f;
+                circumference = radius * 2f * Mathf.PI;
+                circleArea = radius * radius * Mathf.PI;
+                sphereSurfaceArea = radius * radius * 4f * Mathf.PI;
+                sphereVolume = radius * radius * radius * 4f * Mathf.PI / 3f;
+            }
+
+            /// <summary>Updates the circle or sphere diameter and recalculates all other properties.</summary>
+            /// <param name="value">Distance through the center of the circle or sphere from one side to the other.</param>
+            public void SetDiameter(float value)
+            {
+                SetRadius(radius = value / 2f);
+
+                diameter = value;
+            }
+
+            /// <summary>Updates the circle circumference and recalculates all other properties.</summary>
+            /// <param name="value">The perimeter length of the circle as if straightened out to a line segment.</param>
+            public void SetCircumference(float value)
+            {
+                SetRadius(value / (2f * Mathf.PI));
+
+                circumference = value;
+            }
+
+            /// <summary>Updates the circle area and recalculates all other properties.</summary>
+            /// <param name="value">The area enclosed by the circle.</param>
+            public void SetCircleArea(float value)
+            {
+                SetRadius(Mathf.Pow(value / Mathf.PI, 1f / 2f));
+
+                circleArea = value;
+            }
+
+            /// <summary>Updates the sphere surface area and recalculates all other properties.</summary>
+            /// <param name="value">The region covered by the outer surface in three-dimensional space.</param>
+            public void SetSphereSurfaceArea(float value)
+            {
+                SetRadius(Mathf.Pow(value / (Mathf.PI * 4f), 1f / 2f));
+
+                sphereSurfaceArea = value;
+            }
+
+            /// <summary>Updates the sphere volume and recalculates all other properties.</summary>
+            /// <param name="value">The capacity the space occupied by the sphere.</param>
+            public void SetSphereVolume(float value)
+            {
+                SetRadius(Mathf.Pow(value * 3f / (Mathf.PI * 4f), 1f / 3f));
+
+                sphereVolume = value;
+            }
+
+            /// <summary>Gets the position on the circle by linear interpolant t.</summary>
+            /// <param name="t">The linear interpolant t a percentage from 0.0f - 1.0f around the circle.</param>
+            public Vector3 GetCirclePosition(float t)
+            {
+                t = Mathf.Repeat(t, 1.0f);
+                return new Vector3(Mathf.Sin(t * Mathf.PI * 2.0f) * radius, 0.0f, Mathf.Cos(t * Mathf.PI * 2.0f) * radius);
+            }
+
+            /// <summary>
+            /// Gets a radius for part of a circle (by interpolant t) that fits the given circumference.
+            /// </summary>
+            /// <param name="circumference">The length of a line segment following the perimeter of the circle.</param>
+            /// <param name="t">The linear interpolant t a percentage from 0.0f - 1.0f around the circle.</param>
+            public static float GetCircleRadiusThatFitsCircumference(float circumference, float t)
+            {
+                t = Mathf.Repeat(t, 1.0f);
+                if (t == 0f) return circumference / (Mathf.PI * 2f);
+                return circumference / (t * Mathf.PI * 2f);
+            }
+
+            /// <summary>
+            /// Gets a circle for part of a circle (by interpolant t) that fits the given circumference.
+            /// </summary>
+            /// <param name="circumference">The length of a line segment following the perimeter of the circle.</param>
+            /// <param name="t">The linear interpolant t a percentage from 0.0f - 1.0f around the circle.</param>
+            public static Circle GetCircleThatFitsCircumference(float circumference, float t)
+            {
+                return new Circle(GetCircleRadiusThatFitsCircumference(circumference, t));
             }
         }
     }

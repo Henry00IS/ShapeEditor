@@ -159,6 +159,10 @@ namespace AeternumGames.ShapeEditor
             {
                 switch (keyCode)
                 {
+                    case KeyCode.Escape:
+                        ToolOnCancel();
+                        return true;
+
                     case KeyCode.X:
                         constraint = constraint == Constraints.GlobalX ? Constraints.None : Constraints.GlobalX;
                         return true;
@@ -205,6 +209,21 @@ namespace AeternumGames.ShapeEditor
                         break;
                 }
             }
+        }
+
+        /// <summary>Cancels the single-use tool operation and undoes all changes.</summary>
+        private void ToolOnCancel()
+        {
+            // undo scaling.
+            foreach (var segment in editor.ForEachSelectedObject())
+                segment.position = segment.gpVector1;
+
+            // discard undo operation.
+            editor.DiscardUndo();
+
+            // exit the tool.
+            isSingleUseDone = true;
+            editor.SwitchTool(parent);
         }
     }
 }

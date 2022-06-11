@@ -9,6 +9,7 @@ namespace AeternumGames.ShapeEditor
         FixedExtrude = 1,
         ScaledExtrude = 5,
         SplineExtrude = 2,
+        RevolveChopped = 6,
         RevolveExtrude = 3,
         LinearStaircase = 4,
     }

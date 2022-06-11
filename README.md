@@ -4,11 +4,13 @@ The 2D Shape Editor is a versatile tool to create complex 3D meshes out of 2D sh
 
 With this program you can easily create a design cross-section in a two-dimensional view and then expand it to a 3D mesh.
 
-![Default 2D Shape Editor Window](https://github.com/Henry00IS/ShapeEditor/wiki/images/home/default-window.png)
+![Default 2D Shape Editor Window](https://github.com/Henry00IS/ShapeEditor/wiki/images/home/multiple-windows.png)
 
 This tool has been integrated directly into the Unity editor to ensure a seamless and fast workflow. When you need a special design, such as curved pipes, an underground channel or a baroque arch, this is the tool for the job.
 
 The controls and user interface were inspired by the popular modeling program Blender. Many of the shortcuts and tricks also work in this program. Special tools have been provided to allow a non-destructive workflow with generators that can be easily modified.
+
+YouTube [2D Shape Editor for Unity - Getting Started](https://www.youtube.com/watch?v=yq0keiF3o8o)
 
 ## Constructive Solid Geometry:
 

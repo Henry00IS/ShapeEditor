@@ -13,6 +13,8 @@ namespace AeternumGames.ShapeEditor
 
         private void Polygon_Rebuild()
         {
+            RequireConvexPolygons2D();
+
             var mesh = MeshGenerator.CreatePolygonMesh(convexPolygons2D, polygonDoubleSided);
             OnShapeEditorMesh(mesh);
         }

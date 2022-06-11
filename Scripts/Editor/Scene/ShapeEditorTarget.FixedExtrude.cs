@@ -13,6 +13,8 @@ namespace AeternumGames.ShapeEditor
 
         private void FixedExtrude_Rebuild()
         {
+            RequireConvexPolygons2D();
+
             var mesh = MeshGenerator.CreateExtrudedPolygonMesh(convexPolygons2D, fixedExtrudeDistance);
             OnShapeEditorMesh(mesh);
         }

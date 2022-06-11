@@ -63,6 +63,17 @@ namespace AeternumGames.ShapeEditor
             extrudedSegment.selected = true;
             shape.InsertSegmentBefore(segment.next.next, extrudedSegment);
         }
+
+        protected override void ToolOnCancel()
+        {
+            // undo translation.
+            foreach (var segment in editor.ForEachSelectedObject())
+                segment.position = segment.gpVector1;
+
+            // exit the tool.
+            isSingleUseDone = true;
+            editor.SwitchTool(parent);
+        }
     }
 }
 

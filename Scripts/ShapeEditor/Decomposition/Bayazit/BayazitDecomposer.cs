@@ -32,11 +32,19 @@ namespace AeternumGames.ShapeEditor
             Debug.Assert(vertices.Count >= 3);
             Debug.Assert(vertices.IsCounterClockWise2D());
 
-            return TriangulatePolygon(vertices);
+            var depth = 800;
+            var result = TriangulatePolygon(vertices, ref depth);
+
+            if (depth <= 0)
+                Debug.LogError("Prevented Stack Overflow and Editor Crash in BayazitDecomposer! Try to avoid thin lines (like the middle left side of the character 'B'). Internal Boolean operations have probably mistakenly considered your shapes as a single shape with an infinitely thin point connecting them, causing the convex decomposition to fail. The splitting of this type of polygon at the singularity has yet to be fixed. PR is welcome. It could also be that your shape is too complex with hundreds of vertices.");
+
+            return result;
         }
 
-        private static List<Polygon> TriangulatePolygon(Polygon vertices)
+        private static List<Polygon> TriangulatePolygon(Polygon vertices, ref int depth)
         {
+            if (depth-- <= 0) return new List<Polygon> { vertices };
+
             var list = new List<Polygon>();
             var lowerInt = new Vector3();
             var upperInt = new Vector3(); // intersection points
@@ -132,8 +140,8 @@ namespace AeternumGames.ShapeEditor
                         lowerPoly = Copy(i, (int)bestIndex, vertices);
                         upperPoly = Copy((int)bestIndex, i, vertices);
                     }
-                    list.AddRange(TriangulatePolygon(lowerPoly));
-                    list.AddRange(TriangulatePolygon(upperPoly));
+                    list.AddRange(TriangulatePolygon(lowerPoly, ref depth));
+                    list.AddRange(TriangulatePolygon(upperPoly, ref depth));
                     return list;
                 }
             }
@@ -143,8 +151,8 @@ namespace AeternumGames.ShapeEditor
             {
                 lowerPoly = Copy(0, vertices.Count / 2, vertices);
                 upperPoly = Copy(vertices.Count / 2, 0, vertices);
-                list.AddRange(TriangulatePolygon(lowerPoly));
-                list.AddRange(TriangulatePolygon(upperPoly));
+                list.AddRange(TriangulatePolygon(lowerPoly, ref depth));
+                list.AddRange(TriangulatePolygon(upperPoly, ref depth));
             }
             else
                 list.Add(vertices);

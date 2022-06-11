@@ -128,6 +128,14 @@ namespace AeternumGames.ShapeEditor
 
             switch (keyCode)
             {
+                case KeyCode.C:
+                    if (!editor.isModifierPressed)
+                    {
+                        editor.UseTool(new CutTool());
+                        return true;
+                    }
+                    return false;
+
                 case KeyCode.G:
                     if (editor.selectedSegmentsCount > 0)
                     {
@@ -160,10 +168,6 @@ namespace AeternumGames.ShapeEditor
                     }
                     return false;
 
-                case KeyCode.C:
-                    editor.UseTool(new CutTool());
-                    return true;
-
                 case KeyCode.B:
                     if (editor.selectedSegmentsCount > 0)
                     {
@@ -189,7 +193,7 @@ namespace AeternumGames.ShapeEditor
                     return false;
 
                 case KeyCode.V:
-                    if (editor.selectedSegmentsCount > 0)
+                    if (!editor.isModifierPressed && editor.selectedSegmentsCount > 0)
                     {
                         editor.UserApplyGeneratorForSelectedEdges();
                         return true;

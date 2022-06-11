@@ -744,6 +744,140 @@ namespace AeternumGames.ShapeEditor
             mesh.RecalculateTangents();
             return mesh;
         }
+
+        /// <summary>[Concave] Creates a mesh by revolving chopped convex polygons along a circle.</summary>
+        /// <param name="convexPolygons">The chopped and decomposed convex polygons.</param>
+        /// <param name="degrees">The revolve degrees between -360 to 360.</param>
+        /// <param name="distance">The distance to extrude by.</param>
+        public static Mesh CreateRevolveChoppedMesh(PolygonMeshes choppedPolygons, float degrees, float distance)
+        {
+            int precision = choppedPolygons.Count;
+            var polygonMeshes = new List<PolygonMesh>(precision);
+
+            Bounds projectBounds = choppedPolygons.bounds2D;
+
+            // offset the polygons by the the vertical project center line as this will let us
+            // rotate left or right without self-intersecting or inverting the mesh.
+            var projectCenterOffset = new Vector3(projectBounds.min.x, 0f, 0f);
+
+            var innerCircle = MathEx.Circle.GetCircleThatFitsCircumference(projectBounds.size.x * Mathf.Sign(degrees), Mathf.Abs(degrees) / 360f);
+            var outerCircle = new MathEx.Circle(innerCircle.radius + distance * Mathf.Sign(degrees));
+
+            // iterate over all chops in the project:
+            for (int i = 0; i < precision; i++)
+            {
+                var original = choppedPolygons[i];
+                var originalCount = original.Count;
+                var brush = new PolygonMesh(originalCount);
+
+                var stepLength = projectBounds.size.x / precision;
+
+                // iterate over all decomposed convex polygons of the chop:
+                for (int j = 0; j < originalCount; j++)
+                {
+                    var poly = new Polygon(original[j]);
+
+                    // calculate 2D UV coordinates for the front polygon.
+                    poly.ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
+
+                    // ensure that the polygon is always on one side of the vertical project center line.
+                    poly.Translate(-projectCenterOffset);
+
+                    var backPoly = new Polygon(original[j]);
+                    var polyCount = poly.Count;
+
+                    // iterate over all cloned vertices:
+                    for (int v = 0; v < polyCount; v++)
+                    {
+                        var vertex = poly[v];
+
+                        float s1 = i * stepLength;
+                        float s2 = (i + 1) * stepLength;
+                        float t1 = s1 / innerCircle.circumference;
+                        float t2 = s2 / innerCircle.circumference;
+
+                        var innerCirclepos1 = innerCircle.GetCirclePosition(t1) + projectCenterOffset;
+                        var innerCirclepos2 = innerCircle.GetCirclePosition(t2) + projectCenterOffset;
+                        var outerCirclepos1 = outerCircle.GetCirclePosition(t1) + projectCenterOffset;
+                        var outerCirclepos2 = outerCircle.GetCirclePosition(t2) + projectCenterOffset;
+
+                        var innerVertexPos = Vector3.Lerp(
+                            new Vector3(innerCirclepos1.x, vertex.position.y, innerCirclepos1.z),
+                            new Vector3(innerCirclepos2.x, vertex.position.y, innerCirclepos2.z),
+                            Mathf.InverseLerp(s1, s2, vertex.position.x)
+                        );
+
+                        var outerVertexPos = Vector3.Lerp(
+                            new Vector3(outerCirclepos1.x, vertex.position.y, outerCirclepos1.z),
+                            new Vector3(outerCirclepos2.x, vertex.position.y, outerCirclepos2.z),
+                            Mathf.InverseLerp(s1, s2, vertex.position.x)
+                        );
+
+                        innerVertexPos.z -= innerCircle.radius;
+                        outerVertexPos.z -= innerCircle.radius;
+
+                        if (degrees < 0f)
+                        {
+                            innerVertexPos.z += distance;
+                            outerVertexPos.z += distance;
+                        }
+
+                        poly[v] = new Vertex(innerVertexPos, poly[v].uv0, poly[v].hidden);
+                        backPoly[v] = new Vertex(outerVertexPos, poly[v].uv0, poly[v].hidden);
+                    }
+
+                    if (degrees < 0f)
+                    {
+                        brush.Add(poly.flipped);
+                        brush.Add(backPoly);
+                    }
+                    else
+                    {
+                        brush.Add(poly);
+                        brush.Add(backPoly.flipped);
+                    }
+
+                    // fill the gap with quads "extruding" the shape.
+                    Polygon extrudedPolygon;
+                    for (int k = 0; k < polyCount - 1; k++)
+                    {
+                        if (poly[k].hidden) continue;
+
+                        extrudedPolygon = new Polygon(new Vertex[] {
+                            poly[k],
+                            backPoly[k],
+                            backPoly[k + 1],
+                            poly[k + 1],
+                        });
+
+                        extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
+                        brush.Add(degrees < 0f ? extrudedPolygon.flipped : extrudedPolygon);
+                    }
+
+                    // one more face that wraps around to index 0.
+                    if (!poly[polyCount - 1].hidden)
+                    {
+                        extrudedPolygon = new Polygon(new Vertex[] {
+                            poly[polyCount - 1],
+                            backPoly[polyCount - 1],
+                            backPoly[0],
+                            poly[0],
+                        });
+
+                        extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
+                        brush.Add(degrees < 0f ? extrudedPolygon.flipped : extrudedPolygon);
+                    }
+                }
+
+                polygonMeshes.Add(brush);
+            }
+
+            var polygonMesh = PolygonMesh.Combine(polygonMeshes);
+            var mesh = polygonMesh.ToMesh();
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
+            return mesh;
+        }
     }
 }
 
