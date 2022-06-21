@@ -431,15 +431,16 @@ namespace AeternumGames.ShapeEditor
         /// plane, returns two polygons with the most optimal split that retains the shape
         /// (essentially triangulation). This has only been tested with convex CSG shapes.
         /// </summary>
-        public Polygon[] SplitNonPlanar4()
+        public bool SplitNonPlanar4(out Polygon[] polygons)
         {
+            polygons = null;
             var count = Count;
 
             // the simplest polygon which can exist in the euclidean plane has 3 sides.
             // in order for a polygon to be non-planar it must have more than 3 vertices.
             // this function can only handle 4 vertices.
             if (count != 4)
-                return null;
+                return false;
 
             var plane = new Plane(this[0].position, this[1].position, this[2].position);
             Debug.Assert(plane.normal != Vector3.zero, "Attempted to calculate the plane of a 3D polygon but got a zero normal.");
@@ -449,13 +450,13 @@ namespace AeternumGames.ShapeEditor
             for (int i = 0; i < count; i++)
             {
                 distances[i] = plane.GetDistanceToPoint(this[i].position);
-                if (Mathf.Abs(distances[i]) < 0.002f)
+                if (Mathf.Abs(distances[i]) < MathEx.EPSILON_5)
                     distances[i] = 0f;
             }
 
             // if the polygon is completely planar, we do not split.
             if (distances[0] == 0f && distances[1] == 0f && distances[2] == 0f && distances[3] == 0f)
-                return null;
+                return false;
 
             var zeroOneTwo = new Polygon[] {
                 new Polygon(new Vertex[] { this[0], this[1], this[2] }),
@@ -476,11 +477,13 @@ namespace AeternumGames.ShapeEditor
             if (distances[0] == 0f && distances[1] == 0f && distances[2] == 0f)
                 if (distances[3] < 0f)
                 {
-                    return oneTwoThree;
+                    polygons = oneTwoThree;
+                    return true;
                 }
                 else
                 {
-                    return zeroOneTwo;
+                    polygons = zeroOneTwo;
+                    return true;
                 }
 
             /*
@@ -492,14 +495,16 @@ namespace AeternumGames.ShapeEditor
             if (distances[1] == 0f && distances[2] == 0f && distances[3] == 0f)
                 if (distances[0] < 0f)
                 {
-                    return zeroOneTwo;
+                    polygons = zeroOneTwo;
+                    return true;
                 }
                 else
                 {
-                    return oneTwoThree;
+                    polygons = oneTwoThree;
+                    return true;
                 }
 
-            return null;
+            return false;
         }
     }
 }

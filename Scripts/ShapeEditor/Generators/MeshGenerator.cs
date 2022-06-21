@@ -851,16 +851,13 @@ namespace AeternumGames.ShapeEditor
                             poly[k + 1],
                         });
 
-                        var planarPolygons = extrudedPolygon.SplitNonPlanar4();
-                        if (planarPolygons == null)
-                        {
-                            brush.Add(degrees < 0f ? extrudedPolygon.flipped : extrudedPolygon);
-                        }
+                        if (degrees < 0)
+                            extrudedPolygon = extrudedPolygon.flipped;
+
+                        if (extrudedPolygon.SplitNonPlanar4(out var planarPolygons))
+                            brush.AddRange(planarPolygons);
                         else
-                        {
-                            brush.Add(degrees < 0f ? planarPolygons[0].flipped : planarPolygons[0]);
-                            brush.Add(degrees < 0f ? planarPolygons[1].flipped : planarPolygons[1]);
-                        }
+                            brush.Add(extrudedPolygon);
                     }
 
                     // one more face that wraps around to index 0.
@@ -872,16 +869,13 @@ namespace AeternumGames.ShapeEditor
                             poly[0],
                         });
 
-                        var planarPolygons = extrudedPolygon.SplitNonPlanar4();
-                        if (planarPolygons == null)
-                        {
-                            brush.Add(degrees < 0f ? extrudedPolygon.flipped : extrudedPolygon);
-                        }
+                        if (degrees < 0)
+                            extrudedPolygon = extrudedPolygon.flipped;
+
+                        if (extrudedPolygon.SplitNonPlanar4(out var planarPolygons))
+                            brush.AddRange(planarPolygons);
                         else
-                        {
-                            brush.Add(degrees < 0f ? planarPolygons[0].flipped : planarPolygons[0]);
-                            brush.Add(degrees < 0f ? planarPolygons[1].flipped : planarPolygons[1]);
-                        }
+                            brush.Add(extrudedPolygon);
                     }
                 }
             }

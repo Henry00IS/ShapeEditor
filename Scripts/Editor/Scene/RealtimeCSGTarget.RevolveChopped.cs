@@ -11,7 +11,7 @@ namespace AeternumGames.ShapeEditor
         internal int revolveChoppedPrecision = 8;
 
         [SerializeField]
-        [Range(0f, 360.0f)]
+        [Range(-360f, 360.0f)]
         internal float revolveChoppedDegrees = 90f;
 
         [SerializeField]
