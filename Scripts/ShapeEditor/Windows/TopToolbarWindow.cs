@@ -79,6 +79,7 @@ namespace AeternumGames.ShapeEditor
             sceneMenu.Add("Create Linear Staircase", resources.shapeEditorExtrudeLinearStaircase, editor.UserCreateLinearStaircaseExtrudeTarget);
             sceneMenu.Add("Create Pyramid", resources.shapeEditorExtrudePoint, editor.UserCreateScaledExtrudeTarget);
             sceneMenu.Add("Create Revolved", resources.shapeEditorExtrudeRevolve, editor.UserCreateRevolvedExtrudeTarget);
+            sceneMenu.Add("Create Revolve Chopped", resources.shapeEditorExtrudeRevolveChopped, editor.UserCreateRevolveChoppedExtrudeTarget);
             sceneMenu.Add("Create Slope", resources.shapeEditorExtrudeSlope, editor.UserCreateSlopeExtrudeTarget);
             sceneMenu.Add("Create Spiral", resources.shapeEditorExtrudeSpiral, editor.UserCreateSpiralExtrudeTarget);
             sceneMenu.Add("Create Spline", resources.shapeEditorExtrudeSpline, editor.UserCreateSplineExtrudeTarget);
@@ -97,7 +98,9 @@ namespace AeternumGames.ShapeEditor
                 realtimeCsgMenu.Add("Create Linear Staircase", resources.shapeEditorExtrudeLinearStaircase, editor.UserCreateRealtimeCsgLinearStaircaseExtrudeTarget);
                 realtimeCsgMenu.Add("Create Pyramid", resources.shapeEditorExtrudePoint, editor.UserCreateRealtimeCsgScaledExtrudeTarget);
                 realtimeCsgMenu.Add("Create Revolved", resources.shapeEditorExtrudeRevolve, editor.UserCreateRealtimeCsgRevolvedExtrudeTarget);
+                realtimeCsgMenu.Add("Create Revolve Chopped", resources.shapeEditorExtrudeRevolveChopped, editor.UserCreateRealtimeCsgRevolveChoppedExtrudeTarget);
                 realtimeCsgMenu.Add("Create Slope", resources.shapeEditorExtrudeSlope, editor.UserCreateRealtimeCsgSlopeExtrudeTarget);
+                realtimeCsgMenu.Add("Create Spiral", resources.shapeEditorExtrudeSpiral, editor.UserCreateRealtimeCsgSpiralExtrudeTarget);
                 realtimeCsgMenu.Add("Create Spline (Experimental!)", resources.shapeEditorExtrudeSpline, editor.UserCreateRealtimeCsgSplineExtrudeTarget);
             }
 
@@ -115,7 +118,9 @@ namespace AeternumGames.ShapeEditor
                 chiselMenu.Add("Create Linear Staircase", resources.shapeEditorExtrudeLinearStaircase, editor.UserCreateChiselLinearStaircaseExtrudeTarget);
                 chiselMenu.Add("Create Pyramid", resources.shapeEditorExtrudePoint, editor.UserCreateChiselScaledExtrudeTarget);
                 chiselMenu.Add("Create Revolved", resources.shapeEditorExtrudeRevolve, editor.UserCreateChiselRevolvedExtrudeTarget);
+                chiselMenu.Add("Create Revolve Chopped", resources.shapeEditorExtrudeRevolveChopped, editor.UserCreateChiselRevolveChoppedExtrudeTarget);
                 chiselMenu.Add("Create Slope", resources.shapeEditorExtrudeSlope, editor.UserCreateChiselSlopeExtrudeTarget);
+                chiselMenu.Add("Create Spiral", resources.shapeEditorExtrudeSpiral, editor.UserCreateChiselSpiralExtrudeTarget);
             }
 
             var viewMenu = menu.Add("View");

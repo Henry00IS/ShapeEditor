@@ -53,6 +53,7 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorExtrudeLinearStaircase;
         public Texture2D shapeEditorExtrudePoint;
         public Texture2D shapeEditorExtrudeRevolve;
+        public Texture2D shapeEditorExtrudeRevolveChopped;
         public Texture2D shapeEditorExtrudeShape;
         public Texture2D shapeEditorExtrudeSlope;
         public Texture2D shapeEditorExtrudeSpiral;
