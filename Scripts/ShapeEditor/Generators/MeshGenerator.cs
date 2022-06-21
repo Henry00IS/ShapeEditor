@@ -766,16 +766,26 @@ namespace AeternumGames.ShapeEditor
             // iterate over all chops in the project:
             for (int i = 0; i < precision; i++)
             {
-                var original = choppedPolygons[i];
-                var originalCount = original.Count;
-                var brush = new PolygonMesh(originalCount);
+                var convexPolygons = choppedPolygons[i];
+                var convexPolygonsCount = convexPolygons.Count;
+                var brush = new PolygonMesh(convexPolygonsCount);
 
                 var stepLength = projectBounds.size.x / precision;
 
+                float s1 = i * stepLength;
+                float s2 = (i + 1) * stepLength;
+                float t1 = s1 / innerCircle.circumference;
+                float t2 = s2 / innerCircle.circumference;
+
+                var innerCirclepos1 = innerCircle.GetCirclePosition(t1) + projectCenterOffset;
+                var innerCirclepos2 = innerCircle.GetCirclePosition(t2) + projectCenterOffset;
+                var outerCirclepos1 = outerCircle.GetCirclePosition(t1) + projectCenterOffset;
+                var outerCirclepos2 = outerCircle.GetCirclePosition(t2) + projectCenterOffset;
+
                 // iterate over all decomposed convex polygons of the chop:
-                for (int j = 0; j < originalCount; j++)
+                for (int j = 0; j < convexPolygonsCount; j++)
                 {
-                    var poly = new Polygon(original[j]);
+                    var poly = new Polygon(convexPolygons[j]);
 
                     // calculate 2D UV coordinates for the front polygon.
                     poly.ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
@@ -783,23 +793,13 @@ namespace AeternumGames.ShapeEditor
                     // ensure that the polygon is always on one side of the vertical project center line.
                     poly.Translate(-projectCenterOffset);
 
-                    var backPoly = new Polygon(original[j]);
+                    var backPoly = new Polygon(convexPolygons[j]);
                     var polyCount = poly.Count;
 
                     // iterate over all cloned vertices:
                     for (int v = 0; v < polyCount; v++)
                     {
                         var vertex = poly[v];
-
-                        float s1 = i * stepLength;
-                        float s2 = (i + 1) * stepLength;
-                        float t1 = s1 / innerCircle.circumference;
-                        float t2 = s2 / innerCircle.circumference;
-
-                        var innerCirclepos1 = innerCircle.GetCirclePosition(t1) + projectCenterOffset;
-                        var innerCirclepos2 = innerCircle.GetCirclePosition(t2) + projectCenterOffset;
-                        var outerCirclepos1 = outerCircle.GetCirclePosition(t1) + projectCenterOffset;
-                        var outerCirclepos2 = outerCircle.GetCirclePosition(t2) + projectCenterOffset;
 
                         var innerVertexPos = Vector3.Lerp(
                             new Vector3(innerCirclepos1.x, vertex.position.y, innerCirclepos1.z),
