@@ -222,9 +222,16 @@ namespace AeternumGames.ShapeEditor
         /// <param name="degrees">The revolve degrees between -360 to 360.</param>
         /// <param name="diameter">The inner diameter to revolve around.</param>
         /// <param name="height">The target height to be reached by offsetting the individual meshes.</param>
-        public static List<PolygonMesh> CreateRevolveExtrudedPolygonMeshes(PolygonMesh convexPolygons, int precision, float degrees, float diameter, float height)
+        public static List<PolygonMesh> CreateRevolveExtrudedPolygonMeshes(PolygonMesh convexPolygons, int precision, float degrees, float diameter, float height, bool sloped)
         {
             var polygonMeshes = new List<PolygonMesh>();
+
+            var slopedHeightOffset = new Vector3();
+            if (sloped && precision >= 2)
+                slopedHeightOffset = new Vector3(0.0f, height / precision, 0.0f);
+
+            // the ending height has to be reduced so that it aligns perfectly with the non-sloped version.
+            height -= slopedHeightOffset.y;
 
             // offset the polygons by the the vertical project center line as this will let us
             // rotate left or right without self-intersecting or inverting the mesh.
@@ -264,7 +271,7 @@ namespace AeternumGames.ShapeEditor
                             heightOffset.y = (j / ((float)precision - 1)) * height;
 
                         poly[v] = new Vertex(heightOffset + MathEx.RotatePointAroundPivot(poly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, j / (float)precision), 0.0f)), poly[v].uv0);
-                        nextPoly[v] = new Vertex(heightOffset + MathEx.RotatePointAroundPivot(nextPoly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, (j + 1) / (float)precision), 0.0f)), nextPoly[v].uv0);
+                        nextPoly[v] = new Vertex(heightOffset + slopedHeightOffset + MathEx.RotatePointAroundPivot(nextPoly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, (j + 1) / (float)precision), 0.0f)), nextPoly[v].uv0);
                     }
 
                     brush.Add(poly);
@@ -281,20 +288,28 @@ namespace AeternumGames.ShapeEditor
                             poly[k + 1],
                         });
 
-                        // (RealtimeCSG doesn't need this) extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
-                        brush.Add(extrudedPolygon);
+                        // split non-planar polygons for slopes to prevent cracking quads.
+                        if (height != 0f && sloped && extrudedPolygon.SplitNonPlanar4(out var planarPolygons))
+                            brush.AddRange(planarPolygons);
+                        else
+                            brush.Add(extrudedPolygon);
                     }
 
                     // one more face that wraps around to index 0.
-                    extrudedPolygon = new Polygon(new Vertex[] {
-                        poly[polyVertexCount - 1],
-                        nextPoly[polyVertexCount - 1],
-                        nextPoly[0],
-                        poly[0],
-                    });
+                    {
+                        extrudedPolygon = new Polygon(new Vertex[] {
+                            poly[polyVertexCount - 1],
+                            nextPoly[polyVertexCount - 1],
+                            nextPoly[0],
+                            poly[0],
+                        });
 
-                    // (RealtimeCSG doesn't need this) extrudedPolygon.ApplyPositionBasedUV0(new Vector2(0.5f, 0.5f));
-                    brush.Add(extrudedPolygon);
+                        // split non-planar polygons for slopes to prevent cracking quads.
+                        if (height != 0f && sloped && extrudedPolygon.SplitNonPlanar4(out var planarPolygons))
+                            brush.AddRange(planarPolygons);
+                        else
+                            brush.Add(extrudedPolygon);
+                    }
 
                     // undo the polygon translation ensuring they were always on one side of the center line.
                     brush.Translate(-projectCenterOffset);

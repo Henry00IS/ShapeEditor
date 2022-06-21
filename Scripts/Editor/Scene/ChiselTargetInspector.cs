@@ -17,6 +17,7 @@ namespace AeternumGames.ShapeEditor
         private SerializedProperty spRevolveExtrudeDegrees => serializedObject.FindProperty(nameof(ChiselTarget.revolveExtrudeDegrees));
         private SerializedProperty spRevolveExtrudeRadius => serializedObject.FindProperty(nameof(ChiselTarget.revolveExtrudeRadius));
         private SerializedProperty spRevolveExtrudeHeight => serializedObject.FindProperty(nameof(ChiselTarget.revolveExtrudeHeight));
+        private SerializedProperty spRevolveExtrudeSloped => serializedObject.FindProperty(nameof(ChiselTarget.revolveExtrudeSloped));
         private SerializedProperty spLinearStaircasePrecision => serializedObject.FindProperty(nameof(ChiselTarget.linearStaircasePrecision));
         private SerializedProperty spLinearStaircaseDistance => serializedObject.FindProperty(nameof(ChiselTarget.linearStaircaseDistance));
         private SerializedProperty spLinearStaircaseHeight => serializedObject.FindProperty(nameof(ChiselTarget.linearStaircaseHeight));
@@ -71,7 +72,8 @@ namespace AeternumGames.ShapeEditor
             EditorGUILayout.PropertyField(spRevolveExtrudePrecision, new GUIContent("Precision"));
             EditorGUILayout.PropertyField(spRevolveExtrudeDegrees, new GUIContent("Degrees"));
             EditorGUILayout.PropertyField(spRevolveExtrudeRadius, new GUIContent("Radius"));
-            EditorGUILayout.PropertyField(spRevolveExtrudeHeight, new GUIContent("Target Height"));
+            EditorGUILayout.PropertyField(spRevolveExtrudeHeight, new GUIContent("Spiral Height"));
+            EditorGUILayout.PropertyField(spRevolveExtrudeSloped, new GUIContent("Spiral Sloped"));
         }
 
         private void LinearStaircase_OnGUI()

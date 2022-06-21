@@ -22,6 +22,9 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         internal float revolveExtrudeHeight = 0f;
 
+        [SerializeField]
+        internal bool revolveExtrudeSloped = false;
+
         private void RevolveExtrude_Rebuild()
         {
             // clamp the degrees to be at least between -0.1f and 0.1f but never 0.0f.
@@ -32,7 +35,7 @@ namespace AeternumGames.ShapeEditor
 
             var parent = CleanAndGetBrushParent();
 
-            var polygonMeshes = MeshGenerator.CreateRevolveExtrudedPolygonMeshes(convexPolygons2D, revolveExtrudePrecision, revolveExtrudeDegrees, revolveExtrudeRadius, revolveExtrudeHeight);
+            var polygonMeshes = MeshGenerator.CreateRevolveExtrudedPolygonMeshes(convexPolygons2D, revolveExtrudePrecision, revolveExtrudeDegrees, revolveExtrudeRadius, revolveExtrudeHeight, revolveExtrudeSloped);
             var polygonMeshesCount = polygonMeshes.Count;
             for (int i = 0; i < polygonMeshesCount; i++)
             {
