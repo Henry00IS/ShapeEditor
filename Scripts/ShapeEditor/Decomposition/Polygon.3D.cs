@@ -425,6 +425,82 @@ namespace AeternumGames.ShapeEditor
             for (int p = 0; p < count; p++)
                 this[p] = new Vertex(m * this[p].position, this[p].uv0);
         }
+
+        /// <summary>
+        /// [3D] For polygons with exactly four vertices, where one vertex does not lie on the same
+        /// plane, returns two polygons with the most optimal split that retains the shape
+        /// (essentially triangulation). This has only been tested with convex CSG shapes.
+        /// </summary>
+        public Polygon[] SplitNonPlanar4()
+        {
+            var count = Count;
+
+            // the simplest polygon which can exist in the euclidean plane has 3 sides.
+            // in order for a polygon to be non-planar it must have more than 3 vertices.
+            // this function can only handle 4 vertices.
+            if (count != 4)
+                return null;
+
+            var plane = new Plane(this[0].position, this[1].position, this[2].position);
+            Debug.Assert(plane.normal != Vector3.zero, "Attempted to calculate the plane of a 3D polygon but got a zero normal.");
+
+            // for each vertex, find the distance to the plane.
+            var distances = new float[count];
+            for (int i = 0; i < count; i++)
+            {
+                distances[i] = plane.GetDistanceToPoint(this[i].position);
+                if (Mathf.Abs(distances[i]) < 0.002f)
+                    distances[i] = 0f;
+            }
+
+            // if the polygon is completely planar, we do not split.
+            if (distances[0] == 0f && distances[1] == 0f && distances[2] == 0f && distances[3] == 0f)
+                return null;
+
+            var zeroOneTwo = new Polygon[] {
+                new Polygon(new Vertex[] { this[0], this[1], this[2] }),
+                new Polygon(new Vertex[] { this[0], this[2], this[3] })
+            };
+
+            var oneTwoThree = new Polygon[] {
+                new Polygon(new Vertex[] { this[1], this[2], this[3] }),
+                new Polygon(new Vertex[] { this[0], this[1], this[3] })
+            };
+
+            /*
+             * 0 ---- 1
+             * |      |
+             * |      |
+             *   ---- 2
+             */
+            if (distances[0] == 0f && distances[1] == 0f && distances[2] == 0f)
+                if (distances[3] < 0f)
+                {
+                    return oneTwoThree;
+                }
+                else
+                {
+                    return zeroOneTwo;
+                }
+
+            /*
+             *   ---- 1
+             * |      |
+             * |      |
+             * 3 ---- 2
+             */
+            if (distances[1] == 0f && distances[2] == 0f && distances[3] == 0f)
+                if (distances[0] < 0f)
+                {
+                    return zeroOneTwo;
+                }
+                else
+                {
+                    return oneTwoThree;
+                }
+
+            return null;
+        }
     }
 }
 

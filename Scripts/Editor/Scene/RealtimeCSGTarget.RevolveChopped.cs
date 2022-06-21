@@ -6,29 +6,31 @@ namespace AeternumGames.ShapeEditor
 {
     public partial class RealtimeCSGTarget
     {
-        // builds a linear staircase.
-
         [SerializeField]
         [Min(1)]
-        internal int linearStaircasePrecision = 8;
+        internal int revolveChoppedPrecision = 8;
 
         [SerializeField]
-        [Min(MathEx.EPSILON_2)]
-        internal float linearStaircaseDistance = 1f;
+        [Range(0f, 360.0f)]
+        internal float revolveChoppedDegrees = 90f;
 
         [SerializeField]
-        internal float linearStaircaseHeight = 0.75f;
+        [Min(MathEx.EPSILON_3)]
+        internal float revolveChoppedDistance = 0.25f;
 
-        [SerializeField]
-        internal bool linearStaircaseSloped = false;
-
-        private void LinearStaircase_Rebuild()
+        private void RevolveChopped_Rebuild()
         {
-            RequireConvexPolygons2D();
+            RequireChoppedPolygons2D(revolveChoppedPrecision);
+
+            // clamp the degrees to be at least between -0.1f and 0.1f but never 0.0f.
+            if (revolveChoppedDegrees >= 0.0f && revolveChoppedDegrees < 0.1f)
+                revolveChoppedDegrees = 0.1f;
+            else if (revolveChoppedDegrees < 0.0f && revolveChoppedDegrees > -0.1f)
+                revolveChoppedDegrees = -0.1f;
 
             var parent = CleanAndGetBrushParent();
 
-            var polygonMeshes = MeshGenerator.CreateLinearStaircaseMeshes(convexPolygons2D, linearStaircasePrecision, linearStaircaseDistance, linearStaircaseHeight, linearStaircaseSloped);
+            var polygonMeshes = MeshGenerator.CreateRevolveChoppedMeshes(choppedPolygons2D, revolveChoppedDegrees, revolveChoppedDistance);
             var polygonMeshesCount = polygonMeshes.Count;
             for (int i = 0; i < polygonMeshesCount; i++)
             {

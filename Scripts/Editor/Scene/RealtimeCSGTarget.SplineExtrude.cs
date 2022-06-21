@@ -21,6 +21,8 @@ namespace AeternumGames.ShapeEditor
             var spline = GetSpline3();
             if (spline == null) return;
 
+            RequireConvexPolygons2D();
+
             var parent = CleanAndGetBrushParent();
 
             var polygonMeshes = MeshGenerator.CreateSplineExtrudedPolygonMeshes(convexPolygons2D, spline, splineExtrudePrecision);

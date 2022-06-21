@@ -14,6 +14,9 @@ namespace AeternumGames.ShapeEditor
         /// <summary>The convex polygons set by the shape editor.</summary>
         private PolygonMesh convexPolygons2D;
 
+        /// <summary>The chopped polygon meshes set by the shape editor.</summary>
+        private PolygonMeshes choppedPolygons2D;
+
         /// <summary>The operating mode.</summary>
         [SerializeField]
         internal RealtimeCSGTargetMode targetMode = RealtimeCSGTargetMode.FixedExtrude;
@@ -21,13 +24,15 @@ namespace AeternumGames.ShapeEditor
         public void OnShapeEditorUpdateProject(Project project)
         {
             convexPolygons2D = null;
+            choppedPolygons2D = null;
 
             this.project = project.Clone();
 
             Rebuild();
         }
 
-        public void Rebuild()
+        /// <summary>Must be called when <see cref="convexPolygons2D"/> is required.</summary>
+        private void RequireConvexPolygons2D()
         {
             // get the convex project polygons.
             if (convexPolygons2D == null)
@@ -35,10 +40,28 @@ namespace AeternumGames.ShapeEditor
                 // ensure the project data is ready.
                 project.Validate();
 
-                convexPolygons2D = project.GenerateConvexPolygons(false);
+                convexPolygons2D = project.GenerateConvexPolygons();
                 convexPolygons2D.CalculateBounds2D();
             }
+        }
 
+        /// <summary>Must be called when <see cref="choppedPolygons2D"/> is required.</summary>
+        /// <param name="chopCount">The amount of chops the project will be cut into.</param>
+        private void RequireChoppedPolygons2D(int chopCount)
+        {
+            // get the chopped project polygons.
+            if (choppedPolygons2D == null || choppedPolygons2D.Count != chopCount)
+            {
+                // ensure the project data is ready.
+                project.Validate();
+
+                choppedPolygons2D = project.GenerateChoppedPolygons(chopCount);
+                choppedPolygons2D.CalculateBounds2D();
+            }
+        }
+
+        public void Rebuild()
+        {
             switch (targetMode)
             {
                 case RealtimeCSGTargetMode.FixedExtrude:
@@ -59,6 +82,10 @@ namespace AeternumGames.ShapeEditor
 
                 case RealtimeCSGTargetMode.ScaledExtrude:
                     ScaledExtrude_Rebuild();
+                    break;
+
+                case RealtimeCSGTargetMode.RevolveChopped:
+                    RevolveChopped_Rebuild();
                     break;
             }
         }

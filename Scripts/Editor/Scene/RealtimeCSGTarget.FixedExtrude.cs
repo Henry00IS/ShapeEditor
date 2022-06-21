@@ -13,6 +13,8 @@ namespace AeternumGames.ShapeEditor
 
         private void FixedExtrude_Rebuild()
         {
+            RequireConvexPolygons2D();
+
             var parent = CleanAndGetBrushParent();
 
             var polygonsCount = convexPolygons2D.Count;
