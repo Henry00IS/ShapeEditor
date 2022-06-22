@@ -83,9 +83,12 @@ namespace AeternumGames.ShapeEditor
             var p3 = bezierPivot2.position;
             var p4 = segment.next.position;
 
+            var last = new float2(float.NegativeInfinity);
             for (int i = 1; i <= bezierDetail - 1; i++)
             {
-                yield return MathEx.BezierGetPoint(p1, p2, p3, p4, i / (float)bezierDetail).Snap(bezierGridSnapSize);
+                var point = MathEx.BezierGetPoint(p1, p2, p3, p4, i / (float)bezierDetail).Snap(bezierGridSnapSize);
+                if (!point.Equals(last))
+                    yield return last = point;
             }
         }
     }

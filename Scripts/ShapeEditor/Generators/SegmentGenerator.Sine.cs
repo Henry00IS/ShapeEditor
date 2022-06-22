@@ -68,6 +68,7 @@ namespace AeternumGames.ShapeEditor
             var normal = math.normalize(p2 - p1);
             var cross = Vector2.Perpendicular(normal);
 
+            var last = new float2(float.NegativeInfinity);
             for (int i = 1; i <= sineDetail - 1; i++)
             {
                 float2 pos;
@@ -78,7 +79,9 @@ namespace AeternumGames.ShapeEditor
                 pos.x += curve * cross.x;
                 pos.y += curve * cross.y;
 
-                yield return pos.Snap(sineGridSnapSize);
+                var point = pos.Snap(sineGridSnapSize);
+                if (!point.Equals(last))
+                    yield return last = point;
             }
         }
     }
