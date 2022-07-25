@@ -36,6 +36,7 @@ namespace AeternumGames.ShapeEditor
         public Mesh ToMesh()
         {
             var mesh = new Mesh();
+            mesh.name = "Generated Mesh";
 
             var vertices = new List<Vector3>();
             var uvs = new List<Vector2>();

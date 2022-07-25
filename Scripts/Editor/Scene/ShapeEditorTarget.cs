@@ -43,6 +43,10 @@ namespace AeternumGames.ShapeEditor
             meshFilter.sharedMesh = mesh;
             if (!meshRenderer.sharedMaterial)
                 meshRenderer.sharedMaterial = ShapeEditorResources.Instance.shapeEditorDefaultMaterial;
+
+            // ensure that user-defined mesh colliders are updated.
+            if (TryGetComponent<MeshCollider>(out var meshCollider))
+                meshCollider.sharedMesh = mesh;
         }
 
         /// <summary>Must be called when <see cref="convexPolygons2D"/> is required.</summary>
