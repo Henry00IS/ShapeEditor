@@ -68,6 +68,9 @@ namespace AeternumGames.ShapeEditor
                     break;
             }
 
+            // rebuild the target upon detecting an undo or redo event.
+            rebuild = rebuild || Event.current.HasPerformedUndoRedo();
+
             if (serializedObject.ApplyModifiedProperties() || rebuild)
             {
                 shapeEditorTarget.Rebuild();

@@ -75,6 +75,12 @@ namespace AeternumGames.ShapeEditor
                 transform.SetSiblingIndex(parent.GetSiblingIndex() + 1);
             }
         }
+
+        /// <summary>Whether the event is the "UndoRedoPerformed" command.</summary>
+        public static bool HasPerformedUndoRedo(this Event current)
+        {
+            return (current.type == EventType.ValidateCommand || current.type == EventType.ExecuteCommand) && current.commandName == "UndoRedoPerformed";
+        }
     }
 }
 
