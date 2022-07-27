@@ -341,6 +341,10 @@ namespace AeternumGames.ShapeEditor
                             UserSwitchToTranslateTool();
                             return true;
 
+                        case KeyCode.X:
+                            UserDeleteSelection();
+                            return true;
+
                         case KeyCode.Y:
                             if (hasFocus && isCtrlPressed)
                             {
@@ -355,6 +359,10 @@ namespace AeternumGames.ShapeEditor
                                 UserUndo();
                                 return true;
                             }
+                            return true;
+
+                        case KeyCode.T:
+                            UserPopupTest();
                             return true;
                     }
                 }

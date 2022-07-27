@@ -109,7 +109,7 @@ namespace AeternumGames.ShapeEditor
             brushMeshFactory = GetType("Chisel.Core.BrushMeshFactory");
             if (brushMeshFactory == null) { initializationError = true; return false; }
 
-            createFromPointsMethod = GetMethod(brushMeshFactory, "CreateFromPoints", "points", "surfaceDefinition", "brushMesh");
+            createFromPointsMethod = brushMeshFactory.GetMethodByName("CreateFromPoints", "points", "surfaceDefinition", "brushMesh");
             if (createFromPointsMethod == null) { initializationError = true; return false; }
 
             chiselSurfaceDefinition = GetType("Chisel.Core.ChiselSurfaceDefinition");
@@ -179,34 +179,6 @@ namespace AeternumGames.ShapeEditor
                 if (type != null)
                     return type;
             }
-            return null;
-        }
-
-        /// <summary>
-        /// Gets a method by name in a type that matche all of the parameter names.
-        /// </summary>
-        /// <param name="type">The type to search inside of.</param>
-        /// <param name="name">The name of the method.</param>
-        /// <param name="parameterNames">The parameter names to match.</param>
-        /// <returns>Returns the method or null if not found.</returns>
-        private static MethodInfo GetMethod(Type type, string name, params string[] parameterNames)
-        {
-            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
-            {
-                // method names must match.
-                if (method.Name != name) continue;
-
-                // the amount of parameters must match.
-                var parameters = method.GetParameters();
-                if (parameters.Length != parameterNames.Length) continue;
-
-                // the individual parameter names must match.
-                for (int i = 0; i < parameters.Length; i++)
-                    if (parameters[i].Name != parameterNames[i]) continue;
-
-                return method;
-            }
-
             return null;
         }
 

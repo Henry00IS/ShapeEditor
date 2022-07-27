@@ -125,19 +125,19 @@ namespace AeternumGames.ShapeEditor
             brushFactory = GetType("RealtimeCSG.Legacy.BrushFactory");
             if (brushFactory == null) { initializationError = true; return false; }
 
-            createBrushFromPlanesMethod = GetMethod(brushFactory, "CreateBrushFromPlanes", "brushName", "planes", "tangents", "binormals", "materials", "textureMatrices", "textureMatrixSpace");
+            createBrushFromPlanesMethod = brushFactory.GetMethodByName("CreateBrushFromPlanes", "brushName", "planes", "tangents", "binormals", "materials", "textureMatrices", "textureMatrixSpace");
             if (createBrushFromPlanesMethod == null) { initializationError = true; return false; }
 
-            createBrushMethod = GetMethod(brushFactory, "CreateBrush", "parent", "brushName", "controlMesh", "shape");
+            createBrushMethod = brushFactory.GetMethodByName("CreateBrush", "parent", "brushName", "controlMesh", "shape");
             if (createBrushMethod == null) { initializationError = true; return false; }
 
             shapePolygonUtility = GetType("RealtimeCSG.ShapePolygonUtility");
             if (shapePolygonUtility == null) { initializationError = true; return false; }
 
-            createCleanSubPolygonsFromVerticesMethod = GetMethod(shapePolygonUtility, "CreateCleanSubPolygonsFromVertices", "vertices2d", "buildPlane");
+            createCleanSubPolygonsFromVerticesMethod = shapePolygonUtility.GetMethodByName("CreateCleanSubPolygonsFromVertices", "vertices2d", "buildPlane");
             if (createCleanSubPolygonsFromVerticesMethod == null) { initializationError = true; return false; }
 
-            generateControlMeshFromVerticesMethod = GetMethod(shapePolygonUtility, "GenerateControlMeshFromVertices", "shape2DPolygon", "localToWorld", "direction", "height", "capTexgen", "smooth", "singleSurfaceEnds", "controlMesh", "shape");
+            generateControlMeshFromVerticesMethod = shapePolygonUtility.GetMethodByName("GenerateControlMeshFromVertices", "shape2DPolygon", "localToWorld", "direction", "height", "capTexgen", "smooth", "singleSurfaceEnds", "controlMesh", "shape");
             if (generateControlMeshFromVerticesMethod == null) { initializationError = true; return false; }
 
             csgBrush = GetType("RealtimeCSG.Components.CSGBrush");
@@ -170,7 +170,7 @@ namespace AeternumGames.ShapeEditor
             editModeManager = GetType("RealtimeCSG.EditModeManager");
             if (editModeManager == null) { initializationError = true; return false; }
 
-            updateSelectionMethod = GetMethod(editModeManager, "UpdateSelection", "forceUpdate");
+            updateSelectionMethod = editModeManager.GetMethodByName("UpdateSelection", "forceUpdate");
             if (updateSelectionMethod == null) { initializationError = true; return false; }
 
             initializationSuccess = true;
@@ -204,34 +204,6 @@ namespace AeternumGames.ShapeEditor
                 if (type != null)
                     return type;
             }
-            return null;
-        }
-
-        /// <summary>
-        /// Gets a method by name in a type that matche all of the parameter names.
-        /// </summary>
-        /// <param name="type">The type to search inside of.</param>
-        /// <param name="name">The name of the method.</param>
-        /// <param name="parameterNames">The parameter names to match.</param>
-        /// <returns>Returns the method or null if not found.</returns>
-        private static MethodInfo GetMethod(Type type, string name, params string[] parameterNames)
-        {
-            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
-            {
-                // method names must match.
-                if (method.Name != name) continue;
-
-                // the amount of parameters must match.
-                var parameters = method.GetParameters();
-                if (parameters.Length != parameterNames.Length) continue;
-
-                // the individual parameter names must match.
-                for (int i = 0; i < parameters.Length; i++)
-                    if (parameters[i].Name != parameterNames[i]) continue;
-
-                return method;
-            }
-
             return null;
         }
 
