@@ -12,6 +12,8 @@ namespace AeternumGames.ShapeEditor
         public Texture2D icon;
         /// <summary>The text to be displayed inside of the button when the icon is not set.</summary>
         public string text;
+        /// <summary>The tooltip text to be displayed when the mouse hovers over the button.</summary>
+        public string tooltip;
         /// <summary>The action to be called when the button is clicked.</summary>
         public System.Action onClick;
         /// <summary>Whether this button appears as being checked (background color).</summary>
@@ -48,6 +50,10 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Called when the control is rendered.</summary>
         public override void OnRender()
         {
+            // set the tooltip text when hovering over this control.
+            if (isMouseHoverEffectApplicable)
+                editor.SetTooltipText(tooltip);
+
             // draw the button outline.
             GLUtilities.DrawGui(() =>
             {

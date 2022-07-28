@@ -604,14 +604,6 @@ namespace AeternumGames.ShapeEditor
                 }
             }
         }
-
-        internal void UserPopupTest()
-        {
-            var popup = CreateInstance<TooltipWindow>();
-            popup.position = new Rect(Extensions.GetCurrentMousePosition(), new Vector2(200, 200));
-            popup.Initialize(this);
-            popup.ShowTooltip();
-        }
     }
 }
 

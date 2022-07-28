@@ -23,6 +23,7 @@ namespace AeternumGames.ShapeEditor
         private MouseCursor desiredMouseCursor;
         private Texture2D customMouseCursor;
         private float2 customMouseHotspot;
+        private string desiredTooltipText;
 
         /// <summary>Called by the Unity Editor to process events.</summary>
         private void OnGUI()
@@ -37,6 +38,13 @@ namespace AeternumGames.ShapeEditor
 
             if (e.type == EventType.Repaint)
             {
+                // set the desired tooltip.
+                if (desiredTooltipText != null)
+                {
+                    GUI.Label(GetViewportRect(), new GUIContent("", desiredTooltipText));
+                    desiredTooltipText = null;
+                }
+
                 var time = Time.realtimeSinceStartup;
                 OnRepaint();
                 lastRenderTime = Time.realtimeSinceStartup - time;
@@ -303,6 +311,14 @@ namespace AeternumGames.ShapeEditor
             customMouseCursor = cursor;
             customMouseHotspot = hotspot;
             desiredMouseCursorTimer = 1;
+        }
+
+        /// <summary>While this function is called every repaint, it will set the tooltip text.</summary>
+        /// <param name="tooltip">The tooltip text to display when the mouse is idling.</param>
+        internal void SetTooltipText(string tooltip)
+        {
+            if (tooltip == null) return;
+            desiredTooltipText = tooltip;
         }
 
         /// <summary>Whether the Ctrl or Shift key is pressed.</summary>

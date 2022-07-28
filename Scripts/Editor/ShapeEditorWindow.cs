@@ -360,10 +360,6 @@ namespace AeternumGames.ShapeEditor
                                 return true;
                             }
                             return true;
-
-                        case KeyCode.T:
-                            UserPopupTest();
-                            return true;
                     }
                 }
             }
