@@ -333,18 +333,43 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Switches to the box select tool unless already active.</summary>
+        [Instructions(
+            title: "Box Select Tool",
+            description: "Switches to the box select tool. You can draw a rectangle while holding down the left mouse button. Any element that lies within this rectangle will be selected. Hold down the Shift key to select more elements. Hold down the Ctrl key to deselect elements.",
+            shortcut: "Q key"
+        )]
         internal void UserSwitchToBoxSelectTool() => SwitchTool(boxSelectTool);
 
         /// <summary>Switches to the translate tool unless already active.</summary>
+        [Instructions(
+            title: "Translate Tool",
+            description: "Switches to the translate tool. Once you have selected one or more items, a translation gizmo appears. You can drag it around to translate the selection.\n\nMost of the other tools allow you to translate the selection with the G key. Once activated, you can press X or Y to move along that axis accordingly.",
+            shortcut: "W key"
+        )]
         internal void UserSwitchToTranslateTool() => SwitchTool(translateTool);
 
         /// <summary>Switches to the rotate tool unless already active.</summary>
+        [Instructions(
+            title: "Rotate Tool",
+            description: "Switches to the rotate tool. Once you have selected one or more items, a rotation gizmo appears. You can spin it around to rotate the selection.\n\nMost of the other tools allow you to rotate the selection with the R key as well.",
+            shortcut: "R key"
+        )]
         internal void UserSwitchToRotateTool() => SwitchTool(rotateTool);
 
         /// <summary>Switches to the scale tool unless already active.</summary>
+        [Instructions(
+            title: "Scale Tool",
+            description: "Switches to the scale tool. Once you have selected one or more items, a scaling gizmo appears. You can use it to scale the selection.\n\nMost of the other tools allow you to scale the selection with the S key as well. Once activated, you can press X or Y to scale along that axis accordingly.",
+            shortcut: "S key"
+        )]
         internal void UserSwitchToScaleTool() => SwitchTool(scaleTool);
 
         /// <summary>Switches to the cut tool unless already active.</summary>
+        [Instructions(
+            title: "Cut Tool",
+            description: "Switches to the cutting tool. When you hover the mouse over a segment, you will see a small yellow cutting caret. When you click the left mouse button, the segment is split at this point and a new vertex is inserted.",
+            shortcut: "C key single-use"
+        )]
         internal void UserSwitchToCutTool() => SwitchTool(cutTool);
 
         /// <summary>Switches to the vertex select mode.</summary>
@@ -356,6 +381,10 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Switches to the face select mode.</summary>
         internal void UserSwitchToFaceSelectMode() => shapeSelectMode = ShapeSelectMode.Face;
 
+        [Instructions(
+            title: "New Project",
+            description: "Pushes the current project to the undo stack and starts a new project containing only a default cube."
+        )]
         internal void UserNewProject()
         {
             NewProject();

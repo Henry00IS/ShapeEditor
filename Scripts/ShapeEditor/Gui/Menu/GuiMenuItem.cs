@@ -119,6 +119,8 @@ namespace AeternumGames.ShapeEditor
         {
             if (isMouseOver)
             {
+                editor.SetTooltipText(onClick, InstructionsDisplayMode.Menu);
+
                 GLUtilities.DrawGui(() =>
                 {
                     GL.Color(colorMenuItemHoverBackground);

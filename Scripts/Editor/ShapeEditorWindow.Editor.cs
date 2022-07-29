@@ -317,8 +317,16 @@ namespace AeternumGames.ShapeEditor
         /// <param name="tooltip">The tooltip text to display when the mouse is idling.</param>
         internal void SetTooltipText(string tooltip)
         {
-            if (tooltip == null) return;
+            if (tooltip == null || tooltip.Length == 0) return;
             desiredTooltipText = tooltip;
+        }
+
+        /// <summary>While this function is called every repaint, it will set the tooltip text.</summary>
+        /// <param name="action">The action to retrieve <see cref="InstructionsAttribute"/> for.</param>
+        /// <param name="mode">The usage instructions display mode.</param>
+        internal void SetTooltipText(System.Action action, InstructionsDisplayMode mode = InstructionsDisplayMode.Default)
+        {
+            SetTooltipText(action?.GetInstructions()?.GetTooltip(mode));
         }
 
         /// <summary>Whether the Ctrl or Shift key is pressed.</summary>

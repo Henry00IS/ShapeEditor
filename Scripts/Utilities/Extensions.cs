@@ -111,6 +111,16 @@ namespace AeternumGames.ShapeEditor
 
             return null;
         }
+
+        /// <summary>
+        /// Retrieves the <see cref="InstructionsAttribute"/> associated with this action or null.
+        /// </summary>
+        public static InstructionsAttribute GetInstructions(this Action action) => action.Method.GetInstructions();
+
+        /// <summary>
+        /// Retrieves the <see cref="InstructionsAttribute"/> associated with this method or null.
+        /// </summary>
+        public static InstructionsAttribute GetInstructions(this MethodBase method) => method.GetCustomAttribute<InstructionsAttribute>();
     }
 }
 
