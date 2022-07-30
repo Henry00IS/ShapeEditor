@@ -24,6 +24,7 @@ namespace AeternumGames.ShapeEditor
         private Texture2D customMouseCursor;
         private float2 customMouseHotspot;
         private string desiredTooltipText;
+        private double tooltipDetectionTime;
 
         /// <summary>Called by the Unity Editor to process events.</summary>
         private void OnGUI()
@@ -38,16 +39,18 @@ namespace AeternumGames.ShapeEditor
 
             if (e.type == EventType.Repaint)
             {
-                // set the desired tooltip.
-                if (desiredTooltipText != null)
-                {
-                    GUI.Label(GetViewportRect(), new GUIContent("", desiredTooltipText));
-                    desiredTooltipText = null;
-                }
+                // always reset the tooltip.
+                desiredTooltipText = null;
 
                 var time = Time.realtimeSinceStartup;
                 OnRepaint();
                 lastRenderTime = Time.realtimeSinceStartup - time;
+
+                // set the desired tooltip (unity calls a repaint after a brief pause for their own tooltip logic).
+                if (desiredTooltipText != null && Time.realtimeSinceStartupAsDouble - tooltipDetectionTime > 0.2f)
+                    TooltipWindow.ShowTooltip(this, desiredTooltipText);
+                else
+                    TooltipWindow.CloseTooltips();
 
                 // set the desired mouse cursor.
                 if (desiredMouseCursor != MouseCursor.Arrow)
@@ -157,6 +160,8 @@ namespace AeternumGames.ShapeEditor
 
             if (e.type == EventType.MouseMove)
             {
+                UpdateTooltipDetectionTime();
+
                 var previousMouseGridPosition = mouseGridPosition;
                 mousePosition = eMousePosition;
                 mouseGridPosition = ScreenPointToGrid(mousePosition);
@@ -222,6 +227,12 @@ namespace AeternumGames.ShapeEditor
         private void UpdateLastInteractedTime()
         {
             lastInteraction = Time.realtimeSinceStartupAsDouble;
+            UpdateTooltipDetectionTime();
+        }
+
+        private void UpdateTooltipDetectionTime()
+        {
+            tooltipDetectionTime = Time.realtimeSinceStartupAsDouble;
         }
 
         /// <summary>Called when a new 2D Shape Editor window is created.</summary>

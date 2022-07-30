@@ -121,6 +121,34 @@ namespace AeternumGames.ShapeEditor
         /// Retrieves the <see cref="InstructionsAttribute"/> associated with this method or null.
         /// </summary>
         public static InstructionsAttribute GetInstructions(this MethodBase method) => method.GetCustomAttribute<InstructionsAttribute>();
+
+        /// <summary>The cached show tooltip method after initialization.</summary>
+        private static MethodInfo showTooltipMethod = null;
+
+        /// <summary>
+        /// Calls the internal <see cref="EditorWindow.ShowTooltip"/> function that creates a
+        /// borderless window without taking input focus.
+        /// </summary>
+        public static void ShowTooltip(this EditorWindow window)
+        {
+            if (showTooltipMethod == null)
+                showTooltipMethod = typeof(EditorWindow).GetMethodByName("ShowTooltip");
+            showTooltipMethod.Invoke(window, null);
+        }
+
+        /// <summary>The cached get current mouse position method after initialization.</summary>
+        private static MethodInfo getCurrentMousePositionMethod = null;
+
+        /// <summary>
+        /// Calls the internal <see cref="Editor.GetCurrentMousePosition"/> function that returns
+        /// the actual mouse coordinates of the operating system.
+        /// </summary>
+        public static Vector2 GetCurrentMousePosition()
+        {
+            if (getCurrentMousePositionMethod == null)
+                getCurrentMousePositionMethod = typeof(Editor).GetMethodByName("GetCurrentMousePosition");
+            return (Vector2)getCurrentMousePositionMethod.Invoke(null, null);
+        }
     }
 }
 

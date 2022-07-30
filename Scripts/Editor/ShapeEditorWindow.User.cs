@@ -694,7 +694,7 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Displays the background settings window.</summary>
         [Instructions(
             title: "Background settings",
-            description: "Displays the background settings window."
+            description: "Displays the background settings window. Can load a background image that will be displayed behind the grid."
         )]
         internal void UserShowBackgroundSettingsWindow()
         {
