@@ -72,6 +72,7 @@ namespace AeternumGames.ShapeEditor
             base.OnRender();
         }
 
+        [Instructions(title: "Applies the specified bezier detail level, which generates more vertices.")]
         private void ApplyBezierDetailToSelectedEdges()
         {
             editor.RegisterUndo("Apply Bezier Detail");
@@ -81,6 +82,7 @@ namespace AeternumGames.ShapeEditor
                     segment.generator.bezierDetail = bezierDetail;
         }
 
+        [Instructions(title: "Applies the specified grid size, which snaps all generated vertices to it (set to 0 to disable).")]
         private void ApplyGridSnapSizeToSelectedEdges()
         {
             editor.RegisterUndo("Apply Bezier Grid Snap Size");

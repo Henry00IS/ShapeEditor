@@ -61,11 +61,13 @@ namespace AeternumGames.ShapeEditor
             );
         }
 
+        [Instructions(title: "Clears the currently loaded background image.")]
         private void ClearBackgroundImage()
         {
             editor.gridBackgroundImage = null;
         }
 
+        [Instructions(title: "Displays a file open dialog to load a background image file.")]
         private void SelectBackgroundImage()
         {
             string path = EditorUtility.OpenFilePanelWithFilters("Load Background Image", "", new string[] { "Image Files", "png,jpg,jpeg" });

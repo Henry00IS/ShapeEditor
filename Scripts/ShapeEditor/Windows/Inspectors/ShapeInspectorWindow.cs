@@ -28,9 +28,9 @@ namespace AeternumGames.ShapeEditor
 
             layout.Add(new GuiLabel("Symmetry Mode"));
             layout.Space(64);
-            layout.Add(horizontalSymmetryButton = new GuiButton(resources.shapeEditorFlipHorizontally, new float2(16f, 16f), () => symmetryAxes ^= SimpleGlobalAxis.Horizontal));
+            layout.Add(horizontalSymmetryButton = new GuiButton(resources.shapeEditorFlipHorizontally, new float2(16f, 16f), ToggleHorizontalSymmetry));
             layout.Space(2);
-            layout.Add(verticalSymmetryButton = new GuiButton(resources.shapeEditorFlipVertically, new float2(16f, 16f), () => symmetryAxes ^= SimpleGlobalAxis.Vertical));
+            layout.Add(verticalSymmetryButton = new GuiButton(resources.shapeEditorFlipVertically, new float2(16f, 16f), ToggleVerticalSymmetry));
             layout.Space(2);
             layout.Add(new GuiButton("Apply", new float2(40, 16), ApplySymmetryAxesToSelectedShapes));
         }
@@ -51,6 +51,19 @@ namespace AeternumGames.ShapeEditor
             base.OnRender();
         }
 
+        [Instructions(title: "Whether horizontal symmetry will be enabled.")]
+        private void ToggleHorizontalSymmetry()
+        {
+            symmetryAxes ^= SimpleGlobalAxis.Horizontal;
+        }
+
+        [Instructions(title: "Whether vertical symmetry will be enabled.")]
+        private void ToggleVerticalSymmetry()
+        {
+            symmetryAxes ^= SimpleGlobalAxis.Vertical;
+        }
+
+        [Instructions(title: "Applies the specified symmetry mode on all fully selected shapes, which mirrors the shape on the global horizontal and/or vertical axes.")]
         private void ApplySymmetryAxesToSelectedShapes()
         {
             editor.RegisterUndo("Apply Symmetry Axes");

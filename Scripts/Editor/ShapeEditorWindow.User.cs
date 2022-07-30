@@ -518,10 +518,10 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        /// <summary>Clears the current selection, pastes shapes from the clipboard into the project.</summary>
+        /// <summary>Clears the current selection, pastes shapes from the clipboard into the project and selects them.</summary>
         [Instructions(
             title: "Paste shapes",
-            description: "Clears the current selection, pastes shapes from the clipboard into the project.",
+            description: "Clears the current selection, pastes shapes from the clipboard into the project and selects them.",
             shortcut: "Ctrl + V"
         )]
         internal void UserPaste()

@@ -78,6 +78,7 @@ namespace AeternumGames.ShapeEditor
             base.OnRender();
         }
 
+        [Instructions(title: "Applies the specified sine detail level, which generates more vertices.")]
         private void ApplySineDetailToSelectedEdges()
         {
             editor.RegisterUndo("Apply Sine Detail");
@@ -87,6 +88,7 @@ namespace AeternumGames.ShapeEditor
                     segment.generator.sineDetail = sineDetail;
         }
 
+        [Instructions(title: "Applies the specified sine frequency. A positive number inverts the sine wave. Adding 0.5 ends the wave on the same polarity as it started.")]
         private void ApplySineFrequencyToSelectedEdges()
         {
             editor.RegisterUndo("Apply Sine Frequency");
@@ -96,6 +98,7 @@ namespace AeternumGames.ShapeEditor
                     segment.generator.sineFrequency = sineFrequency;
         }
 
+        [Instructions(title: "Applies the specified grid size, which snaps all generated vertices to it (set to 0 to disable).")]
         private void ApplyGridSnapSizeToSelectedEdges()
         {
             editor.RegisterUndo("Apply Bezier Grid Snap Size");
