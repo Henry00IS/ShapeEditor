@@ -888,6 +888,7 @@ namespace AeternumGames.ShapeEditor
         private void UserCreateChiselTarget(string name, ChiselTargetMode mode, Action<GameObject, ChiselTarget> init = null)
         {
             GameObject go = new GameObject(name);
+            Undo.RegisterCreatedObjectUndo(go, "Create Chisel Target");
             go.transform.SetSiblingOfActiveTransform();
 
             var target = go.AddComponent<ChiselTarget>();
@@ -909,6 +910,7 @@ namespace AeternumGames.ShapeEditor
         private void UserCreateRealtimeCSGTarget(string name, RealtimeCSGTargetMode mode, Action<GameObject, RealtimeCSGTarget> init = null)
         {
             GameObject go = new GameObject(name);
+            Undo.RegisterCreatedObjectUndo(go, "Create RealtimeCSG Target");
             go.transform.SetSiblingOfActiveTransform();
 
             var target = go.AddComponent<RealtimeCSGTarget>();
@@ -930,6 +932,7 @@ namespace AeternumGames.ShapeEditor
         private void UserCreateShapeEditorTarget(string name, ShapeEditorTargetMode mode, Action<GameObject, ShapeEditorTarget> init = null)
         {
             GameObject go = new GameObject(name);
+            Undo.RegisterCreatedObjectUndo(go, "Create Shape Editor Target");
             go.transform.SetSiblingOfActiveTransform();
 
             var target = go.AddComponent<ShapeEditorTarget>();
