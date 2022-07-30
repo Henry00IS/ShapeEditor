@@ -11,6 +11,12 @@ namespace AeternumGames.ShapeEditor
         internal static readonly Color windowBorderColor = new Color(0.102f, 0.102f, 0.102f);
         internal static readonly Color windowBackgroundColor = new Color(0.247f, 0.247f, 0.247f);
 
+        /// <summary>
+        /// Whether an instance of this tooltip window is probably active. Used for lag reduction as
+        /// <see cref="Resources.FindObjectsOfTypeAll"/> is slow.
+        /// </summary>
+        private static bool isWindowProbablyActive;
+
         /// <summary>The shape editor window.</summary>
         public ShapeEditorWindow editor { get; private set; }
 
@@ -20,17 +26,22 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Gets an existing open tooltip window or if none, makes a new one and opens it.</summary>
         public static TooltipWindow ShowTooltip(ShapeEditorWindow editor, string tooltipText)
         {
-            // find all tooltip windows.
+            isWindowProbablyActive = true;
+
+            // calculate the required size to the fit the word wrapped tooltip text.
+            var size = EditorStyles.wordWrappedLabel.CalcSize(new GUIContent(tooltipText));
+            size.x = size.x < 303 - 8 ? size.x + 8 : 303;
+            size.y = EditorStyles.wordWrappedLabel.CalcHeight(new GUIContent(tooltipText), size.x - 8) + 4;
+
+            // calculate a position based on the size and mouse cursor.
+            var pos = Extensions.GetCurrentMousePosition() + new Vector2(-Mathf.FloorToInt(size.x / 2), 20);
+
+            // find and update a tooltip window that already exists.
             var windows = Resources.FindObjectsOfTypeAll<TooltipWindow>();
-
-            var width = EditorStyles.wordWrappedLabel.CalcSize(new GUIContent(tooltipText)).x;
-            width = width < 303 - 8 ? width + 8 : 303;
-            var height = EditorStyles.wordWrappedLabel.CalcHeight(new GUIContent(tooltipText), width - 8) + 4;
-
             if (windows.Length > 0)
             {
                 windows[0].tooltipText = tooltipText;
-                windows[0].position = new Rect(Extensions.GetCurrentMousePosition() + new Vector2(-Mathf.FloorToInt(width / 2), 20), new Vector2(width, height));
+                windows[0].position = new Rect(pos, size);
                 return windows[0];
             }
 
@@ -40,19 +51,20 @@ namespace AeternumGames.ShapeEditor
             popup.editor = editor;
             popup.tooltipText = tooltipText;
             popup.minSize = new Vector2(1, 1);
-            popup.position = new Rect(Extensions.GetCurrentMousePosition() + new Vector2(-Mathf.FloorToInt(width / 2), 20), new Vector2(width, height));
+            popup.position = new Rect(pos, size);
             popup.ShowTooltip();
             return popup;
         }
 
         public static void CloseTooltips()
         {
-            // find all tooltip windows.
-            var windows = Resources.FindObjectsOfTypeAll<TooltipWindow>();
+            if (!isWindowProbablyActive) return;
+            isWindowProbablyActive = false;
 
-            // if found remove it.
-            if (windows.Length > 0)
-                windows[0].Close();
+            // find and close all tooltip windows.
+            var windows = Resources.FindObjectsOfTypeAll<TooltipWindow>();
+            for (int i = 0; i < windows.Length; i++)
+                windows[i].Close();
         }
 
         /// <summary>Called by the Unity Editor to process events.</summary>
