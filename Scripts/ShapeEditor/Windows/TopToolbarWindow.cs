@@ -44,6 +44,9 @@ namespace AeternumGames.ShapeEditor
             editMenu.Add("Invert Selection", editor.UserInvertSelection);
             editMenu.Add("Delete Selection", resources.shapeEditorDelete, editor.UserDeleteSelection);
             editMenu.Separator();
+            editMenu.Add("Copy", editor.UserCopy);
+            editMenu.Add("Paste", editor.UserPaste);
+            editMenu.Separator();
             editMenu.Add("Flip Horizontally", resources.shapeEditorFlipHorizontally, editor.UserFlipSelectionHorizonally);
             editMenu.Add("Flip Vertically", resources.shapeEditorFlipVertically, editor.UserFlipSelectionVertically);
             editMenu.Separator();
