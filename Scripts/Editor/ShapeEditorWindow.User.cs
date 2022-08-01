@@ -79,6 +79,7 @@ namespace AeternumGames.ShapeEditor
                 var target = transform.GetComponent<IShapeEditorTarget>();
                 if (target != null)
                 {
+                    Undo.RegisterCompleteObjectUndo((UnityEngine.Object)target, "Assign Project To Targets");
                     target.OnShapeEditorUpdateProject(project);
                 }
             }

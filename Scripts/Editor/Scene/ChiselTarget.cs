@@ -61,6 +61,13 @@ namespace AeternumGames.ShapeEditor
 
         public void Rebuild()
         {
+            // unity editor will serialize private fields and restore them upon redo.
+            if (Event.current.HasPerformedUndoRedo())
+            {
+                convexPolygons2D = null;
+                choppedPolygons2D = null;
+            }
+
             switch (targetMode)
             {
                 case ChiselTargetMode.FixedExtrude:
