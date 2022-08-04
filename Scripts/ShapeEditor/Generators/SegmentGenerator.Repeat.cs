@@ -43,33 +43,42 @@ namespace AeternumGames.ShapeEditor
         {
             if (repeatSegments > 0)
             {
-                // iterate backwards and find the individual offsets from 0,0.
-                var offsets = new float2[repeatSegments];
-                var current = segment;
+                // iterate backwards and find the first segment to begin copying.
+                var begin = segment;
                 for (int i = 0; i < repeatSegments; i++)
-                {
-                    var previous = current.previous;
-                    offsets[i] = current.position - previous.position;
-                    current = previous;
-                }
+                    begin = begin.previous;
 
-                // starting from the current segment position, repeat x number of times:
-                var offset = segment.position;
-                for (int j = 0; j < repeatTimes; j++)
+                // repeat this the specified amount of times:
+                var lastPoint = segment.position;
+                for (int i = 0; i < repeatTimes; i++)
                 {
-                    // iterate over the offsets in reverse and add them as new segments.
-                    for (int i = repeatSegments; i-- > 0;)
+                    // iterate over all points from the beginning:
+                    var current = begin;
+                    for (int j = 0; j < repeatSegments; j++)
                     {
-                        offset += offsets[i];
-
-                        // do NOT add the very last segment as it needs to connect to the next segment.
-                        if (!(j == repeatTimes - 1 && i == 0))
+                        var nextLastPoint = float2.zero;
+                        foreach (var point in Repeat_GetPoints(lastPoint, current))
                         {
-                            yield return offset;
+                            yield return point;
+                            nextLastPoint = point;
                         }
+                        lastPoint = nextLastPoint;
+                        current = current.next;
                     }
                 }
             }
+        }
+
+        private IEnumerable<float2> Repeat_GetPoints(float2 previous, Segment current)
+        {
+            if (current.generator.type != SegmentGeneratorType.Repeat)
+            {
+                foreach (var point in current.generator.ForEachAdditionalSegmentPoint())
+                {
+                    yield return previous + (point - current.position);
+                }
+            }
+            yield return previous + (current.next.position - current.position);
         }
     }
 }

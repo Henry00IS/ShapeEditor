@@ -81,6 +81,7 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Whether the event is the "UndoRedoPerformed" command.</summary>
         public static bool HasPerformedUndoRedo(this Event current)
         {
+            if (current == null) return false;
             return (current.type == EventType.ValidateCommand || current.type == EventType.ExecuteCommand) && current.commandName == "UndoRedoPerformed";
         }
 

@@ -712,6 +712,16 @@ namespace AeternumGames.ShapeEditor
             OpenWindow(new BezierInspectorWindow());
         }
 
+        /// <summary>Displays the repeat inspector window.</summary>
+        [Instructions(
+            title: "Repeat inspector",
+            description: "Displays the repeat inspector window. Allows for modification of repeat segment generator parameters."
+        )]
+        internal void UserShowRepeatInspectorWindow()
+        {
+            OpenWindow(new RepeatInspectorWindow());
+        }
+
         /// <summary>Displays the shape inspector window.</summary>
         [Instructions(
             title: "Shape inspector",
