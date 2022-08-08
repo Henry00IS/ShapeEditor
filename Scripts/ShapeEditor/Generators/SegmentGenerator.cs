@@ -102,6 +102,10 @@ namespace AeternumGames.ShapeEditor
                 case SegmentGeneratorType.Repeat:
                     Repeat_DrawSegments();
                     break;
+
+                case SegmentGeneratorType.Arch:
+                    Arch_DrawSegments();
+                    break;
             }
         }
 
@@ -146,6 +150,11 @@ namespace AeternumGames.ShapeEditor
 
                 case SegmentGeneratorType.Repeat:
                     foreach (var point in Repeat_ForEachSegmentPoint())
+                        yield return point;
+                    yield break;
+
+                case SegmentGeneratorType.Arch:
+                    foreach (var point in Arch_ForEachSegmentPoint())
                         yield return point;
                     yield break;
             }

@@ -692,6 +692,16 @@ namespace AeternumGames.ShapeEditor
             OpenWindow(new AboutWindow());
         }
 
+        /// <summary>Displays the arch inspector window.</summary>
+        [Instructions(
+            title: "Arch inspector",
+            description: "Displays the arch inspector window. Allows for modification of arch segment generator parameters."
+        )]
+        internal void UserShowArchInspectorWindow()
+        {
+            OpenWindow(new ArchInspectorWindow());
+        }
+
         /// <summary>Displays the background settings window.</summary>
         [Instructions(
             title: "Background settings",
@@ -843,6 +853,21 @@ namespace AeternumGames.ShapeEditor
         internal void UserToggleGridSnapping()
         {
             snapEnabled = !snapEnabled;
+        }
+
+        /// <summary>
+        /// Switches between the arch and linear segment generator for all selected edges.
+        /// </summary>
+        [Instructions(
+            title: "Toggle arch generator",
+            description: "Switches between the arch and linear segment generator for all selected edges."
+        )]
+        internal void UserToggleArchSegmentGeneratorForSelectedEdges()
+        {
+            RegisterUndo("Toggle Arch Generator");
+
+            foreach (var segment in ForEachSelectedEdge())
+                segment.generator = new SegmentGenerator(segment, segment.generator.type != SegmentGeneratorType.Arch ? SegmentGeneratorType.Arch : SegmentGeneratorType.Linear);
         }
 
         /// <summary>

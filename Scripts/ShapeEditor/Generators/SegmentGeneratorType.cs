@@ -13,6 +13,8 @@ namespace AeternumGames.ShapeEditor
         Sine,
         /// <summary>Repeats x amount of previous segments.</summary>
         Repeat,
+        /// <summary>Generates a well-known architectural arch between two segments.</summary>
+        Arch,
     }
 }
 

@@ -45,6 +45,7 @@ MonoBehaviour:
   shapeEditorSave: {fileID: 2800000, guid: 76adb6eb78c8f42438808b9ee4f5b194, type: 3}
   shapeEditorScale: {fileID: 2800000, guid: dcd56c9580c27d643a9a6de926a57f60, type: 3}
   shapeEditorSegmentApply: {fileID: 2800000, guid: 2e6c111fa0c51b047b2e08c09ca7db4b, type: 3}
+  shapeEditorSegmentArch: {fileID: 2800000, guid: eb6df58274e2e7649b2635514b905aac, type: 3}
   shapeEditorSegmentBezier: {fileID: 2800000, guid: 8edcf55907a9330459e010614fb83a5c, type: 3}
   shapeEditorSegmentBezierDetail: {fileID: 2800000, guid: 71ed1a9056d0c5a488787b5de3727ec4, type: 3}
   shapeEditorSegmentDuplicateWarning: {fileID: 2800000, guid: 8f9116e77a430714383a3c4aec898a99, type: 3}
@@ -62,6 +63,37 @@ MonoBehaviour:
   shapeEditorVertexSelect: {fileID: 2800000, guid: 39a55776995e72b4d8e7286baf55163c, type: 3}
   shapeEditorZoomIn: {fileID: 2800000, guid: 4680d936fb0455f4f99c0d94155d38df, type: 3}
   shapeEditorZoomOut: {fileID: 2800000, guid: 62299d3e26649b442aed157a222ab744, type: 3}
+  shapeEditorArchSegmentRound: {fileID: 2800000, guid: a60a408522ca49b4493c199ba1801fc9, type: 3}
+  shapeEditorArchSegmentSegmental: {fileID: 2800000, guid: 54af54ead15c94c4ea3c803a43446d97, type: 3}
+  shapeEditorArchSegmentHorseshoe: {fileID: 2800000, guid: e308de4d7ee8dfc438f1800a539615a0, type: 3}
+  shapeEditorArchSegmentPointedHorseshoe: {fileID: 2800000, guid: 01b191598c88a97489266f6fda7a671c, type: 3}
+  shapeEditorArchSegmentThreeCentered: {fileID: 2800000, guid: 91199b8c14b2ac247bc122a49a590bf2, type: 3}
+  shapeEditorArchSegmentPseudoThreeCentered: {fileID: 2800000, guid: a72b798298a132043902acd535e4e90c, type: 3}
+  shapeEditorArchSegmentPseudoFourCentered: {fileID: 2800000, guid: acb2e6397ffed054d97df6fbe56558c2, type: 3}
+  shapeEditorArchSegmentTriangular: {fileID: 2800000, guid: 2e7154a6b4aa43f4c8a2ce50898c64d7, type: 3}
+  shapeEditorArchSegmentRoundedHorseshoe: {fileID: 2800000, guid: 4e869d7a746b55a47b6bc2d37d093d89, type: 3}
+  shapeEditorArchSegmentThreePointed: {fileID: 2800000, guid: 66c5922de0664b741aac9cf2e3295673, type: 3}
+  shapeEditorArchSegmentPointedSegmental: {fileID: 2800000, guid: 7a68406eea4f7d7439643090d121727a, type: 3}
+  shapeEditorArchSegmentParabolic: {fileID: 2800000, guid: 3feab7540d934eb428b4f859175771d7, type: 3}
+  shapeEditorArchSegmentInflexed: {fileID: 2800000, guid: eec6531ebd71e874caaefbf572065b49, type: 3}
+  shapeEditorArchSegmentRoundRampant: {fileID: 2800000, guid: 490b8ac667e96844bb487920bb0948b6, type: 3}
+  shapeEditorArchSegmentRampant: {fileID: 2800000, guid: 87c2695a1530e7b4e8e754df4364ed25, type: 3}
+  shapeEditorArchSegmentFourCentered: {fileID: 2800000, guid: e364b3704d318704c9ed41182848f1e7, type: 3}
+  shapeEditorArchSegmentKeyhole: {fileID: 2800000, guid: 2b8be034145f78b4aa743fff62917e71, type: 3}
+  shapeEditorArchSegmentReverseOgee: {fileID: 2800000, guid: 6ce3213b2bd572f47b819685e777a339, type: 3}
+  shapeEditorArchSegmentOgeeThreeCentered: {fileID: 2800000, guid: 7622bee4135ea94419c7624fe05ff24f, type: 3}
+  shapeEditorArchSegmentOgeeFourCentered: {fileID: 2800000, guid: 5a4727feece62764fb682fb210e21a58, type: 3}
+  shapeEditorArchSegmentOriental: {fileID: 2800000, guid: b74def24d1304e0499d83a4ed1f7a8a8, type: 3}
+  shapeEditorArchSegmentRoundTrefoil: {fileID: 2800000, guid: 239cd5f82f709cc41a71ded5ac8ecd6f, type: 3}
+  shapeEditorArchSegmentShouldered: {fileID: 2800000, guid: 8718ba7f516d2e94eab95fedd4152133, type: 3}
+  shapeEditorArchSegmentPointedTrefoil: {fileID: 2800000, guid: 0e20c8f48479fca47923d544ce71d1f7, type: 3}
+  shapeEditorArchSegmentDraped: {fileID: 2800000, guid: 18dc09b70fa71834aa746a5976b162a9, type: 3}
+  shapeEditorArchSegmentDoubleDraped: {fileID: 2800000, guid: 1c92dbb84c94af449a15509fc042f6ee, type: 3}
+  shapeEditorArchSegmentCinquefoil: {fileID: 2800000, guid: b65df4c3a87ab2d4998713b178d2eac8, type: 3}
+  shapeEditorArchSegmentPointedCinquefoil: {fileID: 2800000, guid: eef7ebdac2e1e734a89d905a925dfe90, type: 3}
+  shapeEditorArchSegmentMultifoil: {fileID: 2800000, guid: 5226af647e63510498528e15758d7a87, type: 3}
+  shapeEditorArchSegmentRoundRampantMirrored: {fileID: 2800000, guid: d4abfa5dcc6ef2448a351b2a31c8a4c4, type: 3}
+  shapeEditorArchSegmentRampantMirrored: {fileID: 2800000, guid: ea76d1e39e43f8a4eb6f72a28eadb350, type: 3}
   shapeEditorFontSegoeUI14Xml: {fileID: 4900000, guid: 96c44120173bdb24081e0676c015daee, type: 3}
   shapeEditorFontSegoeUI14: {fileID: 2800000, guid: 4c29aef198600c443825fa46c0b76761, type: 3}
   shapeEditorDefaultMaterial: {fileID: 2100000, guid: 10af3fe77d7a84a4d951b38b54533f7a, type: 2}

@@ -74,6 +74,7 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorSave;
         public Texture2D shapeEditorScale;
         public Texture2D shapeEditorSegmentApply;
+        public Texture2D shapeEditorSegmentArch;
         public Texture2D shapeEditorSegmentBezier;
         public Texture2D shapeEditorSegmentBezierDetail;
         public Texture2D shapeEditorSegmentDuplicateWarning;
@@ -91,6 +92,38 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorVertexSelect;
         public Texture2D shapeEditorZoomIn;
         public Texture2D shapeEditorZoomOut;
+
+        public Texture2D shapeEditorArchSegmentRound;
+        public Texture2D shapeEditorArchSegmentSegmental;
+        public Texture2D shapeEditorArchSegmentHorseshoe;
+        public Texture2D shapeEditorArchSegmentPointedHorseshoe;
+        public Texture2D shapeEditorArchSegmentThreeCentered;
+        public Texture2D shapeEditorArchSegmentPseudoThreeCentered;
+        public Texture2D shapeEditorArchSegmentPseudoFourCentered;
+        public Texture2D shapeEditorArchSegmentTriangular;
+        public Texture2D shapeEditorArchSegmentRoundedHorseshoe;
+        public Texture2D shapeEditorArchSegmentThreePointed;
+        public Texture2D shapeEditorArchSegmentPointedSegmental;
+        public Texture2D shapeEditorArchSegmentParabolic;
+        public Texture2D shapeEditorArchSegmentInflexed;
+        public Texture2D shapeEditorArchSegmentRoundRampant;
+        public Texture2D shapeEditorArchSegmentRampant;
+        public Texture2D shapeEditorArchSegmentFourCentered;
+        public Texture2D shapeEditorArchSegmentKeyhole;
+        public Texture2D shapeEditorArchSegmentReverseOgee;
+        public Texture2D shapeEditorArchSegmentOgeeThreeCentered;
+        public Texture2D shapeEditorArchSegmentOgeeFourCentered;
+        public Texture2D shapeEditorArchSegmentOriental;
+        public Texture2D shapeEditorArchSegmentRoundTrefoil;
+        public Texture2D shapeEditorArchSegmentShouldered;
+        public Texture2D shapeEditorArchSegmentPointedTrefoil;
+        public Texture2D shapeEditorArchSegmentDraped;
+        public Texture2D shapeEditorArchSegmentDoubleDraped;
+        public Texture2D shapeEditorArchSegmentCinquefoil;
+        public Texture2D shapeEditorArchSegmentPointedCinquefoil;
+        public Texture2D shapeEditorArchSegmentMultifoil;
+        public Texture2D shapeEditorArchSegmentRoundRampantMirrored;
+        public Texture2D shapeEditorArchSegmentRampantMirrored;
 
         public TextAsset shapeEditorFontSegoeUI14Xml;
         public Texture2D shapeEditorFontSegoeUI14;
