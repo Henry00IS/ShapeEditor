@@ -274,7 +274,7 @@ namespace AeternumGames.ShapeEditor
 
                 case ArchMode.RoundRampant:
                     {
-                        var right = p4 + up * 0.283882f;
+                        var right = p4 + up * 0.31f;
                         p2 = p1 + up * 0.75f + normal * 0.05f;
                         p3 = p4 + up * 0.8f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, right))
@@ -714,13 +714,13 @@ namespace AeternumGames.ShapeEditor
 
                 case ArchMode.RoundRampantMirrored:
                     {
-                        var left = p1 + up * 0.283882f;
+                        var left = p1 + up * 0.31f;
 
                         yield return left.Snap(archGridSnapSize);
 
-                        p2 = p1 + up * 0.75f + normal * 0.05f;
-                        p3 = p4 + up * 0.8f;
-                        foreach (var point in Arch_ForEachBezierSegmentPoint(left, p2, p3, p4))
+                        p2 = p4 + up * 0.75f - normal * 0.05f;
+                        p3 = p1 + up * 0.8f;
+                        foreach (var point in Arch_ForEachBezierSegmentPoint(left, p3, p2, p4))
                             yield return point;
                     }
                     break;
