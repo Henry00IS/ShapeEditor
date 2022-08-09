@@ -111,7 +111,7 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.455f + normal * 0.0455f;
                         p3 = midpoint - up * 0.03f + normal * 0.1f;
@@ -128,7 +128,7 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.3f;
                         p3 = midpoint + normal * 0.1f;
@@ -147,8 +147,8 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, left))
                             yield return point;
 
-                        yield return left;
-                        yield return right;
+                        yield return left.Snap(archGridSnapSize);
+                        yield return right.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.1f;
                         p3 = right + normal * 0.1f;
@@ -168,9 +168,9 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, left))
                             yield return point;
 
-                        yield return left;
-                        yield return midpoint;
-                        yield return right;
+                        yield return left.Snap(archGridSnapSize);
+                        yield return midpoint.Snap(archGridSnapSize);
+                        yield return right.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.08f - normal * 0.005f;
                         p3 = right + normal * 0.07f - up * 0.025f;
@@ -182,7 +182,7 @@ namespace AeternumGames.ShapeEditor
                 case ArchMode.Triangular:
                     {
                         var midpoint = ((p1 + p4) / 2f) + up * 0.5f;
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
                     }
                     break;
 
@@ -194,7 +194,7 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.52f + normal * 0.5f;
                         p3 = midpoint + normal * 0.5375f;
@@ -211,7 +211,7 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.2f;
                         p3 = p4 + up * 0.6f - normal * 0.15f;
@@ -228,7 +228,7 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.1f - normal * 0.1f;
                         p3 = p4 + up * 0.25f - normal * 0.35f;
@@ -245,7 +245,7 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.5f;
                         p3 = p4 + up * 1.35f - normal * 0.2f;
@@ -262,7 +262,7 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = p4 - normal * 0.25f;
                         p3 = p4 + up * 0.15f - normal * 0.45f;
@@ -279,7 +279,7 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, right))
                             yield return point;
 
-                        yield return right;
+                        yield return right.Snap(archGridSnapSize);
                     }
                     break;
 
@@ -293,14 +293,14 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.65f;
                         p3 = p4 + up * 0.85f - normal * 0.1f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(midpoint, p3, p2, right))
                             yield return point;
 
-                        yield return right;
+                        yield return right.Snap(archGridSnapSize);
                     }
                     break;
 
@@ -312,7 +312,7 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.25f;
                         p3 = p4 + up * 0.4f - normal * 0.35f;
@@ -330,7 +330,7 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, right))
                             yield return point;
 
-                        yield return right;
+                        yield return right.Snap(archGridSnapSize);
 
                         var midpoint = ((p1 + p4) / 2f) + up * 1.135f;
                         p2 = p1 + up * 0.555f - normal * 0.222f;
@@ -338,14 +338,14 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(right, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.555f + normal * 0.222f;
                         p3 = midpoint + normal * 0.5f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(midpoint, p3, p2, left))
                             yield return point;
 
-                        yield return left;
+                        yield return left.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.055f;
                         p3 = p4 + up * 0.167f - normal * 0.055f;
@@ -362,7 +362,7 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = p4 - normal * 0.25f;
                         p3 = p4 + up * 0.3f - normal * 0.125f;
@@ -379,7 +379,7 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.45f - normal * 0.05f;
                         p3 = p4 + up * 0.3f - normal * 0.3f;
@@ -396,7 +396,7 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.3f - normal * 0.05f;
                         p3 = p4 + up * 0.25f - normal * 0.3f;
@@ -413,7 +413,7 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.31f + normal * 0.25f;
                         p3 = p4 + up * 0.437f - normal * 0.0625f;
@@ -431,14 +431,14 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, left))
                             yield return point;
 
-                        yield return left;
+                        yield return left.Snap(archGridSnapSize);
 
                         p2 = left + up * 0.342f - normal * 0.0265f;
                         p3 = right + up * 0.342f + normal * 0.0265f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(left, p2, p3, right))
                             yield return point;
 
-                        yield return right;
+                        yield return right.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.13f;
                         p3 = p4 + up * 0.237f - normal * 0.132f;
@@ -456,15 +456,15 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, left))
                             yield return point;
 
-                        yield return left;
+                        yield return left.Snap(archGridSnapSize);
 
                         var shoulderLeft = p1 + up * 0.3685f + normal * 0.26325f;
                         var shoulderRight = p4 + up * 0.3685f - normal * 0.26325f;
 
-                        yield return shoulderLeft;
-                        yield return shoulderRight;
+                        yield return shoulderLeft.Snap(archGridSnapSize);
+                        yield return shoulderRight.Snap(archGridSnapSize);
 
-                        yield return right;
+                        yield return right.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.13f;
                         p3 = p4 + up * 0.237f - normal * 0.132f;
@@ -483,21 +483,21 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, left))
                             yield return point;
 
-                        yield return left;
+                        yield return left.Snap(archGridSnapSize);
 
                         p2 = left + up * 0.15f - normal * 0.1f;
                         p3 = left + up * 0.35f + normal * 0.05f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(left, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = right + up * 0.15f + normal * 0.1f;
                         p3 = right + up * 0.35f - normal * 0.05f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(midpoint, p3, p2, right))
                             yield return point;
 
-                        yield return right;
+                        yield return right.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.2f;
                         p3 = p4 + up * 0.35f - normal * 0.1f;
@@ -515,8 +515,8 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, left))
                             yield return point;
 
-                        yield return left;
-                        yield return right;
+                        yield return left.Snap(archGridSnapSize);
+                        yield return right.Snap(archGridSnapSize);
 
                         p2 = p4 - normal * 0.2f;
                         p3 = p4 + up * 0.1f - normal * 0.325f;
@@ -537,22 +537,22 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, left1))
                             yield return point;
 
-                        yield return left1;
+                        yield return left1.Snap(archGridSnapSize);
 
                         p2 = left1 + normal * 0.125f;
                         p3 = left1 + up * 0.05f + normal * 0.175f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(left1, p2, p3, left2))
                             yield return point;
 
-                        yield return left2;
-                        yield return right2;
+                        yield return left2.Snap(archGridSnapSize);
+                        yield return right2.Snap(archGridSnapSize);
 
                         p2 = right1 - normal * 0.125f;
                         p3 = right1 + up * 0.05f - normal * 0.175f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(right2, p3, p2, right1))
                             yield return point;
 
-                        yield return right1;
+                        yield return right1.Snap(archGridSnapSize);
 
                         p2 = p4 - normal * 0.15f;
                         p3 = p4 + up * 0.05f - normal * 0.2f;
@@ -573,28 +573,28 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, left1))
                             yield return point;
 
-                        yield return left1;
+                        yield return left1.Snap(archGridSnapSize);
 
                         p2 = left1 + up * 0.15f - normal * 0.075f;
                         p3 = left1 + up * 0.3f + normal * 0.05f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(left1, p2, p3, left2))
                             yield return point;
 
-                        yield return left2;
+                        yield return left2.Snap(archGridSnapSize);
 
                         p2 = left2 + up * 0.15f + normal * 0.075f;
                         p3 = right2 + up * 0.15f - normal * 0.075f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(left2, p2, p3, right2))
                             yield return point;
 
-                        yield return right2;
+                        yield return right2.Snap(archGridSnapSize);
 
                         p2 = right1 + up * 0.15f + normal * 0.075f;
                         p3 = right1 + up * 0.3f - normal * 0.05f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(right2, p3, p2, right1))
                             yield return point;
 
-                        yield return right1;
+                        yield return right1.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.075f;
                         p3 = p4 + up * 0.15f - normal * 0.05f;
@@ -616,35 +616,35 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, left1))
                             yield return point;
 
-                        yield return left1;
+                        yield return left1.Snap(archGridSnapSize);
 
                         p2 = left1 + up * 0.125f - normal * 0.05f;
                         p3 = left1 + up * 0.275f + normal * 0.025f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(left1, p2, p3, left2))
                             yield return point;
 
-                        yield return left2;
+                        yield return left2.Snap(archGridSnapSize);
 
                         p2 = left2 + up * 0.1f;
                         p3 = right2 + up * 0.225f - normal * 0.25f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(left2, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = right2 + up * 0.1f;
                         p3 = left2 + up * 0.225f + normal * 0.25f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(midpoint, p3, p2, right2))
                             yield return point;
 
-                        yield return right2;
+                        yield return right2.Snap(archGridSnapSize);
 
                         p2 = right1 + up * 0.125f + normal * 0.05f;
                         p3 = right1 + up * 0.275f - normal * 0.025f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(right2, p3, p2, right1))
                             yield return point;
 
-                        yield return right1;
+                        yield return right1.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.05f;
                         p3 = p4 + up * 0.125f - normal * 0.075f;
@@ -667,42 +667,42 @@ namespace AeternumGames.ShapeEditor
                         foreach (var point in Arch_ForEachBezierSegmentPoint(p1, p2, p3, left1))
                             yield return point;
 
-                        yield return left1;
+                        yield return left1.Snap(archGridSnapSize);
 
                         p2 = left1 + up * 0.075f - normal * 0.075f;
                         p3 = left1 + up * 0.225f - normal * 0.05f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(left1, p2, p3, left2))
                             yield return point;
 
-                        yield return left2;
+                        yield return left2.Snap(archGridSnapSize);
 
                         p2 = left2 + up * 0.125f - normal * 0.05f;
                         p3 = left2 + up * 0.225f + normal * 0.05f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(left2, p2, p3, left3))
                             yield return point;
 
-                        yield return left3;
+                        yield return left3.Snap(archGridSnapSize);
 
                         p2 = left3 + up * 0.175f + normal * 0.025f;
                         p3 = right3 + up * 0.175f - normal * 0.025f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(left3, p2, p3, right3))
                             yield return point;
 
-                        yield return right3;
+                        yield return right3.Snap(archGridSnapSize);
 
                         p2 = right2 + up * 0.125f + normal * 0.05f;
                         p3 = right2 + up * 0.225f - normal * 0.05f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(right3, p3, p2, right2))
                             yield return point;
 
-                        yield return right2;
+                        yield return right2.Snap(archGridSnapSize);
 
                         p2 = right1 + up * 0.075f + normal * 0.075f;
                         p3 = right1 + up * 0.225f + normal * 0.05f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(right2, p3, p2, right1))
                             yield return point;
 
-                        yield return right1;
+                        yield return right1.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.05f;
                         p3 = p4 + up * 0.125f - normal * 0.05f;
@@ -715,7 +715,7 @@ namespace AeternumGames.ShapeEditor
                     {
                         var left = p1 + up * 0.3f;
 
-                        yield return left;
+                        yield return left.Snap(archGridSnapSize);
 
                         p2 = p1 + up * 0.75f + normal * 0.05f;
                         p3 = p4 + up * 0.8f;
@@ -729,14 +729,14 @@ namespace AeternumGames.ShapeEditor
                         var midpoint = ((p1 + p4) / 2f) - normal * 0.15f + up * 0.95f;
                         var left = p1 + up * 0.45f;
 
-                        yield return left;
+                        yield return left.Snap(archGridSnapSize);
 
                         p2 = p1 + up * 0.65f;
                         p3 = p1 + up * 0.85f + normal * 0.1f;
                         foreach (var point in Arch_ForEachBezierSegmentPoint(left, p2, p3, midpoint))
                             yield return point;
 
-                        yield return midpoint;
+                        yield return midpoint.Snap(archGridSnapSize);
 
                         p2 = p4 + up * 0.5f;
                         p3 = p4 + up * 0.85f - normal * 0.35f;
