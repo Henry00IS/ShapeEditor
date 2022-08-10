@@ -83,6 +83,7 @@ namespace AeternumGames.ShapeEditor
             // unity editor will serialize private fields and restore them upon redo.
             if (Event.current.HasPerformedUndoRedo())
             {
+                project.Invalidate();
                 convexPolygons2D = null;
                 choppedPolygons2D = null;
             }

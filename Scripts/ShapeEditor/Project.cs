@@ -92,6 +92,17 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>
+        /// Forces the project to revalidate on the next call to <see cref="Validate"/>, required
+        /// for undo/redo operations in the scene as Unity Editor will serialize the <see
+        /// cref="isValid"/> field and keep it true, which can cause null reference exceptions in
+        /// extrude targets.
+        /// </summary>
+        internal void Invalidate()
+        {
+            isValid = false;
+        }
+
+        /// <summary>
         /// Generates concave polygons for all shapes and applies their boolean operators into a
         /// segment list representing this project.
         /// </summary>
