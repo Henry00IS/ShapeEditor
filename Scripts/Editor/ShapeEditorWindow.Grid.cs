@@ -422,12 +422,13 @@ namespace AeternumGames.ShapeEditor
                 {
                     // get the current segment and the next segment (wrapping around).
                     var segment = shape.segments[j];
-                    var p1 = GridPointToScreen(segment.position);
-                    var p2 = GridPointToScreen(segment.next.position);
+                    var currentPoint = GridPointToScreen(segment.position);
+                    var lastPoint = GridPointToScreen(segment.next.position);
 
+                    float distance;
                     if (segment.generator.type == SegmentGeneratorType.Linear)
                     {
-                        var distance = MathEx.PointDistanceFromLine(position, p1, p2);
+                        distance = MathEx.PointDistanceFromLine(position, currentPoint, lastPoint);
                         if (distance < maxDistance && distance < closestDistance)
                         {
                             closestDistance = distance;
@@ -439,16 +440,24 @@ namespace AeternumGames.ShapeEditor
                         // check generated segments from the segment generator.
                         foreach (var point in segment.generator.ForEachAdditionalSegmentPoint())
                         {
-                            p2 = GridPointToScreen(point);
+                            var generatedPoint = GridPointToScreen(point);
 
-                            var distance = MathEx.PointDistanceFromLine(position, p1, p2);
+                            distance = MathEx.PointDistanceFromLine(position, currentPoint, generatedPoint);
                             if (distance < maxDistance && distance < closestDistance)
                             {
                                 closestDistance = distance;
                                 result = segment;
                             }
 
-                            p1 = p2;
+                            currentPoint = generatedPoint;
+                        }
+
+                        // one more check from the current generated point to the last point.
+                        distance = MathEx.PointDistanceFromLine(position, currentPoint, lastPoint);
+                        if (distance < maxDistance && distance < closestDistance)
+                        {
+                            closestDistance = distance;
+                            result = segment;
                         }
                     }
                 }
