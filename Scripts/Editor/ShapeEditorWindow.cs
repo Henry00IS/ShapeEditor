@@ -397,6 +397,12 @@ namespace AeternumGames.ShapeEditor
 
             return false;
         }
+
+        private void OnWindowResize(float2 lastWindowSize, float2 screenDelta)
+        {
+            // keep the camera centered by panning the viewport the correct amount to counteract resizing.
+            gridOffset += screenDelta * 0.5f;
+        }
     }
 }
 

@@ -11,6 +11,7 @@ namespace AeternumGames.ShapeEditor
     {
         internal double lastInteraction;
         internal float lastRenderTime;
+        internal float2 lastWindowSize;
         internal bool isLeftMousePressed;
         private bool isRightMousePressed;
         internal float2 mousePosition;
@@ -220,6 +221,20 @@ namespace AeternumGames.ShapeEditor
                 }
 
                 e.Use();
+            }
+
+            // detect window resizing and invoke an event.
+            if (!position.size.Equals(lastWindowSize))
+            {
+                if (lastWindowSize.Equals(float2.zero))
+                {
+                    lastWindowSize = position.size;
+                    return;
+                }
+
+                var screenDelta = (float2)position.size - lastWindowSize;
+                OnWindowResize(lastWindowSize, screenDelta);
+                lastWindowSize = position.size;
             }
         }
 
