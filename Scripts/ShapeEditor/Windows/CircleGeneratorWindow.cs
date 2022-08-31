@@ -66,7 +66,7 @@ namespace AeternumGames.ShapeEditor
             {
                 var position = circle.GetCirclePosition(i / (float)circleDetail);
 
-                var segment = new Segment(shape, new float2(position.x, position.z));
+                var segment = new Segment(shape, new float2(position.x, -position.z));
                 shape.AddSegment(segment);
             }
 
