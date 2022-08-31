@@ -722,6 +722,16 @@ namespace AeternumGames.ShapeEditor
             OpenWindow(new BezierInspectorWindow());
         }
 
+        /// <summary>Displays the circle generator window.</summary>
+        [Instructions(
+            title: "Circle generator",
+            description: "Displays the circle generator window. Provides the ability to create circular shapes."
+        )]
+        internal void UserShowCircleGeneratorWindow()
+        {
+            OpenWindow(new CircleGeneratorWindow());
+        }
+
         /// <summary>Displays the repeat inspector window.</summary>
         [Instructions(
             title: "Repeat inspector",
