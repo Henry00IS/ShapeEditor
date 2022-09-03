@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shapeEditorAbout: {fileID: 2800000, guid: 546586d856de70b4ebcdb76994f7e739, type: 3}
   shapeEditorAboutPatreon: {fileID: 2800000, guid: 17b6c9730b35ab24f9e388ab44ce96ef, type: 3}
+  shapeEditorCircleGenerator: {fileID: 2800000, guid: ff3d5242f79428149bc3f4d88e6b6de1, type: 3}
   shapeEditorCreatePolygon: {fileID: 2800000, guid: e75ef525809c0e34cbfc71c8aae44202, type: 3}
   shapeEditorCut: {fileID: 2800000, guid: ba6aee88efca1344bacb0e0f82e2a395, type: 3}
   shapeEditorDelete: {fileID: 2800000, guid: 5efe46f796cdc1b438c1a2b21d3ea154, type: 3}

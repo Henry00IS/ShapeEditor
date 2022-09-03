@@ -133,7 +133,7 @@ namespace AeternumGames.ShapeEditor
             viewMenu.Separator();
             viewMenu.Add("Arch Inspector", resources.shapeEditorSegmentArch, editor.UserShowArchInspectorWindow);
             viewMenu.Add("Bezier Inspector", resources.shapeEditorSegmentBezier, editor.UserShowBezierInspectorWindow);
-            viewMenu.Add("Circle Generator", resources.shapeEditorShapeCreate, editor.UserShowCircleGeneratorWindow);
+            viewMenu.Add("Circle Generator", resources.shapeEditorCircleGenerator, editor.UserShowCircleGeneratorWindow);
             viewMenu.Add("Repeat Inspector", resources.shapeEditorSegmentRepeat, editor.UserShowRepeatInspectorWindow);
             viewMenu.Add("Shape Inspector", resources.shapeEditorShapeCreate, editor.UserShowShapeInspectorWindow);
             viewMenu.Add("Sine Inspector", resources.shapeEditorSegmentSine, editor.UserShowSineInspectorWindow);

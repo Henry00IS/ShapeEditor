@@ -43,6 +43,7 @@ namespace AeternumGames.ShapeEditor
 
         public Texture2D shapeEditorAbout;
         public Texture2D shapeEditorAboutPatreon;
+        public Texture2D shapeEditorCircleGenerator;
         public Texture2D shapeEditorCreatePolygon;
         public Texture2D shapeEditorCut;
         public Texture2D shapeEditorDelete;
