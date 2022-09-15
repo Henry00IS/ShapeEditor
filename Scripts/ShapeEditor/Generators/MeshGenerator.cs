@@ -487,8 +487,6 @@ namespace AeternumGames.ShapeEditor
                     Polygon extrudedPolygon;
                     for (int k = 0; k < polyVertexCount - 1; k++)
                     {
-                        if (poly[k].hidden) continue;
-
                         extrudedPolygon = new Polygon(new Vertex[] {
                             poly[k],
                             nextPoly[k],
@@ -500,7 +498,6 @@ namespace AeternumGames.ShapeEditor
                     }
 
                     // one more face that wraps around to index 0.
-                    if (!poly[polyVertexCount - 1].hidden)
                     {
                         extrudedPolygon = new Polygon(new Vertex[] {
                             poly[polyVertexCount - 1],
