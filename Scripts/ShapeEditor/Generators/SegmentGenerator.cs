@@ -171,6 +171,10 @@ namespace AeternumGames.ShapeEditor
                 case SegmentGeneratorType.Sine:
                     Sine_FlipDirection();
                     break;
+
+                case SegmentGeneratorType.Arch:
+                    Arch_FlipDirection();
+                    break;
             }
         }
 

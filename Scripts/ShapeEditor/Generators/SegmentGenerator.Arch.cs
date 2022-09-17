@@ -14,6 +14,9 @@ namespace AeternumGames.ShapeEditor
         public int archDetail = 8;
 
         [SerializeField]
+        public bool archFlipped = false;
+
+        [SerializeField]
         public float archGridSnapSize = 0f;
 
         [SerializeField]
@@ -65,7 +68,7 @@ namespace AeternumGames.ShapeEditor
             var p4 = segment.next.position;
             var distance = math.distance(p1, p4);
             var normal = math.normalize(p4 - p1) * distance;
-            var up = -(float2)Vector2.Perpendicular(normal);
+            var up = -(float2)Vector2.Perpendicular(normal * (archFlipped ? -1f : 1f));
             float2 p2;
             float2 p3;
 
@@ -757,6 +760,11 @@ namespace AeternumGames.ShapeEditor
                 if (!point.Equals(last))
                     yield return last = point;
             }
+        }
+
+        private void Arch_FlipDirection()
+        {
+            archFlipped = !archFlipped;
         }
     }
 }

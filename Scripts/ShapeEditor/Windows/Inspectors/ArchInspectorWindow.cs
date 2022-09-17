@@ -8,8 +8,10 @@ namespace AeternumGames.ShapeEditor
     /// <summary>The inspector window with context sensitive properties.</summary>
     public class ArchInspectorWindow : GuiWindow
     {
-        private static readonly float2 windowSize = new float2(170, 205);
+        private static readonly float2 windowSize = new float2(170, 225);
         private GuiFloatTextbox archDetailTextbox;
+        private GuiButton flipDirectionButton;
+        private bool archFlipDirection;
         private int archDetail = 8;
         private GuiFloatTextbox archGridSnapSizeTextbox;
         private float archGridSnapSize = 0f;
@@ -69,6 +71,13 @@ namespace AeternumGames.ShapeEditor
 
             layout.NextRow(4);
 
+            layout.Add(new GuiLabel("Flip Direction"));
+            layout.Space(84);
+            layout.Add(flipDirectionButton = new GuiButton(resources.shapeEditorFlipVertically, new float2(16f, 16f), ToggleFlipDirection));
+            layout.Add(new GuiButton("Apply", new float2(40, 16), ApplyArchFlipDirectionToSelectedEdges));
+
+            layout.NextRow(4);
+
             layout.Add(new GuiLabel("Detail Level"));
             layout.Space(60);
             layout.Add(archDetailTextbox = new GuiFloatTextbox(new float2(40, 16)) { allowNegativeNumbers = false, minValue = 1 });
@@ -108,6 +117,7 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnRender()
         {
+            flipDirectionButton.isChecked = archFlipDirection;
             archDetail = Mathf.RoundToInt(archDetailTextbox.UpdateValue(archDetail));
             archGridSnapSize = archGridSnapSizeTextbox.UpdateValue(archGridSnapSize);
 
@@ -132,6 +142,22 @@ namespace AeternumGames.ShapeEditor
             foreach (var segment in editor.ForEachSelectedEdge())
                 if (segment.generator.type == SegmentGeneratorType.Arch)
                     segment.generator.archGridSnapSize = archGridSnapSize;
+        }
+
+        [Instructions(title: "Whether the arch will be flipped, which will extrude the arch in the other direction.")]
+        private void ToggleFlipDirection()
+        {
+            archFlipDirection = !archFlipDirection;
+        }
+
+        [Instructions(title: "Applies the specified flip direction, which extrudes the arch in the other direction.")]
+        private void ApplyArchFlipDirectionToSelectedEdges()
+        {
+            editor.RegisterUndo("Apply Arch Flip Direction");
+
+            foreach (var segment in editor.ForEachSelectedEdge())
+                if (segment.generator.type == SegmentGeneratorType.Arch)
+                    segment.generator.archFlipped = archFlipDirection;
         }
 
         private void ApplyArchModeToSelectedEdges(SegmentGenerator.ArchMode archMode)
