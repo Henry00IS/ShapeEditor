@@ -160,6 +160,20 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        /// <summary>
+        /// When shapes are flipped horizontally or vertically this function is called in order to
+        /// flip the direction of the generator.
+        /// </summary>
+        public void FlipDirection()
+        {
+            switch (type)
+            {
+                case SegmentGeneratorType.Sine:
+                    Sine_FlipDirection();
+                    break;
+            }
+        }
+
         /// <summary>Iterates over the enumerable of grid coordinate points to draw segments.</summary>
         /// <param name="iterator">The generated segment points in grid coordinates.</param>
         private void DrawSegments(IEnumerable<float2> iterator)

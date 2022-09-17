@@ -84,6 +84,11 @@ namespace AeternumGames.ShapeEditor
                     yield return last = point;
             }
         }
+
+        private void Sine_FlipDirection()
+        {
+            sineFrequency *= -1f;
+        }
     }
 }
 

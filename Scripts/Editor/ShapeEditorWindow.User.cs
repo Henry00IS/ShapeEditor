@@ -433,12 +433,16 @@ namespace AeternumGames.ShapeEditor
             RegisterUndo("Flip Selection Horizonally");
 
             var left = float.MaxValue;
-            foreach (var segment in ForEachSelectedObject())
-                if (segment.position.x < left)
-                    left = segment.position.x;
+            foreach (var selectable in ForEachSelectedObject())
+                if (selectable.position.x < left)
+                    left = selectable.position.x;
 
-            foreach (var segment in ForEachSelectedObject())
-                segment.position = new float2(-segment.position.x + (left * 2), segment.position.y);
+            foreach (var selectable in ForEachSelectedObject())
+            {
+                selectable.position = new float2(-selectable.position.x + (left * 2), selectable.position.y);
+                if (selectable is Segment segment && segment.next.selected)
+                    segment.generator.FlipDirection();
+            }
         }
 
         /// <summary>
@@ -453,12 +457,16 @@ namespace AeternumGames.ShapeEditor
             RegisterUndo("Flip Selection Vertically");
 
             var top = float.MaxValue;
-            foreach (var segment in ForEachSelectedObject())
-                if (segment.position.y < top)
-                    top = segment.position.y;
+            foreach (var selectable in ForEachSelectedObject())
+                if (selectable.position.y < top)
+                    top = selectable.position.y;
 
-            foreach (var segment in ForEachSelectedObject())
-                segment.position = new float2(segment.position.x, -segment.position.y + (top * 2));
+            foreach (var selectable in ForEachSelectedObject())
+            {
+                selectable.position = new float2(selectable.position.x, -selectable.position.y + (top * 2));
+                if (selectable is Segment segment && segment.next.selected)
+                    segment.generator.FlipDirection();
+            }
         }
 
         /// <summary>Inverts the selection all of the selectable objects in the project.</summary>
