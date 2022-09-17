@@ -426,20 +426,26 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         [Instructions(
             title: "Flip selection horizontally",
-            description: "Flips the selection horizontally against the leftmost position of all selected elements."
+            description: "Flips the selection horizontally against the leftmost position of all selected elements.",
+            shortcut: "Shift + H"
         )]
         internal void UserFlipSelectionHorizonally()
         {
             RegisterUndo("Flip Selection Horizonally");
 
             var left = float.MaxValue;
+            var right = float.MinValue;
             foreach (var selectable in ForEachSelectedObject())
+            {
                 if (selectable.position.x < left)
                     left = selectable.position.x;
+                if (selectable.position.x > right)
+                    right = selectable.position.x;
+            }
 
             foreach (var selectable in ForEachSelectedObject())
             {
-                selectable.position = new float2(-selectable.position.x + (left * 2), selectable.position.y);
+                selectable.position = new float2(-selectable.position.x + left + right, selectable.position.y);
                 if (selectable is Segment segment && segment.next.selected)
                     segment.generator.FlipDirection();
             }
@@ -450,20 +456,26 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         [Instructions(
             title: "Flip selection vertically",
-            description: "Flips the selection vertically against the topmost position of all selected elements."
+            description: "Flips the selection vertically against the topmost position of all selected elements.",
+            shortcut: "Shift + V"
         )]
         internal void UserFlipSelectionVertically()
         {
             RegisterUndo("Flip Selection Vertically");
 
             var top = float.MaxValue;
+            var bottom = float.MinValue;
             foreach (var selectable in ForEachSelectedObject())
+            {
                 if (selectable.position.y < top)
                     top = selectable.position.y;
+                if (selectable.position.y > bottom)
+                    bottom = selectable.position.y;
+            }
 
             foreach (var selectable in ForEachSelectedObject())
             {
-                selectable.position = new float2(selectable.position.x, -selectable.position.y + (top * 2));
+                selectable.position = new float2(selectable.position.x, -selectable.position.y + top + bottom);
                 if (selectable is Segment segment && segment.next.selected)
                     segment.generator.FlipDirection();
             }

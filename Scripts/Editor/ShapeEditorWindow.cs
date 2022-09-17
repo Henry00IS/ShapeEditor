@@ -296,7 +296,15 @@ namespace AeternumGames.ShapeEditor
                             return false;
 
                         case KeyCode.H:
-                            UserResetCamera();
+                            if (isShiftPressed)
+                            {
+                                UserFlipSelectionHorizonally();
+                                return true;
+                            }
+                            else
+                            {
+                                UserResetCamera();
+                            }
                             return true;
 
                         case KeyCode.I:
@@ -333,6 +341,11 @@ namespace AeternumGames.ShapeEditor
                             if (isCtrlPressed)
                             {
                                 UserPaste();
+                                return true;
+                            }
+                            else if (isShiftPressed)
+                            {
+                                UserFlipSelectionVertically();
                                 return true;
                             }
                             return false;
