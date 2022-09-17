@@ -73,13 +73,7 @@ namespace AeternumGames.ShapeEditor
             string path = EditorUtility.OpenFilePanelWithFilters("Load Background Image", "", new string[] { "Image Files", "png,jpg,jpeg" });
             if (path.Length != 0)
             {
-                // when the file can not be read, LoadImage() will display a question mark.
-                byte[] fileBytes = null;
-                try { fileBytes = File.ReadAllBytes(path); } catch (System.Exception) { }
-
-                var backgroundImage = new Texture2D(1, 1, TextureFormat.ARGB32, false);
-                backgroundImage.LoadImage(fileBytes);
-                editor.gridBackgroundImage = backgroundImage;
+                editor.gridBackgroundImage = FileEx.LoadImage(path);
             }
         }
     }

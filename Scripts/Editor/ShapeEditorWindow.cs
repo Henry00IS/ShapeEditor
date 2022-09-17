@@ -416,6 +416,18 @@ namespace AeternumGames.ShapeEditor
             // keep the camera centered by panning the viewport the correct amount to counteract resizing.
             gridOffset += screenDelta * 0.5f;
         }
+
+        private void OnDragDrop(string path)
+        {
+            if (FileEx.IsJsonFile(path))
+            {
+                OpenProject(path);
+            }
+            else
+            {
+                gridBackgroundImage = FileEx.LoadImage(path);
+            }
+        }
     }
 }
 

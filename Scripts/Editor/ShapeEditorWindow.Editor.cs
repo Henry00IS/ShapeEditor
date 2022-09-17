@@ -219,7 +219,7 @@ namespace AeternumGames.ShapeEditor
 
                 if (DragAndDrop.paths.Length > 0)
                 {
-                    OpenProject(DragAndDrop.paths[0]);
+                    OnDragDrop(DragAndDrop.paths[0]);
                 }
 
                 e.Use();
