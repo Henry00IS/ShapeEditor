@@ -85,6 +85,71 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        /// <summary>With up to 3 or 4 points selected, a shape consisting of these points is added to the project, and with more points, a shape consisting of the convex hull of these points is added. Then clears the current selection and selects the new shape.</summary>
+        [Instructions(
+            title: "Shape from selection",
+            description: "With up to 3 or 4 points selected, a shape consisting of these points is added to the project, and with more points, a shape consisting of the convex hull of these points is added. Then clears the current selection and selects the new shape. This can for example be used to bridge edges.",
+            shortcut: "Ctrl + E"
+        )]
+        internal void UserShapeFromSelection()
+        {
+            if (selectedSegmentsCount < 3) return;
+
+            RegisterUndo("Shape From Selection");
+
+            var shape = new Shape();
+            shape.segments.Clear();
+
+            // get a list of selected positions.
+            var points = new List<float2>(selectedSegmentsCount);
+            foreach (var selectable in ForEachSelectedObject())
+                points.Add(selectable.position);
+
+            // triangle:
+            if (selectedSegmentsCount == 3)
+            {
+                // if the triangle is ordered clockwise we reverse it to help with directional generators.
+                if (MathEx.IsCounterClockwise(points[0], points[1], points[2]) < 0f)
+                    points.Reverse();
+
+                foreach (var point in points)
+                    shape.AddSegment(new Segment(shape, point));
+            }
+            // quad (bridge edges):
+            else if (selectedSegmentsCount == 4)
+            {
+                // detect a bowtie and untangle it, shoutouts to jazz mickle.
+                var a = MathEx.LineIntersect2(points[0], points[1], points[2], points[3], out _);
+                var b = MathEx.LineIntersect2(points[1], points[2], points[0], points[3], out _);
+                if (a || b)
+                {
+                    float2 temp;
+                    temp = points[2];
+                    points[2] = points[3];
+                    points[3] = temp;
+                }
+
+                // if the points are ordered clockwise we reverse it to help with directional generators.
+                if (MathEx.IsCounterClockwise(points[0], points[1], points[2]) < 0f || MathEx.IsCounterClockwise(points[1], points[2], points[3]) < 0f)
+                    points.Reverse();
+
+                foreach (var point in points)
+                    shape.AddSegment(new Segment(shape, point));
+            }
+            // convex hull:
+            else
+            {
+                foreach (var point in MathEx.GiftWrap.GetConvexHull(points))
+                    shape.AddSegment(new Segment(shape, point));
+            }
+
+            project.shapes.Add(shape);
+
+            project.ClearSelection();
+
+            shape.SelectAll();
+        }
+
         /// <summary>Clears the selection of all selectable objects in the project.</summary>
         [Instructions(
             title: "Clear selection",

@@ -2,6 +2,7 @@
 
 // contains source code from https://github.com/Genbox/VelcroPhysics (see Licenses/VelcroPhysics.txt).
 
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -321,6 +322,18 @@ namespace AeternumGames.ShapeEditor
         public static float Area2D(ref Vector3 a, ref Vector3 b, ref Vector3 c)
         {
             return a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y);
+        }
+
+        /// <summary>Checks whether the given three points are oriented counter-clockwise.</summary>
+        /// <param name="p1">The first point.</param>
+        /// <param name="p2">The second point.</param>
+        /// <param name="p3">The third point.</param>
+        /// <returns>
+        /// Less than 0 if clockwise, greater than 0 if counter-clockwise and 0 when collinear.
+        /// </returns>
+        public static float IsCounterClockwise(float2 p1, float2 p2, float2 p3)
+        {
+            return Mathf.Sign((p2.x - p1.x) * (p3.y - p1.y) - (p3.x - p1.x) * (p2.y - p1.y));
         }
 
         public static float2 FindNearestPointOnLine(float2 point, float2 origin, float2 end)
@@ -830,6 +843,87 @@ namespace AeternumGames.ShapeEditor
             public static Circle GetCircleThatFitsCircumference(float circumference, float t)
             {
                 return new Circle(GetCircleRadiusThatFitsCircumference(circumference, t));
+            }
+        }
+
+        /// <summary>
+        /// Giftwrap convex hull algorithm. O(n * h) time complexity, where n is the number of points and h is the number
+        /// of points on the convex hull. See http://en.wikipedia.org/wiki/Gift_wrapping_algorithm for more details.
+        /// </summary>
+        public static class GiftWrap
+        {
+            // contains source code from https://github.com/Genbox/VelcroPhysics/ (see Licenses/VelcroPhysics.txt).
+
+            //Extracted from Box2D
+
+            /// <summary>Returns the convex hull from the given vertices.</summary>
+            /// <param name="vertices">The vertices.</param>
+            public static List<float2> GetConvexHull(List<float2> vertices)
+            {
+                if (vertices.Count <= 3)
+                    return vertices;
+
+                // Find the right most point on the hull
+                int i0 = 0;
+                float x0 = vertices[0].x;
+                for (int i = 1; i < vertices.Count; ++i)
+                {
+                    float x = vertices[i].x;
+                    if (x > x0 || (x == x0 && vertices[i].y < vertices[i0].y))
+                    {
+                        i0 = i;
+                        x0 = x;
+                    }
+                }
+
+                int[] hull = new int[vertices.Count];
+                int m = 0;
+                int ih = i0;
+
+                for (; ; )
+                {
+                    hull[m] = ih;
+
+                    int ie = 0;
+                    for (int j = 1; j < vertices.Count; ++j)
+                    {
+                        if (ie == ih)
+                        {
+                            ie = j;
+                            continue;
+                        }
+
+                        Vector2 r = vertices[ie] - vertices[hull[m]];
+                        Vector2 v = vertices[j] - vertices[hull[m]];
+                        float c = Cross(ref r, ref v);
+                        if (c < 0.0f)
+                            ie = j;
+
+                        // Collinearity check
+                        if (c == 0.0f && math.lengthsq(v) > math.lengthsq(r))
+                            ie = j;
+                    }
+
+                    ++m;
+                    ih = ie;
+
+                    if (ie == i0)
+                        break;
+                }
+
+                List<float2> result = new List<float2>(m);
+
+                // Copy vertices.
+                for (int i = 0; i < m; ++i)
+                {
+                    result.Add(vertices[hull[i]]);
+                }
+                return result;
+            }
+
+            private static float Cross(ref Vector2 a, ref Vector2 b)
+            {
+                return a.x * b.y - a.y * b.x;
             }
         }
     }

@@ -295,6 +295,14 @@ namespace AeternumGames.ShapeEditor
                             }
                             return false;
 
+                        case KeyCode.E:
+                            if (isCtrlPressed)
+                            {
+                                UserShapeFromSelection();
+                                return true;
+                            }
+                            return false;
+
                         case KeyCode.H:
                             if (isShiftPressed)
                             {

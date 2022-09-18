@@ -66,6 +66,7 @@ namespace AeternumGames.ShapeEditor
             shapeMenu.Add("Add Shape", resources.shapeEditorShapeCreate, editor.UserAddShapeToProject);
             shapeMenu.Separator();
             shapeMenu.Add("Duplicate Selection", resources.shapeEditorShapeDuplicate, editor.UserDuplicateSelectedShapes);
+            shapeMenu.Add("Shape From Selection", resources.shapeEditorShapeCreate, editor.UserShapeFromSelection);
             shapeMenu.Separator();
             shapeMenu.Add("Set Additive", editor.UserSetSelectedShapesAdditive);
             shapeMenu.Add("Set Subtractive", editor.UserSetSelectedShapesSubtractive);

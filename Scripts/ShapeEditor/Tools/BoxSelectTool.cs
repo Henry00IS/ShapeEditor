@@ -161,7 +161,7 @@ namespace AeternumGames.ShapeEditor
                     return false;
 
                 case KeyCode.E:
-                    if (editor.selectedSegmentsCount > 1)
+                    if (!editor.isModifierPressed && editor.selectedSegmentsCount > 1)
                     {
                         editor.UseTool(new ExtrudeTool());
                         return true;
