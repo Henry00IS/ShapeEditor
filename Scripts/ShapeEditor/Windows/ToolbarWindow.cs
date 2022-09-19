@@ -12,6 +12,7 @@ namespace AeternumGames.ShapeEditor
         private GuiButton rotateButton;
         private GuiButton scaleButton;
         private GuiButton cutButton;
+        private GuiButton measureButton;
 
         public ToolbarWindow(float2 position) : base(position, float2.zero) { }
 
@@ -28,6 +29,7 @@ namespace AeternumGames.ShapeEditor
             verticalLayout.Add(rotateButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorRotate, 28, editor.UserSwitchToRotateTool));
             verticalLayout.Add(scaleButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorScale, 28, editor.UserSwitchToScaleTool));
             verticalLayout.Add(cutButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorCut, 28, editor.UserSwitchToCutTool));
+            verticalLayout.Add(measureButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorMeasuringTape, 28, editor.UserSwitchToMeasuringTapeTool));
 
             size = verticalLayout.windowSize;
         }
@@ -40,6 +42,7 @@ namespace AeternumGames.ShapeEditor
             rotateButton.isChecked = type == typeof(RotateTool);
             scaleButton.isChecked = type == typeof(ScaleTool);
             cutButton.isChecked = type == typeof(CutTool);
+            measureButton.isChecked = type == typeof(MeasuringTapeTool);
 
             base.OnRender();
         }

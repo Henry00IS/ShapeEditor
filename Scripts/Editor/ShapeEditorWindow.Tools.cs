@@ -17,6 +17,7 @@ namespace AeternumGames.ShapeEditor
         private RotateTool rotateTool;
         private ScaleTool scaleTool;
         private CutTool cutTool;
+        private MeasuringTapeTool measuringTapeTool;
 
         /// <summary>Ensures that a valid tools always exists, to handle C# reloads.</summary>
         private void ValidateTools()
@@ -28,6 +29,7 @@ namespace AeternumGames.ShapeEditor
                 rotateTool = new RotateTool();
                 scaleTool = new ScaleTool();
                 cutTool = new CutTool();
+                measuringTapeTool = new MeasuringTapeTool();
             }
 
             if (activeTool == null)

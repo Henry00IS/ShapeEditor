@@ -35,6 +35,7 @@ MonoBehaviour:
   shapeEditorFlipVertically: {fileID: 2800000, guid: 620c7febb2a0936488a0f70141a5ecb8, type: 3}
   shapeEditorHome: {fileID: 2800000, guid: fc1b94e293a80fc4e9a2dee33d4f727b, type: 3}
   shapeEditorIcon: {fileID: 2800000, guid: e26ddf28b90139547be10d543d9da1d7, type: 3}
+  shapeEditorMeasuringTape: {fileID: 2800000, guid: b175d1172db56d74f98e3b6c84864d51, type: 3}
   shapeEditorMouseCursorHand: {fileID: 2800000, guid: f74eab10fff57654f88689a14c0b19d4, type: 3}
   shapeEditorMouseCursorScissors: {fileID: 2800000, guid: 8f3701d51319c7b45aac38a37db42257, type: 3}
   shapeEditorNew: {fileID: 2800000, guid: 51111d3247a51d64286cbfa64489563c, type: 3}

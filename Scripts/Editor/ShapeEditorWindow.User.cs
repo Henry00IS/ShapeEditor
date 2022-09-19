@@ -916,6 +916,14 @@ namespace AeternumGames.ShapeEditor
         )]
         internal void UserSwitchToTranslateTool() => SwitchTool(translateTool);
 
+        /// <summary>Switches to the translate tool unless already active.</summary>
+        [Instructions(
+            title: "Measuring Tape Tool",
+            description: "Switches to the measuring tape tool. Click and Drag to create a line. The length of the line is displayed in the middle.",
+            shortcut: "4 key"
+        )]
+        internal void UserSwitchToMeasuringTapeTool() => SwitchTool(measuringTapeTool);
+
         /// <summary>Switches to the vertex select mode.</summary>
         [Instructions(
             title: "Vertex select mode",

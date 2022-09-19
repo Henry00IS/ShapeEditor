@@ -262,6 +262,10 @@ namespace AeternumGames.ShapeEditor
                             UserSwitchToFaceSelectMode();
                             return true;
 
+                        case KeyCode.Alpha4:
+                            UserSwitchToMeasuringTapeTool();
+                            return true;
+                        
                         case KeyCode.A:
                             if (isCtrlPressed)
                             {
