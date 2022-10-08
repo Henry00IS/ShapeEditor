@@ -86,7 +86,8 @@ namespace AeternumGames.ShapeEditor
 
             // insert a segment at the cut position.
             var shape = findSegmentLineResult.shape;
-            var segment = new Segment(shape, cutGridPosition) { selected = true };
+            var segment = new Segment(shape, cutGridPosition);
+            segment.selected = true;
             shape.InsertSegmentBefore(findSegmentLineResult.next, segment);
         }
 

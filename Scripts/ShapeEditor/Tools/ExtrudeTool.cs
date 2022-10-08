@@ -1,6 +1,8 @@
 ﻿#if UNITY_EDITOR
 
 using System.Collections.Generic;
+using Unity.Mathematics;
+using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
 {
@@ -53,10 +55,12 @@ namespace AeternumGames.ShapeEditor
             var position1 = segment.position;
             var position2 = segment.next.position;
 
-            var extrudedSegment = new Segment(shape, position1) { selected = true };
+            var extrudedSegment = new Segment(shape, position1);
+            extrudedSegment.selected = true;
             shape.InsertSegmentBefore(segment.next, extrudedSegment);
 
-            extrudedSegment = new Segment(shape, position2) { selected = true };
+            extrudedSegment = new Segment(shape, position2);
+            extrudedSegment.selected = true;
             shape.InsertSegmentBefore(segment.next.next, extrudedSegment);
         }
 
