@@ -15,7 +15,7 @@ namespace AeternumGames.ShapeEditor
         private float measuringLength;
         private bool proc;
         
-        private static readonly Color orangeColorMercilesslyStolenFromCutTool = new Color(1.0f, 0.5f, 0.0f);
+        private static readonly Color pivotColor = new Color(1.0f, 0.5f, 0.0f);
 
         public override void OnActivate()
         {
@@ -36,16 +36,17 @@ namespace AeternumGames.ShapeEditor
                 GL.Color(Color.red);
                 GLUtilities.DrawDottedLine(1f, p1, p2, 16f);
                 
-                GLUtilities.DrawCircle(2f, p1, 6f, orangeColorMercilesslyStolenFromCutTool, 4);
-                GLUtilities.DrawCircle(2f, p2, 6f, orangeColorMercilesslyStolenFromCutTool, 4);
+                GLUtilities.DrawCircle(2f, p1, 6f, pivotColor, 4);
+                GLUtilities.DrawCircle(2f, p2, 6f, pivotColor, 4);
             }));
 
             if (!proc) return;
 
-            // todo is there really no midpoint method somewhere? 
-            float2 guh = new float2((p1.x + p2.x) * 0.5f, (p1.y + p2.y) * 0.5f);
-            // todo make a lil background for the text so that it doesnt clash with other white gui
-            GLUtilities.DrawGuiText(ShapeEditorResources.fontSegoeUI14, measuringLength.ToString(CultureInfo.InvariantCulture), guh);
+            string distance = measuringLength.ToString("0.00000", CultureInfo.InvariantCulture).TrimEnd('0', '.') + "m";
+            if (distance == "m") return;
+
+            float2 mid = (p1 + p2) / 2f;
+            GLUtilities.DrawGuiText(ShapeEditorResources.fontSegoeUI14, distance, mid);
         }
 
         public override void OnMouseMove(float2 screenDelta, float2 gridDelta)
@@ -73,11 +74,7 @@ namespace AeternumGames.ShapeEditor
             if (button == 0 && proc)
             {
                 SetPivotPosition(endPivot);
-                
-                // todo uhhhhhhh theres gotta be a distance method for this somewhere right?
-                float num1 = endPivot.position.x - startPivot.position.x;
-                float num2 = endPivot.position.y - startPivot.position.y;
-                measuringLength = (float) Math.Sqrt(num1 * (double) num1 + num2 * (double) num2);
+                measuringLength = math.distance(startPivot.position, endPivot.position);
             }
         }
 
