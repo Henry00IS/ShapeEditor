@@ -41,7 +41,7 @@ namespace AeternumGames.ShapeEditor
         {
             var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
             guiMaterial.mainTexture = null;
-            guiMaterial.SetVector(ClipID, new Vector4(clip.x, clip.y, clip.width, clip.height));
+            guiMaterial.SetVector("_clip", new Vector4(clip.x, clip.y, clip.width, clip.height));
             guiMaterial.SetPass(1);
 
             GL.Begin(GL.QUADS);
@@ -56,7 +56,7 @@ namespace AeternumGames.ShapeEditor
         {
             var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
             guiMaterial.mainTexture = texture;
-            guiMaterial.SetVector(ClipID, new Vector4(clip.x, clip.y, clip.width, clip.height));
+            guiMaterial.SetVector("_clip", new Vector4(clip.x, clip.y, clip.width, clip.height));
             guiMaterial.SetPass(1);
 
             GL.Begin(GL.QUADS);
@@ -96,12 +96,12 @@ namespace AeternumGames.ShapeEditor
         /// <param name="position">The screen position.</param>
         public static void DrawGuiText(BmFont font, string text, float2 position, Color color)
         {
-            ShapeEditorResources.temporaryGuiMaterial.SetColor(ColorID, color);
+            ShapeEditorResources.temporaryGuiMaterial.SetColor("_Color", color);
             DrawGuiTextured(font.texture, () =>
             {
                 DrawOrthoMeshNow(BmFontCache.GetStringMesh(font, text), position);
             });
-            ShapeEditorResources.temporaryGuiMaterial.SetColor(ColorID, Color.white);
+            ShapeEditorResources.temporaryGuiMaterial.SetColor("_Color", Color.white);
         }
 
         /// <summary>
@@ -128,12 +128,12 @@ namespace AeternumGames.ShapeEditor
         /// <param name="position">The screen position.</param>
         public static void DrawGuiClippedText(Rect clip, BmFont font, string text, float2 position, Color color)
         {
-            ShapeEditorResources.temporaryGuiMaterial.SetColor(ColorID, color);
+            ShapeEditorResources.temporaryGuiMaterial.SetColor("_Color", color);
             DrawGuiClippedTextured(clip, font.texture, () =>
             {
                 DrawOrthoMeshNow(BmFontCache.GetStringMesh(font, text), position);
             });
-            ShapeEditorResources.temporaryGuiMaterial.SetColor(ColorID, Color.white);
+            ShapeEditorResources.temporaryGuiMaterial.SetColor("_Color", Color.white);
         }
 
         public static void DrawRectangle(float x, float y, float w, float h)
@@ -584,8 +584,6 @@ namespace AeternumGames.ShapeEditor
         private static readonly Color scaleGizmoColorGreenActive = new Color(0.575f, 0.810f, 0.331f);
         private static readonly Color scaleGizmoColorRed = new Color(0.796f, 0.310f, 0.357f);
         private static readonly Color scaleGizmoColorRedActive = new Color(0.896f, 0.410f, 0.457f);
-        private static readonly int ColorID = Shader.PropertyToID("_Color");
-        private static readonly int ClipID = Shader.PropertyToID("_clip");
 
         public static void DrawScaleGizmo(float2 position, float2 mousePosition, ref ScaleGizmoState state, float radius = 64.0f)
         {
