@@ -1,4 +1,3 @@
-
 #if UNITY_EDITOR
 
 using System;
@@ -14,7 +13,7 @@ namespace AeternumGames.ShapeEditor
         private readonly Pivot endPivot = new Pivot();
         private float measuringLength;
         private bool proc;
-        
+
         private static readonly Color pivotColor = new Color(1.0f, 0.5f, 0.0f);
 
         public override void OnActivate()
@@ -29,21 +28,21 @@ namespace AeternumGames.ShapeEditor
             float2 p1 = editor.GridPointToScreen(startPivot.position);
             float2 p2 = editor.GridPointToScreen(endPivot.position);
 
-            GLUtilities.DrawGui((() => 
+            GLUtilities.DrawGui((() =>
             {
                 GL.Color(Color.white);
                 GLUtilities.DrawLine(1f, p1, p2);
                 GL.Color(Color.red);
                 GLUtilities.DrawDottedLine(1f, p1, p2, 16f);
-                
+
                 GLUtilities.DrawCircle(2f, p1, 6f, pivotColor, 4);
                 GLUtilities.DrawCircle(2f, p2, 6f, pivotColor, 4);
             }));
 
             if (!proc) return;
 
-            string distance = measuringLength.ToString("0.00000", CultureInfo.InvariantCulture).TrimEnd('0', '.') + "m";
-            if (distance == "m") return;
+            string distance = measuringLength.ToStringHumans() + "m";
+            if (distance == "0m") return;
 
             float2 mid = (p1 + p2) / 2f;
             GLUtilities.DrawGuiText(ShapeEditorResources.fontSegoeUI14, distance, mid);

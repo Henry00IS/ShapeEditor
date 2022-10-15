@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -149,6 +150,20 @@ namespace AeternumGames.ShapeEditor
             if (getCurrentMousePositionMethod == null)
                 getCurrentMousePositionMethod = typeof(Editor).GetMethodByName("GetCurrentMousePosition");
             return (Vector2)getCurrentMousePositionMethod.Invoke(null, null);
+        }
+
+        /// <summary>
+        /// Converts the numeric value of this float to its equivalent string representation with 5
+        /// decimal places of accuracy.
+        /// <para>Transforms "3.1415926" to "3.14159".</para>
+        /// <para>Transforms "3.1400000001" to "3.14".</para>
+        /// <para>Transforms "3" to "3".</para>
+        /// </summary>
+        /// <param name="value">The floating-point number to be converted.</param>
+        /// <returns>The human-readable floating point number.</returns>
+        public static string ToStringHumans(this float value)
+        {
+            return value.ToString("0.00000", CultureInfo.InvariantCulture).TrimEnd('0').TrimEnd('.');
         }
     }
 }
