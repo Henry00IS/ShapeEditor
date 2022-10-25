@@ -933,11 +933,11 @@ namespace AeternumGames.ShapeEditor
         internal void UserSwitchToVertexSelectMode() => shapeSelectMode = ShapeSelectMode.Vertex;
 
         /// <summary>
-        /// Switches between the bezier and linear segment generator for all selected edges.
+        /// Switches between the bezier, quadratic curve and linear segment generator for all selected edges.
         /// </summary>
         [Instructions(
             title: "Toggle bezier generator",
-            description: "Switches between the bezier and linear segment generator for all selected edges.",
+            description: "Switches between the bezier, quadratic curve and linear segment generator for all selected edges.",
             shortcut: "B key"
         )]
         internal void UserToggleBezierSegmentGeneratorForSelectedEdges()
@@ -945,7 +945,21 @@ namespace AeternumGames.ShapeEditor
             RegisterUndo("Toggle Bezier Generator");
 
             foreach (var segment in ForEachSelectedEdge())
-                segment.generator = new SegmentGenerator(segment, segment.generator.type != SegmentGeneratorType.Bezier ? SegmentGeneratorType.Bezier : SegmentGeneratorType.Linear);
+            {
+                switch (segment.generator.type)
+                {
+                    case SegmentGeneratorType.Bezier:
+                        if (!segment.generator.bezierQuadratic)
+                            segment.generator.bezierQuadratic = true;
+                        else
+                            segment.generator = new SegmentGenerator(segment, SegmentGeneratorType.Linear);
+                        break;
+
+                    default:
+                        segment.generator = new SegmentGenerator(segment, SegmentGeneratorType.Bezier);
+                        break;
+                }
+            }
         }
 
         /// <summary>Toggles whether grid snapping is enabled by default.</summary>

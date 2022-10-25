@@ -368,6 +368,18 @@ namespace AeternumGames.ShapeEditor
                 t * t * t * p3;
         }
 
+        /// <summary>Gets the control points for a bezier curve that matches a 3-point quadratic curve.</summary>
+        /// <param name="p1">The start point.</param>
+        /// <param name="p2">The pivot point.</param>
+        /// <param name="p3">The end point.</param>
+        /// <param name="cp1">The first bezier curve control point.</param>
+        /// <param name="cp1">The second bezier curve control point.</param>
+        public static void GetBezierControlPointsForQuadraticCurve(float2 p1, float2 p2, float2 p3, out float2 cp1, out float2 cp2)
+        {
+            cp1 = p1 + math.normalize(p2 - p1) * (math.distance(p1, p2) * (2f / 3f));
+            cp2 = p3 + math.normalize(p2 - p3) * (math.distance(p2, p3) * (2f / 3f));
+        }
+
         // From Eric Jordan's convex decomposition library
         /// <summary>
         /// Check if the lines a0->a1 and b0->b1 cross. If they do, intersectionPoint will be filled with the point of
