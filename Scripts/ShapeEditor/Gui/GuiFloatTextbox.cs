@@ -18,6 +18,8 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Whether negative numbers are supported.</summary>
         public bool allowNegativeNumbers = true;
+        /// <summary>Whether the contents update every time a character is added.</summary>
+        public bool autoUpdateOnInput;
         /// <summary>The value must be at least this number.</summary>
         public float minValue = float.MinValue;
         /// <summary>The value must be at most this number.</summary>
@@ -72,6 +74,12 @@ namespace AeternumGames.ShapeEditor
         // whitelist the input characters related to floating point numbers and math.
         protected override bool ValidateCharacter(char character)
         {
+            return (ValidateNumber(character) || ValidateOther(character));
+        }
+
+        // whitelist all number characters
+        private static bool ValidateNumber(char character)
+        {
             switch (character)
             {
                 case '0':
@@ -84,6 +92,16 @@ namespace AeternumGames.ShapeEditor
                 case '7':
                 case '8':
                 case '9':
+                    return true;
+            }
+            return false;
+        }
+
+        // whitelist any non-integer math related characters
+        private static bool ValidateOther(char character)
+        {
+            switch (character)
+            {
                 case '.':
                 case '-':
                 case '+':
@@ -98,11 +116,11 @@ namespace AeternumGames.ShapeEditor
             }
             return false;
         }
-
+        
         /// <summary>
         /// Parses and modifies the number so that it's valid for the rules of this textbox.
         /// </summary>
-        /// <param name="number">The number to be checked.</param>
+        /// <param name="text">The number to be checked.</param>
         /// <returns>The corrected number or the same number.</returns>
         private float ParseAndValidateNumber(string text)
         {
@@ -134,6 +152,7 @@ namespace AeternumGames.ShapeEditor
         {
             // store a copy of the text before the edit.
             textBeforeEdit = text;
+            base.OnFocus();
         }
 
         public override void OnFocusLost()
@@ -145,12 +164,14 @@ namespace AeternumGames.ShapeEditor
         public override bool OnKeyDown(KeyCode keyCode)
         {
             // pressing the enter key could mean the user finished an edit.
-            if (keyCode == KeyCode.Return)
+            if (keyCode == KeyCode.Return || keyCode == KeyCode.KeypadEnter)
             {
                 OnFinishEdit();
             }
 
-            return base.OnKeyDown(keyCode);
+            bool returnValue = base.OnKeyDown(keyCode);
+            if (autoUpdateOnInput && !ValidateOther(Event.current.character)) OnFinishEdit();
+            return returnValue;
         }
     }
 }

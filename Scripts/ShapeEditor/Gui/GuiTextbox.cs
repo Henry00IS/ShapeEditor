@@ -43,6 +43,8 @@ namespace AeternumGames.ShapeEditor
         public int maxLength = 32767;
         /// <summary>Whether this textbox accepts text input.</summary>
         public bool isReadonly;
+        /// <summary>Whether all contents are selected upon focus gained.</summary>
+        public bool selectAllOnFocus;
         /// <summary>The textbox font.</summary>
         public BmFont font;
 
@@ -87,6 +89,9 @@ namespace AeternumGames.ShapeEditor
         {
             if (button == 0)
             {
+                // avoid interference with focus gain
+                if (selectAllOnFocus) return;
+                
                 // set the caret position.
                 caretCharPosition = TextXToCaretCharPosition(Mathf.RoundToInt(editor.mousePosition.x));
 
@@ -105,6 +110,9 @@ namespace AeternumGames.ShapeEditor
         {
             if (button == 0)
             {
+                // avoid interference with focus gain
+                if (selectAllOnFocus) return;
+
                 // automatic scrolling when the mouse moves (for the edges on long text).
 
                 // set the caret position.
@@ -212,6 +220,12 @@ namespace AeternumGames.ShapeEditor
             if (editor.isCtrlPressed && keyCode == KeyCode.X) CaretCut();
 
             return true; // true everything, we are typing!
+        }
+
+        public override void OnFocus()
+        {
+            base.OnFocus();
+            if (selectAllOnFocus) CaretSelectAll();
         }
 
         /// <summary>Can be used by child classes to whitelist or blacklist characters.</summary>
