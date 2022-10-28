@@ -18,8 +18,6 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Whether negative numbers are supported.</summary>
         public bool allowNegativeNumbers = true;
-        /// <summary>Whether the contents update every time a character is added.</summary>
-        public bool autoUpdateOnInput;
         /// <summary>The value must be at least this number.</summary>
         public float minValue = float.MinValue;
         /// <summary>The value must be at most this number.</summary>
@@ -152,7 +150,6 @@ namespace AeternumGames.ShapeEditor
         {
             // store a copy of the text before the edit.
             textBeforeEdit = text;
-            base.OnFocus();
         }
 
         public override void OnFocusLost()
@@ -169,9 +166,7 @@ namespace AeternumGames.ShapeEditor
                 OnFinishEdit();
             }
 
-            bool returnValue = base.OnKeyDown(keyCode);
-            if (autoUpdateOnInput && !ValidateOther(Event.current.character)) OnFinishEdit();
-            return returnValue;
+            return base.OnKeyDown(keyCode);
         }
     }
 }
