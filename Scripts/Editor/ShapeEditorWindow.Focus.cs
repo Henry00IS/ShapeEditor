@@ -15,6 +15,9 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Gets whether the active event receiver is a widget.</summary>
         internal bool activeEventReceiverIsWidget => activeEventReceiver is Widget;
 
+        /// <summary>Gets whether the active event receiver is a button.</summary>
+        internal bool activeEventReceiverIsButton => activeEventReceiver is GuiButton;
+        
         /// <summary>Gets whether the active event receiver is a tool.</summary>
         internal bool activeEventReceiverIsTool => activeEventReceiver is Tool;
 

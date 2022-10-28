@@ -127,12 +127,12 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnGlobalMouseUp(int button)
         {
-            if (button == 0)
+            if (button == 0 && isPressed)
             {
                 isPressed = false;
 
-                if (isMouseOver && onClick != null)
-                    onClick();
+                if (isMouseOver)
+                    onClick?.Invoke();
             }
         }
 

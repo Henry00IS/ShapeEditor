@@ -102,10 +102,7 @@ namespace AeternumGames.ShapeEditor
                         eventReceiver.OnMouseUp(button);
 
                         // try to focus the active tool.
-                        if (TrySwitchActiveEventReceiver(activeTool))
-                        {
-                            eventReceiver = activeTool;
-                        }
+                        if (TrySwitchActiveEventReceiver(activeTool));
                     }
                     else
                     {
@@ -124,6 +121,7 @@ namespace AeternumGames.ShapeEditor
         private void OnGlobalMouseUp(int button)
         {
             var eventReceiver = GetActiveEventReceiver();
+            bool switchToTool = false;
 
             // when the event receiver is busy it has exclusive rights to this event.
             if (eventReceiver.IsBusy())
@@ -137,26 +135,24 @@ namespace AeternumGames.ShapeEditor
                 {
                     var widget = GetActiveEventReceiver<Widget>();
                     if (!widget.wantsActive)
-                    {
-                        eventReceiver.OnGlobalMouseUp(button);
+                        switchToTool = true;
+                }
 
-                        // try to focus the active tool.
-                        if (TrySwitchActiveEventReceiver(activeTool))
-                        {
-                            eventReceiver = activeTool;
-                        }
-                    }
-                    else
-                    {
-                        eventReceiver.OnGlobalMouseUp(button);
-                    }
-                }
-                else
-                {
-                    eventReceiver.OnGlobalMouseUp(button);
-                }
+                // dispatch event
+                eventReceiver.OnGlobalMouseUp(button);
             }
 
+            // handles buttons auto losing focus
+            if (activeEventReceiverIsButton)
+                switchToTool = true;
+
+
+            // try to focus the active tool when requested.
+            if (switchToTool)
+            {
+                TrySwitchActiveEventReceiver(activeTool);
+            }
+            
             Repaint();
         }
 
