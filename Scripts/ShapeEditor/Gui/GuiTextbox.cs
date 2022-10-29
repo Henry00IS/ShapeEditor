@@ -99,6 +99,11 @@ namespace AeternumGames.ShapeEditor
                 // set the selection end position.
                 SelectionSetEnd(caretCharPosition);
             }
+            else if (button == 1)
+            {
+                // right-clicking is a shortcut to select all text.
+                CaretSelectAll();
+            }
         }
 
         public override void OnMouseDrag(int button, float2 screenDelta, float2 gridDelta)

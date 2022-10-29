@@ -102,7 +102,7 @@ namespace AeternumGames.ShapeEditor
         /// <summary>
         /// Parses and modifies the number so that it's valid for the rules of this textbox.
         /// </summary>
-        /// <param name="number">The number to be checked.</param>
+        /// <param name="text">The number to be checked.</param>
         /// <returns>The corrected number or the same number.</returns>
         private float ParseAndValidateNumber(string text)
         {
@@ -145,7 +145,7 @@ namespace AeternumGames.ShapeEditor
         public override bool OnKeyDown(KeyCode keyCode)
         {
             // pressing the enter key could mean the user finished an edit.
-            if (keyCode == KeyCode.Return)
+            if (keyCode == KeyCode.Return || keyCode == KeyCode.KeypadEnter)
             {
                 OnFinishEdit();
             }
