@@ -165,6 +165,19 @@ namespace AeternumGames.ShapeEditor
         {
             return value.ToString("0.00000", CultureInfo.InvariantCulture).TrimEnd('0').TrimEnd('.');
         }
+
+        /// <summary>Checks whether the keycode is a modifier key (Control, Shift, Alt, AltGr).</summary>
+        /// <returns>True when the keycode is a modifier key else false.</returns>
+        public static bool IsModifierKey(this KeyCode keyCode)
+        {
+            return keyCode == KeyCode.LeftControl
+                || keyCode == KeyCode.RightControl
+                || keyCode == KeyCode.LeftShift
+                || keyCode == KeyCode.RightShift
+                || keyCode == KeyCode.LeftAlt
+                || keyCode == KeyCode.RightAlt
+                || keyCode == KeyCode.AltGr;
+        }
     }
 }
 

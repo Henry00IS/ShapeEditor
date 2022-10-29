@@ -245,6 +245,19 @@ namespace AeternumGames.ShapeEditor
             {
                 var used = eventReceiver.OnKeyDown(keyCode);
 
+                // when a gui container event receiver did not use the keyboard event.
+                if (activeEventReceiverIsGuiContainer && !used && !keyCode.IsModifierKey() && !isMouseBusy)
+                {
+                    // try to switch the focus back to the active tool.
+                    if (TrySwitchActiveEventReceiver(activeTool))
+                    {
+                        eventReceiver = activeTool;
+
+                        // have the tool handle the keyboard event instead.
+                        used = eventReceiver.OnKeyDown(keyCode);
+                    }
+                }
+
                 // in tool mode we provide default keyboard shortcuts.
                 if (activeEventReceiverIsTool && !used)
                 {
@@ -265,14 +278,14 @@ namespace AeternumGames.ShapeEditor
                         case KeyCode.Alpha4:
                             UserSwitchToMeasuringTapeTool();
                             return true;
-                        
+
                         case KeyCode.A:
                             if (isCtrlPressed)
                             {
                                 UserSelectAll();
                                 return true;
                             }
-                            return false;
+                            return true;
 
                         case KeyCode.C:
                             if (isCtrlPressed)
@@ -280,7 +293,7 @@ namespace AeternumGames.ShapeEditor
                                 UserCopy();
                                 return true;
                             }
-                            return false;
+                            return true;
 
                         case KeyCode.Delete:
                             UserDeleteSelection();
@@ -297,7 +310,7 @@ namespace AeternumGames.ShapeEditor
                                 UserDuplicateSelectedShapes();
                                 return true;
                             }
-                            return false;
+                            return true;
 
                         case KeyCode.E:
                             if (isCtrlPressed)
@@ -305,7 +318,7 @@ namespace AeternumGames.ShapeEditor
                                 UserShapeFromSelection();
                                 return true;
                             }
-                            return false;
+                            return true;
 
                         case KeyCode.H:
                             if (isShiftPressed)
@@ -325,7 +338,7 @@ namespace AeternumGames.ShapeEditor
                                 UserInvertSelection();
                                 return true;
                             }
-                            return false;
+                            return true;
 
                         case KeyCode.Q:
                             UserSwitchToBoxSelectTool();
@@ -360,7 +373,7 @@ namespace AeternumGames.ShapeEditor
                                 UserFlipSelectionVertically();
                                 return true;
                             }
-                            return false;
+                            return true;
 
                         case KeyCode.W:
                             UserSwitchToTranslateTool();

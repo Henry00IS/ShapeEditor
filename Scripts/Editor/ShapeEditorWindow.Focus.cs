@@ -9,8 +9,8 @@ namespace AeternumGames.ShapeEditor
         /// <summary>The active event receiver with input focus (e.g. a tool or window etc.).</summary>
         private IEditorEventReceiver activeEventReceiver;
 
-        /// <summary>Gets whether the active event receiver is a window.</summary>
-        internal bool activeEventReceiverIsWindow => activeEventReceiver is GuiWindow;
+        /// <summary>Gets whether the active event receiver is a gui container.</summary>
+        internal bool activeEventReceiverIsGuiContainer => activeEventReceiver is IGuiContainerEventReceiver;
 
         /// <summary>Gets whether the active event receiver is a widget.</summary>
         internal bool activeEventReceiverIsWidget => activeEventReceiver is Widget;
