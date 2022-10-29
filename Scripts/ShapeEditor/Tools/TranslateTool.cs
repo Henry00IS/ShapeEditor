@@ -25,6 +25,8 @@ namespace AeternumGames.ShapeEditor
 
         private Constraints constraint = Constraints.None;
 
+        private float2 deltaAccumulator;
+
         public override void OnActivate()
         {
             base.OnActivate();
@@ -144,18 +146,18 @@ namespace AeternumGames.ShapeEditor
 
                     case KeyCode.X:
                         constraint = constraint == Constraints.GlobalX ? Constraints.None : Constraints.GlobalX;
+                        ToolOnMouseDrag(editor, float2.zero);
                         return true;
 
                     case KeyCode.Y:
                         constraint = constraint == Constraints.GlobalY ? Constraints.None : Constraints.GlobalY;
+                        ToolOnMouseDrag(editor, float2.zero);
                         return true;
                 }
             }
             return base.OnKeyDown(keyCode);
         }
-
-        private float2 deltaAccumulator;
-
+        
         private void ToolOnBeginTranslating(ShapeEditorWindow editor)
         {
             if (registerTranslateUndoOperation)

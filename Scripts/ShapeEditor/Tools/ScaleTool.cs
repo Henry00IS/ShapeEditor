@@ -90,20 +90,12 @@ namespace AeternumGames.ShapeEditor
         {
             if (isSingleUse && !isSingleUseDone)
             {
-                float2 scale = math.distance(initialGridPosition, editor.mouseGridPosition);
-                if (initialDistance == 0f)
-                {
-                    scale = new float2(1.0f, 1.0f);
-                }
-                else
-                {
-                    scale /= initialDistance;
-                }
+                float2 scale = GetMoveScale();
 
                 ToolOnMouseDrag(initialGridPosition, scale);
             }
         }
-
+        
         public override void OnMouseDown(int button)
         {
             if (isSingleUse)
@@ -165,14 +157,31 @@ namespace AeternumGames.ShapeEditor
 
                     case KeyCode.X:
                         constraint = constraint == Constraints.GlobalX ? Constraints.None : Constraints.GlobalX;
+                        ToolOnMouseDrag(initialGridPosition, GetMoveScale());
                         return true;
 
                     case KeyCode.Y:
                         constraint = constraint == Constraints.GlobalY ? Constraints.None : Constraints.GlobalY;
+                        ToolOnMouseDrag(initialGridPosition, GetMoveScale());
                         return true;
                 }
             }
             return base.OnKeyDown(keyCode);
+        }
+
+        private float2 GetMoveScale()
+        {
+            float2 scale = math.distance(initialGridPosition, editor.mouseGridPosition);
+            if (initialDistance == 0f)
+            {
+                scale = new float2(1.0f, 1.0f);
+            }
+            else
+            {
+                scale /= initialDistance;
+            }
+
+            return scale;
         }
 
         private void ToolOnBeginScaling()
