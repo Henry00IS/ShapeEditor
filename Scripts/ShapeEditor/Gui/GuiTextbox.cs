@@ -85,25 +85,24 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnMouseDown(int button)
         {
-            switch (button)
+            if (button == 0)
             {
-                case 1:
-                    CaretSelectAll();
-                    break;
-                
-                default:
-                    // set the caret position.
-                    caretCharPosition = TextXToCaretCharPosition(Mathf.RoundToInt(editor.mousePosition.x));
+                // set the caret position.
+                caretCharPosition = TextXToCaretCharPosition(Mathf.RoundToInt(editor.mousePosition.x));
 
-                    // set the selection position.
-                    SelectionSet(caretCharPosition, caretCharPosition);
+                // set the selection position.
+                SelectionSet(caretCharPosition, caretCharPosition);
 
-                    // reset the caret blink timer.
-                    CaretResetBlink();
+                // reset the caret blink timer.
+                CaretResetBlink();
 
-                    // set the selection end position.
-                    SelectionSetEnd(caretCharPosition);
-                    break;
+                // set the selection end position.
+                SelectionSetEnd(caretCharPosition);
+            }
+            else if (button == 1)
+            {
+                // right-clicking is a shortcut to select all text.
+                CaretSelectAll();
             }
         }
 

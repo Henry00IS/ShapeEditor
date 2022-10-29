@@ -72,12 +72,6 @@ namespace AeternumGames.ShapeEditor
         // whitelist the input characters related to floating point numbers and math.
         protected override bool ValidateCharacter(char character)
         {
-            return (ValidateNumber(character) || ValidateOther(character));
-        }
-
-        // whitelist all number characters
-        private static bool ValidateNumber(char character)
-        {
             switch (character)
             {
                 case '0':
@@ -90,16 +84,6 @@ namespace AeternumGames.ShapeEditor
                 case '7':
                 case '8':
                 case '9':
-                    return true;
-            }
-            return false;
-        }
-
-        // whitelist any non-integer math related characters
-        private static bool ValidateOther(char character)
-        {
-            switch (character)
-            {
                 case '.':
                 case '-':
                 case '+':
@@ -114,7 +98,7 @@ namespace AeternumGames.ShapeEditor
             }
             return false;
         }
-        
+
         /// <summary>
         /// Parses and modifies the number so that it's valid for the rules of this textbox.
         /// </summary>
