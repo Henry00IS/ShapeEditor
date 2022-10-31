@@ -16,6 +16,7 @@ namespace AeternumGames.ShapeEditor
         private TranslateTool translateTool;
         private RotateTool rotateTool;
         private ScaleTool scaleTool;
+        private DrawTool drawTool;
         private CutTool cutTool;
         private MeasuringTapeTool measuringTapeTool;
 
@@ -28,6 +29,7 @@ namespace AeternumGames.ShapeEditor
                 translateTool = new TranslateTool();
                 rotateTool = new RotateTool();
                 scaleTool = new ScaleTool();
+                drawTool = new DrawTool();
                 cutTool = new CutTool();
                 measuringTapeTool = new MeasuringTapeTool();
             }

@@ -876,6 +876,14 @@ namespace AeternumGames.ShapeEditor
         )]
         internal void UserSwitchToCutTool() => SwitchTool(cutTool);
 
+        /// <summary>Switches to the draw tool unless already active.</summary>
+        [Instructions(
+            title: "Draw Tool",
+            description: "Switches to the draw tool. When you move the mouse over an edge, it will be highlighted. When you click the left mouse button, a new vertex is inserted on that edge that follows the mouse pointer. If you click again, this point is set and another vertex is inserted. Press the Escape key to discard the last vertex and finish editing the edge.\n\nSingle-Use Modes:\n\nWithout an active selection, you can click anywhere to start drawing a new shape. Press the Escape key to discard the last vertex and finish the shape.\n\nWhen exactly one edge is selected, a new vertex is inserted on that edge that follows the mouse pointer. If you click the left mouse button, this point is set and another vertex is inserted. Press the Escape key to discard the last vertex and finish editing the edge.",
+            shortcut: "D key single-use"
+        )]
+        internal void UserSwitchToDrawTool() => SwitchTool(drawTool);
+
         /// <summary>Switches to the edge select mode.</summary>
         [Instructions(
             title: "Edge select mode",

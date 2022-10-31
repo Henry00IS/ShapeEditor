@@ -11,6 +11,7 @@ namespace AeternumGames.ShapeEditor
         private GuiButton translateButton;
         private GuiButton rotateButton;
         private GuiButton scaleButton;
+        private GuiButton drawButton;
         private GuiButton cutButton;
         private GuiButton measureButton;
 
@@ -28,6 +29,7 @@ namespace AeternumGames.ShapeEditor
             verticalLayout.Add(translateButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorTranslate, 28, editor.UserSwitchToTranslateTool));
             verticalLayout.Add(rotateButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorRotate, 28, editor.UserSwitchToRotateTool));
             verticalLayout.Add(scaleButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorScale, 28, editor.UserSwitchToScaleTool));
+            verticalLayout.Add(drawButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorDraw, 28, editor.UserSwitchToDrawTool));
             verticalLayout.Add(cutButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorCut, 28, editor.UserSwitchToCutTool));
             verticalLayout.Add(measureButton = new GuiButton(ShapeEditorResources.Instance.shapeEditorMeasuringTape, 28, editor.UserSwitchToMeasuringTapeTool));
 
@@ -41,6 +43,7 @@ namespace AeternumGames.ShapeEditor
             translateButton.isChecked = type == typeof(TranslateTool);
             rotateButton.isChecked = type == typeof(RotateTool);
             scaleButton.isChecked = type == typeof(ScaleTool);
+            drawButton.isChecked = type == typeof(DrawTool);
             cutButton.isChecked = type == typeof(CutTool);
             measureButton.isChecked = type == typeof(MeasuringTapeTool);
 

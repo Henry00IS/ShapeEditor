@@ -136,6 +136,14 @@ namespace AeternumGames.ShapeEditor
                     }
                     return false;
 
+                case KeyCode.D:
+                    if (!editor.isModifierPressed)
+                    {
+                        editor.UseTool(new DrawTool());
+                        return true;
+                    }
+                    return false;
+
                 case KeyCode.G:
                     if (editor.selectedSegmentsCount > 0)
                     {

@@ -47,6 +47,7 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorCreatePolygon;
         public Texture2D shapeEditorCut;
         public Texture2D shapeEditorDelete;
+        public Texture2D shapeEditorDraw;
         public Texture2D shapeEditorEdgeSelect;
         public Texture2D shapeEditorExtrudeBevel;
         public Texture2D shapeEditorExtrudeCurvedStaircase;
@@ -66,6 +67,7 @@ namespace AeternumGames.ShapeEditor
         public Texture2D shapeEditorIcon;
         public Texture2D shapeEditorMeasuringTape;
         public Texture2D shapeEditorMouseCursorHand;
+        public Texture2D shapeEditorMouseCursorPencil;
         public Texture2D shapeEditorMouseCursorScissors;
         public Texture2D shapeEditorNew;
         public Texture2D shapeEditorOpen;
