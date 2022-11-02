@@ -53,6 +53,11 @@ namespace AeternumGames.ShapeEditor
                     // insert another segment at the (optionally snapped) mouse position.
                     // this leaves the current segment at the last position, thus placing it.
                     InsertSegmentBeforeSelectedSegment2(tool.mouseSnappedGridPosition);
+
+                    // with the shift key pressed we set the selected segment 2 to the added point,
+                    // this lets us work counter-clockwise.
+                    if (editor.isShiftPressed)
+                        tool.selectedSegment2 = tool.selectedSegment2.previous;
                 }
             }
 
@@ -78,14 +83,23 @@ namespace AeternumGames.ShapeEditor
             {
                 GLUtilities.DrawGui(() =>
                 {
+                    var previous = editor.GridPointToScreen(tool.selectedSegment2.previous.previous.position);
                     var current = editor.GridPointToScreen(tool.selectedSegment2.previous.position);
                     var last = editor.GridPointToScreen(tool.selectedSegment2.position);
                     var segmentCount = shape.segments.Count;
 
                     if (segmentCount > 2)
                     {
-                        GL.Color(drawIndicatorColor);
-                        GLUtilities.DrawLine(1.0f, current, last);
+                        if (editor.isShiftPressed)
+                        {
+                            GL.Color(drawIndicatorColor);
+                            GLUtilities.DrawLine(1.0f, previous, current);
+                        }
+                        else
+                        {
+                            GL.Color(drawIndicatorColor);
+                            GLUtilities.DrawLine(1.0f, current, last);
+                        }
                     }
                 });
             }
