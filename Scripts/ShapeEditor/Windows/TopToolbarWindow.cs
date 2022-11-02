@@ -179,6 +179,8 @@ namespace AeternumGames.ShapeEditor
 
             editMenuUndoItem.enabled = editor.canUndo;
             editMenuRedoItem.enabled = editor.canRedo;
+            editMenuUndoItem.text = "Undo " + editor.canUndoName;
+            editMenuRedoItem.text = "Redo " + editor.canRedoName;
 
             base.OnRender();
         }
