@@ -139,6 +139,8 @@ namespace AeternumGames.ShapeEditor
             viewMenu.Add("Shape Inspector", resources.shapeEditorShapeCreate, editor.UserShowShapeInspectorWindow);
             viewMenu.Add("Sine Inspector", resources.shapeEditorSegmentSine, editor.UserShowSineInspectorWindow);
             viewMenu.Separator();
+            viewMenu.Add("3D Preview", editor.UserShowPreviewWindow);
+            viewMenu.Separator();
             viewMenu.Add("Reset Camera", editor.UserResetCamera);
 
             var helpMenu = menu.Add("Help");

@@ -136,6 +136,32 @@ namespace AeternumGames.ShapeEditor
             ShapeEditorResources.temporaryGuiMaterial.SetColor("_Color", Color.white);
         }
 
+        /// <summary>
+        /// Creates a temporary render texture, sets it as active, pushes the matrix and executes
+        /// the callback. Then pops the matrix, resets the active render texture and returns the
+        /// temporary render texture. It must be released with <see cref="RenderTexture.ReleaseTemporary(RenderTexture)"/>.
+        /// </summary>
+        /// <param name="width">The width of the desired render texture in pixels.</param>
+        /// <param name="height">The height of the desired render texture in pixels.</param>
+        /// <param name="depthBuffer">
+        /// Depth buffer bits (0, 16 or 24). Note that only 24 bit depth has stencil buffer.
+        /// </param>
+        /// <param name="action">The action to be called to draw primitives.</param>
+        /// <returns>Returns the temporary render texture. It must be released with <see cref="RenderTexture.ReleaseTemporary(RenderTexture)"/>.</returns>
+        public static RenderTexture DrawTemporaryRenderTexture(int width, int height, int depthBuffer, System.Action action)
+        {
+            var originalRenderTexture = RenderTexture.active;
+            var temporaryRenderTexture = RenderTexture.GetTemporary(width, height, depthBuffer);
+            RenderTexture.active = temporaryRenderTexture;
+            GL.PushMatrix();
+
+            action();
+
+            GL.PopMatrix();
+            RenderTexture.active = originalRenderTexture;
+            return temporaryRenderTexture;
+        }
+
         public static void DrawRectangle(float x, float y, float w, float h)
         {
             w += x;

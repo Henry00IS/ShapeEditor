@@ -847,6 +847,16 @@ namespace AeternumGames.ShapeEditor
             OpenWindow(new SineInspectorWindow());
         }
 
+        /// <summary>Displays the 3D preview window.</summary>
+        [Instructions(
+            title: "Preview window",
+            description: "Displays the 3D preview window. An experimental beta feature."
+        )]
+        internal void UserShowPreviewWindow()
+        {
+            OpenWindow(new PreviewWindow());
+        }
+
         /// <summary>Snaps the selected objects to the grid.</summary>
         [Instructions(
             title: "Snap selection to grid",

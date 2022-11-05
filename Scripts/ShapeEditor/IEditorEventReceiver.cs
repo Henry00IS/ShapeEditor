@@ -38,6 +38,9 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Called when the object receives a mouse drag event.</summary>
         void OnMouseDrag(int button, float2 screenDelta, float2 gridDelta);
 
+        /// <summary>Called when the object receives a global mouse drag event.</summary>
+        void OnGlobalMouseDrag(int button, float2 screenDelta, float2 gridDelta);
+
         /// <summary>Called when the object receives a mouse move event.</summary>
         void OnMouseMove(float2 screenDelta, float2 gridDelta);
 

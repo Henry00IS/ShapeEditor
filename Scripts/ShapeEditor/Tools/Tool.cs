@@ -64,6 +64,11 @@ namespace AeternumGames.ShapeEditor
         {
         }
 
+        /// <summary>Called when the tool receives a global mouse drag event.</summary>
+        public virtual void OnGlobalMouseDrag(int button, float2 screenDelta, float2 gridDelta)
+        {
+        }
+
         /// <summary>Called when the tool receives a mouse move event.</summary>
         public virtual void OnMouseMove(float2 screenDelta, float2 gridDelta)
         {

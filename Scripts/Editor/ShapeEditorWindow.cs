@@ -174,6 +174,23 @@ namespace AeternumGames.ShapeEditor
                 eventReceiver.OnMouseDrag(button, screenDelta, gridDelta);
             }
 
+            Repaint();
+        }
+
+        private void OnGlobalMouseDrag(int button, float2 screenDelta, float2 gridDelta)
+        {
+            var eventReceiver = GetActiveEventReceiver();
+
+            // when the event receiver is busy it has exclusive rights to this event.
+            if (eventReceiver.IsBusy())
+            {
+                eventReceiver.OnGlobalMouseDrag(button, screenDelta, gridDelta);
+            }
+            else
+            {
+                eventReceiver.OnGlobalMouseDrag(button, screenDelta, gridDelta);
+            }
+
             // maybe check for a return value and disable this behavior.
             if (activeEventReceiverIsTool || activeEventReceiverIsWidget)
             {
@@ -246,7 +263,7 @@ namespace AeternumGames.ShapeEditor
                 var used = eventReceiver.OnKeyDown(keyCode);
 
                 // when a gui container event receiver did not use the keyboard event.
-                if (activeEventReceiverIsGuiContainer && !used && !keyCode.IsModifierKey() && !isMouseBusy)
+                if (activeEventReceiverIsGuiContainer && !used && !keyCode.IsModifierKey() && !isMouseBusy && keyCode != KeyCode.None)
                 {
                     // try to switch the focus back to the active tool.
                     if (TrySwitchActiveEventReceiver(activeTool))

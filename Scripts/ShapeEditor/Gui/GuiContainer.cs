@@ -227,6 +227,11 @@ namespace AeternumGames.ShapeEditor
             activeChild?.OnMouseDrag(button, screenDelta, gridDelta);
         }
 
+        public virtual void OnGlobalMouseDrag(int button, float2 screenDelta, float2 gridDelta)
+        {
+            activeChild?.OnGlobalMouseDrag(button, screenDelta, gridDelta);
+        }
+
         public virtual void OnMouseMove(float2 screenDelta, float2 gridDelta)
         {
             // forward this event to the topmost child container under the mouse position.

@@ -11,7 +11,7 @@ Shader "Aeternum Games/Shape Editor Gui"
 	{
 		Pass
 		{
-			ZWrite Off
+			//ZWrite Off
 			Cull Off
 			Blend SrcAlpha OneMinusSrcAlpha
 			CGPROGRAM

@@ -13,7 +13,7 @@ namespace AeternumGames.ShapeEditor
         internal float lastRenderTime;
         internal float2 lastWindowSize;
         internal bool isLeftMousePressed;
-        private bool isRightMousePressed;
+        internal bool isRightMousePressed;
         internal float2 mousePosition;
         internal float2 mouseGridPosition;
         internal float2 mouseInitialPosition;
@@ -27,6 +27,7 @@ namespace AeternumGames.ShapeEditor
         private string desiredTooltipText;
         private double tooltipDetectionTime;
         private Vector2 tooltipExpectedMousePosition;
+        private int desiresMouseScreenWrapping;
 
         /// <summary>Called by the Unity Editor to process events.</summary>
         private void OnGUI()
@@ -76,6 +77,18 @@ namespace AeternumGames.ShapeEditor
                             desiredMouseCursor = MouseCursor.Arrow;
                         }
                     }
+                }
+
+                // use screen wrapping of the mouse if desired.
+                if (desiresMouseScreenWrapping == 2)
+                {
+                    EditorGUIUtility.SetWantsMouseJumping(1);
+                }
+                // reset the mouse screen wrapping here, when the function is no longer getting called.
+                if (desiresMouseScreenWrapping-- == 1)
+                {
+                    desiresMouseScreenWrapping = 0;
+                    EditorGUIUtility.SetWantsMouseJumping(0);
                 }
             }
 
@@ -150,15 +163,17 @@ namespace AeternumGames.ShapeEditor
 
             if (e.type == EventType.MouseDrag)
             {
+                var previousMouseGridPosition = mouseGridPosition;
+                mousePosition = eMousePosition;
+                mouseGridPosition = ScreenPointToGrid(mousePosition);
+
                 if (IsMousePositionInViewport(eMousePosition))
                 {
-                    var previousMouseGridPosition = mouseGridPosition;
-                    mousePosition = eMousePosition;
-                    mouseGridPosition = ScreenPointToGrid(mousePosition);
                     OnMouseDrag(e.button, e.delta, mouseGridPosition - previousMouseGridPosition);
-
-                    e.Use();
                 }
+                OnGlobalMouseDrag(e.button, e.delta, mouseGridPosition - previousMouseGridPosition);
+
+                e.Use();
             }
 
             if (e.type == EventType.MouseMove)
@@ -356,6 +371,15 @@ namespace AeternumGames.ShapeEditor
         internal void SetTooltipText(System.Action action, InstructionsDisplayMode mode = InstructionsDisplayMode.Default)
         {
             SetTooltipText(action?.GetInstructions()?.GetTooltip(mode));
+        }
+
+        /// <summary>
+        /// While this function is called every repaint, it will force the mouse to wrap around the
+        /// monitor screen edges without affecting the mouse delta coordinates.
+        /// </summary>
+        internal void SetMouseScreenWrapping()
+        {
+            desiresMouseScreenWrapping = 2;
         }
 
         /// <summary>Whether the Ctrl or Shift key is pressed.</summary>
