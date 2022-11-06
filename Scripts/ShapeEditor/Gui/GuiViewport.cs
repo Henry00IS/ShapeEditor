@@ -2,7 +2,6 @@
 
 using Unity.Mathematics;
 using UnityEngine;
-using GLUtilities3D = AeternumGames.ShapeEditor.GLUtilities.GLUtilities3D;
 
 namespace AeternumGames.ShapeEditor
 {
@@ -237,9 +236,18 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        /// <summary>Called at the beginning of the control's <see cref="OnRender"/> function. This draws on the normal screen.</summary>
+        public System.Action onPreRender;
+        /// <summary>Called before drawing the 3D world on the render texture with a 2D pixel matrix.</summary>
+        public System.Action onPreRender2D;
+        /// <summary>Called when the 3D world is to be drawn the render texture with a 3D projection matrix.</summary>
+        public System.Action onRender3D;
+        /// <summary>Called after drawing the 3D world on the render texture with a 2D pixel matrix.</summary>
+        public System.Action onPostRender2D;
+        /// <summary>Called at the end of the control's <see cref="OnRender"/> function. This draws on the normal screen.</summary>
+        public System.Action onPostRender;
+
         public readonly FirstPersonCamera camera = new FirstPersonCamera();
-        private Mesh mesh;
-        private MeshRaycast meshRaycast;
 
         public GuiViewport(float2 position, float2 size) : base(position, size)
         {
@@ -252,8 +260,7 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Called when the control is rendered.</summary>
         public override void OnRender()
         {
-            if (mesh == null)
-                RebuildMesh();
+            onPreRender?.Invoke();
 
             if (isActive && editor.isRightMousePressed)
             {
@@ -265,65 +272,40 @@ namespace AeternumGames.ShapeEditor
             camera.height = drawRect.height;
 
             var temporaryRenderTexture = GLUtilities.DrawTemporaryRenderTexture((int)drawRect.width, (int)drawRect.height, 24, OnRenderViewport);
-
             GLUtilities.DrawGuiTextured(temporaryRenderTexture, () =>
             {
                 GLUtilities.DrawFlippedUvRectangle(drawRect.x, drawRect.y, drawRect.width, drawRect.height);
             });
             RenderTexture.ReleaseTemporary(temporaryRenderTexture);
+
+            onPostRender?.Invoke();
         }
 
         /// <summary>Called when the custom viewport render texture is rendered.</summary>
         private void OnRenderViewport(RenderTexture renderTexture)
         {
-            GLUtilities3D.DrawGuiTextured(ShapeEditorResources.Instance.shapeEditorDefaultMaterial.mainTexture, -camera.transform.position, () =>
+            // update the camera.
+            if (camera.Update())
+                editor.Repaint();
+
+            // optional 2D render pass before drawing the 3D world.
+            if (onPreRender2D != null)
             {
-                if (camera.Update())
-                    editor.Repaint();
-
-                GL.Clear(true, true, Color.black);
-                camera.LoadMatricesIntoGL();
-
-                Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
-            });
-
-            GLUtilities3D.DrawGuiLines(() =>
-            {
-                GL.Color(Color.green);
-                GLUtilities3D.DrawLine(new float3(1f, 1f, 1f), new float3(1f, 2f, 1f));
-            });
-
-            // no need to do raycasting when the mouse isn't over the window.
-            if (isMouseOver)
-            {
-                GLUtilities3D.DrawGuiLines(() =>
-                {
-                    var ray = camera.ScreenPointToRay(mousePosition);
-                    var target = ray.origin + ray.direction * 2f;
-
-                    if (meshRaycast.Raycast(ray.origin, ray.direction, out var hit))
-                    {
-                        GL.Color(Color.blue);
-                        GLUtilities3D.DrawLine(hit.point, hit.point + hit.normal * 0.25f);
-
-                        GL.Color(Color.red);
-                        GLUtilities3D.DrawLine(hit.vertex1, hit.vertex2);
-                        GLUtilities3D.DrawLine(hit.vertex2, hit.vertex3);
-                        GLUtilities3D.DrawLine(hit.vertex3, hit.vertex1);
-                    }
-                });
+                GL.LoadPixelMatrix(0f, drawRect.width, drawRect.height, 0f);
+                onPreRender2D.Invoke();
             }
 
-            GLUtilities.DrawGui(() =>
-            {
-                GL.LoadPixelMatrix(0f, renderTexture.width, renderTexture.height, 0f);
+            // main 3D render pass.
+            GL.Clear(true, true, Color.black);
+            camera.LoadMatricesIntoGL();
+            onRender3D?.Invoke();
 
-                var pos = camera.WorldToScreenPoint(new Vector3(1f, 1f, 1f));
-                if (pos.z >= 0f)
-                {
-                    GLUtilities.DrawCircle(1f, new float2(pos.x, pos.y), 8f, Color.red);
-                }
-            });
+            // optional 2D render pass after drawing the 3D world.
+            if (onPostRender2D != null)
+            {
+                GL.LoadPixelMatrix(0f, drawRect.width, drawRect.height, 0f);
+                onPostRender2D.Invoke();
+            }
         }
 
         public override void OnGlobalMouseDrag(int button, float2 screenDelta, float2 gridDelta)
@@ -332,10 +314,6 @@ namespace AeternumGames.ShapeEditor
             {
                 camera.OnGlobalMouseDrag(button, screenDelta, gridDelta);
             }
-        }
-
-        public override void OnMouseUp(int button)
-        {
         }
 
         public override bool OnKeyDown(KeyCode keyCode)
@@ -350,21 +328,6 @@ namespace AeternumGames.ShapeEditor
             if (camera.OnKeyUp(keyCode))
                 return true;
             return false;
-        }
-
-        public override void OnFocus()
-        {
-            RebuildMesh();
-        }
-
-        private void RebuildMesh()
-        {
-            // ensure the project data is ready.
-            editor.project.Validate();
-            var convexPolygons2D = editor.project.GenerateConvexPolygons();
-            convexPolygons2D.CalculateBounds2D();
-            mesh = MeshGenerator.CreateExtrudedPolygonMesh(convexPolygons2D, 0.25f);
-            meshRaycast = new MeshRaycast(mesh);
         }
     }
 }
