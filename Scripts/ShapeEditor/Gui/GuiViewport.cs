@@ -2,19 +2,21 @@
 
 using Unity.Mathematics;
 using UnityEngine;
+using GLUtilities3D = AeternumGames.ShapeEditor.GLUtilities.GLUtilities3D;
 
 namespace AeternumGames.ShapeEditor
 {
     /// <summary>Represents a 3D viewport control inside of a window.</summary>
     public class GuiViewport : GuiControl
     {
-        private class MyTransform
+        /// <summary>Represents a transformation in 3D space much like <see cref="Transform"/>.</summary>
+        public class Transform3D
         {
-            /// <summary>Position of the transform.</summary>
+            /// <summary>The position of the transform.</summary>
             public Vector3 position { get; set; } = Vector3.zero;
 
-            /// <summary>The local rotation of the transform.</summary>
-            public Quaternion localRotation { get; set; } = Quaternion.identity;
+            /// <summary>The rotation of the transform.</summary>
+            public Quaternion rotation { get; set; } = Quaternion.identity;
 
             /// <summary>Moves the transform in the direction and distance of <paramref name="translation"/>.</summary>
             public void Translate(Vector3 translation, Space relativeTo = Space.Self)
@@ -28,7 +30,7 @@ namespace AeternumGames.ShapeEditor
             /// <summary>Transforms <paramref name="direction"/> from local space to world space.</summary>
             public Vector3 TransformDirection(Vector3 direction)
             {
-                return Quaternion.Inverse(localRotation) * direction;
+                return Quaternion.Inverse(rotation) * direction;
             }
 
             /// <summary>
@@ -39,19 +41,84 @@ namespace AeternumGames.ShapeEditor
             {
                 Quaternion eulerRot = Quaternion.Euler(eulers.x, eulers.y, eulers.z);
                 if (relativeTo == Space.Self)
-                    localRotation *= eulerRot;
+                    rotation *= eulerRot;
                 else
-                    localRotation *= (Quaternion.Inverse(localRotation) * eulerRot * localRotation);
+                    rotation *= (Quaternion.Inverse(rotation) * eulerRot * rotation);
             }
 
-            /// <summary>Returns a matrix that can be used to orient a camera or alike.</summary>
-            public Matrix4x4 matrix => Matrix4x4.Rotate(localRotation) * Matrix4x4.Translate(position);
+            /// <summary>Returns the model matrix that represents the position, rotate and scale.</summary>
+            public Matrix4x4 matrix => Matrix4x4.Rotate(rotation) * Matrix4x4.Translate(position);
         }
 
-        private class Camera
+        /// <summary>Represents a viewport camera that renders the world.</summary>
+        public class Camera
         {
-            public MyTransform transform;
+            /// <summary>The camera transform.</summary>
+            public Transform3D transform { get; set; } = new Transform3D();
 
+            /// <summary>Vertical field-of-view in degrees.</summary>
+            public float fieldOfView { get; set; } = 45;
+
+            /// <summary>Near depth clipping plane value.</summary>
+            public float zNear { get; set; } = 0.01f;
+
+            /// <summary>Far depth clipping plane value.</summary>
+            public float zFar { get; set; } = 100f;
+
+            /// <summary>The width of the screen in pixels.</summary>
+            public float width { get; set; } = 800f;
+
+            /// <summary>The height of the screen in pixels.</summary>
+            public float height { get; set; } = 600f;
+
+            /// <summary>Gets the perspective projection matrix.</summary>
+            public Matrix4x4 projectionMatrix => Matrix4x4.Perspective(fieldOfView, width / height, zNear, zFar);
+
+            /// <summary>Gets the model view matrix.</summary>
+            public Matrix4x4 viewMatrix => transform.matrix;
+
+            /// <summary>
+            /// Calls <see cref="GL.LoadProjectionMatrix"/> with the <see cref="projectionMatrix"/>
+            /// and sets <see cref="GL.modelview"/> to the <see cref="viewMatrix"/> of this camera.
+            /// </summary>
+            public void LoadMatricesIntoGL()
+            {
+                GL.LoadProjectionMatrix(projectionMatrix);
+                GL.modelview = viewMatrix;
+            }
+
+            /// <summary>
+            /// Returns a ray going from camera through a screen point. Resulting ray is in world
+            /// space, starting on the near plane of the camera and going through position's (x,y)
+            /// pixel coordinates on the screen.
+            /// </summary>
+            public Ray ScreenPointToRay(float2 screen)
+            {
+                var aspect = width / height;
+                Vector2 uv = new Vector2(Mathf.Lerp(0.5f, -0.5f, screen.x / width), Mathf.Lerp(-0.5f, 0.5f, screen.y / height));
+
+                // angle in radians from the view axis to the top plane of the view pyramid.
+                float verticalAngle = 0.5f * Mathf.Deg2Rad * fieldOfView;
+
+                // world space height of the view pyramid measured at 1 m depth from the camera.
+                float worldHeight = 2f * Mathf.Tan(verticalAngle);
+
+                // convert relative position to world units.
+                Vector3 worldUnits = uv * worldHeight;
+                worldUnits.x *= aspect;
+                worldUnits.z = 1;
+
+                // Rotate to match camera orientation.
+                Vector3 direction = Quaternion.Inverse(transform.rotation) * worldUnits;
+                Vector3 origin = Matrix4x4.Translate(transform.position) * -transform.position;
+
+                return new Ray(origin, -direction);
+            }
+        }
+
+        /// <summary>Represents a first-person camera with WSAD control scheme.</summary>
+        public class FirstPersonCamera : Camera
+        {
             private float speed = 10f;
             private Vector3 pos;
             private Vector2 rot;
@@ -65,9 +132,9 @@ namespace AeternumGames.ShapeEditor
             private bool useDeltaTime = false;
             private float lastUpdateTime = 0.0f;
 
-            public Camera()
+            public FirstPersonCamera()
             {
-                transform = new MyTransform();
+                transform = new Transform3D();
                 transform.position = Vector3.back * 4f;
             }
 
@@ -112,7 +179,7 @@ namespace AeternumGames.ShapeEditor
 
             private void HandleCameraRotation()
             {
-                transform.localRotation = Quaternion.AngleAxis(rot.x, Vector3.up);
+                transform.rotation = Quaternion.AngleAxis(rot.x, Vector3.up);
                 transform.Rotate(Vector3.left * rot.y, Space.World);
             }
 
@@ -144,16 +211,9 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        /// <summary>Vertical field-of-view in degrees.</summary>
-        public float fieldOfView { get; set; } = 45;
-
-        /// <summary>Near depth clipping plane value.</summary>
-        public float zNear { get; set; } = 0.01f;
-
-        /// <summary>Far depth clipping plane value.</summary>
-        public float zFar { get; set; } = 100f;
-
-        private Camera camera = new Camera();
+        public readonly FirstPersonCamera camera = new FirstPersonCamera();
+        private Mesh mesh;
+        private MeshRaycast meshRaycast;
 
         public GuiViewport(float2 position, float2 size) : base(position, size)
         {
@@ -166,11 +226,17 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Called when the control is rendered.</summary>
         public override void OnRender()
         {
+            if (mesh == null)
+                RebuildMesh();
+
             if (isActive && editor.isRightMousePressed)
             {
                 editor.SetMouseCursor(UnityEditor.MouseCursor.FPS);
                 editor.SetMouseScreenWrapping();
             }
+
+            camera.width = drawRect.width;
+            camera.height = drawRect.height;
 
             var temporaryRenderTexture = GLUtilities.DrawTemporaryRenderTexture((int)drawRect.width, (int)drawRect.height, 24, OnRenderViewport);
 
@@ -184,24 +250,35 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Called when the custom viewport render texture is rendered.</summary>
         private void OnRenderViewport()
         {
-            GLUtilities.DrawGuiTextured(ShapeEditorResources.Instance.shapeEditorDefaultMaterial.mainTexture, () =>
+            GLUtilities3D.DrawGuiTextured(ShapeEditorResources.Instance.shapeEditorDefaultMaterial.mainTexture, -camera.transform.position, () =>
             {
-                GL.Clear(true, true, Color.black);
-
-                GL.LoadProjectionMatrix(Matrix4x4.Perspective(fieldOfView, drawRect.width / drawRect.height, zNear, zFar));
-                GL.modelview = camera.transform.matrix;
-
-                // ensure the project data is ready.
-                editor.project.Validate();
-
-                var convexPolygons2D = editor.project.GenerateConvexPolygons();
-                convexPolygons2D.CalculateBounds2D();
-
                 if (camera.Update())
                     editor.Repaint();
 
-                var mesh = MeshGenerator.CreateExtrudedPolygonMesh(convexPolygons2D, 0.25f);
+                GL.Clear(true, true, Color.black);
+                camera.LoadMatricesIntoGL();
+
                 Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
+            });
+
+            // no need to do raycasting when the mouse isn't over the window.
+            if (!isMouseOver) return;
+
+            GLUtilities3D.DrawGuiLines(() =>
+            {
+                var ray = camera.ScreenPointToRay(mousePosition);
+                var target = ray.origin + ray.direction * 2f;
+
+                if (meshRaycast.Raycast(ray.origin, ray.direction, out var hit))
+                {
+                    GL.Color(Color.blue);
+                    GLUtilities3D.DrawLine(hit.point, hit.point + hit.normal * 0.25f);
+
+                    GL.Color(Color.red);
+                    GLUtilities3D.DrawLine(hit.vertex1, hit.vertex2);
+                    GLUtilities3D.DrawLine(hit.vertex2, hit.vertex3);
+                    GLUtilities3D.DrawLine(hit.vertex3, hit.vertex1);
+                }
             });
         }
 
@@ -229,6 +306,21 @@ namespace AeternumGames.ShapeEditor
             if (camera.OnKeyUp(keyCode))
                 return true;
             return false;
+        }
+
+        public override void OnFocus()
+        {
+            RebuildMesh();
+        }
+
+        private void RebuildMesh()
+        {
+            // ensure the project data is ready.
+            editor.project.Validate();
+            var convexPolygons2D = editor.project.GenerateConvexPolygons();
+            convexPolygons2D.CalculateBounds2D();
+            mesh = MeshGenerator.CreateExtrudedPolygonMesh(convexPolygons2D, 0.25f);
+            meshRaycast = new MeshRaycast(mesh);
         }
     }
 }

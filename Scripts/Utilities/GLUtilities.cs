@@ -630,6 +630,45 @@ namespace AeternumGames.ShapeEditor
             DrawLine(3.0f, position, right);
             DrawRectangle(right.x - distanceFromRadius + 1f, right.y - 4f, 9f, 9f);
         }
+
+        /// <summary>3D drawing extensions.</summary>
+        public static class GLUtilities3D
+        {
+            /// <summary>Calls the specified action with the textured 3D GUI shader between GL begin and GL end.</summary>
+            /// <param name="action">The action be called to draw primitives.</param>
+            public static void DrawGuiTextured(Texture texture, Vector3 cameraPosition, System.Action action)
+            {
+                var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
+                guiMaterial.mainTexture = texture;
+                guiMaterial.SetVector("_cameraPosition", cameraPosition);
+                guiMaterial.SetPass(2);
+
+                GL.Begin(GL.QUADS);
+                action();
+                GL.End();
+            }
+
+            /// <summary>
+            /// Calls the specified action with the GUI shader between GL begin and GL end in LINES mode.
+            /// </summary>
+            /// <param name="action">The action be called to draw lines.</param>
+            public static void DrawGuiLines(System.Action action)
+            {
+                var guiMaterial = ShapeEditorResources.temporaryGuiMaterial;
+                guiMaterial.mainTexture = null;
+                guiMaterial.SetPass(0);
+
+                GL.Begin(GL.LINES);
+                action();
+                GL.End();
+            }
+
+            public static void DrawLine(float3 from, float3 to)
+            {
+                GL.Vertex3(from.x, from.y, from.z);
+                GL.Vertex3(to.x, to.y, to.z);
+            }
+        }
     }
 }
 
