@@ -114,6 +114,32 @@ namespace AeternumGames.ShapeEditor
 
                 return new Ray(origin, -direction);
             }
+
+            /// <summary>
+            /// Transforms a position from world space into screen space.
+            /// </summary>
+            public Vector3 WorldToScreenPoint(Vector3 position)
+            {
+                // calculate view-projection matrix.
+                Matrix4x4 mat = projectionMatrix * viewMatrix;
+
+                // multiply world point by VP matrix.
+                Vector4 temp = mat * new Vector4(position.x, position.y, position.z, 1f);
+
+                if (temp.w == 0f)
+                {
+                    // point is exactly on camera focus point, screen point is undefined unity
+                    // handles this by returning 0,0,0.
+                    return Vector3.zero;
+                }
+                else
+                {
+                    // convert x and y from clip space to window coordinates.
+                    temp.x = (temp.x / temp.w + 1f) * .5f * width;
+                    temp.y = (temp.y / temp.w + 1f) * .5f * height;
+                    return new Vector3(temp.x, height - temp.y, temp.z);
+                }
+            }
         }
 
         /// <summary>Represents a first-person camera with WSAD control scheme.</summary>
@@ -248,7 +274,7 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Called when the custom viewport render texture is rendered.</summary>
-        private void OnRenderViewport()
+        private void OnRenderViewport(RenderTexture renderTexture)
         {
             GLUtilities3D.DrawGuiTextured(ShapeEditorResources.Instance.shapeEditorDefaultMaterial.mainTexture, -camera.transform.position, () =>
             {
@@ -261,23 +287,41 @@ namespace AeternumGames.ShapeEditor
                 Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
             });
 
-            // no need to do raycasting when the mouse isn't over the window.
-            if (!isMouseOver) return;
-
             GLUtilities3D.DrawGuiLines(() =>
             {
-                var ray = camera.ScreenPointToRay(mousePosition);
-                var target = ray.origin + ray.direction * 2f;
+                GL.Color(Color.green);
+                GLUtilities3D.DrawLine(new float3(1f, 1f, 1f), new float3(1f, 2f, 1f));
+            });
 
-                if (meshRaycast.Raycast(ray.origin, ray.direction, out var hit))
+            // no need to do raycasting when the mouse isn't over the window.
+            if (isMouseOver)
+            {
+                GLUtilities3D.DrawGuiLines(() =>
                 {
-                    GL.Color(Color.blue);
-                    GLUtilities3D.DrawLine(hit.point, hit.point + hit.normal * 0.25f);
+                    var ray = camera.ScreenPointToRay(mousePosition);
+                    var target = ray.origin + ray.direction * 2f;
 
-                    GL.Color(Color.red);
-                    GLUtilities3D.DrawLine(hit.vertex1, hit.vertex2);
-                    GLUtilities3D.DrawLine(hit.vertex2, hit.vertex3);
-                    GLUtilities3D.DrawLine(hit.vertex3, hit.vertex1);
+                    if (meshRaycast.Raycast(ray.origin, ray.direction, out var hit))
+                    {
+                        GL.Color(Color.blue);
+                        GLUtilities3D.DrawLine(hit.point, hit.point + hit.normal * 0.25f);
+
+                        GL.Color(Color.red);
+                        GLUtilities3D.DrawLine(hit.vertex1, hit.vertex2);
+                        GLUtilities3D.DrawLine(hit.vertex2, hit.vertex3);
+                        GLUtilities3D.DrawLine(hit.vertex3, hit.vertex1);
+                    }
+                });
+            }
+
+            GLUtilities.DrawGui(() =>
+            {
+                GL.LoadPixelMatrix(0f, renderTexture.width, renderTexture.height, 0f);
+
+                var pos = camera.WorldToScreenPoint(new Vector3(1f, 1f, 1f));
+                if (pos.z >= 0f)
+                {
+                    GLUtilities.DrawCircle(1f, new float2(pos.x, pos.y), 8f, Color.red);
                 }
             });
         }
