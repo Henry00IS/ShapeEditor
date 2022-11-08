@@ -16,6 +16,40 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         public Plane plane;
 
+        /// <summary>
+        /// [3D] The material index to be used when building this polygon. Taken from the first
+        /// vertex of this polygon or if there are none it will return 0.
+        /// </summary>
+        public byte material => (Count > 0) ? this[0].material : (byte)0;
+
+        /// <summary>
+        /// [3D] Sets the material index to the front of the shape (only the first vertex is set).
+        /// </summary>
+        /// <returns>Returns this instance for chaining.</returns>
+        public Polygon withFrontMaterial
+        {
+            get
+            {
+                var polygon = new Polygon(this);
+                polygon[0] = new Vertex(this[0].position, this[0].uv0, this[0].hidden, 0);
+                return polygon;
+            }
+        }
+
+        /// <summary>
+        /// [3D] Sets the material index to the back of the shape (only the first vertex is set).
+        /// </summary>
+        /// <returns>Returns this instance for chaining.</returns>
+        public Polygon withBackMaterial
+        {
+            get
+            {
+                var polygon = new Polygon(this);
+                polygon[0] = new Vertex(this[0].position, this[0].uv0, this[0].hidden, 0);
+                return polygon;
+            }
+        }
+
         /// <summary>[3D] Calculates a plane that approximately resembles the polygon.</summary>
         public Plane RecalculatePlane()
         {
@@ -81,7 +115,7 @@ namespace AeternumGames.ShapeEditor
         {
             int count = Count;
             for (int i = 0; i < count; i++)
-                this[i] = new Vertex(rotation * this[i].position, this[i].uv0, this[i].hidden);
+                this[i] = new Vertex(rotation * this[i].position, this[i].uv0, this[i].hidden, this[i].material);
         }
 
         /// <summary>[3D] Generates UV0 coordinates using the AutoUV algorithm of SabreCSG.</summary>
@@ -96,7 +130,7 @@ namespace AeternumGames.ShapeEditor
             for (int i = 0; i < count; i++)
             {
                 Vector2 uv = (cancellingRotation * (new Vector3(offset.x, offset.y) + this[i].position));
-                this[i] = new Vertex(this[i].position, uv);
+                this[i] = new Vertex(this[i].position, uv, this[i].hidden, this[i].material);
             }
         }
 
@@ -172,7 +206,7 @@ namespace AeternumGames.ShapeEditor
             }
 
             // add the front face.
-            results.Add(lastPoly);
+            results.Add(lastPoly.withFrontMaterial);
 
             for (int p = 1; p < precision + 1; p++)
             {
@@ -215,7 +249,7 @@ namespace AeternumGames.ShapeEditor
 
             // add the back face.
             lastPoly.Reverse();
-            results.Add(lastPoly);
+            results.Add(lastPoly.withBackMaterial);
 
             return results;
         }
@@ -330,7 +364,7 @@ namespace AeternumGames.ShapeEditor
                 for (int i = 0; i < count; i++)
                 {
                     var vertex = this[i];
-                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.y));
+                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.y), vertex.hidden, vertex.material);
                 }
             }
             else if (xavg >= yavg && xavg >= zavg && zavg >= yavg)
@@ -338,7 +372,7 @@ namespace AeternumGames.ShapeEditor
                 for (int i = 0; i < count; i++)
                 {
                     var vertex = this[i];
-                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.z));
+                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.z), vertex.hidden, vertex.material);
                 }
             }
             else if (yavg > xavg && yavg > zavg && xavg > zavg)
@@ -346,7 +380,7 @@ namespace AeternumGames.ShapeEditor
                 for (int i = 0; i < count; i++)
                 {
                     var vertex = this[i];
-                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.y));
+                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.y), vertex.hidden, vertex.material);
                 }
             }
             else if (yavg >= xavg && yavg >= zavg && zavg >= xavg)
@@ -354,7 +388,7 @@ namespace AeternumGames.ShapeEditor
                 for (int i = 0; i < count; i++)
                 {
                     var vertex = this[i];
-                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.z, offset.y + vertex.position.y));
+                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.z, offset.y + vertex.position.y), vertex.hidden, vertex.material);
                 }
             }
             else if (zavg > xavg && zavg > yavg && xavg > yavg)
@@ -362,7 +396,7 @@ namespace AeternumGames.ShapeEditor
                 for (int i = 0; i < count; i++)
                 {
                     var vertex = this[i];
-                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.z));
+                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.z), vertex.hidden, vertex.material);
                 }
             }
             else if (zavg >= xavg && zavg >= yavg && yavg >= xavg)
@@ -370,7 +404,7 @@ namespace AeternumGames.ShapeEditor
                 for (int i = 0; i < count; i++)
                 {
                     var vertex = this[i];
-                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.z, offset.y + vertex.position.y));
+                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.z, offset.y + vertex.position.y), vertex.hidden, vertex.material);
                 }
             }
             else
@@ -378,7 +412,7 @@ namespace AeternumGames.ShapeEditor
                 for (int i = 0; i < count; i++)
                 {
                     var vertex = this[i];
-                    this[i] = new Vertex(vertex.position, Vector2.zero);
+                    this[i] = new Vertex(vertex.position, Vector2.zero, vertex.hidden, vertex.material);
                 }
             }
         }

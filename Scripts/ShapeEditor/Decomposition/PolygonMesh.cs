@@ -32,6 +32,12 @@ namespace AeternumGames.ShapeEditor
         /// <summary>The cached last calculated <see cref="CalculateBounds2D"/> bounds.</summary>
         public Bounds bounds2D;
 
+        private class Submesh // todo: we can optimize this class away by checking List<int>.Count to determine whether it's used.
+        {
+            public bool used = false;
+            public List<int> triangles = new List<int>();
+        }
+
         /// <summary>[2D/3D] Creates a mesh out of the polygons.</summary>
         public Mesh ToMesh()
         {
@@ -40,17 +46,21 @@ namespace AeternumGames.ShapeEditor
 
             var vertices = new List<Vector3>();
             var uvs = new List<Vector2>();
-            var triangles = new List<int>();
+            var submeshes = new Submesh[8];
+            for (int i = 0; i < submeshes.Length; i++)
+                submeshes[i] = new Submesh();
 
             int triangleOffset = 0;
             int count = Count;
             for (int i = 0; i < count; i++)
             {
                 var polygon = this[i];
+                var submesh = submeshes[polygon.material];
 
                 vertices.AddRange(polygon.GetVertices());
                 uvs.AddRange(polygon.GetUV0());
-                triangles.AddRange(polygon.GetTriangles(triangleOffset));
+                submesh.used = true;
+                submesh.triangles.AddRange(polygon.GetTriangles(triangleOffset));
 
                 triangleOffset = vertices.Count;
             }
@@ -61,7 +71,19 @@ namespace AeternumGames.ShapeEditor
 
             mesh.SetVertices(vertices);
             mesh.SetUVs(0, uvs);
-            mesh.SetTriangles(triangles, 0);
+
+            // assign submeshes for used material slots.
+            int j = 0;
+            for (int i = 0; i < submeshes.Length; i++)
+            {
+                var submesh = submeshes[i];
+                if (submesh.used)
+                {
+                    mesh.subMeshCount = j + 1;
+                    mesh.SetTriangles(submesh.triangles, j);
+                    j++;
+                }
+            }
 
             return mesh;
         }

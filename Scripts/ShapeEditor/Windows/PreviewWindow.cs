@@ -28,6 +28,7 @@ namespace AeternumGames.ShapeEditor
             viewport.onPostRender += Viewport_OnPostRender;
             viewport.onRender3D += Viewport_OnRender3D;
             viewport.onPostRender2D += Viewport_OnPostRender2D;
+            viewport.onUnusedKeyDown += Viewport_OnUnusedKeyDown;
         }
 
         private float2 GetCenterPosition()
@@ -41,6 +42,8 @@ namespace AeternumGames.ShapeEditor
         private Mesh mesh;
         private MeshRaycast meshRaycast;
         private MeshRaycastHit hit;
+        private byte materialIndex;
+        private byte materialIndexUnderMouse;
 
         private void Viewport_OnPreRender()
         {
@@ -50,35 +53,34 @@ namespace AeternumGames.ShapeEditor
 
         private void Viewport_OnPostRender()
         {
-            GLUtilities.DrawGui(() =>
+            if (hit != null)
             {
-                editor.project.ClearSelection();
-
-                if (hit != null)
+                var pos = new float2(hit.point.x, -hit.point.y);
+                if (hit.normal.z.EqualsWithEpsilon5(0.0f))
                 {
-                    var pos = new float2(hit.point.x, -hit.point.y);
-                    if (hit.normal.z.EqualsWithEpsilon5(0.0f))
-                    {
-                        pos = editor.GridPointToScreen(pos);
-                        GLUtilities.DrawCircle(1f, pos, 8f, Color.yellow);
+                    //GLUtilities.DrawCircle(1f, editor.GridPointToScreen(pos), 8f, Color.yellow);
 
-                        var segment = editor.FindSegmentLineAtScreenPosition(pos, 1f);
-                        if (segment != null)
-                        {
-                            segment.selected = true;
-                            segment.next.selected = true;
-                        }
-                    }
-                    else
+                    var segment = editor.project.FindSegmentLineAtPosition(pos, 1f);
+                    if (segment != null && editor.isLeftMousePressed)
                     {
-                        var shape = editor.FindShapeAtGridPosition(pos);
-                        if (shape != null)
-                        {
-                            shape.SelectAll();
-                        }
+                        segment.material = materialIndex;
+                    }
+                    materialIndexUnderMouse = 0;
+                    if (segment != null)
+                    {
+                        materialIndexUnderMouse = segment.material;
                     }
                 }
-            });
+                else
+                {
+                    /* full shape detection.
+                    var shape = editor.FindShapeAtGridPosition(pos);
+                    if (shape != null)
+                    {
+                        shape.SelectAll();
+                    }*/
+                }
+            }
         }
 
         private void Viewport_OnRender3D()
@@ -126,6 +128,10 @@ namespace AeternumGames.ShapeEditor
                     GLUtilities.DrawCircle(1f, new float2(pos.x, pos.y), 8f, Color.red);
                 }
             });
+
+            GLUtilities.DrawGuiText(ShapeEditorResources.fontSegoeUI14, "Drawing Material (key 1-8): " + materialIndex, new float2(10, 10));
+            if (hit != null)
+                GLUtilities.DrawGuiText(ShapeEditorResources.fontSegoeUI14, "Material under mouse: " + materialIndexUnderMouse, new float2(10, 30));
         }
 
         private void RebuildMesh()
@@ -142,6 +148,110 @@ namespace AeternumGames.ShapeEditor
         {
             RebuildMesh();
         }
+
+        private bool Viewport_OnUnusedKeyDown(KeyCode keyCode)
+        {
+            switch (keyCode)
+            {
+                case KeyCode.Alpha1: materialIndex = 0; return true;
+                case KeyCode.Alpha2: materialIndex = 1; return true;
+                case KeyCode.Alpha3: materialIndex = 2; return true;
+                case KeyCode.Alpha4: materialIndex = 3; return true;
+                case KeyCode.Alpha5: materialIndex = 4; return true;
+                case KeyCode.Alpha6: materialIndex = 5; return true;
+                case KeyCode.Alpha7: materialIndex = 6; return true;
+                case KeyCode.Alpha8: materialIndex = 7; return true;
+            }
+            return false;
+        }
+
+        /*
+        private class MeshTriangleLookupTable
+        {
+            /// <summary>The project containing all shapes and segments.</summary>
+            private Project project;
+
+            private ShapeEditorWindow editor;
+
+            /// <summary>An array containing all triangles in the mesh.</summary>
+            private int[] triangles;
+
+            /// <summary>An array containing all vertices in the mesh.</summary>
+            private Vector3[] vertices;
+
+            /// <summary>Gets an array containing all triangles in the mesh.</summary>
+            public int[] Triangles => triangles;
+
+            /// <summary>Gets an array containing all vertices in the mesh.</summary>
+            public Vector3[] Vertices => vertices;
+
+            private Dictionary<int, List<Segment>> table2;
+
+            public MeshTriangleLookupTable(ShapeEditorWindow editor, Mesh mesh, Project project)
+            {
+                this.project = project;
+                this.editor = editor;
+                triangles = mesh.triangles;
+                vertices = mesh.vertices;
+
+                CalculateLookupTable();
+            }
+
+            private void CalculateLookupTable()
+            {
+                // first we iterate over all triangles in the mesh. we associate a segment with
+                // every triangle. We look for segment edges at the triangle center.
+                Dictionary<int, Segment> triangleTable1 = new Dictionary<int, Segment>(triangles.Length);
+
+                for (int i = 0; i < triangles.Length; i += 3)
+                {
+                    var v1 = vertices[triangles[i]];
+                    var v2 = vertices[triangles[i + 1]];
+                    var v3 = vertices[triangles[i + 2]];
+                    var plane = new Plane(v1, v2, v3);
+
+                    if (plane.normal.z.EqualsWithEpsilon5(0.0f))
+                    {
+                        var center = (v1 + v2 + v3) / 3f;
+                        var pos = new float2(center.x, -center.y);
+
+                        pos = editor.GridPointToScreen(pos);
+                        GLUtilities.DrawCircle(1f, pos, 8f, Color.yellow);
+
+                        var segment = editor.FindSegmentLineAtScreenPosition(pos, 1f);
+                        if (segment != null)
+                        {
+                            triangleTable1.Add(i, segment);
+                        }
+                    }
+                }
+
+                // now we iterate over every segment that has a triangle associated. we look
+                // backwards and forwards to find segment lines that lie on the same plane. we also
+                // associate those with the same triangle. this is important because polybool is
+                // joining segments together.
+                table2 = new Dictionary<int, List<Segment>>(triangleTable1.Count);
+
+                foreach (var triangle in triangleTable1)
+                {
+                    var t2segments = new List<Segment>();
+                    table2[triangle.Key] = t2segments;
+
+                    t2segments.Add(triangle.Value);
+                }
+            }
+
+            public bool TryGetTriangleSegments(int triangleIndex, out List<Segment> segment)
+            {
+                if (!table2.ContainsKey(triangleIndex))
+                {
+                    segment = default;
+                    return false;
+                }
+                segment = table2[triangleIndex];
+                return true;
+            }
+        }*/
     }
 }
 

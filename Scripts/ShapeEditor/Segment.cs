@@ -44,6 +44,10 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         public SegmentGenerator generator;
 
+        /// <summary>The material index that is used when extruding this segment as 3D polygons.</summary>
+        [SerializeField]
+        public byte material;
+
         /// <summary>General purpose editor variable available to the object with input focus.</summary>
         public float2 gpVector1 { get; set; }
 

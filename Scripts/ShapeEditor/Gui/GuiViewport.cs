@@ -246,6 +246,8 @@ namespace AeternumGames.ShapeEditor
         public System.Action onPostRender2D;
         /// <summary>Called at the end of the control's <see cref="OnRender"/> function. This draws on the normal screen.</summary>
         public System.Action onPostRender;
+        /// <summary>Called when the viewport control received an unused key down event.</summary>
+        public System.Func<KeyCode, bool> onUnusedKeyDown;
 
         public readonly FirstPersonCamera camera = new FirstPersonCamera();
 
@@ -320,7 +322,7 @@ namespace AeternumGames.ShapeEditor
         {
             if (camera.OnKeyDown(keyCode))
                 return true;
-            return false;
+            return onUnusedKeyDown != null ? onUnusedKeyDown.Invoke(keyCode) : false;
         }
 
         public override bool OnKeyUp(KeyCode keyCode)

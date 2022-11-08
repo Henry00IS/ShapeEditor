@@ -122,7 +122,7 @@ namespace AeternumGames.ShapeEditor
             for (int i = 0; i < count; i++)
             {
                 var vertex = this[i];
-                this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.y), vertex.hidden);
+                this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.y), vertex.hidden, vertex.material);
             }
         }
 

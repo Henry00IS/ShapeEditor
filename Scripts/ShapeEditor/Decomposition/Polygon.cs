@@ -84,7 +84,7 @@ namespace AeternumGames.ShapeEditor
             int count = Count;
 
             for (int i = 0; i < count; i++)
-                this[i] = new Vertex(this[i].position + value, this[i].uv0, this[i].hidden);
+                this[i] = new Vertex(this[i].position + value, this[i].uv0, this[i].hidden, this[i].material);
         }
 
         /// <summary>[2D/3D] Scales the vertices with the specified vector.</summary>
@@ -101,7 +101,7 @@ namespace AeternumGames.ShapeEditor
             int count = Count;
 
             for (int i = 0; i < count; i++)
-                this[i] = new Vertex(new Vector3(this[i].position.x * value.x, this[i].position.y * value.y, this[i].position.z * value.z), this[i].uv0, this[i].hidden);
+                this[i] = new Vertex(new Vector3(this[i].position.x * value.x, this[i].position.y * value.y, this[i].position.z * value.z), this[i].uv0, this[i].hidden, this[i].material);
         }
 
         /// <summary>[2D/3D] Converts the vertex positions to an array of vectors.</summary>

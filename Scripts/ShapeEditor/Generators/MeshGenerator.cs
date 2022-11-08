@@ -23,12 +23,12 @@ namespace AeternumGames.ShapeEditor
                 // calculate 2D UV coordinates for the front polygon.
                 convexPolygons[i].ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
                 // add the front polygon.
-                polygonMesh.Add(convexPolygons[i]);
+                polygonMesh.Add(convexPolygons[i].withFrontMaterial);
 
                 if (doubleSided)
                 {
                     // add the back polygon.
-                    polygonMesh.Add(convexPolygons[i].flipped);
+                    polygonMesh.Add(convexPolygons[i].flipped.withBackMaterial);
                 }
             }
 
@@ -118,8 +118,8 @@ namespace AeternumGames.ShapeEditor
                 // calculate 2D UV coordinates for the back polygon.
                 nextPoly.ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
 
-                brush.Add(poly);
-                brush.Add(nextPoly.flipped);
+                brush.Add(poly.withFrontMaterial);
+                brush.Add(nextPoly.flipped.withBackMaterial);
 
                 // fill the gap with quads "extruding" the shape.
                 Polygon extrudedPolygon;
@@ -371,19 +371,19 @@ namespace AeternumGames.ShapeEditor
                         if (precision >= 2)
                             heightOffset.y = (j / ((float)precision - 1)) * height;
 
-                        poly[v] = new Vertex(heightOffset + MathEx.RotatePointAroundPivot(poly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, j / (float)precision), 0.0f)), poly[v].uv0, poly[v].hidden);
-                        nextPoly[v] = new Vertex(heightOffset + slopedHeightOffset + MathEx.RotatePointAroundPivot(nextPoly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, (j + 1) / (float)precision), 0.0f)), nextPoly[v].uv0, nextPoly[v].hidden);
+                        poly[v] = new Vertex(heightOffset + MathEx.RotatePointAroundPivot(poly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, j / (float)precision), 0.0f)), poly[v].uv0, poly[v].hidden, poly[v].material);
+                        nextPoly[v] = new Vertex(heightOffset + slopedHeightOffset + MathEx.RotatePointAroundPivot(nextPoly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, (j + 1) / (float)precision), 0.0f)), nextPoly[v].uv0, nextPoly[v].hidden, nextPoly[v].material);
                     }
 
                     if (height == 0f || sloped)
                     {
-                        if (j == 0) brush.Add(poly);
-                        if (j == precision - 1) brush.Add(nextPoly.flipped);
+                        if (j == 0) brush.Add(poly.withFrontMaterial);
+                        if (j == precision - 1) brush.Add(nextPoly.flipped.withBackMaterial);
                     }
                     else
                     {
-                        brush.Add(poly);
-                        brush.Add(nextPoly.flipped);
+                        brush.Add(poly.withFrontMaterial);
+                        brush.Add(nextPoly.flipped.withBackMaterial);
                     }
 
                     // fill the gap with quads "extruding" the shape.
@@ -564,13 +564,13 @@ namespace AeternumGames.ShapeEditor
 
                     if (height == 0f || sloped)
                     {
-                        if (j == 0) brush.Add(poly);
-                        if (j == precision - 1) brush.Add(nextPoly.flipped);
+                        if (j == 0) brush.Add(poly.withFrontMaterial);
+                        if (j == precision - 1) brush.Add(nextPoly.flipped.withBackMaterial);
                     }
                     else
                     {
-                        brush.Add(poly);
-                        brush.Add(nextPoly.flipped);
+                        brush.Add(poly.withFrontMaterial);
+                        brush.Add(nextPoly.flipped.withBackMaterial);
                     }
 
                     // fill the gap with quads "extruding" the shape.
@@ -714,8 +714,8 @@ namespace AeternumGames.ShapeEditor
                 // calculate 2D UV coordinates for the back polygon.
                 nextPoly.ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
 
-                if (beginScale != 0.0f) brush.Add(poly);
-                if (endScale != 0.0f) brush.Add(nextPoly.flipped);
+                if (beginScale != 0.0f) brush.Add(poly.withFrontMaterial);
+                if (endScale != 0.0f) brush.Add(nextPoly.flipped.withBackMaterial);
 
                 // fill the gap with quads "extruding" the shape.
                 Polygon extrudedPolygon;
@@ -837,8 +837,8 @@ namespace AeternumGames.ShapeEditor
                             outerVertexPos.z += distance;
                         }
 
-                        poly[v] = new Vertex(innerVertexPos, poly[v].uv0, poly[v].hidden);
-                        backPoly[v] = new Vertex(outerVertexPos, poly[v].uv0, poly[v].hidden);
+                        poly[v] = new Vertex(innerVertexPos, poly[v].uv0, poly[v].hidden, poly[v].material);
+                        backPoly[v] = new Vertex(outerVertexPos, poly[v].uv0, poly[v].hidden, poly[v].material);
                     }
 
                     if (degrees < 0f)
@@ -972,8 +972,8 @@ namespace AeternumGames.ShapeEditor
                             outerVertexPos.z += distance;
                         }
 
-                        poly[v] = new Vertex(innerVertexPos, poly[v].uv0, poly[v].hidden);
-                        backPoly[v] = new Vertex(outerVertexPos, poly[v].uv0, poly[v].hidden);
+                        poly[v] = new Vertex(innerVertexPos, poly[v].uv0, poly[v].hidden, poly[v].material);
+                        backPoly[v] = new Vertex(outerVertexPos, poly[v].uv0, poly[v].hidden, poly[v].material);
                     }
 
                     if (degrees < 0f)

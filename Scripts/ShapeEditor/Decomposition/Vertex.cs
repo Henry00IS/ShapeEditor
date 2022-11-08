@@ -22,6 +22,12 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         public bool hidden;
 
+        /// <summary>
+        /// The material index that this and the next vertex use for extruded polygons.
+        /// This is used just before the mesh or brushes are created.
+        /// </summary>
+        public byte material;
+
         /// <summary>Gets the x-coordinate of the vertex position.</summary>
         public float x => position.x;
 
@@ -45,6 +51,7 @@ namespace AeternumGames.ShapeEditor
             this.position = position;
             this.uv0 = uv0;
             hidden = false;
+            material = 0;
         }
 
         /// <summary>Creates a new vertex located at the specified position.</summary>
@@ -56,6 +63,20 @@ namespace AeternumGames.ShapeEditor
             this.position = position;
             this.uv0 = uv0;
             this.hidden = hidden;
+            material = 0;
+        }
+
+        /// <summary>Creates a new vertex located at the specified position.</summary>
+        /// <param name="position">The vertex position.</param>
+        /// <param name="uv0">The UV channel 0 coordinates of the vertex.</param>
+        /// <param name="hidden">Whether this and the next vertex are part of a hidden edge.</param>
+        /// <param name="material">The material index that this and the next vertex use for extruded polygons.</param>
+        public Vertex(Vector3 position, Vector2 uv0, bool hidden, byte material)
+        {
+            this.position = position;
+            this.uv0 = uv0;
+            this.hidden = hidden;
+            this.material = material;
         }
 
         /// <summary>Creates a new vertex located at the specified position.</summary>

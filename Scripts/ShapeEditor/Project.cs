@@ -102,6 +102,70 @@ namespace AeternumGames.ShapeEditor
             isValid = false;
         }
 
+        /// <summary>Attempts to find the closest segment line at the specified grid position.</summary>
+        /// <param name="position">The grid position to search at.</param>
+        /// <returns>The segments if found or null.</returns>
+        internal Segment FindSegmentLineAtPosition(float2 position, float maxDistance)
+        {
+            Segment result = null;
+            float closestDistance = float.MaxValue;
+
+            // for every shape in the project:
+            var shapesCount = shapes.Count;
+            for (int i = 0; i < shapesCount; i++)
+            {
+                var shape = shapes[i];
+
+                // for every segment in the project:
+                var segmentsCount = shape.segments.Count;
+                for (int j = 0; j < segmentsCount; j++)
+                {
+                    // get the current segment and the next segment (wrapping around).
+                    var segment = shape.segments[j];
+                    var currentPoint = segment.position;
+                    var lastPoint = segment.next.position;
+
+                    float distance;
+                    if (segment.generator.type == SegmentGeneratorType.Linear)
+                    {
+                        distance = MathEx.PointDistanceFromLine(position, currentPoint, lastPoint);
+                        if (distance < maxDistance && distance < closestDistance)
+                        {
+                            closestDistance = distance;
+                            result = segment;
+                        }
+                    }
+                    else
+                    {
+                        // check generated segments from the segment generator.
+                        foreach (var point in segment.generator.ForEachAdditionalSegmentPoint())
+                        {
+                            var generatedPoint = point;
+
+                            distance = MathEx.PointDistanceFromLine(position, currentPoint, generatedPoint);
+                            if (distance < maxDistance && distance < closestDistance)
+                            {
+                                closestDistance = distance;
+                                result = segment;
+                            }
+
+                            currentPoint = generatedPoint;
+                        }
+
+                        // one more check from the current generated point to the last point.
+                        distance = MathEx.PointDistanceFromLine(position, currentPoint, lastPoint);
+                        if (distance < maxDistance && distance < closestDistance)
+                        {
+                            closestDistance = distance;
+                            result = segment;
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// Generates concave polygons for all shapes and applies their boolean operators into a
         /// segment list representing this project.
@@ -228,6 +292,9 @@ namespace AeternumGames.ShapeEditor
 
             // cleanup step that removes degenerate polygons and polygons with less than 3 sides.
             CleanupPolygons(convexPolygons);
+
+            // final step that compares the polygon edges with the segments and associates materials.
+            AssignMaterials(convexPolygons);
 
             return convexPolygons;
         }
@@ -373,6 +440,36 @@ namespace AeternumGames.ShapeEditor
                     // mark the edge as hidden.
                     if (hide)
                         convexPolygons[j][i] = new Vertex(thisVertex.position, thisVertex.uv0, true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The final step that compares the polygon edges with the segments and associates materials.
+        /// </summary>
+        /// <param name="convexPolygons">The collection of 2D polygons of <see cref="GenerateConvexPolygons"/></param>
+        private void AssignMaterials(List<Polygon> convexPolygons)
+        {
+            // iterate over every 2d convex polygon:
+            var convexPolygonsCount = convexPolygons.Count;
+            for (int j = convexPolygonsCount; j-- > 0;)
+            {
+                var vertices = convexPolygons[j];
+                var vertexCount = vertices.Count;
+                for (int i = 0; i < vertexCount; i++)
+                {
+                    // find the center position of the edge.
+                    var thisVertex = vertices[i];
+                    var nextVertex = vertices.NextVertex(i);
+                    var center = Vector3.Lerp(thisVertex.position, nextVertex.position, 0.5f);
+
+                    // find a segment line of the project at the center position.
+                    var segment = FindSegmentLineAtPosition(new float2(center.x, -center.y), 1f);
+                    if (segment != null)
+                    {
+                        // copy the material index of the segment line into the vertex.
+                        convexPolygons[j][i] = new Vertex(thisVertex.position, thisVertex.uv0, thisVertex.hidden, segment.material);
+                    }
                 }
             }
         }
