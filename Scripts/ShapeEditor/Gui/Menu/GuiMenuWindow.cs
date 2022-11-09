@@ -62,7 +62,7 @@ namespace AeternumGames.ShapeEditor
                 // manually forward the mouse up event.
                 if (FindAtPosition(mousePosition) is GuiMenuVerticalItem item)
                 {
-                    activeChild = item;
+                    editor.TrySwitchActiveEventReceiver(item);
                     item.OnMouseUp(button);
                 }
             }
@@ -83,7 +83,7 @@ namespace AeternumGames.ShapeEditor
             // event, so it's not active, thus we manually forward the mouse up event.
             if (FindAtPosition(mousePosition) is GuiMenuVerticalItem item)
             {
-                activeChild = item;
+                editor.TrySwitchActiveEventReceiver(item);
                 item.OnMouseUp(button);
             }
         }

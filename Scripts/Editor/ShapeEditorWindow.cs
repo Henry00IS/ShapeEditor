@@ -41,8 +41,28 @@ namespace AeternumGames.ShapeEditor
                 var window = FindWindowAtPosition(mousePosition);
                 if (window != null)
                 {
+                    bool switchToWindow = true;
+
+                    // stops here if the window is already the current event receiver.
+                    if (window == eventReceiver)
+                    {
+                        switchToWindow = false;
+                    }
+                    else
+                    {
+                        // if the current event receiver is at the current mouse position and a
+                        // child of the window we picked then don't switch the active event receiver.
+
+                        // the underlying OnMouseDown() implementation will handle selecting
+                        // further children of the control.
+                        if (eventReceiver is IGuiContainerEventReceiver guiContainerEventReceiver
+                            && guiContainerEventReceiver.isMouseOver
+                            && guiContainerEventReceiver.IsChildOf(window))
+                            switchToWindow = false;
+                    }
+
                     // try to focus the window.
-                    if (TrySwitchActiveEventReceiver(window))
+                    if (switchToWindow && TrySwitchActiveEventReceiver(window))
                     {
                         eventReceiver = window;
                         MoveWindowToFront(window);
