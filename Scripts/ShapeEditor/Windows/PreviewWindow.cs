@@ -60,18 +60,22 @@ namespace AeternumGames.ShapeEditor
                 var pos = new float2(hit.point.x, -hit.point.y);
                 if (hit.normal.z.EqualsWithEpsilon5(0.0f))
                 {
-                    //GLUtilities.DrawCircle(1f, editor.GridPointToScreen(pos), 8f, Color.yellow);
+                    if (editor.isLeftMousePressed)
+                    {
+                        if (lookupTable.TryGetSegmentsForTriangleIndex(hit.triangleIndex, out var segments))
+                        {
+                            foreach (var segment in segments)
+                            {
+                                segment.material = materialIndex;
+                            }
+                        }
+                    }
 
-                    var segment = editor.project.FindSegmentLineAtPosition(pos, 1f);
-                    if (segment != null && editor.isLeftMousePressed)
-                    {
-                        segment.material = materialIndex;
-                    }
+
+                    var segmentUnderMouse = editor.project.FindSegmentLineAtPosition(pos, 1f);
                     materialIndexUnderMouse = 0;
-                    if (segment != null)
-                    {
-                        materialIndexUnderMouse = segment.material;
-                    }
+                    if (segmentUnderMouse != null)
+                        materialIndexUnderMouse = segmentUnderMouse.material;
                 }
                 else
                 {
@@ -138,7 +142,6 @@ namespace AeternumGames.ShapeEditor
                             GLUtilities3D.DrawLine(hit.vertex2, hit.vertex3);
                             GLUtilities3D.DrawLine(hit.vertex3, hit.vertex1);
                         }
-
                     }
                 });
             }
@@ -211,9 +214,12 @@ namespace AeternumGames.ShapeEditor
 
             private Dictionary<Segment, List<int>> segmentTriangles;
 
+            private Dictionary<int, List<Segment>> triangleSegments;
+
             public MeshTriangleLookupTable(Mesh mesh, Project project)
             {
                 segmentTriangles = new Dictionary<Segment, List<int>>();
+                triangleSegments = new Dictionary<int, List<Segment>>();
 
                 this.project = project;
                 triangles = mesh.triangles;
@@ -295,6 +301,11 @@ namespace AeternumGames.ShapeEditor
                                         triangles.Add(k);
                                     else
                                         segmentTriangles.Add(segment, new List<int>() { k });
+
+                                    if (triangleSegments.TryGetValue(k, out var segments))
+                                        segments.Add(segment);
+                                    else
+                                        triangleSegments.Add(k, new List<Segment>() { segment });
                                 };
 
                                 // given two points checks whether they both lie on the triangle edge we chose.
@@ -328,6 +339,15 @@ namespace AeternumGames.ShapeEditor
             {
                 if (segment == null) { triangles = null; return false; }
                 return segmentTriangles.TryGetValue(segment, out triangles);
+            }
+
+            /// <summary>Looks up all segments associated with the specified triangle index.</summary>
+            /// <param name="triangleIndex">The triangle index to find segments for.</param>
+            /// <param name="segments">The segments that lie on the triangle edge.</param>
+            /// <returns>True when the triangle index was found else false.</returns>
+            public bool TryGetSegmentsForTriangleIndex(int triangleIndex, out List<Segment> segments)
+            {
+                return triangleSegments.TryGetValue(triangleIndex, out segments);
             }
         }
     }
