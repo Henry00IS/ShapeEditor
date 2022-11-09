@@ -47,14 +47,11 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         public bool isMouseObstructed { get; set; }
 
-        /// <summary>Called when the parent container receives input focus.</summary>
-        public void OnParentFocus();
-
-        /// <summary>Called when the parent container loses input focus.</summary>
-        public void OnParentFocusLost();
-
         /// <summary>Gets whether this container or a parent container has input focus.</summary>
         public bool IsActiveOrHasActiveParent();
+
+        /// <summary>Gets whether this container is a child of the specified parent container.</summary>
+        public bool IsChildOf(IGuiContainerEventReceiver parent);
     }
 
     public interface IGuiContainerEventReceiver<T> : IGuiContainerEventReceiver where T : IGuiContainerEventReceiver<T>
@@ -63,7 +60,7 @@ namespace AeternumGames.ShapeEditor
         List<T> children { get; set; }
 
         /// <summary>The child <typeparamref name="T"/> that currently has input focus or null.</summary>
-        public T activeChild { get; set; }
+        public T activeChild { get; }
 
         /// <summary>Gets whether this container or recursively a child container has input focus.</summary>
         public bool IsActiveOrHasActiveChild();

@@ -54,19 +54,18 @@ namespace AeternumGames.ShapeEditor
 
         public bool isMouseOver => sizeRect.Contains(mousePosition);
 
-        private T _activeChild;
-
         public T activeChild
         {
-            get => _activeChild;
-            set
+            get
             {
-                _activeChild = value;
-
-                if (_activeChild != null)
+                if (editor.GetActiveEventReceiver() is IGuiContainerEventReceiver guiContainer)
                 {
-                    editor.TrySwitchActiveEventReceiver(_activeChild);
+                    if (guiContainer.IsChildOf(this))
+                    {
+                        return children.Find(i => guiContainer.Equals(i));
+                    }
                 }
+                return default;
             }
         }
 
@@ -142,6 +141,19 @@ namespace AeternumGames.ShapeEditor
             return false;
         }
 
+        public bool IsChildOf(IGuiContainerEventReceiver parent)
+        {
+            var current = parent;
+            while (current != null)
+            {
+                if (current == parent)
+                    return true;
+
+                current = current.parent;
+            }
+            return false;
+        }
+
         public virtual bool IsBusy()
         {
             return false;
@@ -172,85 +184,69 @@ namespace AeternumGames.ShapeEditor
 
         public virtual void OnFocus()
         {
-            // inform the active child that we got focus.
-            activeChild?.OnParentFocus();
         }
 
         public virtual void OnFocusLost()
-        {
-            // inform the active child that we lost focus.
-            activeChild?.OnParentFocusLost();
-        }
-
-        public virtual void OnParentFocus()
-        {
-        }
-
-        public virtual void OnParentFocusLost()
         {
         }
 
         public virtual void OnGlobalMouseUp(int button)
         {
-            activeChild?.OnGlobalMouseUp(button);
         }
 
         public virtual bool OnKeyDown(KeyCode keyCode)
         {
-            if (activeChild != null)
-            {
-                return activeChild.OnKeyDown(keyCode);
-            }
             return false;
         }
 
         public virtual bool OnKeyUp(KeyCode keyCode)
         {
-            if (activeChild != null)
-            {
-                return activeChild.OnKeyUp(keyCode);
-            }
             return false;
         }
 
         public virtual void OnMouseDown(int button)
         {
             // try to give focus to a child container.
-            activeChild = FindAtPosition(mousePosition);
+            var child = FindAtPosition(mousePosition);
 
-            // forward the event to a child container.
-            activeChild?.OnMouseDown(button);
+            if (editor.TrySwitchActiveEventReceiver(child))
+            {
+                // forward the event to a child container.
+                child?.OnMouseDown(button);
+            }
         }
 
         public virtual void OnMouseDrag(int button, float2 screenDelta, float2 gridDelta)
         {
-            activeChild?.OnMouseDrag(button, screenDelta, gridDelta);
         }
 
         public virtual void OnGlobalMouseDrag(int button, float2 screenDelta, float2 gridDelta)
         {
-            activeChild?.OnGlobalMouseDrag(button, screenDelta, gridDelta);
         }
 
         public virtual void OnMouseMove(float2 screenDelta, float2 gridDelta)
         {
             // forward this event to the topmost child container under the mouse position.
-            var container = FindAtPosition(mousePosition);
-            container?.OnMouseMove(screenDelta, gridDelta);
+            var child = FindAtPosition(mousePosition);
+
+            child?.OnMouseMove(screenDelta, gridDelta);
         }
 
         public virtual bool OnMouseScroll(float delta)
         {
-            if (activeChild != null)
+            // forward this event to the topmost child container under the mouse position.
+            var child = FindAtPosition(mousePosition);
+
+            if (child != null)
             {
-                return activeChild.OnMouseScroll(delta);
+                // forward the event to a child container.
+                return child.OnMouseScroll(delta);
             }
             return false;
         }
 
         public virtual void OnMouseUp(int button)
         {
-            activeChild?.OnMouseUp(button);
         }
 
         public virtual void OnRender()

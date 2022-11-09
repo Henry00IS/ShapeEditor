@@ -36,6 +36,7 @@ namespace AeternumGames.ShapeEditor
         internal bool TrySwitchActiveEventReceiver(IEditorEventReceiver eventReceiver)
         {
             if (eventReceiver == null) return false;
+            if (activeEventReceiver == eventReceiver) return true;
 
             if (activeEventReceiver != null)
             {
@@ -51,7 +52,7 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>Gets the active event receiver with input focus and ensures it's never null.</summary>
-        private IEditorEventReceiver GetActiveEventReceiver()
+        internal IEditorEventReceiver GetActiveEventReceiver()
         {
             // fallback to the default tool.
             if (activeEventReceiver == null)
