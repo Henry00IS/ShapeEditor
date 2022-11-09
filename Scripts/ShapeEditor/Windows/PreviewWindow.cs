@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 using GLUtilities3D = AeternumGames.ShapeEditor.GLUtilities.GLUtilities3D;
@@ -41,6 +42,7 @@ namespace AeternumGames.ShapeEditor
 
         private Mesh mesh;
         private MeshRaycast meshRaycast;
+        private MeshTriangleLookupTable lookupTable;
         private MeshRaycastHit hit;
         private byte materialIndex;
         private byte materialIndexUnderMouse;
@@ -109,10 +111,34 @@ namespace AeternumGames.ShapeEditor
                         GL.Color(Color.blue);
                         GLUtilities3D.DrawLine(hit.point, hit.point + hit.normal * 0.25f);
 
-                        GL.Color(Color.red);
-                        GLUtilities3D.DrawLine(hit.vertex1, hit.vertex2);
-                        GLUtilities3D.DrawLine(hit.vertex2, hit.vertex3);
-                        GLUtilities3D.DrawLine(hit.vertex3, hit.vertex1);
+                        if (hit.normal.z.EqualsWithEpsilon5(0.0f))
+                        {
+                            GL.Color(Color.green);
+
+                            var pos = new float2(hit.point.x, -hit.point.y);
+                            var segment = editor.project.FindSegmentLineAtPosition(pos, 1f);
+                            if (lookupTable.TryGetTrianglesForSegment(segment, out var triangleIndices))
+                            {
+                                foreach (var triangleIndex in triangleIndices)
+                                {
+                                    var v1 = lookupTable.Vertices[lookupTable.Triangles[triangleIndex]];
+                                    var v2 = lookupTable.Vertices[lookupTable.Triangles[triangleIndex + 1]];
+                                    var v3 = lookupTable.Vertices[lookupTable.Triangles[triangleIndex + 2]];
+
+                                    GLUtilities3D.DrawLine(v1, v2);
+                                    GLUtilities3D.DrawLine(v2, v3);
+                                    GLUtilities3D.DrawLine(v3, v1);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            GL.Color(Color.red);
+                            GLUtilities3D.DrawLine(hit.vertex1, hit.vertex2);
+                            GLUtilities3D.DrawLine(hit.vertex2, hit.vertex3);
+                            GLUtilities3D.DrawLine(hit.vertex3, hit.vertex1);
+                        }
+
                     }
                 });
             }
@@ -142,6 +168,7 @@ namespace AeternumGames.ShapeEditor
             convexPolygons2D.CalculateBounds2D();
             mesh = MeshGenerator.CreateExtrudedPolygonMesh(convexPolygons2D, 0.5f);
             meshRaycast = new MeshRaycast(mesh);
+            lookupTable = new MeshTriangleLookupTable(mesh, editor.project);
         }
 
         public override void OnFocus()
@@ -165,13 +192,10 @@ namespace AeternumGames.ShapeEditor
             return false;
         }
 
-        /*
         private class MeshTriangleLookupTable
         {
             /// <summary>The project containing all shapes and segments.</summary>
             private Project project;
-
-            private ShapeEditorWindow editor;
 
             /// <summary>An array containing all triangles in the mesh.</summary>
             private int[] triangles;
@@ -185,12 +209,13 @@ namespace AeternumGames.ShapeEditor
             /// <summary>Gets an array containing all vertices in the mesh.</summary>
             public Vector3[] Vertices => vertices;
 
-            private Dictionary<int, List<Segment>> table2;
+            private Dictionary<Segment, List<int>> segmentTriangles;
 
-            public MeshTriangleLookupTable(ShapeEditorWindow editor, Mesh mesh, Project project)
+            public MeshTriangleLookupTable(Mesh mesh, Project project)
             {
+                segmentTriangles = new Dictionary<Segment, List<int>>();
+
                 this.project = project;
-                this.editor = editor;
                 triangles = mesh.triangles;
                 vertices = mesh.vertices;
 
@@ -199,59 +224,112 @@ namespace AeternumGames.ShapeEditor
 
             private void CalculateLookupTable()
             {
-                // first we iterate over all triangles in the mesh. we associate a segment with
-                // every triangle. We look for segment edges at the triangle center.
-                Dictionary<int, Segment> triangleTable1 = new Dictionary<int, Segment>(triangles.Length);
-
-                for (int i = 0; i < triangles.Length; i += 3)
+                // for every shape in the project:
+                var shapesCount = project.shapes.Count;
+                for (int i = 0; i < shapesCount; i++)
                 {
-                    var v1 = vertices[triangles[i]];
-                    var v2 = vertices[triangles[i + 1]];
-                    var v3 = vertices[triangles[i + 2]];
-                    var plane = new Plane(v1, v2, v3);
+                    var shape = project.shapes[i];
 
-                    if (plane.normal.z.EqualsWithEpsilon5(0.0f))
+                    // for every edge in the shape:
+                    var segmentCount = shape.segments.Count;
+                    for (int j = 0; j < segmentCount; j++)
                     {
-                        var center = (v1 + v2 + v3) / 3f;
-                        var pos = new float2(center.x, -center.y);
+                        // get the current segment.
+                        var segment = shape.segments[j];
 
-                        pos = editor.GridPointToScreen(pos);
-                        GLUtilities.DrawCircle(1f, pos, 8f, Color.yellow);
-
-                        var segment = editor.FindSegmentLineAtScreenPosition(pos, 1f);
-                        if (segment != null)
+                        // find all triangles that are part of the edge.
+                        for (int k = 0; k < triangles.Length; k += 3)
                         {
-                            triangleTable1.Add(i, segment);
+                            var v1 = vertices[triangles[k]];
+                            var v2 = vertices[triangles[k + 1]];
+                            var v3 = vertices[triangles[k + 2]];
+                            var plane = new Plane(v1, v2, v3);
+
+                            // the triangle must not be facing front or back.
+                            if (plane.normal.z.EqualsWithEpsilon5(0.0f))
+                            {
+                                // flatten the triangle vertices into 2D space.
+
+                                v1.z = 0.0f;
+                                v2.z = 0.0f;
+                                v3.z = 0.0f;
+                                var v1to2 = math.distance(v1, v2);
+                                var v1to3 = math.distance(v1, v3);
+                                var v2to3 = math.distance(v2, v3);
+                                float2 p1;
+                                float2 p2;
+
+                                // find the triangle edge with the most 2D X&Y movement:
+
+                                if (v1to2 > v1to3) // v1to3 out
+                                {
+                                    if (v1to2 > v2to3) // v2to3 out
+                                    {
+                                        p1 = new float2(v1.x, -v1.y);
+                                        p2 = new float2(v2.x, -v2.y);
+                                    }
+                                    else // v1to2 out
+                                    {
+                                        p1 = new float2(v2.x, -v2.y);
+                                        p2 = new float2(v3.x, -v3.y);
+                                    }
+                                }
+                                else // v1to2 out
+                                {
+                                    if (v1to3 > v2to3) // v2to3 out
+                                    {
+                                        p1 = new float2(v1.x, -v1.y);
+                                        p2 = new float2(v3.x, -v3.y);
+                                    }
+                                    else // v1to3 out
+                                    {
+                                        p1 = new float2(v2.x, -v2.y);
+                                        p2 = new float2(v3.x, -v3.y);
+                                    }
+                                }
+
+                                // associates the current triangle index with the current segment.
+                                System.Action associate = () =>
+                                {
+                                    if (segmentTriangles.TryGetValue(segment, out var triangles))
+                                        triangles.Add(k);
+                                    else
+                                        segmentTriangles.Add(segment, new List<int>() { k });
+                                };
+
+                                // given two points checks whether they both lie on the triangle edge we chose.
+                                System.Func<float2, float2, bool> check = (a, b) => MathEx.IsPointOnLine2(a, p1, p2, 0.0001403269f) && MathEx.IsPointOnLine2(b, p1, p2, 0.0001403269f);
+
+                                // iterate over all points of the edge (including the segment generator):
+                                float2 last = segment.position;
+                                foreach (var point in segment.generator.ForEachAdditionalSegmentPoint())
+                                {
+                                    // if this segment lies on the triangle edge:
+                                    if (check(last, point))
+                                    {
+                                        associate();
+                                        break;
+                                    }
+                                    last = point;
+                                }
+                                if (check(last, segment.next.position))
+                                    associate();
+                            }
                         }
                     }
                 }
-
-                // now we iterate over every segment that has a triangle associated. we look
-                // backwards and forwards to find segment lines that lie on the same plane. we also
-                // associate those with the same triangle. this is important because polybool is
-                // joining segments together.
-                table2 = new Dictionary<int, List<Segment>>(triangleTable1.Count);
-
-                foreach (var triangle in triangleTable1)
-                {
-                    var t2segments = new List<Segment>();
-                    table2[triangle.Key] = t2segments;
-
-                    t2segments.Add(triangle.Value);
-                }
             }
 
-            public bool TryGetTriangleSegments(int triangleIndex, out List<Segment> segment)
+            /// <summary>Looks up all triangle indices associated with the specified segment.</summary>
+            /// <param name="segment">The segment to find triangle indices for.</param>
+            /// <param name="triangles">The triangle indices that lie on the edge.</param>
+            /// <returns>True when the segment was found else false.</returns>
+            public bool TryGetTrianglesForSegment(Segment segment, out List<int> triangles)
             {
-                if (!table2.ContainsKey(triangleIndex))
-                {
-                    segment = default;
-                    return false;
-                }
-                segment = table2[triangleIndex];
-                return true;
+                if (segment == null) { triangles = null; return false; }
+                return segmentTriangles.TryGetValue(segment, out triangles);
             }
-        }*/
+        }
     }
 }
 
