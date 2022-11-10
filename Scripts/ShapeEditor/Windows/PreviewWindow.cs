@@ -71,7 +71,6 @@ namespace AeternumGames.ShapeEditor
                         }
                     }
 
-
                     var segmentUnderMouse = editor.project.FindSegmentLineAtPosition(pos, 1f);
                     materialIndexUnderMouse = 0;
                     if (segmentUnderMouse != null)
@@ -91,6 +90,35 @@ namespace AeternumGames.ShapeEditor
 
         private void Viewport_OnRender3D()
         {
+            var colors = new Color32[mesh.vertexCount];
+            var triangles = mesh.triangles;
+
+            // find all triangles that are part of the edge.
+            for (int k = 0; k < triangles.Length; k += 3)
+            {
+                Color32 color = new Color32(255, 255, 255, 255);
+
+                if (lookupTable.TryGetSegmentsForTriangleIndex(k, out var segments))
+                {
+                    switch (segments[0].material)
+                    {
+                        case 0: color = new Color32(255, 255, 255, 255); break;
+                        case 1: color = new Color32(0, 0, 255, 255); break;
+                        case 2: color = new Color32(0, 255, 0, 255); break;
+                        case 3: color = new Color32(255, 0, 0, 255); break;
+                        case 4: color = new Color32(0, 255, 255, 255); break;
+                        case 5: color = new Color32(255, 255, 0, 255); break;
+                        case 6: color = new Color32(255, 0, 255, 255); break;
+                        case 7: color = new Color32(64, 172, 128, 255); break;
+                    }
+                }
+
+                colors[triangles[k]] = color;
+                colors[triangles[k + 1]] = color;
+                colors[triangles[k + 2]] = color;
+            }
+            mesh.colors32 = colors;
+
             GLUtilities3D.DrawGuiTextured(ShapeEditorResources.Instance.shapeEditorDefaultMaterial.mainTexture, -viewport.camera.transform.position, () =>
             {
                 Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
