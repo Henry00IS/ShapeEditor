@@ -2,29 +2,51 @@
 
 using System.Collections.Generic;
 using Unity.Mathematics;
+using UnityEditor.SearchService;
 using UnityEngine;
 using GLUtilities3D = AeternumGames.ShapeEditor.GLUtilities.GLUtilities3D;
 
 namespace AeternumGames.ShapeEditor
 {
-    /// <summary>The 3D preview window.</summary>
-    public class PreviewWindow : GuiWindow
+    /// <summary>The 3D material editor window.</summary>
+    public class MaterialEditorWindow : GuiWindow
     {
-        private static readonly float2 windowSize = new float2(360, 270);
+        private static readonly float2 windowSize = new float2(360, 290);
+        private GuiButton buttonSetBrushMaterial1;
+        private GuiButton buttonSetBrushMaterial2;
+        private GuiButton buttonSetBrushMaterial3;
+        private GuiButton buttonSetBrushMaterial4;
+        private GuiButton buttonSetBrushMaterial5;
+        private GuiButton buttonSetBrushMaterial6;
+        private GuiButton buttonSetBrushMaterial7;
+        private GuiButton buttonSetBrushMaterial8;
         private GuiViewport viewport;
 
-        public PreviewWindow() : base(float2.zero, windowSize) { }
+        public MaterialEditorWindow() : base(float2.zero, windowSize) { }
 
         public override void OnActivate()
         {
             base.OnActivate();
-            var resources = ShapeEditorResources.Instance;
 
+            var resources = ShapeEditorResources.Instance;
+            colorWindowBackground = new Color(0.192f, 0.192f, 0.192f);
             position = GetCenterPosition();
 
-            Add(new GuiWindowTitle("3D Preview Test"));
+            Add(new GuiWindowTitle("Material Editor"));
 
-            Add(viewport = new GuiViewport(new float2(1, 21), new float2(windowSize.x - 2, windowSize.y - 22)));
+            var horizontalLayout = new GuiHorizontalLayout(this, 1, 21);
+            horizontalLayout.Add(new GuiButton(resources.shapeEditorNew, 20, UserResetMaterials));
+            horizontalLayout.Space(5);
+            horizontalLayout.Add(buttonSetBrushMaterial1 = new GuiButton("1", 20, UserSetBrushMaterial1));
+            horizontalLayout.Add(buttonSetBrushMaterial2 = new GuiButton("2", 20, UserSetBrushMaterial2));
+            horizontalLayout.Add(buttonSetBrushMaterial3 = new GuiButton("3", 20, UserSetBrushMaterial3));
+            horizontalLayout.Add(buttonSetBrushMaterial4 = new GuiButton("4", 20, UserSetBrushMaterial4));
+            horizontalLayout.Add(buttonSetBrushMaterial5 = new GuiButton("5", 20, UserSetBrushMaterial5));
+            horizontalLayout.Add(buttonSetBrushMaterial6 = new GuiButton("6", 20, UserSetBrushMaterial6));
+            horizontalLayout.Add(buttonSetBrushMaterial7 = new GuiButton("7", 20, UserSetBrushMaterial7));
+            horizontalLayout.Add(buttonSetBrushMaterial8 = new GuiButton("8", 20, UserSetBrushMaterial8));
+
+            Add(viewport = new GuiViewport(new float2(1, 41), new float2(windowSize.x - 2, windowSize.y - 42)));
             viewport.onPreRender += Viewport_OnPreRender;
             viewport.onPreRender2D += Viewport_OnPreRender2D;
             viewport.onRender3D += Viewport_OnRender3D;
@@ -41,12 +63,76 @@ namespace AeternumGames.ShapeEditor
             );
         }
 
+        public override void OnRender()
+        {
+            buttonSetBrushMaterial1.isChecked = materialIndex == 0;
+            buttonSetBrushMaterial2.isChecked = materialIndex == 1;
+            buttonSetBrushMaterial3.isChecked = materialIndex == 2;
+            buttonSetBrushMaterial4.isChecked = materialIndex == 3;
+            buttonSetBrushMaterial5.isChecked = materialIndex == 4;
+            buttonSetBrushMaterial6.isChecked = materialIndex == 5;
+            buttonSetBrushMaterial7.isChecked = materialIndex == 6;
+            buttonSetBrushMaterial8.isChecked = materialIndex == 7;
+
+            base.OnRender();
+        }
+
         private Mesh mesh;
         private MeshRaycast meshRaycast;
         private MeshColors meshColors;
         private MeshTriangleLookupTable lookupTable;
         private byte materialIndex;
         private byte materialIndexUnderMouse;
+
+        [Instructions(title: "Reset all surfaces to material index number one.", description: "Resets all materials assignments in the project to the default material slot which appears as white.")]
+        private void UserResetMaterials()
+        {
+            // for every shape in the project:
+            var project = editor.project;
+            var shapesCount = project.shapes.Count;
+            for (int i = 0; i < shapesCount; i++)
+            {
+                var shape = project.shapes[i];
+
+                // for every edge in the shape:
+                var segmentCount = shape.segments.Count;
+                for (int j = 0; j < segmentCount; j++)
+                {
+                    // reset the material index.
+                    var segment = shape.segments[j];
+                    segment.material = 0;
+                }
+            }
+        }
+
+        [Instructions(title: "Draw with material index number one.", shortcut: "1 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).\n\nThis is the default material slot and appears as white.")]
+        private void UserSetBrushMaterial1() => UserSetBrushMaterial(0);
+
+        [Instructions(title: "Draw with material index number two.", shortcut: "2 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
+        private void UserSetBrushMaterial2() => UserSetBrushMaterial(1);
+
+        [Instructions(title: "Draw with material index number three.", shortcut: "3 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
+        private void UserSetBrushMaterial3() => UserSetBrushMaterial(2);
+
+        [Instructions(title: "Draw with material index number four.", shortcut: "4 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
+        private void UserSetBrushMaterial4() => UserSetBrushMaterial(3);
+
+        [Instructions(title: "Draw with material index number five.", shortcut: "5 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
+        private void UserSetBrushMaterial5() => UserSetBrushMaterial(4);
+
+        [Instructions(title: "Draw with material index number six.", shortcut: "6 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
+        private void UserSetBrushMaterial6() => UserSetBrushMaterial(5);
+
+        [Instructions(title: "Draw with material index number seven.", shortcut: "7 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
+        private void UserSetBrushMaterial7() => UserSetBrushMaterial(6);
+
+        [Instructions(title: "Draw with material index number eight.", shortcut: "8 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
+        private void UserSetBrushMaterial8() => UserSetBrushMaterial(7);
+
+        private void UserSetBrushMaterial(byte materialIndex)
+        {
+            this.materialIndex = materialIndex;
+        }
 
         private void RebuildMesh()
         {
@@ -88,53 +174,9 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         private void Viewport_OnRender3D()
         {
-            GLUtilities3D.DrawGuiLines(() =>
-            {
-                int gridSegments = 100;
-                float halfSegments = gridSegments / 2f;
-
-                var campos = viewport.camera.transform.position;
-                var camdist = Vector3.Magnitude(new Vector3(campos.x, 0f, campos.z));
-
-                // we keep the grid centered at the camera position, then with modulo the grid is
-                // moved in reverse within 1m giving the illusion of an infinite grid.
-                var offset = new float3(campos.x - campos.x % 1f, 0f, campos.z - campos.z % 1f);
-
-                for (int i = 0; i < gridSegments; i++)
-                {
-                    var dist = Mathf.InverseLerp(halfSegments, 0.0f, Mathf.Abs(-halfSegments + i)) * 0.206f;
-                    var fade = new Color(dist, dist, dist);
-
-                    GLUtilities3D.DrawLine(offset + new float3(-halfSegments + i, 0f, -0.25f), offset + new float3(-halfSegments + i, 0f, halfSegments), fade, Color.black);
-                    GLUtilities3D.DrawLine(offset + new float3(-halfSegments + i, 0f, 0.25f), offset + new float3(-halfSegments + i, 0f, -halfSegments), fade, Color.black);
-
-                    GLUtilities3D.DrawLine(offset + new float3(0f, 0f, -halfSegments + i + 0.25f), offset + new float3(halfSegments, 0f, -halfSegments + i + 0.25f), fade, Color.black);
-                    GLUtilities3D.DrawLine(offset + new float3(0f, 0f, -halfSegments + i + 0.25f), offset + new float3(-halfSegments, 0f, -halfSegments + i + 0.25f), fade, Color.black);
-                }
-
-                GL.Color(Color.green);
-                GLUtilities3D.DrawLine(new float3(0f, 1f, 0f), new float3(0f, 2f, 0f));
-                GL.Color(Color.blue);
-                GLUtilities3D.DrawLine(new float3(0f, 1f, 0f), new float3(0f, 1f, 1f));
-                GL.Color(Color.red);
-                GLUtilities3D.DrawLine(new float3(0f, 1f, 0f), new float3(1f, 1f, 0f));
-
-                GLUtilities3D.DrawLine(new float3(0f, 0f, 0.25f), new float3(halfSegments + camdist, 0f, 0.25f), ShapeEditorWindow.gridCenterLineXColor, Color.black);
-                GLUtilities3D.DrawLine(new float3(0f, 0f, 0.25f), new float3(-halfSegments - camdist, 0f, 0.25f), ShapeEditorWindow.gridCenterLineXColor, Color.black);
-
-                GLUtilities3D.DrawLine(new float3(0f, 0f, 0f), new float3(0f, 0f, halfSegments + camdist), ShapeEditorWindow.gridCenterLineYColor, Color.black);
-                GLUtilities3D.DrawLine(new float3(0f, 0f, 0f), new float3(0f, 0f, -halfSegments - camdist), ShapeEditorWindow.gridCenterLineYColor, Color.black);
-            });
-
             GLUtilities3D.DrawGuiTextured(ShapeEditorResources.Instance.shapeEditorDefaultMaterial.mainTexture, viewport.camera.transform.position, () =>
             {
                 Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
-            });
-
-            GLUtilities3D.DrawGuiLines(() =>
-            {
-                GL.Color(Color.green);
-                GLUtilities3D.DrawLine(new float3(1f, 1f, 1f), new float3(1f, 2f, 1f));
             });
 
             // no need to do raycasting when the mouse isn't over the window.
@@ -221,18 +263,8 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         private void Viewport_OnPostRender2D()
         {
-            GLUtilities.DrawGui(() =>
-            {
-                var pos = viewport.camera.WorldToScreenPoint(new Vector3(1f, 1f, 1f));
-                if (pos.z >= 0f)
-                {
-                    GLUtilities.DrawCircle(1f, new float2(pos.x, pos.y), 8f, Color.red);
-                }
-            });
-
-            GLUtilities.DrawGuiText(ShapeEditorResources.fontSegoeUI14, "Drawing Material (key 1-8): " + materialIndex, new float2(10, 10));
             if (materialIndexUnderMouse != 255)
-                GLUtilities.DrawGuiText(ShapeEditorResources.fontSegoeUI14, "Material under mouse: " + materialIndexUnderMouse, new float2(10, 30));
+                GLUtilities.DrawGuiText(ShapeEditorResources.fontSegoeUI14, "Material under mouse: " + materialIndexUnderMouse, new float2(10, 10));
         }
 
         /// <summary>
@@ -248,14 +280,14 @@ namespace AeternumGames.ShapeEditor
         {
             switch (keyCode)
             {
-                case KeyCode.Alpha1: materialIndex = 0; return true;
-                case KeyCode.Alpha2: materialIndex = 1; return true;
-                case KeyCode.Alpha3: materialIndex = 2; return true;
-                case KeyCode.Alpha4: materialIndex = 3; return true;
-                case KeyCode.Alpha5: materialIndex = 4; return true;
-                case KeyCode.Alpha6: materialIndex = 5; return true;
-                case KeyCode.Alpha7: materialIndex = 6; return true;
-                case KeyCode.Alpha8: materialIndex = 7; return true;
+                case KeyCode.Alpha1: UserSetBrushMaterial1(); return true;
+                case KeyCode.Alpha2: UserSetBrushMaterial2(); return true;
+                case KeyCode.Alpha3: UserSetBrushMaterial3(); return true;
+                case KeyCode.Alpha4: UserSetBrushMaterial4(); return true;
+                case KeyCode.Alpha5: UserSetBrushMaterial5(); return true;
+                case KeyCode.Alpha6: UserSetBrushMaterial6(); return true;
+                case KeyCode.Alpha7: UserSetBrushMaterial7(); return true;
+                case KeyCode.Alpha8: UserSetBrushMaterial8(); return true;
             }
             return false;
         }

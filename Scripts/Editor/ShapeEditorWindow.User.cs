@@ -849,12 +849,12 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Displays the 3D preview window.</summary>
         [Instructions(
-            title: "Preview window",
-            description: "Displays the 3D preview window. An experimental beta feature."
+            title: "Material editor",
+            description: "Displays the material editor window. Allows assigning multiple persistent materials to extruded shapes in the scene."
         )]
-        internal void UserShowPreviewWindow()
+        internal void UserShowMaterialEditorWindow()
         {
-            OpenWindow(new PreviewWindow());
+            OpenWindow(new MaterialEditorWindow());
         }
 
         /// <summary>Snaps the selected objects to the grid.</summary>

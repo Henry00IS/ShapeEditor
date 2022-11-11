@@ -2,6 +2,7 @@
 
 using Unity.Mathematics;
 using UnityEngine;
+using static AeternumGames.ShapeEditor.GLUtilities;
 
 namespace AeternumGames.ShapeEditor
 {
@@ -165,13 +166,21 @@ namespace AeternumGames.ShapeEditor
             private bool keyboard_d = false;
             private bool keyboard_q = false;
             private bool keyboard_e = false;
+            private bool keyboard_shift = false;
             private bool useDeltaTime = false;
             private float lastUpdateTime = 0.0f;
 
             public FirstPersonCamera()
             {
                 transform = new Transform3D();
-                transform.position = Vector3.back * 4f + Vector3.up;
+                ResetCamera();
+            }
+
+            /// <summary>Resets the camera position and rotation to the defaults.</summary>
+            public void ResetCamera()
+            {
+                transform.position = Vector3.back * 4f + Vector3.up * 2f + Vector3.left * 4f;
+                rot = new Vector2(-43.25f, 20f);
             }
 
             public bool Update()
@@ -199,6 +208,8 @@ namespace AeternumGames.ShapeEditor
             {
                 pos = Vector3.zero;
 
+                var speed = keyboard_shift ? this.speed * 3f : this.speed;
+
                 if (keyboard_w) pos.z = speed;
                 if (keyboard_s) pos.z = -speed;
                 if (keyboard_a) pos.x = -speed;
@@ -224,19 +235,26 @@ namespace AeternumGames.ShapeEditor
                 rot += new Vector2(-screenDelta.x * 0.5f, screenDelta.y * 0.5f);
             }
 
-            public bool OnKeyDown(KeyCode keyCode)
+            public bool OnKeyDown(ShapeEditorWindow editor, KeyCode keyCode)
             {
+                keyboard_shift = editor.isShiftPressed;
                 if (keyCode == KeyCode.W) { keyboard_w = true; return true; }
                 if (keyCode == KeyCode.S) { keyboard_s = true; return true; }
                 if (keyCode == KeyCode.A) { keyboard_a = true; return true; }
                 if (keyCode == KeyCode.D) { keyboard_d = true; return true; }
                 if (keyCode == KeyCode.Q) { keyboard_q = true; return true; }
                 if (keyCode == KeyCode.E) { keyboard_e = true; return true; }
+                if (keyCode == KeyCode.H)
+                {
+                    ResetCamera();
+                    return true;
+                }
                 return false;
             }
 
-            public bool OnKeyUp(KeyCode keyCode)
+            public bool OnKeyUp(ShapeEditorWindow editor, KeyCode keyCode)
             {
+                keyboard_shift = editor.isShiftPressed;
                 if (keyCode == KeyCode.W) { keyboard_w = false; return true; }
                 if (keyCode == KeyCode.S) { keyboard_s = false; return true; }
                 if (keyCode == KeyCode.A) { keyboard_a = false; return true; }
@@ -262,6 +280,12 @@ namespace AeternumGames.ShapeEditor
 
         /// <summary>Gets or sets the clear color used before rendering.</summary>
         public Color clearColor = Color.black;
+
+        /// <summary>
+        /// Gets or sets whether to draw an infinite metric grid that fades into the camera clear
+        /// color. It highlights the global X and Y coordinates.
+        /// </summary>
+        public bool gridEnabled = true;
 
         public readonly FirstPersonCamera camera = new FirstPersonCamera();
 
@@ -316,6 +340,10 @@ namespace AeternumGames.ShapeEditor
 
             // main 3D render pass.
             camera.LoadMatricesIntoGL();
+
+            if (gridEnabled)
+                RenderGrid();
+
             onRender3D?.Invoke();
 
             // optional 2D render pass after drawing the 3D world.
@@ -324,6 +352,46 @@ namespace AeternumGames.ShapeEditor
                 GL.LoadPixelMatrix(0f, drawRect.width, drawRect.height, 0f);
                 onPostRender2D.Invoke();
             }
+        }
+
+        /// <summary>
+        /// Draws an infinite metric grid that fades into the camera clear color. It highlights the
+        /// global X and Y coordinates.
+        /// </summary>
+        private void RenderGrid()
+        {
+            GLUtilities3D.DrawGuiLines(() =>
+            {
+                int gridSegments = 100;
+                float halfSegments = gridSegments / 2f;
+
+                var campos = camera.transform.position;
+                var camdist = Vector3.Magnitude(new Vector3(campos.x, 0f, campos.z));
+
+                // we keep the grid centered at the camera position, then with modulo the grid is
+                // moved in reverse within 1m giving the illusion of an infinite grid.
+                var offset = new float3(campos.x - campos.x % 1f, 0f, campos.z - campos.z % 1f);
+
+                for (int i = 0; i < gridSegments; i++)
+                {
+                    var dist = Mathf.InverseLerp(halfSegments, 0.0f, Mathf.Abs(-halfSegments + i)) * 0.206f;
+                    var fade = new Color(dist, dist, dist);
+
+                    GLUtilities3D.DrawLine(offset + new float3(-halfSegments + i, 0f, -0.25f), offset + new float3(-halfSegments + i, 0f, halfSegments), fade, Color.black);
+                    GLUtilities3D.DrawLine(offset + new float3(-halfSegments + i, 0f, 0.25f), offset + new float3(-halfSegments + i, 0f, -halfSegments), fade, Color.black);
+
+                    GLUtilities3D.DrawLine(offset + new float3(0f, 0f, -halfSegments + i + 0.25f), offset + new float3(halfSegments, 0f, -halfSegments + i + 0.25f), fade, Color.black);
+                    GLUtilities3D.DrawLine(offset + new float3(0f, 0f, -halfSegments + i + 0.25f), offset + new float3(-halfSegments, 0f, -halfSegments + i + 0.25f), fade, Color.black);
+                }
+
+                // global x line:
+                GLUtilities3D.DrawLine(new float3(0f, 0f, 0.25f), new float3(halfSegments + camdist, 0f, 0.25f), ShapeEditorWindow.gridCenterLineXColor, Color.black);
+                GLUtilities3D.DrawLine(new float3(0f, 0f, 0.25f), new float3(-halfSegments - camdist, 0f, 0.25f), ShapeEditorWindow.gridCenterLineXColor, Color.black);
+
+                // global y line:
+                GLUtilities3D.DrawLine(new float3(0f, 0f, 0f), new float3(0f, 0f, halfSegments + camdist), ShapeEditorWindow.gridCenterLineYColor, Color.black);
+                GLUtilities3D.DrawLine(new float3(0f, 0f, 0f), new float3(0f, 0f, -halfSegments - camdist), ShapeEditorWindow.gridCenterLineYColor, Color.black);
+            });
         }
 
         public override void OnGlobalMouseDrag(int button, float2 screenDelta, float2 gridDelta)
@@ -336,14 +404,14 @@ namespace AeternumGames.ShapeEditor
 
         public override bool OnKeyDown(KeyCode keyCode)
         {
-            if (camera.OnKeyDown(keyCode))
+            if (camera.OnKeyDown(editor, keyCode))
                 return true;
             return onUnusedKeyDown != null ? onUnusedKeyDown.Invoke(keyCode) : false;
         }
 
         public override bool OnKeyUp(KeyCode keyCode)
         {
-            if (camera.OnKeyUp(keyCode))
+            if (camera.OnKeyUp(editor, keyCode))
                 return true;
             return false;
         }

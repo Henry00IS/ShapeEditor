@@ -131,6 +131,7 @@ namespace AeternumGames.ShapeEditor
 
             var viewMenu = menu.Add("View");
             viewMenu.Add("Background Settings", editor.UserShowBackgroundSettingsWindow);
+            viewMenu.Add("Material Editor", editor.UserShowMaterialEditorWindow);
             viewMenu.Separator();
             viewMenu.Add("Arch Inspector", resources.shapeEditorSegmentArch, editor.UserShowArchInspectorWindow);
             viewMenu.Add("Bezier Inspector", resources.shapeEditorSegmentBezier, editor.UserShowBezierInspectorWindow);
@@ -138,8 +139,6 @@ namespace AeternumGames.ShapeEditor
             viewMenu.Add("Repeat Inspector", resources.shapeEditorSegmentRepeat, editor.UserShowRepeatInspectorWindow);
             viewMenu.Add("Shape Inspector", resources.shapeEditorShapeCreate, editor.UserShowShapeInspectorWindow);
             viewMenu.Add("Sine Inspector", resources.shapeEditorSegmentSine, editor.UserShowSineInspectorWindow);
-            viewMenu.Separator();
-            viewMenu.Add("3D Preview", editor.UserShowPreviewWindow);
             viewMenu.Separator();
             viewMenu.Add("Reset Camera", editor.UserResetCamera);
 
