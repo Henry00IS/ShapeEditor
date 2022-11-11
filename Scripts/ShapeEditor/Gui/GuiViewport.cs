@@ -249,6 +249,9 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Called when the viewport control received an unused key down event.</summary>
         public System.Func<KeyCode, bool> onUnusedKeyDown;
 
+        /// <summary>Gets or sets the clear color used before rendering.</summary>
+        public Color clearColor = Color.black;
+
         public readonly FirstPersonCamera camera = new FirstPersonCamera();
 
         public GuiViewport(float2 position, float2 size) : base(position, size)
@@ -290,6 +293,9 @@ namespace AeternumGames.ShapeEditor
             if (camera.Update())
                 editor.Repaint();
 
+            // clear the temporary texture which may be anything.
+            GL.Clear(true, true, clearColor);
+
             // optional 2D render pass before drawing the 3D world.
             if (onPreRender2D != null)
             {
@@ -298,7 +304,6 @@ namespace AeternumGames.ShapeEditor
             }
 
             // main 3D render pass.
-            GL.Clear(true, true, Color.black);
             camera.LoadMatricesIntoGL();
             onRender3D?.Invoke();
 

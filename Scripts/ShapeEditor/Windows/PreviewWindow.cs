@@ -26,9 +26,10 @@ namespace AeternumGames.ShapeEditor
 
             Add(viewport = new GuiViewport(new float2(1, 21), new float2(windowSize.x - 2, windowSize.y - 22)));
             viewport.onPreRender += Viewport_OnPreRender;
-            viewport.onPostRender += Viewport_OnPostRender;
+            viewport.onPreRender2D += Viewport_OnPreRender2D;
             viewport.onRender3D += Viewport_OnRender3D;
             viewport.onPostRender2D += Viewport_OnPostRender2D;
+            viewport.onPostRender += Viewport_OnPostRender;
             viewport.onUnusedKeyDown += Viewport_OnUnusedKeyDown;
         }
 
@@ -42,82 +43,83 @@ namespace AeternumGames.ShapeEditor
 
         private Mesh mesh;
         private MeshRaycast meshRaycast;
+        private MeshColors meshColors;
         private MeshTriangleLookupTable lookupTable;
-        private MeshRaycastHit hit;
         private byte materialIndex;
         private byte materialIndexUnderMouse;
 
+        private void RebuildMesh()
+        {
+            // ensure the project data is ready.
+            editor.project.Validate();
+            var convexPolygons2D = editor.project.GenerateConvexPolygons();
+            convexPolygons2D.CalculateBounds2D();
+            mesh = MeshGenerator.CreateExtrudedPolygonMesh(convexPolygons2D, 0.5f);
+            meshRaycast = new MeshRaycast(mesh);
+            lookupTable = new MeshTriangleLookupTable(meshRaycast.Triangles, meshRaycast.Vertices, editor.project);
+            meshColors = new MeshColors(mesh);
+        }
+
+        public override void OnFocus()
+        {
+            RebuildMesh();
+        }
+
+        /// <summary>
+        /// Called at the beginning of the control's OnRender function. This draws on the normal screen.
+        /// </summary>
         private void Viewport_OnPreRender()
         {
             if (mesh == null)
                 RebuildMesh();
+
+            UpdateMeshColors();
         }
 
-        private void Viewport_OnPostRender()
+        /// <summary>
+        /// Called before drawing the 3D world on the render texture with a 2D pixel matrix.
+        /// </summary>
+        private void Viewport_OnPreRender2D()
         {
-            if (hit != null)
-            {
-                var pos = new float2(hit.point.x, -hit.point.y);
-                if (hit.normal.z.EqualsWithEpsilon5(0.0f))
-                {
-                    if (editor.isLeftMousePressed)
-                    {
-                        if (lookupTable.TryGetSegmentsForTriangleIndex(hit.triangleIndex, out var segments))
-                        {
-                            foreach (var segment in segments)
-                            {
-                                segment.material = materialIndex;
-                            }
-                        }
-                    }
-
-                    var segmentUnderMouse = editor.project.FindSegmentLineAtPosition(pos, 1f);
-                    materialIndexUnderMouse = 0;
-                    if (segmentUnderMouse != null)
-                        materialIndexUnderMouse = segmentUnderMouse.material;
-                }
-                else
-                {
-                    /* full shape detection.
-                    var shape = editor.FindShapeAtGridPosition(pos);
-                    if (shape != null)
-                    {
-                        shape.SelectAll();
-                    }*/
-                }
-            }
         }
 
+        /// <summary>
+        /// Called when the 3D world is to be drawn the render texture with a 3D projection matrix.
+        /// </summary>
         private void Viewport_OnRender3D()
         {
-            var colors = new Color32[mesh.vertexCount];
-            var triangles = mesh.triangles;
-
-            // find all triangles that are part of the edge.
-            for (int k = 0; k < triangles.Length; k += 3)
+            GLUtilities3D.DrawGuiLines(() =>
             {
-                Color32 color = new Color32(255, 255, 255, 255);
+                int gridSegments = 100;
+                float halfSegments = gridSegments / 2f;
 
-                if (lookupTable.TryGetSegmentsForTriangleIndex(k, out var segments))
+                var campos = viewport.camera.transform.position;
+                var camdist = Vector3.Magnitude(new Vector3(campos.x, 0f, campos.z));
+
+                // we keep the grid centered at the camera position, then with modulo the grid is
+                // moved in reverse within 1m giving the illusion of an infinite grid.
+                var offset = new float3(-campos.x + campos.x % 1f, 0f, -campos.z + campos.z % 1f);
+
+                for (int i = 0; i < gridSegments; i++)
                 {
-                    switch (segments[0].material)
-                    {
-                        case 0: color = new Color32(255, 255, 255, 255); break;
-                        case 1: color = new Color32(0, 0, 255, 255); break;
-                        case 2: color = new Color32(0, 255, 0, 255); break;
-                        case 3: color = new Color32(255, 0, 0, 255); break;
-                        case 4: color = new Color32(0, 255, 255, 255); break;
-                        case 5: color = new Color32(255, 255, 0, 255); break;
-                        case 6: color = new Color32(255, 0, 255, 255); break;
-                        case 7: color = new Color32(64, 172, 128, 255); break;
-                    }
+                    var dist = Mathf.InverseLerp(halfSegments, 0.0f, Mathf.Abs(-halfSegments + i)) * 0.206f;
+                    var fade = new Color(dist, dist, dist);
+
+                    // viewport z is mirrored, oops...
+                    GLUtilities3D.DrawLine(offset + new float3(-halfSegments + i, 0f, 0.25f), offset + new float3(-halfSegments + i, 0f, -halfSegments), fade, Color.black);
+                    GLUtilities3D.DrawLine(offset + new float3(-halfSegments + i, 0f, -0.25f), offset + new float3(-halfSegments + i, 0f, halfSegments), fade, Color.black);
+
+                    GLUtilities3D.DrawLine(offset + new float3(0f, 0f, -halfSegments + i + 0.25f), offset + new float3(halfSegments, 0f, -halfSegments + i + 0.25f), fade, Color.black);
+                    GLUtilities3D.DrawLine(offset + new float3(0f, 0f, -halfSegments + i + 0.25f), offset + new float3(-halfSegments, 0f, -halfSegments + i + 0.25f), fade, Color.black);
                 }
 
-                colors[triangles[k]] = color;
-                colors[triangles[k + 1]] = color;
-                colors[triangles[k + 2]] = color;
-            }
-            mesh.colors32 = colors;
+                // viewport z is mirrored, oops...
+                GLUtilities3D.DrawLine(new float3(0f, 0f, 0.25f), new float3(-halfSegments - camdist, 0f, 0.25f), ShapeEditorWindow.gridCenterLineXColor, Color.black);
+                GLUtilities3D.DrawLine(new float3(0f, 0f, 0.25f), new float3(halfSegments + camdist, 0f, 0.25f), ShapeEditorWindow.gridCenterLineXColor, Color.black);
+
+                GLUtilities3D.DrawLine(new float3(0f, 0f, 0f), new float3(0f, 0f, halfSegments + camdist), ShapeEditorWindow.gridCenterLineYColor, Color.black);
+                GLUtilities3D.DrawLine(new float3(0f, 0f, 0f), new float3(0f, 0f, -halfSegments - camdist), ShapeEditorWindow.gridCenterLineYColor, Color.black);
+            });
 
             GLUtilities3D.DrawGuiTextured(ShapeEditorResources.Instance.shapeEditorDefaultMaterial.mainTexture, -viewport.camera.transform.position, () =>
             {
@@ -133,10 +135,12 @@ namespace AeternumGames.ShapeEditor
             // no need to do raycasting when the mouse isn't over the window.
             if (isMouseOver)
             {
+                MeshRaycastHit hit = null;
+                materialIndexUnderMouse = 255;
+
                 GLUtilities3D.DrawGuiLines(() =>
                 {
                     var ray = viewport.camera.ScreenPointToRay(viewport.mousePosition);
-                    var target = ray.origin + ray.direction * 2f;
 
                     if (meshRaycast.Raycast(ray.origin, ray.direction, out hit))
                     {
@@ -172,9 +176,44 @@ namespace AeternumGames.ShapeEditor
                         }
                     }
                 });
+
+                if (hit != null)
+                {
+                    var pos = new float2(hit.point.x, -hit.point.y);
+                    if (hit.normal.z.EqualsWithEpsilon5(0.0f))
+                    {
+                        if (editor.isLeftMousePressed)
+                        {
+                            if (lookupTable.TryGetSegmentsForTriangleIndex(hit.triangleIndex, out var segments))
+                            {
+                                foreach (var segment in segments)
+                                {
+                                    segment.material = materialIndex;
+                                }
+                            }
+                        }
+
+                        var segmentUnderMouse = editor.project.FindSegmentLineAtPosition(pos, 1f);
+                        materialIndexUnderMouse = 0;
+                        if (segmentUnderMouse != null)
+                            materialIndexUnderMouse = segmentUnderMouse.material;
+                    }
+                    else
+                    {
+                        /* full shape detection.
+                        var shape = editor.FindShapeAtGridPosition(pos);
+                        if (shape != null)
+                        {
+                            shape.SelectAll();
+                        }*/
+                    }
+                }
             }
         }
 
+        /// <summary>
+        /// Called after drawing the 3D world on the render texture with a 2D pixel matrix.
+        /// </summary>
         private void Viewport_OnPostRender2D()
         {
             GLUtilities.DrawGui(() =>
@@ -187,24 +226,17 @@ namespace AeternumGames.ShapeEditor
             });
 
             GLUtilities.DrawGuiText(ShapeEditorResources.fontSegoeUI14, "Drawing Material (key 1-8): " + materialIndex, new float2(10, 10));
-            if (hit != null)
+            if (materialIndexUnderMouse != 255)
                 GLUtilities.DrawGuiText(ShapeEditorResources.fontSegoeUI14, "Material under mouse: " + materialIndexUnderMouse, new float2(10, 30));
         }
 
-        private void RebuildMesh()
-        {
-            // ensure the project data is ready.
-            editor.project.Validate();
-            var convexPolygons2D = editor.project.GenerateConvexPolygons();
-            convexPolygons2D.CalculateBounds2D();
-            mesh = MeshGenerator.CreateExtrudedPolygonMesh(convexPolygons2D, 0.5f);
-            meshRaycast = new MeshRaycast(mesh);
-            lookupTable = new MeshTriangleLookupTable(mesh, editor.project);
-        }
+        /// <summary>
+        /// Called at the end of the control's <see cref="OnRender"/> function. This draws on the
+        /// normal screen.
+        /// </summary>
 
-        public override void OnFocus()
+        private void Viewport_OnPostRender()
         {
-            RebuildMesh();
         }
 
         private bool Viewport_OnUnusedKeyDown(KeyCode keyCode)
@@ -221,6 +253,101 @@ namespace AeternumGames.ShapeEditor
                 case KeyCode.Alpha8: materialIndex = 7; return true;
             }
             return false;
+        }
+
+        private void UpdateMeshColors()
+        {
+            var triangles = meshRaycast.Triangles;
+
+            // find all triangles that are part of the edge.
+            for (int k = 0; k < triangles.Length; k += 3)
+            {
+                Color32 color = new Color32(255, 255, 255, 255);
+
+                if (lookupTable.TryGetSegmentsForTriangleIndex(k, out var segments))
+                {
+                    switch (segments[0].material)
+                    {
+                        case 0: color = new Color32(255, 255, 255, 255); break;
+                        case 1: color = new Color32(0, 0, 255, 255); break;
+                        case 2: color = new Color32(0, 255, 0, 255); break;
+                        case 3: color = new Color32(255, 0, 0, 255); break;
+                        case 4: color = new Color32(0, 255, 255, 255); break;
+                        case 5: color = new Color32(255, 255, 0, 255); break;
+                        case 6: color = new Color32(255, 0, 255, 255); break;
+                        case 7: color = new Color32(64, 172, 128, 255); break;
+                    }
+                }
+
+                meshColors[triangles[k]] = color;
+                meshColors[triangles[k + 1]] = color;
+                meshColors[triangles[k + 2]] = color;
+            }
+            meshColors.UpdateMesh();
+        }
+
+        private class MeshColors
+        {
+            /// <summary>The mesh that will be updated.</summary>
+            private Mesh mesh;
+
+            /// <summary>An array containing all triangles in the mesh.</summary>
+            private int[] triangles;
+
+            /// <summary>An array containing all vertices in the mesh.</summary>
+            private Vector3[] vertices;
+
+            /// <summary>An array containing all colors in the mesh.</summary>
+            private Color32[] colors;
+
+            /// <summary>Whether the color array has been updated.</summary>
+            private bool dirty;
+
+            /// <summary>Gets an array containing all triangles in the mesh.</summary>
+            public int[] Triangles => triangles;
+
+            /// <summary>Gets an array containing all vertices in the mesh.</summary>
+            public Vector3[] Vertices => vertices;
+
+            /// <summary>Gets or sets the color for the specified vertex index.</summary>
+            /// <param name="i">The vertex index</param>
+            /// <returns>The color of the vertex at the specified index.</returns>
+            public Color32 this[int i]
+            {
+                get => colors[i];
+                set
+                {
+                    // only mark dirty if the assigned color is different.
+                    if (!colors[i].Equals(value))
+                        dirty = true;
+                    colors[i] = value;
+                }
+            }
+
+            /// <summary>Creates a new instance and assigns white vertex colors to the mesh.</summary>
+            /// <param name="mesh">The mesh to have editable vertex colors.</param>
+            public MeshColors(Mesh mesh)
+            {
+                this.mesh = mesh;
+                triangles = mesh.triangles;
+                vertices = mesh.vertices;
+                colors = new Color32[vertices.Length];
+
+                var white = new Color32(255, 255, 255, 255);
+                for (int i = 0; i < colors.Length; i++)
+                    colors[i] = white;
+                mesh.colors32 = colors;
+            }
+
+            /// <summary>Updates the mesh colors if they were changed.</summary>
+            public void UpdateMesh()
+            {
+                if (dirty)
+                {
+                    dirty = false;
+                    mesh.colors32 = colors;
+                }
+            }
         }
 
         private class MeshTriangleLookupTable
@@ -240,23 +367,31 @@ namespace AeternumGames.ShapeEditor
             /// <summary>Gets an array containing all vertices in the mesh.</summary>
             public Vector3[] Vertices => vertices;
 
-            private Dictionary<Segment, List<int>> segmentTriangles;
+            /// <summary>The internal dictionary of triangle indices for a segment.</summary>
+            private Dictionary<Segment, List<int>> segmentTriangles = new Dictionary<Segment, List<int>>();
 
-            private Dictionary<int, List<Segment>> triangleSegments;
+            /// <summary>The internal dictionary of segments for a triangle index.</summary>
+            private Dictionary<int, List<Segment>> triangleSegments = new Dictionary<int, List<Segment>>();
 
             public MeshTriangleLookupTable(Mesh mesh, Project project)
             {
-                segmentTriangles = new Dictionary<Segment, List<int>>();
-                triangleSegments = new Dictionary<int, List<Segment>>();
-
                 this.project = project;
                 triangles = mesh.triangles;
                 vertices = mesh.vertices;
 
-                CalculateLookupTable();
+                CalculateSegmentLookupTables();
             }
 
-            private void CalculateLookupTable()
+            public MeshTriangleLookupTable(int[] triangles, Vector3[] vertices, Project project)
+            {
+                this.project = project;
+                this.triangles = triangles;
+                this.vertices = vertices;
+
+                CalculateSegmentLookupTables();
+            }
+
+            private void CalculateSegmentLookupTables()
             {
                 // for every shape in the project:
                 var shapesCount = project.shapes.Count;

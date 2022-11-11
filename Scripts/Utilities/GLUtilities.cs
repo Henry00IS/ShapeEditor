@@ -668,6 +668,14 @@ namespace AeternumGames.ShapeEditor
                 GL.Vertex3(from.x, from.y, from.z);
                 GL.Vertex3(to.x, to.y, to.z);
             }
+
+            public static void DrawLine(float3 from, float3 to, Color begin, Color end)
+            {
+                GL.Color(begin);
+                GL.Vertex3(from.x, from.y, from.z);
+                GL.Color(end);
+                GL.Vertex3(to.x, to.y, to.z);
+            }
         }
     }
 }
