@@ -279,6 +279,9 @@ namespace AeternumGames.ShapeEditor
                             var v3 = vertices[triangles[k + 2]];
                             var plane = new Plane(v1, v2, v3);
 
+                            if (plane.normal == Vector3.zero)
+                                continue;
+
                             // the triangle must not be facing front or back.
                             if (plane.normal.z.EqualsWithEpsilon5(0.0f))
                             {
@@ -339,8 +342,7 @@ namespace AeternumGames.ShapeEditor
                                 // given two points checks whether they both lie on the triangle edge we chose.
                                 System.Func<float2, float2, bool> check = (a, b)
                                     => MathEx.IsPointOnLine2(a, p1, p2, 0.0001403269f)
-                                    && MathEx.IsPointOnLine2(b, p1, p2, 0.0001403269f)
-                                    && Vector2.Angle(a, b).EqualsWithEpsilon4(Vector2.Angle(p1, p2));
+                                    && MathEx.IsPointOnLine2(b, p1, p2, 0.0001403269f);
 
                                 // iterate over all points of the edge (including the segment generator):
                                 float2 last = segment.position;
