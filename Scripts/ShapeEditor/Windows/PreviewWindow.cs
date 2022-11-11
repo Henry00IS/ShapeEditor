@@ -98,30 +98,35 @@ namespace AeternumGames.ShapeEditor
 
                 // we keep the grid centered at the camera position, then with modulo the grid is
                 // moved in reverse within 1m giving the illusion of an infinite grid.
-                var offset = new float3(-campos.x + campos.x % 1f, 0f, -campos.z + campos.z % 1f);
+                var offset = new float3(campos.x - campos.x % 1f, 0f, campos.z - campos.z % 1f);
 
                 for (int i = 0; i < gridSegments; i++)
                 {
                     var dist = Mathf.InverseLerp(halfSegments, 0.0f, Mathf.Abs(-halfSegments + i)) * 0.206f;
                     var fade = new Color(dist, dist, dist);
 
-                    // viewport z is mirrored, oops...
-                    GLUtilities3D.DrawLine(offset + new float3(-halfSegments + i, 0f, 0.25f), offset + new float3(-halfSegments + i, 0f, -halfSegments), fade, Color.black);
                     GLUtilities3D.DrawLine(offset + new float3(-halfSegments + i, 0f, -0.25f), offset + new float3(-halfSegments + i, 0f, halfSegments), fade, Color.black);
+                    GLUtilities3D.DrawLine(offset + new float3(-halfSegments + i, 0f, 0.25f), offset + new float3(-halfSegments + i, 0f, -halfSegments), fade, Color.black);
 
                     GLUtilities3D.DrawLine(offset + new float3(0f, 0f, -halfSegments + i + 0.25f), offset + new float3(halfSegments, 0f, -halfSegments + i + 0.25f), fade, Color.black);
                     GLUtilities3D.DrawLine(offset + new float3(0f, 0f, -halfSegments + i + 0.25f), offset + new float3(-halfSegments, 0f, -halfSegments + i + 0.25f), fade, Color.black);
                 }
 
-                // viewport z is mirrored, oops...
-                GLUtilities3D.DrawLine(new float3(0f, 0f, 0.25f), new float3(-halfSegments - camdist, 0f, 0.25f), ShapeEditorWindow.gridCenterLineXColor, Color.black);
+                GL.Color(Color.green);
+                GLUtilities3D.DrawLine(new float3(0f, 1f, 0f), new float3(0f, 2f, 0f));
+                GL.Color(Color.blue);
+                GLUtilities3D.DrawLine(new float3(0f, 1f, 0f), new float3(0f, 1f, 1f));
+                GL.Color(Color.red);
+                GLUtilities3D.DrawLine(new float3(0f, 1f, 0f), new float3(1f, 1f, 0f));
+
                 GLUtilities3D.DrawLine(new float3(0f, 0f, 0.25f), new float3(halfSegments + camdist, 0f, 0.25f), ShapeEditorWindow.gridCenterLineXColor, Color.black);
+                GLUtilities3D.DrawLine(new float3(0f, 0f, 0.25f), new float3(-halfSegments - camdist, 0f, 0.25f), ShapeEditorWindow.gridCenterLineXColor, Color.black);
 
                 GLUtilities3D.DrawLine(new float3(0f, 0f, 0f), new float3(0f, 0f, halfSegments + camdist), ShapeEditorWindow.gridCenterLineYColor, Color.black);
                 GLUtilities3D.DrawLine(new float3(0f, 0f, 0f), new float3(0f, 0f, -halfSegments - camdist), ShapeEditorWindow.gridCenterLineYColor, Color.black);
             });
 
-            GLUtilities3D.DrawGuiTextured(ShapeEditorResources.Instance.shapeEditorDefaultMaterial.mainTexture, -viewport.camera.transform.position, () =>
+            GLUtilities3D.DrawGuiTextured(ShapeEditorResources.Instance.shapeEditorDefaultMaterial.mainTexture, viewport.camera.transform.position, () =>
             {
                 Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
             });

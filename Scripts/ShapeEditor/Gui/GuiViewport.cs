@@ -46,7 +46,7 @@ namespace AeternumGames.ShapeEditor
             }
 
             /// <summary>Returns the model matrix that represents the position, rotate and scale.</summary>
-            public Matrix4x4 matrix => Matrix4x4.Rotate(rotation) * Matrix4x4.Translate(position);
+            public Matrix4x4 matrix => Matrix4x4.Rotate(rotation) * Matrix4x4.Translate(-position);
         }
 
         /// <summary>Represents a viewport camera that renders the world.</summary>
@@ -118,9 +118,9 @@ namespace AeternumGames.ShapeEditor
                 worldUnits.x *= aspect;
                 worldUnits.z = 1;
 
-                // Rotate to match camera orientation.
+                // rotate to match camera orientation.
                 Vector3 direction = Quaternion.Inverse(transform.rotation) * worldUnits;
-                Vector3 origin = Matrix4x4.Translate(transform.position) * -transform.position;
+                Vector3 origin = transform.position;
 
                 return new Ray(origin, direction);
             }
@@ -171,7 +171,7 @@ namespace AeternumGames.ShapeEditor
             public FirstPersonCamera()
             {
                 transform = new Transform3D();
-                transform.position = Vector3.back * 4f;
+                transform.position = Vector3.back * 4f + Vector3.up;
             }
 
             public bool Update()
@@ -199,12 +199,12 @@ namespace AeternumGames.ShapeEditor
             {
                 pos = Vector3.zero;
 
-                if (keyboard_w) pos.z = -speed;
-                if (keyboard_s) pos.z = speed;
-                if (keyboard_a) pos.x = speed;
-                if (keyboard_d) pos.x = -speed;
-                if (keyboard_q) pos.y = speed;
-                if (keyboard_e) pos.y = -speed;
+                if (keyboard_w) pos.z = speed;
+                if (keyboard_s) pos.z = -speed;
+                if (keyboard_a) pos.x = -speed;
+                if (keyboard_d) pos.x = speed;
+                if (keyboard_q) pos.y = -speed;
+                if (keyboard_e) pos.y = speed;
 
                 if (useDeltaTime)
                 {
