@@ -71,7 +71,18 @@ namespace AeternumGames.ShapeEditor
             public float height { get; set; } = 600f;
 
             /// <summary>Gets the perspective projection matrix.</summary>
-            public Matrix4x4 projectionMatrix => Matrix4x4.Perspective(fieldOfView, width / height, zNear, zFar);
+            public Matrix4x4 projectionMatrix
+            {
+                get
+                {
+                    var projection = Matrix4x4.Perspective(fieldOfView, width / height, zNear, zFar);
+                    projection.m02 *= -1f;
+                    projection.m12 *= -1f;
+                    projection.m22 *= -1f;
+                    projection.m32 *= -1f;
+                    return projection;
+                }
+            }
 
             /// <summary>Gets the model view matrix.</summary>
             public Matrix4x4 viewMatrix => transform.matrix;
@@ -94,7 +105,7 @@ namespace AeternumGames.ShapeEditor
             public Ray ScreenPointToRay(float2 screen)
             {
                 var aspect = width / height;
-                Vector2 uv = new Vector2(Mathf.Lerp(0.5f, -0.5f, screen.x / width), Mathf.Lerp(-0.5f, 0.5f, screen.y / height));
+                Vector2 uv = new Vector2(Mathf.Lerp(-0.5f, 0.5f, screen.x / width), Mathf.Lerp(0.5f, -0.5f, screen.y / height));
 
                 // angle in radians from the view axis to the top plane of the view pyramid.
                 float verticalAngle = 0.5f * Mathf.Deg2Rad * fieldOfView;
@@ -111,7 +122,7 @@ namespace AeternumGames.ShapeEditor
                 Vector3 direction = Quaternion.Inverse(transform.rotation) * worldUnits;
                 Vector3 origin = Matrix4x4.Translate(transform.position) * -transform.position;
 
-                return new Ray(origin, -direction);
+                return new Ray(origin, direction);
             }
 
             /// <summary>
@@ -188,8 +199,8 @@ namespace AeternumGames.ShapeEditor
             {
                 pos = Vector3.zero;
 
-                if (keyboard_w) pos.z = speed;
-                if (keyboard_s) pos.z = -speed;
+                if (keyboard_w) pos.z = -speed;
+                if (keyboard_s) pos.z = speed;
                 if (keyboard_a) pos.x = speed;
                 if (keyboard_d) pos.x = -speed;
                 if (keyboard_q) pos.y = speed;
@@ -210,7 +221,7 @@ namespace AeternumGames.ShapeEditor
 
             public void OnGlobalMouseDrag(int button, float2 screenDelta, float2 gridDelta)
             {
-                rot += new Vector2(screenDelta.x * 0.5f, -screenDelta.y * 0.5f);
+                rot += new Vector2(-screenDelta.x * 0.5f, screenDelta.y * 0.5f);
             }
 
             public bool OnKeyDown(KeyCode keyCode)

@@ -113,7 +113,7 @@ Shader "Aeternum Games/Shape Editor Gui"
 		Pass
 		{
 			ZWrite On
-			Cull Front
+			Cull Back
 			Blend SrcAlpha OneMinusSrcAlpha
 			CGPROGRAM
 				#pragma vertex vert
