@@ -61,8 +61,8 @@ namespace AeternumGames.ShapeEditor
                 var nextPoly = new Polygon(convexPolygons[i]);
                 nextPoly.Translate(new Vector3(0.0f, 0.0f, distance));
 
-                brush.Add(poly);
-                brush.Add(nextPoly.flipped);
+                brush.Add(poly.withFrontMaterial);
+                brush.Add(nextPoly.flipped.withBackMaterial);
 
                 // fill the gap with quads "extruding" the shape.
                 Polygon extrudedPolygon;
@@ -270,12 +270,12 @@ namespace AeternumGames.ShapeEditor
                         if (precision >= 2)
                             heightOffset.y = (j / ((float)precision - 1)) * height;
 
-                        poly[v] = new Vertex(heightOffset + MathEx.RotatePointAroundPivot(poly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, j / (float)precision), 0.0f)), poly[v].uv0);
-                        nextPoly[v] = new Vertex(heightOffset + slopedHeightOffset + MathEx.RotatePointAroundPivot(nextPoly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, (j + 1) / (float)precision), 0.0f)), nextPoly[v].uv0);
+                        poly[v] = new Vertex(heightOffset + MathEx.RotatePointAroundPivot(poly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, j / (float)precision), 0.0f)), poly[v].uv0, poly[v].hidden, poly[v].material);
+                        nextPoly[v] = new Vertex(heightOffset + slopedHeightOffset + MathEx.RotatePointAroundPivot(nextPoly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, (j + 1) / (float)precision), 0.0f)), nextPoly[v].uv0, nextPoly[v].hidden, nextPoly[v].material);
                     }
 
-                    brush.Add(poly);
-                    brush.Add(nextPoly.flipped);
+                    brush.Add(poly.withFrontMaterial);
+                    brush.Add(nextPoly.flipped.withBackMaterial);
 
                     // fill the gap with quads "extruding" the shape.
                     Polygon extrudedPolygon;
@@ -480,8 +480,8 @@ namespace AeternumGames.ShapeEditor
                     var nextPoly = new Polygon(convexPolygons[i]);
                     nextPoly.Translate(forwardNext + heightOffset + slopedHeightOffset);
 
-                    brush.Add(poly);
-                    brush.Add(nextPoly.flipped);
+                    brush.Add(poly.withFrontMaterial);
+                    brush.Add(nextPoly.flipped.withBackMaterial);
 
                     // fill the gap with quads "extruding" the shape.
                     Polygon extrudedPolygon;
@@ -649,8 +649,8 @@ namespace AeternumGames.ShapeEditor
                 nextPoly.Scale(new Vector3(endScale, endScale, 1.0f));
                 nextPoly.Translate(new Vector3(offset.x, offset.y) + new Vector3(0.0f, 0.0f, distance));
 
-                if (beginScale != 0.0f) brush.Add(poly);
-                if (endScale != 0.0f) brush.Add(nextPoly.flipped);
+                if (beginScale != 0.0f) brush.Add(poly.withFrontMaterial);
+                if (endScale != 0.0f) brush.Add(nextPoly.flipped.withBackMaterial);
 
                 // fill the gap with quads "extruding" the shape.
                 Polygon extrudedPolygon;
@@ -843,13 +843,13 @@ namespace AeternumGames.ShapeEditor
 
                     if (degrees < 0f)
                     {
-                        brush.Add(poly.flipped);
-                        brush.Add(backPoly);
+                        brush.Add(poly.flipped.withFrontMaterial);
+                        brush.Add(backPoly.withBackMaterial);
                     }
                     else
                     {
-                        brush.Add(poly);
-                        brush.Add(backPoly.flipped);
+                        brush.Add(poly.withFrontMaterial);
+                        brush.Add(backPoly.flipped.withBackMaterial);
                     }
 
                     // fill the gap with quads "extruding" the shape.
@@ -978,13 +978,13 @@ namespace AeternumGames.ShapeEditor
 
                     if (degrees < 0f)
                     {
-                        brush.Add(poly.flipped);
-                        brush.Add(backPoly);
+                        brush.Add(poly.flipped.withFrontMaterial);
+                        brush.Add(backPoly.withBackMaterial);
                     }
                     else
                     {
-                        brush.Add(poly);
-                        brush.Add(backPoly.flipped);
+                        brush.Add(poly.withFrontMaterial);
+                        brush.Add(backPoly.flipped.withBackMaterial);
                     }
 
                     // fill the gap with quads "extruding" the shape.

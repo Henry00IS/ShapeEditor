@@ -12,6 +12,7 @@ namespace AeternumGames.ShapeEditor
     public class RealtimeCSGTargetInspector : Editor
     {
         private SerializedProperty spTargetMode => serializedObject.FindProperty(nameof(RealtimeCSGTarget.targetMode));
+        private SerializedProperty spMaterials => serializedObject.FindProperty(nameof(RealtimeCSGTarget.materials));
         private SerializedProperty spFixedExtrudeDistance => serializedObject.FindProperty(nameof(RealtimeCSGTarget.fixedExtrudeDistance));
         private SerializedProperty spSplineExtrudePrecision => serializedObject.FindProperty(nameof(RealtimeCSGTarget.splineExtrudePrecision));
         private SerializedProperty spRevolveExtrudePrecision => serializedObject.FindProperty(nameof(RealtimeCSGTarget.revolveExtrudePrecision));
@@ -67,6 +68,8 @@ namespace AeternumGames.ShapeEditor
                     RevolveChopped_OnGUI();
                     break;
             }
+
+            EditorGUILayout.PropertyField(spMaterials);
 
             // rebuild the target upon detecting an undo or redo event.
             rebuild = rebuild || Event.current.HasPerformedUndoRedo();

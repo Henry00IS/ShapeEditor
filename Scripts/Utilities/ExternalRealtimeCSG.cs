@@ -101,6 +101,16 @@ namespace AeternumGames.ShapeEditor
         private static MethodInfo updateSelectionMethod = null;
 
         /// <summary>
+        /// The cached MaterialUtility type after initialization.
+        /// </summary>
+        private static Type materialUtility = null;
+
+        /// <summary>
+        /// The cached MaterialUtility WallMaterial property after initialization.
+        /// </summary>
+        private static PropertyInfo materialUtilityWallMaterialProperty = null;
+
+        /// <summary>
         /// Used to store whether an initialization error occured.
         /// </summary>
         private static bool initializationError;
@@ -173,6 +183,12 @@ namespace AeternumGames.ShapeEditor
             updateSelectionMethod = editModeManager.GetMethodByName("UpdateSelection", "forceUpdate");
             if (updateSelectionMethod == null) { initializationError = true; return false; }
 
+            materialUtility = GetType("RealtimeCSG.MaterialUtility");
+            if (materialUtility == null) { initializationError = true; return false; }
+
+            materialUtilityWallMaterialProperty = materialUtility.GetProperty("WallMaterial");
+            if (materialUtilityWallMaterialProperty == null) { initializationError = true; return false; }
+
             initializationSuccess = true;
             return true;
         }
@@ -212,6 +228,15 @@ namespace AeternumGames.ShapeEditor
             return csgPlaneConstructorMethod.Invoke(new object[] { plane });
         }
 
+        public static Material WallMaterial
+        {
+            get
+            {
+                if (!IsAvailable()) return null;
+                return (Material)materialUtilityWallMaterialProperty.GetValue(materialUtility);
+            }
+        }
+
         public static void CreateExtrudedBrushesFromPolygon(Transform parent, string brushName, Vector2[] vertices, float distance, PolygonBooleanOperator booleanOperator)
         {
             if (!IsAvailable()) return;
@@ -244,14 +269,14 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        public static MonoBehaviour CreateBrushFromPlanes(string brushName, Plane[] planes, PolygonBooleanOperator booleanOperator)
+        public static MonoBehaviour CreateBrushFromPlanes(string brushName, Plane[] planes, Material[] materials, PolygonBooleanOperator booleanOperator)
         {
             if (!IsAvailable()) return null;
 
             // this fixes some of the errors, but I don't like it:
             planes = planes.Distinct().ToArray();
 
-            var brush = createBrushFromPlanesMethod.Invoke(null, new object[] { brushName, planes, null, null, null, null, 0 });
+            var brush = createBrushFromPlanesMethod.Invoke(null, new object[] { brushName, planes, null, null, materials, null, 0 });
             if (brush == null) return null;
 
             // optionally make the brush subtractive.

@@ -35,7 +35,9 @@ namespace AeternumGames.ShapeEditor
             for (int i = 0; i < polygonMeshesCount; i++)
             {
                 var polygonMesh = polygonMeshes[i];
-                var brush = ExternalRealtimeCSG.CreateBrushFromPlanes("Shape Editor Brush", polygonMesh.ToPlanes(), polygonMesh.booleanOperator);
+                var planes = polygonMesh.ToMaterialPlanes();
+
+                var brush = ExternalRealtimeCSG.CreateBrushFromPlanes("Shape Editor Brush", planes.planes, GetMaterials(planes.materials), polygonMesh.booleanOperator);
                 if (brush != null)
                     brush.transform.SetParent(parent, false);
             }

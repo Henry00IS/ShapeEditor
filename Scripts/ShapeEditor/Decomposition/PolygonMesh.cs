@@ -89,10 +89,10 @@ namespace AeternumGames.ShapeEditor
         }
 
         /// <summary>
-        /// [3D] Creates a set of planes out of the polygons. A convex mesh can consist out of several
-        /// faces, each of which can be defined by a plane (of which there must be at least four).
-        /// Each plane defines a half space, that is, an infinite set of points that is bounded by a
-        /// plane. The intersection of these half spaces forms a convex polyhedron.
+        /// [3D] Creates a set of planes out of the polygons. A convex mesh can consist out of
+        /// several faces, each of which can be defined by a plane (of which there must be at least
+        /// four). Each plane defines a half space, that is, an infinite set of points that is
+        /// bounded by a plane. The intersection of these half spaces forms a convex polyhedron.
         /// </summary>
         /// <returns>The planes that represent the convex mesh.</returns>
         public Plane[] ToPlanes()
@@ -106,6 +106,28 @@ namespace AeternumGames.ShapeEditor
                 planes[i] = polygon.plane.flipped;
             }
             return planes;
+        }
+
+        /// <summary>
+        /// [3D] Creates a set of planes out of the polygons. A convex mesh can consist out of
+        /// several faces, each of which can be defined by a plane (of which there must be at least
+        /// four). Each plane defines a half space, that is, an infinite set of points that is
+        /// bounded by a plane. The intersection of these half spaces forms a convex polyhedron.
+        /// </summary>
+        /// <returns>The planes that represent the convex mesh with their material indices.</returns>
+        public (Plane[] planes, int[] materials) ToMaterialPlanes()
+        {
+            var count = Count;
+            var planes = new Plane[count];
+            var materials = new int[count];
+            for (int i = 0; i < count; i++)
+            {
+                var polygon = this[i];
+                polygon.RecalculatePlane();
+                planes[i] = polygon.plane.flipped;
+                materials[i] = polygon.material;
+            }
+            return (planes, materials);
         }
 
         /// <summary>[2D/3D] Converts the polygons to a list of points (point cloud).</summary>

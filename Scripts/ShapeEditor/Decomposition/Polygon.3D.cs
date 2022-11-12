@@ -296,7 +296,7 @@ namespace AeternumGames.ShapeEditor
                 poly.Translate(spline.GetPoint(there));
 
                 // add the front face.
-                polygons.Add(lastPoly);
+                polygons.Add(lastPoly.withFrontMaterial);
 
                 // fill the gap with quads "extruding" the shape.
                 for (int i = 0; i < count - 1; i++)
@@ -320,7 +320,7 @@ namespace AeternumGames.ShapeEditor
                 // add the back face.
                 var back = new Polygon(poly);
                 back.Reverse();
-                polygons.Add(back);
+                polygons.Add(back.withBackMaterial);
 
                 // add the polygon mesh brush.
                 var brush = new PolygonMesh(polygons);

@@ -17,6 +17,9 @@ namespace AeternumGames.ShapeEditor
         /// <summary>The chopped polygon meshes set by the shape editor.</summary>
         private PolygonMeshes choppedPolygons2D;
 
+        /// <summary>The collection of materials that will be assigned to material indices.</summary>
+        public Material[] materials;
+
         /// <summary>The operating mode.</summary>
         [SerializeField]
         internal RealtimeCSGTargetMode targetMode = RealtimeCSGTargetMode.FixedExtrude;
@@ -105,6 +108,36 @@ namespace AeternumGames.ShapeEditor
             parent = new GameObject("Brushes").transform;
             parent.SetParent(transform, false);
             return parent;
+        }
+
+        private Material[] GetMaterials(int[] materialIndices)
+        {
+            // if there are no materials in the inspector then return null so that realtimecsg uses
+            // the fallback texture. this will also happen when a new shape has just been generated.
+            // we prevent an unnecessary array allocation and iteration.
+            if (materials == null || materials.Length == 0)
+                return null;
+
+            // first find a fallback material in case nothing was assigned to a polygon.
+            var fallback = ExternalRealtimeCSG.WallMaterial;
+            if (fallback == null)
+                fallback = ShapeEditorResources.Instance.shapeEditorDefaultMaterial;
+
+            // assign materials by the material indices.
+            var result = new Material[materialIndices.Length];
+            for (int i = 0; i < materialIndices.Length; i++)
+            {
+                // find the material index in the list of materials.
+                var materialIndex = materialIndices[i];
+                if (materialIndex < materials.Length)
+                    result[i] = materials[materialIndex];
+
+                // if not found we use the fallback.
+                if (result[i] == null)
+                    result[i] = fallback;
+            }
+
+            return result;
         }
 
         private void OnDrawGizmosSelected()
