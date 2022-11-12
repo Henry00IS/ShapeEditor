@@ -22,22 +22,6 @@ namespace AeternumGames.ShapeEditor
             this.front = front;
             this.back = back;
         }
-
-        /// <summary>
-        /// Sets the material index to be used when building this polygon to the front material.
-        /// </summary>
-        public void UseFrontMaterial()
-        {
-            extrude = front;
-        }
-
-        /// <summary>
-        /// Sets the material index to be used when building this polygon to the back material.
-        /// </summary>
-        public void UseBackMaterial()
-        {
-            extrude = back;
-        }
     }
 }
 

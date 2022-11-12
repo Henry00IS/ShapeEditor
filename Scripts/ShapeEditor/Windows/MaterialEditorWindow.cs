@@ -10,15 +10,26 @@ namespace AeternumGames.ShapeEditor
     /// <summary>The 3D material editor window.</summary>
     public class MaterialEditorWindow : GuiWindow
     {
+        private static readonly Color32[] materialIndexToColor = {
+            new Color32(255, 255, 255, 255),
+            new Color32(0, 0, 255, 255),
+            new Color32(0, 255, 0, 255),
+            new Color32(255, 0, 0, 255),
+            new Color32(0, 255, 255, 255),
+            new Color32(255, 255, 0, 255),
+            new Color32(255, 0, 255, 255),
+            new Color32(255, 165, 0, 255),
+        };
+
         private static readonly float2 windowSize = new float2(360, 290);
-        private GuiButton buttonSetBrushMaterial1;
-        private GuiButton buttonSetBrushMaterial2;
-        private GuiButton buttonSetBrushMaterial3;
-        private GuiButton buttonSetBrushMaterial4;
-        private GuiButton buttonSetBrushMaterial5;
-        private GuiButton buttonSetBrushMaterial6;
-        private GuiButton buttonSetBrushMaterial7;
-        private GuiButton buttonSetBrushMaterial8;
+        private GuiMaterialIndexButton buttonSetBrushMaterial1;
+        private GuiMaterialIndexButton buttonSetBrushMaterial2;
+        private GuiMaterialIndexButton buttonSetBrushMaterial3;
+        private GuiMaterialIndexButton buttonSetBrushMaterial4;
+        private GuiMaterialIndexButton buttonSetBrushMaterial5;
+        private GuiMaterialIndexButton buttonSetBrushMaterial6;
+        private GuiMaterialIndexButton buttonSetBrushMaterial7;
+        private GuiMaterialIndexButton buttonSetBrushMaterial8;
         private GuiViewport viewport;
 
         public MaterialEditorWindow() : base(float2.zero, windowSize) { }
@@ -36,14 +47,14 @@ namespace AeternumGames.ShapeEditor
             var horizontalLayout = new GuiHorizontalLayout(this, 1, 21);
             horizontalLayout.Add(new GuiButton(resources.shapeEditorNew, 20, UserResetMaterials));
             horizontalLayout.Space(5);
-            horizontalLayout.Add(buttonSetBrushMaterial1 = new GuiButton("1", 20, UserSetBrushMaterial1));
-            horizontalLayout.Add(buttonSetBrushMaterial2 = new GuiButton("2", 20, UserSetBrushMaterial2));
-            horizontalLayout.Add(buttonSetBrushMaterial3 = new GuiButton("3", 20, UserSetBrushMaterial3));
-            horizontalLayout.Add(buttonSetBrushMaterial4 = new GuiButton("4", 20, UserSetBrushMaterial4));
-            horizontalLayout.Add(buttonSetBrushMaterial5 = new GuiButton("5", 20, UserSetBrushMaterial5));
-            horizontalLayout.Add(buttonSetBrushMaterial6 = new GuiButton("6", 20, UserSetBrushMaterial6));
-            horizontalLayout.Add(buttonSetBrushMaterial7 = new GuiButton("7", 20, UserSetBrushMaterial7));
-            horizontalLayout.Add(buttonSetBrushMaterial8 = new GuiButton("8", 20, UserSetBrushMaterial8));
+            horizontalLayout.Add(buttonSetBrushMaterial1 = new GuiMaterialIndexButton("1", 20, materialIndexToColor[0], UserSetBrushMaterial1));
+            horizontalLayout.Add(buttonSetBrushMaterial2 = new GuiMaterialIndexButton("2", 20, materialIndexToColor[1], UserSetBrushMaterial2));
+            horizontalLayout.Add(buttonSetBrushMaterial3 = new GuiMaterialIndexButton("3", 20, materialIndexToColor[2], UserSetBrushMaterial3));
+            horizontalLayout.Add(buttonSetBrushMaterial4 = new GuiMaterialIndexButton("4", 20, materialIndexToColor[3], UserSetBrushMaterial4));
+            horizontalLayout.Add(buttonSetBrushMaterial5 = new GuiMaterialIndexButton("5", 20, materialIndexToColor[4], UserSetBrushMaterial5));
+            horizontalLayout.Add(buttonSetBrushMaterial6 = new GuiMaterialIndexButton("6", 20, materialIndexToColor[5], UserSetBrushMaterial6));
+            horizontalLayout.Add(buttonSetBrushMaterial7 = new GuiMaterialIndexButton("7", 20, materialIndexToColor[6], UserSetBrushMaterial7));
+            horizontalLayout.Add(buttonSetBrushMaterial8 = new GuiMaterialIndexButton("8", 20, materialIndexToColor[7], UserSetBrushMaterial8));
 
             Add(viewport = new GuiViewport(new float2(1, 41), new float2(windowSize.x - 2, windowSize.y - 42)));
             viewport.onPreRender += Viewport_OnPreRender;
@@ -151,7 +162,10 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnFocus()
         {
-            RebuildMesh();
+            if (viewport.isMouseOver)
+            {
+                RebuildMesh();
+            }
         }
 
         /// <summary>
@@ -338,20 +352,9 @@ namespace AeternumGames.ShapeEditor
 
                 if (lookupTable.TryGetSegmentsForTriangleIndex(k, out var segments))
                 {
-                    switch (segments[0].material)
-                    {
-                        case 0: color = new Color32(255, 255, 255, 255); break;
-                        case 1: color = new Color32(0, 0, 255, 255); break;
-                        case 2: color = new Color32(0, 255, 0, 255); break;
-                        case 3: color = new Color32(255, 0, 0, 255); break;
-                        case 4: color = new Color32(0, 255, 255, 255); break;
-                        case 5: color = new Color32(255, 255, 0, 255); break;
-                        case 6: color = new Color32(255, 0, 255, 255); break;
-                        case 7: color = new Color32(64, 172, 128, 255); break;
-                    }
+                    color = materialIndexToColor[segments[0].material];
                 }
-
-                if (lookupTable.TryGetShapesForTriangleIndex(k, out var shapes))
+                else if (lookupTable.TryGetShapesForTriangleIndex(k, out var shapes))
                 {
                     var v1 = vertices[triangles[k]];
                     var v2 = vertices[triangles[k + 1]];
@@ -360,31 +363,11 @@ namespace AeternumGames.ShapeEditor
 
                     if (plane.normal.z < 0.5f)
                     {
-                        switch (shapes[0].frontMaterial)
-                        {
-                            case 0: color = new Color32(255, 255, 255, 255); break;
-                            case 1: color = new Color32(0, 0, 255, 255); break;
-                            case 2: color = new Color32(0, 255, 0, 255); break;
-                            case 3: color = new Color32(255, 0, 0, 255); break;
-                            case 4: color = new Color32(0, 255, 255, 255); break;
-                            case 5: color = new Color32(255, 255, 0, 255); break;
-                            case 6: color = new Color32(255, 0, 255, 255); break;
-                            case 7: color = new Color32(64, 172, 128, 255); break;
-                        }
+                        color = materialIndexToColor[shapes[0].frontMaterial];
                     }
                     else if (plane.normal.z > 0.5f)
                     {
-                        switch (shapes[0].backMaterial)
-                        {
-                            case 0: color = new Color32(255, 255, 255, 255); break;
-                            case 1: color = new Color32(0, 0, 255, 255); break;
-                            case 2: color = new Color32(0, 255, 0, 255); break;
-                            case 3: color = new Color32(255, 0, 0, 255); break;
-                            case 4: color = new Color32(0, 255, 255, 255); break;
-                            case 5: color = new Color32(255, 255, 0, 255); break;
-                            case 6: color = new Color32(255, 0, 255, 255); break;
-                            case 7: color = new Color32(64, 172, 128, 255); break;
-                        }
+                        color = materialIndexToColor[shapes[0].backMaterial];
                     }
                 }
 
@@ -687,6 +670,30 @@ namespace AeternumGames.ShapeEditor
             public bool TryGetShapesForTriangleIndex(int triangleIndex, out List<Shape> shapes)
             {
                 return triangleShapes.TryGetValue(triangleIndex, out shapes);
+            }
+        }
+
+        /// <summary>Displays a small color line at the bottom of the button.</summary>
+        private class GuiMaterialIndexButton : GuiButton
+        {
+            private Color32 color;
+
+            public GuiMaterialIndexButton(string text, float2 size, Color32 color, System.Action onClick) : base(text, size, onClick)
+            {
+                this.color = color;
+            }
+
+            public override void OnRender()
+            {
+                base.OnRender();
+
+                GLUtilities.DrawGui(() =>
+                {
+                    var rect = drawRect;
+
+                    GL.Color(color);
+                    GLUtilities.DrawRectangle(rect.x + 2, rect.yMax - 4, rect.width - 4, 2);
+                });
             }
         }
     }
