@@ -454,6 +454,9 @@ namespace AeternumGames.ShapeEditor
             var convexPolygonsCount = convexPolygons.Count;
             for (int j = convexPolygonsCount; j-- > 0;)
             {
+                var polygonCenter = new Vector3();
+
+                // step 1: extrusion materials for edges:
                 var vertices = convexPolygons[j];
                 var vertexCount = vertices.Count;
                 for (int i = 0; i < vertexCount; i++)
@@ -463,6 +466,9 @@ namespace AeternumGames.ShapeEditor
                     var nextVertex = vertices.NextVertex(i);
                     var center = Vector3.Lerp(thisVertex.position, nextVertex.position, 0.5f);
 
+                    // [for step 2] add all vertex positions in the polygon together).
+                    polygonCenter += thisVertex.position;
+
                     // find a segment line of the project at the center position.
                     var segment = FindSegmentLineAtPosition(new float2(center.x, -center.y), 1f);
                     if (segment != null)
@@ -470,6 +476,35 @@ namespace AeternumGames.ShapeEditor
                         // copy the material index of the segment line and shape into the vertex.
                         var shape = segment.shape;
                         convexPolygons[j][i] = new Vertex(thisVertex.position, thisVertex.uv0, thisVertex.hidden, new VertexMaterial(segment.material, shape.frontMaterial, shape.backMaterial));
+                    }
+                }
+
+                // step 2: use the polygon center point and find a shape that contains it.
+                polygonCenter /= vertexCount;
+                polygonCenter.y = -polygonCenter.y;
+
+                // for every shape in the project:
+                var shapesCount = shapes.Count;
+                for (int i = shapesCount; i-- > 0;)
+                {
+                    var shape = shapes[i];
+
+                    // if the center point of the polygon is inside of the shape:
+                    if (shape.ContainsPoint(polygonCenter) >= 0)
+                    {
+                        for (int k = 0; k < vertexCount; k++)
+                        {
+                            var thisVertex = convexPolygons[j][k];
+
+                            // todo: vertex material can be optimized away if we simply store the front and back in the polygon itself?
+                            // the step 1 info likely isn't useful anyway because the convex piece must be inside of the shape.
+
+                            // copy the front and back material index of the shape into the vertex.
+                            convexPolygons[j][k] = new Vertex(thisVertex.position, thisVertex.uv0, thisVertex.hidden, new VertexMaterial(thisVertex.material.extrude, shape.frontMaterial, shape.backMaterial));
+                        }
+
+                        // respect the shape sorting.
+                        break;
                     }
                 }
             }
