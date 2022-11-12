@@ -548,8 +548,10 @@ namespace AeternumGames.ShapeEditor
 
                                 // given two points checks whether they both lie on the triangle edge we chose.
                                 System.Func<float2, float2, bool> check = (a, b)
-                                    => MathEx.IsPointOnLine2(a, p1, p2, 0.0001403269f)
-                                    && MathEx.IsPointOnLine2(b, p1, p2, 0.0001403269f);
+                                    => (MathEx.IsPointOnLine2(a, p1, p2, 0.0001403269f)
+                                    && MathEx.IsPointOnLine2(b, p1, p2, 0.0001403269f))
+                                    || (MathEx.IsPointOnLine2(p1, a, b, 0.0001403269f)
+                                    && MathEx.IsPointOnLine2(p2, a, b, 0.0001403269f));
 
                                 // iterate over all points of the edge (including the segment generator):
                                 float2 last = segment.position;
