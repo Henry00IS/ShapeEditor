@@ -23,6 +23,14 @@ namespace AeternumGames.ShapeEditor
         [SerializeField]
         public SimpleGlobalAxis symmetryAxes = SimpleGlobalAxis.None;
 
+        /// <summary>The front material index that is used when extruding this shape as 3D polygons.</summary>
+        [SerializeField]
+        public byte frontMaterial;
+
+        /// <summary>The back material index that is used when extruding this shape as 3D polygons.</summary>
+        [SerializeField]
+        public byte backMaterial;
+
         /// <summary>Creates a new shape.</summary>
         public Shape()
         {
@@ -282,7 +290,7 @@ namespace AeternumGames.ShapeEditor
 
             Bounds bounds = polygons[0].GetAABB();
             for (int i = 1; i < polygons.Length; i++)
-                    bounds.Encapsulate(polygons[i].GetAABB());
+                bounds.Encapsulate(polygons[i].GetAABB());
 
             return bounds;
         }

@@ -94,6 +94,10 @@ namespace AeternumGames.ShapeEditor
             {
                 var shape = project.shapes[i];
 
+                // reset the material index.
+                shape.frontMaterial = 0;
+                shape.backMaterial = 0;
+
                 // for every edge in the shape:
                 var segmentCount = shape.segments.Count;
                 for (int j = 0; j < segmentCount; j++)
@@ -216,10 +220,17 @@ namespace AeternumGames.ShapeEditor
                         }
                         else
                         {
-                            GL.Color(Color.red);
-                            GLUtilities3D.DrawLine(hit.vertex1, hit.vertex2);
-                            GLUtilities3D.DrawLine(hit.vertex2, hit.vertex3);
-                            GLUtilities3D.DrawLine(hit.vertex3, hit.vertex1);
+                            // todo: triangle based lookup table for shapes:
+
+                            var pos = new float2(hit.point.x, -hit.point.y);
+                            var shape = editor.FindShapeAtGridPosition(pos);
+                            if (shape != null)
+                            {
+                                GL.Color(Color.red);
+                                GLUtilities3D.DrawLine(hit.vertex1, hit.vertex2);
+                                GLUtilities3D.DrawLine(hit.vertex2, hit.vertex3);
+                                GLUtilities3D.DrawLine(hit.vertex3, hit.vertex1);
+                            }
                         }
                     }
                 });
@@ -247,12 +258,36 @@ namespace AeternumGames.ShapeEditor
                     }
                     else
                     {
-                        /* full shape detection.
+                        materialIndexUnderMouse = 0;
+
+                        // todo: triangle based lookup table for shapes:
                         var shape = editor.FindShapeAtGridPosition(pos);
+                        if (editor.isLeftMousePressed)
+                        {
+                            if (shape != null)
+                            {
+                                if (hit.normal.z < 0.5f)
+                                {
+                                    shape.frontMaterial = materialIndex;
+                                }
+                                else if (hit.normal.z > 0.5f)
+                                {
+                                    shape.backMaterial = materialIndex;
+                                }
+                            }
+                        }
+
                         if (shape != null)
                         {
-                            shape.SelectAll();
-                        }*/
+                            if (hit.normal.z < 0.5f)
+                            {
+                                materialIndexUnderMouse = shape.frontMaterial;
+                            }
+                            else if (hit.normal.z > 0.5f)
+                            {
+                                materialIndexUnderMouse = shape.backMaterial;
+                            }
+                        }
                     }
                 }
             }

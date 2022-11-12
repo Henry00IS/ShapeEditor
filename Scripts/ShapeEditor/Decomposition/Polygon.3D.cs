@@ -20,7 +20,7 @@ namespace AeternumGames.ShapeEditor
         /// [3D] The material index to be used when building this polygon. Taken from the first
         /// vertex of this polygon or if there are none it will return 0.
         /// </summary>
-        public byte material => (Count > 0) ? this[0].material : (byte)0;
+        public byte material => (Count > 0) ? this[0].material.extrude : (byte)0;
 
         /// <summary>
         /// [3D] Sets the material index to the front of the shape (only the first vertex is set).
@@ -31,7 +31,7 @@ namespace AeternumGames.ShapeEditor
             get
             {
                 var polygon = new Polygon(this);
-                polygon[0] = new Vertex(this[0].position, this[0].uv0, this[0].hidden, 0);
+                polygon[0] = new Vertex(this[0].position, this[0].uv0, this[0].hidden, new VertexMaterial(this[0].material.front, 0, 0));
                 return polygon;
             }
         }
@@ -45,7 +45,7 @@ namespace AeternumGames.ShapeEditor
             get
             {
                 var polygon = new Polygon(this);
-                polygon[0] = new Vertex(this[0].position, this[0].uv0, this[0].hidden, 0);
+                polygon[0] = new Vertex(this[0].position, this[0].uv0, this[0].hidden, new VertexMaterial(this[0].material.back, 0, 0));
                 return polygon;
             }
         }
@@ -296,7 +296,7 @@ namespace AeternumGames.ShapeEditor
                 poly.Translate(spline.GetPoint(there));
 
                 // add the front face.
-                polygons.Add(lastPoly.withFrontMaterial);
+                polygons.Add(lastPoly.withBackMaterial); // inverted controls in the scene...
 
                 // fill the gap with quads "extruding" the shape.
                 for (int i = 0; i < count - 1; i++)
@@ -320,7 +320,7 @@ namespace AeternumGames.ShapeEditor
                 // add the back face.
                 var back = new Polygon(poly);
                 back.Reverse();
-                polygons.Add(back.withBackMaterial);
+                polygons.Add(back.withFrontMaterial); // inverted controls in the scene...
 
                 // add the polygon mesh brush.
                 var brush = new PolygonMesh(polygons);

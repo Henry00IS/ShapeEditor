@@ -467,8 +467,9 @@ namespace AeternumGames.ShapeEditor
                     var segment = FindSegmentLineAtPosition(new float2(center.x, -center.y), 1f);
                     if (segment != null)
                     {
-                        // copy the material index of the segment line into the vertex.
-                        convexPolygons[j][i] = new Vertex(thisVertex.position, thisVertex.uv0, thisVertex.hidden, segment.material);
+                        // copy the material index of the segment line and shape into the vertex.
+                        var shape = segment.shape;
+                        convexPolygons[j][i] = new Vertex(thisVertex.position, thisVertex.uv0, thisVertex.hidden, new VertexMaterial(segment.material, shape.frontMaterial, shape.backMaterial));
                     }
                 }
             }
