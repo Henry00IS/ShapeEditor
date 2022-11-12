@@ -197,7 +197,7 @@ namespace AeternumGames.ShapeEditor
             });
 
             // no need to do raycasting when the mouse isn't over the window.
-            if (isMouseOver)
+            if (viewport.isMouseOver)
             {
                 MeshRaycastHit hit = null;
                 materialIndexUnderMouse = 255;
@@ -208,12 +208,9 @@ namespace AeternumGames.ShapeEditor
 
                     if (meshRaycast.Raycast(ray.origin, ray.direction, out hit))
                     {
-                        GL.Color(Color.blue);
-                        GLUtilities3D.DrawLine(hit.point, hit.point + hit.normal * 0.25f);
-
                         if (hit.normal.z.EqualsWithEpsilon5(0.0f))
                         {
-                            GL.Color(Color.green);
+                            GL.Color(materialIndexToColor[materialIndex]);
 
                             var pos = new float2(hit.point.x, -hit.point.y);
                             var segment = editor.project.FindSegmentLineAtPosition(pos, 1f);
@@ -239,7 +236,7 @@ namespace AeternumGames.ShapeEditor
                             var shape = editor.FindShapeAtGridPosition(pos);
                             if (shape != null)
                             {
-                                GL.Color(Color.red);
+                                GL.Color(materialIndexToColor[materialIndex]);
                                 GLUtilities3D.DrawLine(hit.vertex1, hit.vertex2);
                                 GLUtilities3D.DrawLine(hit.vertex2, hit.vertex3);
                                 GLUtilities3D.DrawLine(hit.vertex3, hit.vertex1);
