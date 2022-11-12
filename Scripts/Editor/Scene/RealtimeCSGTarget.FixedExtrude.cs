@@ -17,11 +17,16 @@ namespace AeternumGames.ShapeEditor
 
             var parent = CleanAndGetBrushParent();
 
-            var polygonsCount = convexPolygons2D.Count;
-            for (int i = 0; i < polygonsCount; i++)
+            var polygonMeshes = MeshGenerator.CreateExtrudedPolygonMeshes(convexPolygons2D, fixedExtrudeDistance);
+            var polygonMeshesCount = polygonMeshes.Count;
+            for (int i = 0; i < polygonMeshesCount; i++)
             {
-                var polygon = convexPolygons2D[i];
-                ExternalRealtimeCSG.CreateExtrudedBrushesFromPolygon(parent, "Shape Editor Brush", polygon.GetVertices2D(), fixedExtrudeDistance, polygon.booleanOperator);
+                var polygonMesh = polygonMeshes[i];
+                var planes = polygonMesh.ToMaterialPlanes();
+
+                var brush = ExternalRealtimeCSG.CreateBrushFromPlanes("Shape Editor Brush", planes.planes, GetMaterials(planes.materials), polygonMesh.booleanOperator);
+                if (brush != null)
+                    brush.transform.SetParent(parent, false);
             }
 
             ExternalRealtimeCSG.AddCSGOperationComponent(gameObject);

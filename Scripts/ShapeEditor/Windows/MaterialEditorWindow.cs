@@ -2,7 +2,6 @@
 
 using System.Collections.Generic;
 using Unity.Mathematics;
-using UnityEditor.SearchService;
 using UnityEngine;
 using GLUtilities3D = AeternumGames.ShapeEditor.GLUtilities.GLUtilities3D;
 
@@ -329,6 +328,7 @@ namespace AeternumGames.ShapeEditor
 
         private void UpdateMeshColors()
         {
+            var vertices = meshRaycast.Vertices;
             var triangles = meshRaycast.Triangles;
 
             // find all triangles that are part of the edge.
@@ -348,6 +348,43 @@ namespace AeternumGames.ShapeEditor
                         case 5: color = new Color32(255, 255, 0, 255); break;
                         case 6: color = new Color32(255, 0, 255, 255); break;
                         case 7: color = new Color32(64, 172, 128, 255); break;
+                    }
+                }
+
+                if (lookupTable.TryGetShapesForTriangleIndex(k, out var shapes))
+                {
+                    var v1 = vertices[triangles[k]];
+                    var v2 = vertices[triangles[k + 1]];
+                    var v3 = vertices[triangles[k + 2]];
+                    var plane = new Plane(v1, v2, v3);
+
+                    if (plane.normal.z < 0.5f)
+                    {
+                        switch (shapes[0].frontMaterial)
+                        {
+                            case 0: color = new Color32(255, 255, 255, 255); break;
+                            case 1: color = new Color32(0, 0, 255, 255); break;
+                            case 2: color = new Color32(0, 255, 0, 255); break;
+                            case 3: color = new Color32(255, 0, 0, 255); break;
+                            case 4: color = new Color32(0, 255, 255, 255); break;
+                            case 5: color = new Color32(255, 255, 0, 255); break;
+                            case 6: color = new Color32(255, 0, 255, 255); break;
+                            case 7: color = new Color32(64, 172, 128, 255); break;
+                        }
+                    }
+                    else if (plane.normal.z > 0.5f)
+                    {
+                        switch (shapes[0].backMaterial)
+                        {
+                            case 0: color = new Color32(255, 255, 255, 255); break;
+                            case 1: color = new Color32(0, 0, 255, 255); break;
+                            case 2: color = new Color32(0, 255, 0, 255); break;
+                            case 3: color = new Color32(255, 0, 0, 255); break;
+                            case 4: color = new Color32(0, 255, 255, 255); break;
+                            case 5: color = new Color32(255, 255, 0, 255); break;
+                            case 6: color = new Color32(255, 0, 255, 255); break;
+                            case 7: color = new Color32(64, 172, 128, 255); break;
+                        }
                     }
                 }
 
@@ -445,6 +482,9 @@ namespace AeternumGames.ShapeEditor
             /// <summary>The internal dictionary of segments for a triangle index.</summary>
             private Dictionary<int, List<Segment>> triangleSegments = new Dictionary<int, List<Segment>>();
 
+            /// <summary>The internal dictionary of shapes for a triangle index.</summary>
+            private Dictionary<int, List<Shape>> triangleShapes = new Dictionary<int, List<Shape>>();
+
             public MeshTriangleLookupTable(Mesh mesh, Project project)
             {
                 this.project = project;
@@ -461,6 +501,7 @@ namespace AeternumGames.ShapeEditor
                 this.vertices = vertices;
 
                 CalculateSegmentLookupTables();
+                CalculateShapeLookupTables();
             }
 
             private void CalculateSegmentLookupTables()
@@ -573,6 +614,53 @@ namespace AeternumGames.ShapeEditor
                 }
             }
 
+            private void CalculateShapeLookupTables()
+            {
+                // iterate over all triangles:
+                for (int k = 0; k < triangles.Length; k += 3)
+                {
+                    var v1 = vertices[triangles[k]];
+                    var v2 = vertices[triangles[k + 1]];
+                    var v3 = vertices[triangles[k + 2]];
+                    var plane = new Plane(v1, v2, v3);
+
+                    if (plane.normal == Vector3.zero)
+                        continue;
+
+                    // the triangle must be facing front or back.
+                    if (!plane.normal.z.EqualsWithEpsilon5(0.0f))
+                    {
+                        // flatten the triangle vertices into 2D space.
+                        v1.z = 0.0f;
+                        v2.z = 0.0f;
+                        v3.z = 0.0f;
+
+                        // find the center of the triangle.
+                        var center = (v1 + v2 + v3) / 3f;
+                        center.y = -center.y;
+
+                        // for every shape in the project:
+                        var shapesCount = project.shapes.Count;
+                        for (int i = shapesCount; i-- > 0;)
+                        {
+                            var shape = project.shapes[i];
+
+                            // if the center point of the triangle is inside of the shape:
+                            if (shape.ContainsPoint(center) >= 0)
+                            {
+                                if (triangleShapes.TryGetValue(k, out var shapes))
+                                    shapes.Add(shape);
+                                else
+                                    triangleShapes.Add(k, new List<Shape>() { shape });
+
+                                // respect the shape sorting.
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
             /// <summary>Looks up all triangle indices associated with the specified segment.</summary>
             /// <param name="segment">The segment to find triangle indices for.</param>
             /// <param name="triangles">The triangle indices that lie on the edge.</param>
@@ -590,6 +678,15 @@ namespace AeternumGames.ShapeEditor
             public bool TryGetSegmentsForTriangleIndex(int triangleIndex, out List<Segment> segments)
             {
                 return triangleSegments.TryGetValue(triangleIndex, out segments);
+            }
+
+            /// <summary>Looks up all shapes associated with the specified triangle index.</summary>
+            /// <param name="triangleIndex">The triangle index to find segments for.</param>
+            /// <param name="shapes">The shapes that contain the the triangle center.</param>
+            /// <returns>True when the triangle index was found else false.</returns>
+            public bool TryGetShapesForTriangleIndex(int triangleIndex, out List<Shape> shapes)
+            {
+                return triangleShapes.TryGetValue(triangleIndex, out shapes);
             }
         }
     }
