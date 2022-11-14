@@ -299,23 +299,36 @@ namespace AeternumGames.ShapeEditor
                 polygons.Add(lastPoly.withBackMaterial); // inverted controls in the scene...
 
                 // fill the gap with quads "extruding" the shape.
+                Polygon extrudedPolygon;
                 for (int i = 0; i < count - 1; i++)
                 {
-                    polygons.Add(new Polygon(new Vertex[] {
+                    extrudedPolygon = new Polygon(new Vertex[] {
                         lastPoly[i],
                         poly[i],
                         poly[i + 1],
                         lastPoly[i + 1],
-                    }));
+                    });
+
+                    if (extrudedPolygon.SplitNonPlanar4(out var planarPolygons))
+                        polygons.AddRange(planarPolygons);
+                    else
+                        polygons.Add(extrudedPolygon);
                 }
 
                 // one more face that wraps around to index 0.
-                polygons.Add(new Polygon(new Vertex[] {
-                    lastPoly[count - 1],
-                    poly[count - 1],
-                    poly[0],
-                    lastPoly[0],
-                }));
+                {
+                    extrudedPolygon = new Polygon(new Vertex[] {
+                        lastPoly[count - 1],
+                        poly[count - 1],
+                        poly[0],
+                        lastPoly[0],
+                    });
+
+                    if (extrudedPolygon.SplitNonPlanar4(out var planarPolygons))
+                        polygons.AddRange(planarPolygons);
+                    else
+                        polygons.Add(extrudedPolygon);
+                }
 
                 // add the back face.
                 var back = new Polygon(poly);
