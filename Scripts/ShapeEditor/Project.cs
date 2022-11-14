@@ -492,16 +492,9 @@ namespace AeternumGames.ShapeEditor
                     // if the center point of the polygon is inside of the shape:
                     if (shape.ContainsPoint(polygonCenter) >= 0)
                     {
-                        for (int k = 0; k < vertexCount; k++)
-                        {
-                            var thisVertex = convexPolygons[j][k];
-
-                            // todo: vertex material can be optimized away if we simply store the front and back in the polygon itself?
-                            // the step 1 info likely isn't useful anyway because the convex piece must be inside of the shape.
-
-                            // copy the front and back material index of the shape into the vertex.
-                            convexPolygons[j][k] = new Vertex(thisVertex.position, thisVertex.uv0, thisVertex.hidden, new VertexMaterial(thisVertex.material.extrude, shape.frontMaterial, shape.backMaterial));
-                        }
+                        // copy the front and back material index of the shape into the first vertex.
+                        var thisVertex = convexPolygons[j][0];
+                        convexPolygons[j][0] = new Vertex(thisVertex.position, thisVertex.uv0, thisVertex.hidden, new VertexMaterial(thisVertex.material.extrude, shape.frontMaterial, shape.backMaterial));
 
                         // respect the shape sorting.
                         break;
