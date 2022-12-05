@@ -625,9 +625,9 @@ namespace AeternumGames.ShapeEditor
         /// <param name="beginScale">The scale of the front polygon.</param>
         /// <param name="endScale">The scale of the back polygon.</param>
         /// <param name="offset">The offset from the center to scale towards.</param>
-        public static List<PolygonMesh> CreateScaleExtrudedMeshes(PolygonMesh convexPolygons, float distance, float beginScale, float endScale, Vector2 offset)
+        public static List<PolygonMesh> CreateScaleExtrudedMeshes(PolygonMesh convexPolygons, float distance, Vector2 beginScale, Vector2 endScale, Vector2 offset)
         {
-            if (beginScale == 0f && endScale == 0f)
+            if (beginScale.x == 0f && beginScale.y == 0f && endScale.x == 0f && endScale.y == 0f)
                 return new List<PolygonMesh>();
 
             var convexPolygonsCount = convexPolygons.Count;
@@ -643,14 +643,14 @@ namespace AeternumGames.ShapeEditor
                 brush.booleanOperator = convexPolygons[i].booleanOperator;
 
                 var poly = new Polygon(convexPolygons[i]);
-                poly.Scale(new Vector3(beginScale, beginScale, 1.0f));
+                poly.Scale(new Vector3(beginScale.x, beginScale.y, 1.0f));
 
                 var nextPoly = new Polygon(convexPolygons[i]);
-                nextPoly.Scale(new Vector3(endScale, endScale, 1.0f));
+                nextPoly.Scale(new Vector3(endScale.x, endScale.y, 1.0f));
                 nextPoly.Translate(new Vector3(offset.x, offset.y) + new Vector3(0.0f, 0.0f, distance));
 
-                if (beginScale != 0.0f) brush.Add(poly.withFrontMaterial);
-                if (endScale != 0.0f) brush.Add(nextPoly.flipped.withBackMaterial);
+                if (beginScale.x != 0.0f && beginScale.y != 0.0f) brush.Add(poly.withFrontMaterial);
+                if (endScale.x != 0.0f && endScale.y != 0.0f) brush.Add(nextPoly.flipped.withBackMaterial);
 
                 // fill the gap with quads "extruding" the shape.
                 Polygon extrudedPolygon;
@@ -664,18 +664,26 @@ namespace AeternumGames.ShapeEditor
                         poly[k + 1],
                     });
 
-                    brush.Add(extrudedPolygon);
+                    if ((beginScale.x != beginScale.y || endScale.x != endScale.y) && extrudedPolygon.SplitNonPlanar4(out var planarPolygons))
+                        brush.AddRange(planarPolygons);
+                    else
+                        brush.Add(extrudedPolygon);
                 }
 
-                // one more face that wraps around to index 0.
-                extrudedPolygon = new Polygon(new Vertex[] {
-                    poly[polyVertexCount - 1],
-                    nextPoly[polyVertexCount - 1],
-                    nextPoly[0],
-                    poly[0],
-                });
+                {
+                    // one more face that wraps around to index 0.
+                    extrudedPolygon = new Polygon(new Vertex[] {
+                        poly[polyVertexCount - 1],
+                        nextPoly[polyVertexCount - 1],
+                        nextPoly[0],
+                        poly[0],
+                    });
 
-                brush.Add(extrudedPolygon);
+                    if ((beginScale.x != beginScale.y || endScale.x != endScale.y) && extrudedPolygon.SplitNonPlanar4(out var planarPolygons))
+                        brush.AddRange(planarPolygons);
+                    else
+                        brush.Add(extrudedPolygon);
+                }
             }
 
             return polygonMeshes;
@@ -687,9 +695,9 @@ namespace AeternumGames.ShapeEditor
         /// <param name="beginScale">The scale of the front polygon.</param>
         /// <param name="endScale">The scale of the back polygon.</param>
         /// <param name="offset">The offset from the center to scale towards.</param>
-        public static Mesh CreateScaleExtrudedMesh(PolygonMesh convexPolygons, float distance, float beginScale, float endScale, Vector2 offset)
+        public static Mesh CreateScaleExtrudedMesh(PolygonMesh convexPolygons, float distance, Vector2 beginScale, Vector2 endScale, Vector2 offset)
         {
-            if (beginScale == 0f && endScale == 0f)
+            if (beginScale.x == 0f && beginScale.y == 0f && endScale.x == 0f && endScale.y == 0f)
                 return new Mesh();
 
             var convexPolygonsCount = convexPolygons.Count;
@@ -702,20 +710,20 @@ namespace AeternumGames.ShapeEditor
                 polygonMeshes.Add(brush);
 
                 var poly = new Polygon(convexPolygons[i]);
-                poly.Scale(new Vector3(beginScale, beginScale, 1.0f));
+                poly.Scale(new Vector3(beginScale.x, beginScale.y, 1.0f));
 
                 // calculate 2D UV coordinates for the front polygon.
                 poly.ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
 
                 var nextPoly = new Polygon(convexPolygons[i]);
-                nextPoly.Scale(new Vector3(endScale, endScale, 1.0f));
+                nextPoly.Scale(new Vector3(endScale.x, endScale.y, 1.0f));
                 nextPoly.Translate(new Vector3(offset.x, offset.y) + new Vector3(0.0f, 0.0f, distance));
 
                 // calculate 2D UV coordinates for the back polygon.
                 nextPoly.ApplyXYBasedUV0(new Vector2(0.5f, 0.5f));
 
-                if (beginScale != 0.0f) brush.Add(poly.withFrontMaterial);
-                if (endScale != 0.0f) brush.Add(nextPoly.flipped.withBackMaterial);
+                if (beginScale.x != 0.0f && beginScale.y != 0.0f) brush.Add(poly.withFrontMaterial);
+                if (endScale.x != 0.0f && endScale.y != 0.0f) brush.Add(nextPoly.flipped.withBackMaterial);
 
                 // fill the gap with quads "extruding" the shape.
                 Polygon extrudedPolygon;

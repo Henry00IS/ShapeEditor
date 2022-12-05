@@ -12,10 +12,10 @@ namespace AeternumGames.ShapeEditor
         public float scaledExtrudeDistance = 1.0f;
 
         [Min(0f)]
-        public float scaledExtrudeFrontScale = 1.0f;
+        public Vector2 scaledExtrudeFrontScale = new Vector2(1.0f, 1.0f);
 
         [Min(0f)]
-        public float scaledExtrudeBackScale = 0.0f;
+        public Vector2 scaledExtrudeBackScale = new Vector2(0.0f, 0.0f);
 
         public Vector2 scaledExtrudeOffset;
 

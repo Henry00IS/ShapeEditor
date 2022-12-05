@@ -183,14 +183,14 @@ namespace AeternumGames.ShapeEditor
             title: "Create Bevel",
             description: "Creates a bevel in the scene using a scaled extrude target and selects it. It does this by setting the back scale to 0.5."
         )]
-        internal void UserCreateBevelExtrudeTarget() => UserCreateShapeEditorTarget("Bevel Extrude", ShapeEditorTargetMode.ScaledExtrude, (g, t) => t.scaledExtrudeBackScale = 0.5f);
+        internal void UserCreateBevelExtrudeTarget() => UserCreateShapeEditorTarget("Bevel Extrude", ShapeEditorTargetMode.ScaledExtrude, (g, t) => t.scaledExtrudeBackScale = new Vector2(0.5f, 0.5f));
 
         /// <summary>Creates a bevel in the scene using a scaled extrude target and selects it. It does this by setting the back scale to 0.5.</summary>
         [Instructions(
             title: "Create Bevel",
             description: "Creates a bevel in the scene using a scaled extrude target and selects it. It does this by setting the back scale to 0.5."
         )]
-        internal void UserCreateChiselBevelExtrudeTarget() => UserCreateChiselTarget("Bevel Extrude", ChiselTargetMode.ScaledExtrude, (g, t) => t.scaledExtrudeBackScale = 0.5f);
+        internal void UserCreateChiselBevelExtrudeTarget() => UserCreateChiselTarget("Bevel Extrude", ChiselTargetMode.ScaledExtrude, (g, t) => t.scaledExtrudeBackScale = new Vector2(0.5f, 0.5f));
 
         /// <summary>Creates a curved staircase in the scene using a revolve extrude target and selects it. It does this by setting the spiral height to 0.75.</summary>
         [Instructions(
@@ -281,7 +281,7 @@ namespace AeternumGames.ShapeEditor
             title: "Create Bevel",
             description: "Creates a bevel in the scene using a scaled extrude target and selects it. It does this by setting the back scale to 0.5."
         )]
-        internal void UserCreateRealtimeCsgBevelExtrudeTarget() => UserCreateRealtimeCSGTarget("Bevel Extrude", RealtimeCSGTargetMode.ScaledExtrude, (g, t) => t.scaledExtrudeBackScale = 0.5f);
+        internal void UserCreateRealtimeCsgBevelExtrudeTarget() => UserCreateRealtimeCSGTarget("Bevel Extrude", RealtimeCSGTargetMode.ScaledExtrude, (g, t) => t.scaledExtrudeBackScale = new Vector2(0.5f, 0.5f));
 
         /// <summary>Creates a curved staircase in the scene using a revolve extrude target and selects it. It does this by setting the spiral height to 0.75.</summary>
         [Instructions(
