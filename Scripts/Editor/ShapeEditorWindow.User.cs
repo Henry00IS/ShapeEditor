@@ -48,7 +48,7 @@ namespace AeternumGames.ShapeEditor
             {
                 var shape = project.shapes[i];
 
-                // for every segment in the project:
+                // for every segment in the shape:
                 var segments = shape.segments;
                 var segmentsCount = segments.Count;
                 for (int j = segmentsCount; j-- > 0;)
@@ -60,6 +60,55 @@ namespace AeternumGames.ShapeEditor
                         segment.generator = new SegmentGenerator(segment);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Finds all fully selected shapes, adds the active symmetry previews of those shapes as
+        /// new shapes to the project, clears the current selection and selects the new shapes.
+        /// </summary>
+        [Instructions(
+            title: "Apply symmetry for selected shapes",
+            description: "Finds all fully selected shapes, adds the active symmetry previews of those shapes as new shapes to the project, clears the current selection and selects the new shapes."
+        )]
+        internal void UserApplySymmetryForSelectedShapes()
+        {
+            RegisterUndo("Apply Selected Symmetry");
+
+            var shapesToSelect = new List<Shape>();
+
+            // for every shape in the project:
+            var shapesCount = project.shapes.Count;
+            for (int i = shapesCount; i-- > 0;)
+            {
+                var shape = project.shapes[i];
+
+                // if the shape is fully selected:
+                if (shape.IsSelected())
+                {
+                    // generate symmetry shapes and insert them after the current shape.
+                    var symmetryShapes = shape.GenerateSymmetryShapes();
+                    for (int j = 0; j < symmetryShapes.Length; j++)
+                    {
+                        var symmetryShape = symmetryShapes[j];
+                        symmetryShape.Validate();
+                        project.shapes.Insert(i + 1, symmetryShape);
+                        shapesToSelect.Add(symmetryShape);
+                    }
+
+                    // disable symmetry on the original shape.
+                    shape.symmetryAxes = SimpleGlobalAxis.None;
+                }
+            }
+
+            // select the newly created shapes.
+            var shapesToSelectCount = shapesToSelect.Count;
+            if (shapesToSelectCount > 0)
+            {
+                project.ClearSelection();
+
+                for (int i = 0; i < shapesToSelectCount; i++)
+                    shapesToSelect[i].SelectAll();
             }
         }
 

@@ -2,8 +2,8 @@
 
 using System;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace AeternumGames.ShapeEditor
 {
@@ -263,6 +263,63 @@ namespace AeternumGames.ShapeEditor
                 return new Polygon[] { original, mirrorY };
 
             return new Polygon[] { original };
+        }
+
+        /// <summary>Generates a symmetrical shape for a given mirror axis.</summary>
+        /// <param name="mirror">Whether to mirror the shape horizontally and/or vertically.</param>
+        /// <returns>The mirrored shape.</returns>
+        public Shape GenerateSymmetryShape(SimpleGlobalAxis mirror)
+        {
+            // start with a clone of the current shape.
+            var result = Clone();
+
+            // the clone should not use symmetry.
+            result.symmetryAxes = SimpleGlobalAxis.None;
+
+            if (mirror == SimpleGlobalAxis.None) return result;
+
+            float flipX = mirror.HasFlag(SimpleGlobalAxis.Horizontal) ? -1.0f : 1.0f;
+            float flipY = mirror.HasFlag(SimpleGlobalAxis.Vertical) ? -1.0f : 1.0f;
+
+            // for every segment in the shape:
+            var segmentsCount = result.segments.Count;
+            for (int j = 0; j < segmentsCount; j++)
+            {
+                // move the segment point.
+                var segment = result.segments[j];
+                segment.position = new float2(flipX * segment.position.x, flipY * segment.position.y);
+
+                // move the selectables in segment generators.
+                foreach (var selectable in segment.generator.ForEachSelectableObject())
+                    selectable.position = new float2(flipX * selectable.position.x, flipY * selectable.position.y);
+
+                // flip the direction of the segment generator if required.
+                if ((flipX == -1f) ^ (flipY == -1f)) // exciting XOR
+                    segment.generator.FlipDirection();
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Generates shapes that represent the symmetry of this shape by converting the previews into new shapes.
+        /// </summary>
+        public Shape[] GenerateSymmetryShapes()
+        {
+            if (symmetryAxes == SimpleGlobalAxis.None) return new Shape[0];
+
+            var results = new List<Shape>(3);
+
+            if (symmetryAxes.HasFlag(SimpleGlobalAxis.Horizontal))
+                results.Add(GenerateSymmetryShape(SimpleGlobalAxis.Horizontal));
+
+            if (symmetryAxes.HasFlag(SimpleGlobalAxis.Vertical))
+                results.Add(GenerateSymmetryShape(SimpleGlobalAxis.Vertical));
+
+            if (symmetryAxes.HasFlag(SimpleGlobalAxis.Horizontal | SimpleGlobalAxis.Vertical))
+                results.Add(GenerateSymmetryShape(SimpleGlobalAxis.Horizontal | SimpleGlobalAxis.Vertical));
+
+            return results.ToArray();
         }
 
         // original source code from https://github.com/Genbox/VelcroPhysics/ (see Licenses/VelcroPhysics.txt).
