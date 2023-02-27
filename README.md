@@ -26,7 +26,11 @@ Add the following line to your Unity Package Manager:
 
 `https://github.com/Henry00IS/ShapeEditor.git`
 
-## Donations:
+## Support:
+
+Feel free to join my Discord server and let's talk about it.
+
+[![](https://dcbadge.vercel.app/api/server/sKEvrBwHtq)](https://discord.gg/sKEvrBwHtq)
 
 If you found this package useful, please consider making a donation or supporting me on Patreon. Your donations are a tremendous encouragement for the continued development and support of this package. 😁
 
