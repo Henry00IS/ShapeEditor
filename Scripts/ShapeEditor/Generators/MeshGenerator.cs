@@ -329,6 +329,7 @@ namespace AeternumGames.ShapeEditor
         public static Mesh CreateRevolveExtrudedMesh(PolygonMesh convexPolygons, int precision, float degrees, float diameter, float height, bool sloped)
         {
             var polygonMeshes = new List<PolygonMesh>();
+            var degreesAbs = Mathf.Abs(degrees);
 
             var slopedHeightOffset = new Vector3();
             if (sloped && precision >= 2)
@@ -375,10 +376,15 @@ namespace AeternumGames.ShapeEditor
                         nextPoly[v] = new Vertex(heightOffset + slopedHeightOffset + MathEx.RotatePointAroundPivot(nextPoly[v].position, pivot, new Vector3(0.0f, Mathf.Lerp(0f, degrees, (j + 1) / (float)precision), 0.0f)), nextPoly[v].uv0, nextPoly[v].hidden, nextPoly[v].material);
                     }
 
-                    if (height == 0f || sloped)
+                    if ((degreesAbs != 360.0f && (height == 0f || sloped))
+                     || (degreesAbs == 360.0f && (height != 0f && sloped)))
                     {
                         if (j == 0) brush.Add(poly.withFrontMaterial);
                         if (j == precision - 1) brush.Add(nextPoly.flipped.withBackMaterial);
+                    }
+                    else if (degreesAbs == 360.0f && height == 0f)
+                    {
+                        // hidden surface removal.
                     }
                     else
                     {
