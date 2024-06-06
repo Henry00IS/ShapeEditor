@@ -56,7 +56,7 @@ namespace AeternumGames.ShapeEditor
             byte[] fileBytes = null;
             try { fileBytes = File.ReadAllBytes(path); } catch (System.Exception) { }
 
-            var image = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+            var image = new Texture2D(1, 1, TextureFormat.ARGB32, false, true);
             image.LoadImage(fileBytes);
             return image;
         }

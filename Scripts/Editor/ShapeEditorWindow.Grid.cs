@@ -285,7 +285,7 @@ namespace AeternumGames.ShapeEditor
             // create a render texture for the viewport.
             renderTextureWidth = Mathf.FloorToInt(position.width);
             renderTextureHeight = Mathf.FloorToInt(position.height);
-            var renderTexture = RenderTexture.GetTemporary(renderTextureWidth, renderTextureHeight, 24);
+            var renderTexture = RenderTexture.GetTemporary(renderTextureWidth, renderTextureHeight, 24, RenderTextureFormat.Default, QualitySettings.activeColorSpace == ColorSpace.Linear ? RenderTextureReadWrite.Linear : RenderTextureReadWrite.Default);
             Graphics.SetRenderTarget(renderTexture);
 
             // prepare the clipping pass in the gui material.
