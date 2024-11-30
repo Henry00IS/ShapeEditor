@@ -29,8 +29,8 @@ namespace AeternumGames.ShapeEditor
         private float2 GetCenterPosition()
         {
             return new float2(
-                Mathf.RoundToInt((editor.position.width / 2f) - (windowSize.x / 2f)),
-                Mathf.RoundToInt((editor.position.height / 2f) - (windowSize.y / 2f))
+                Mathf.RoundToInt((editor.width / 2f) - (windowSize.x / 2f)),
+                Mathf.RoundToInt((editor.height / 2f) - (windowSize.y / 2f))
             );
         }
 

@@ -42,8 +42,8 @@ namespace AeternumGames.ShapeEditor
             var resources = ShapeEditorResources.Instance;
 
             // stretch over the width of the window.
-            position = new float2(0f, editor.position.height - 22f);
-            size = new float2(editor.position.width, 22f);
+            position = new float2(0f, editor.height - 22f);
+            size = new float2(editor.width, 22f);
 
             statusLabel.text = "2D Shape Editor (" + editor.totalSegmentsCount + " Segments, Render: " + editor.lastRenderTime + "ms)";
 

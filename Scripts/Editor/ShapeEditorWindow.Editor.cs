@@ -59,7 +59,7 @@ namespace AeternumGames.ShapeEditor
                 // set the desired mouse cursor.
                 if (desiredMouseCursor != MouseCursor.Arrow)
                 {
-                    EditorGUIUtility.AddCursorRect(GetViewportRect(), desiredMouseCursor);
+                    EditorGUIUtility.AddCursorRect(new Rect(0, 0, position.width, position.height), desiredMouseCursor);
 
                     // set the custom mouse cursor texture.
                     if (customMouseCursor != null)
@@ -93,7 +93,7 @@ namespace AeternumGames.ShapeEditor
             }
 
             // get the mouse position.
-            float2 eMousePosition = e.mousePosition;
+            float2 eMousePosition = math.floor(e.mousePosition * EditorGUIUtility.pixelsPerPoint / dpiScalingMultiplier);
 
             // use a passive hot control to detect mouse up outside of the editor window.
             int hotControlId = GUIUtility.GetControlID(FocusType.Passive);
@@ -163,15 +163,16 @@ namespace AeternumGames.ShapeEditor
 
             if (e.type == EventType.MouseDrag)
             {
+                var previousMousePosition = mousePosition;
                 var previousMouseGridPosition = mouseGridPosition;
                 mousePosition = eMousePosition;
                 mouseGridPosition = ScreenPointToGrid(mousePosition);
 
                 if (IsMousePositionInViewport(eMousePosition))
                 {
-                    OnMouseDrag(e.button, e.delta, mouseGridPosition - previousMouseGridPosition);
+                    OnMouseDrag(e.button, mousePosition - previousMousePosition, mouseGridPosition - previousMouseGridPosition);
                 }
-                OnGlobalMouseDrag(e.button, e.delta, mouseGridPosition - previousMouseGridPosition);
+                OnGlobalMouseDrag(e.button, mousePosition - previousMousePosition, mouseGridPosition - previousMouseGridPosition);
 
                 e.Use();
             }
@@ -328,14 +329,22 @@ namespace AeternumGames.ShapeEditor
             return new System.Type[] { typeof(ShapeEditorWindow) };
         }
 
-        internal Rect GetViewportRect()
-        {
-            return new Rect(0, 0, position.width, position.height);
-        }
+        /// <summary>
+        /// The nearest integer based on <see cref="EditorGUIUtility.pixelsPerPoint"/> used for UI scaling.
+        /// </summary>
+        private float dpiScalingMultiplier => math.round(EditorGUIUtility.pixelsPerPoint);
+
+        /// <summary>The width of the window in screen space multiplied by UI scaling.</summary>
+        internal float width => math.floor(position.width * EditorGUIUtility.pixelsPerPoint / dpiScalingMultiplier);
+
+        /// <summary>The height of the window in screen space multiplied by UI scaling.</summary>
+        internal float height => math.floor(position.height * EditorGUIUtility.pixelsPerPoint / dpiScalingMultiplier);
+
+        internal Rect GetViewportRect() => new Rect(0, 0, width, height);
 
         private bool IsMousePositionInViewport(float2 mousePosition)
         {
-            return new Rect(0, 0, position.width, position.height).Contains(mousePosition);
+            return GetViewportRect().Contains(mousePosition);
         }
 
         /// <summary>While this function is called every repaint, it will set the mouse cursor.</summary>

@@ -266,7 +266,7 @@ namespace AeternumGames.ShapeEditor
         {
             GLUtilities.DrawGuiTextured(renderTexture, () =>
             {
-                GLUtilities.DrawFlippedUvRectangle(0, 0, renderTexture.width, renderTexture.height);
+                GLUtilities.DrawFlippedUvRectangle(0, 0, position.width, position.height);
             });
         }
 
@@ -283,9 +283,10 @@ namespace AeternumGames.ShapeEditor
             ValidateTools();
 
             // create a render texture for the viewport.
-            renderTextureWidth = Mathf.FloorToInt(position.width);
-            renderTextureHeight = Mathf.FloorToInt(position.height);
+            renderTextureWidth = Mathf.FloorToInt(width);
+            renderTextureHeight = Mathf.FloorToInt(height);
             var renderTexture = RenderTexture.GetTemporary(renderTextureWidth, renderTextureHeight, 24, RenderTextureFormat.Default, QualitySettings.activeColorSpace == ColorSpace.Linear ? RenderTextureReadWrite.Linear : RenderTextureReadWrite.Default);
+            renderTexture.filterMode = FilterMode.Point;
             Graphics.SetRenderTarget(renderTexture);
 
             // prepare the clipping pass in the gui material.

@@ -64,8 +64,8 @@ namespace AeternumGames.ShapeEditor
         private float2 GetBottomRightPosition()
         {
             return new float2(
-                Mathf.RoundToInt(editor.position.width - windowSize.x - 20),
-                Mathf.RoundToInt(editor.position.height - windowSize.y - 42)
+                Mathf.RoundToInt(editor.width - windowSize.x - 20),
+                Mathf.RoundToInt(editor.height - windowSize.y - 42)
             );
         }
 
