@@ -28,12 +28,10 @@ Add the following line to your Unity Package Manager:
 
 ## Support:
 
-Feel free to join my Discord server and let's talk about it.
+Feel free to [join my Discord server](https://discord.gg/sKEvrBwHtq) and let's talk about it.
 
-[![](https://dcbadge.vercel.app/api/server/sKEvrBwHtq)](https://discord.gg/sKEvrBwHtq)
+[![Join my Discord server](https://dcbadge.limes.pink/api/server/sKEvrBwHtq)](https://discord.gg/sKEvrBwHtq)
 
 If you found this package useful, please consider making a donation or supporting me on Patreon. Your donations are a tremendous encouragement for the continued development and support of this package. 😁
 
-[![Support me on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dhenrydejongh%26type%3Dpatrons&style=for-the-badge)](https://patreon.com/henrydejongh)
-
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/henrydejongh)
+[![Support me on Patreon](https://raw.githubusercontent.com/wiki/Henry00IS/DynamicLighting/images/badges/patreon.svg)](https://patreon.com/henrydejongh) [![Support me on Ko-fi](https://raw.githubusercontent.com/wiki/Henry00IS/DynamicLighting/images/badges/kofi.svg)](https://ko-fi.com/henry00) [![paypal](https://raw.githubusercontent.com/wiki/Henry00IS/DynamicLighting/images/badges/paypal.svg)](https://paypal.me/henrydejongh)
