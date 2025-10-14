@@ -360,73 +360,51 @@ namespace AeternumGames.ShapeEditor
             int count = Count;
             if (count < 1) return;
 
-            var xavg = 0f;
-            var yavg = 0f;
-            var zavg = 0f;
+            // find the span (max - min) for each axis across all vertices:
+            float minX = this[0].position.x, maxX = minX;
+            float minY = this[0].position.y, maxY = minY;
+            float minZ = this[0].position.z, maxZ = minZ;
             for (int i = 1; i < count; i++)
             {
-                var vertex1 = this[0];
-                var vertex2 = this[i];
-                xavg += Mathf.Abs(vertex2.x - vertex1.x);
-                yavg += Mathf.Abs(vertex2.y - vertex1.y);
-                zavg += Mathf.Abs(vertex2.z - vertex1.z);
+                var pos = this[i].position;
+                minX = Mathf.Min(minX, pos.x); maxX = Mathf.Max(maxX, pos.x);
+                minY = Mathf.Min(minY, pos.y); maxY = Mathf.Max(maxY, pos.y);
+                minZ = Mathf.Min(minZ, pos.z); maxZ = Mathf.Max(maxZ, pos.z);
             }
+            float xspan = maxX - minX;
+            float yspan = maxY - minY;
+            float zspan = maxZ - minZ;
 
-            if (xavg > yavg && xavg > zavg && yavg > zavg)
+            // find the axis with smallest span (normal direction).
+            float minSpan = Mathf.Min(xspan, Mathf.Min(yspan, zspan));
+            bool isXNormal = xspan == minSpan;
+            bool isYNormal = yspan == minSpan;
+            bool isZNormal = zspan == minSpan;
+
+            // project onto the other two axes (arbitrary u/v order if tie).
+            for (int i = 0; i < count; i++)
             {
-                for (int i = 0; i < count; i++)
+                var vertex = this[i];
+                float u, v;
+                if (isZNormal)
                 {
-                    var vertex = this[i];
-                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.y), vertex.hidden, vertex.material);
+                    // xy plane:
+                    u = offset.x + vertex.position.x;
+                    v = offset.y + vertex.position.y;
                 }
-            }
-            else if (xavg >= yavg && xavg >= zavg && zavg >= yavg)
-            {
-                for (int i = 0; i < count; i++)
+                else if (isYNormal)
                 {
-                    var vertex = this[i];
-                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.z), vertex.hidden, vertex.material);
+                    // xz plane:
+                    u = offset.x + vertex.position.x;
+                    v = offset.y + vertex.position.z;
                 }
-            }
-            else if (yavg > xavg && yavg > zavg && xavg > zavg)
-            {
-                for (int i = 0; i < count; i++)
+                else
                 {
-                    var vertex = this[i];
-                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.y), vertex.hidden, vertex.material);
+                    // yz plane:
+                    u = offset.x + vertex.position.z;
+                    v = offset.y + vertex.position.y;
                 }
-            }
-            else if (yavg >= xavg && yavg >= zavg && zavg >= xavg)
-            {
-                for (int i = 0; i < count; i++)
-                {
-                    var vertex = this[i];
-                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.z, offset.y + vertex.position.y), vertex.hidden, vertex.material);
-                }
-            }
-            else if (zavg > xavg && zavg > yavg && xavg > yavg)
-            {
-                for (int i = 0; i < count; i++)
-                {
-                    var vertex = this[i];
-                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.x, offset.y + vertex.position.z), vertex.hidden, vertex.material);
-                }
-            }
-            else if (zavg >= xavg && zavg >= yavg && yavg >= xavg)
-            {
-                for (int i = 0; i < count; i++)
-                {
-                    var vertex = this[i];
-                    this[i] = new Vertex(vertex.position, new Vector2(offset.x + vertex.position.z, offset.y + vertex.position.y), vertex.hidden, vertex.material);
-                }
-            }
-            else
-            {
-                for (int i = 0; i < count; i++)
-                {
-                    var vertex = this[i];
-                    this[i] = new Vertex(vertex.position, Vector2.zero, vertex.hidden, vertex.material);
-                }
+                this[i] = new Vertex(vertex.position, new Vector2(u, v), vertex.hidden, vertex.material);
             }
         }
 
