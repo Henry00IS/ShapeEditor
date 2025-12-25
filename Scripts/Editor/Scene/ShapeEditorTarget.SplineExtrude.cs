@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -25,6 +26,18 @@ namespace AeternumGames.ShapeEditor
 
             var mesh = MeshGenerator.CreateSplineExtrudedMesh(convexPolygons2D, spline, splineExtrudePrecision);
             OnShapeEditorMesh(mesh);
+        }
+
+        public bool SplineExtrude_TryGetPolygonMeshes(out List<PolygonMesh> polygonMeshes)
+        {
+            RequireConvexPolygons2D();
+
+            polygonMeshes = default;
+            var spline = GetSpline3();
+            if (spline == null) return false;
+
+            polygonMeshes = MeshGenerator.CreateSplineExtrudedPolygonMeshes(convexPolygons2D, spline, splineExtrudePrecision);
+            return true;
         }
 
         /// <summary>Calculates and gets a 3 point spline or returns null on failure.</summary>

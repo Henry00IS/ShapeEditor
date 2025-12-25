@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -28,6 +29,14 @@ namespace AeternumGames.ShapeEditor
 
             var mesh = MeshGenerator.CreateLinearStaircaseMesh(convexPolygons2D, linearStaircasePrecision, linearStaircaseDistance, linearStaircaseHeight, linearStaircaseSloped);
             OnShapeEditorMesh(mesh);
+        }
+
+        public bool LinearStaircase_TryGetPolygonMeshes(out List<PolygonMesh> polygonMeshes)
+        {
+            RequireConvexPolygons2D();
+
+            polygonMeshes = MeshGenerator.CreateLinearStaircaseMeshes(convexPolygons2D, linearStaircasePrecision, linearStaircaseDistance, linearStaircaseHeight, linearStaircaseSloped);
+            return true;
         }
     }
 }

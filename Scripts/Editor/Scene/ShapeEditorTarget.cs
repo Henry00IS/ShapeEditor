@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -116,6 +117,49 @@ namespace AeternumGames.ShapeEditor
 
                 case ShapeEditorTargetMode.RevolveChopped:
                     RevolveChopped_Rebuild();
+                    break;
+            }
+        }
+
+        /// <summary>Tries to get the polygon meshes that make up this mesh target.</summary>
+        public bool TryGetPolygonMeshes(out List<PolygonMesh> polygonMeshes)
+        {
+            polygonMeshes = default;
+
+            switch (targetMode)
+            {
+                case ShapeEditorTargetMode.Polygon:
+                    return false;
+
+                case ShapeEditorTargetMode.FixedExtrude:
+                    return FixedExtrude_TryGetPolygonMeshes(out polygonMeshes);
+
+                case ShapeEditorTargetMode.SplineExtrude:
+                    return SplineExtrude_TryGetPolygonMeshes(out polygonMeshes);
+
+                case ShapeEditorTargetMode.RevolveExtrude:
+                    return RevolveExtrude_TryGetPolygonMeshes(out polygonMeshes);
+
+                case ShapeEditorTargetMode.LinearStaircase:
+                    return LinearStaircase_TryGetPolygonMeshes(out polygonMeshes);
+
+                case ShapeEditorTargetMode.ScaledExtrude:
+                    return ScaledExtrude_TryGetPolygonMeshes(out polygonMeshes);
+
+                case ShapeEditorTargetMode.RevolveChopped:
+                    return RevolveChopped_TryGetPolygonMeshes(out polygonMeshes);
+            }
+
+            return false;
+        }
+
+        public void CopyBrushesToClipboard(ExternalBrushEditor targetProgram)
+        {
+            switch (targetProgram)
+            {
+                case ExternalBrushEditor.TrenchBroom:
+                    if (TryGetPolygonMeshes(out var polygonMeshes))
+                        EditorGUIUtility.systemCopyBuffer = ExternalTrenchBroom.GenerateClipboardBrushesText(polygonMeshes);
                     break;
             }
         }

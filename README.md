@@ -18,6 +18,12 @@ The shape editor can generate boolean brushes for constructive solid geometry. T
 
 It automatically detects and supports [RealtimeCSG](https://github.com/LogicalError/realtime-CSG-for-unity) and [Chisel Editor](https://github.com/RadicalCSG/Chisel.Prototype) by using convex decomposition to create multiple convex brushes that accurately represent the concave shape.
 
+## TrenchBroom Level Editor:
+
+The shape editor can copy 3D extrusions into the clipboard to be pasted into TrenchBroom. This allows for accurate curved staircases and other shapes that would otherwise be a chore to create.
+
+![Illustrating a curved staircase from Unity into TrenchBroom](https://github.com/Henry00IS/ShapeEditor/wiki/images/home/trenchbroom.png)
+
 ## Installation Instructions:
 
 Add the following line to your Unity Package Manager:

@@ -31,6 +31,7 @@ namespace AeternumGames.ShapeEditor
         private SerializedProperty spRevolveChoppedPrecision => serializedObject.FindProperty(nameof(ShapeEditorTarget.revolveChoppedPrecision));
         private SerializedProperty spRevolveChoppedDegrees => serializedObject.FindProperty(nameof(ShapeEditorTarget.revolveChoppedDegrees));
         private SerializedProperty spRevolveChoppedDistance => serializedObject.FindProperty(nameof(ShapeEditorTarget.revolveChoppedDistance));
+        private static bool foldoutExport;
 
         public override void OnInspectorGUI()
         {
@@ -79,6 +80,16 @@ namespace AeternumGames.ShapeEditor
             if (serializedObject.ApplyModifiedProperties() || rebuild)
             {
                 shapeEditorTarget.Rebuild();
+            }
+
+            switch ((ShapeEditorTargetMode)spTargetMode.enumValueIndex)
+            {
+                case ShapeEditorTargetMode.Polygon:
+                    break;
+
+                default:
+                    TrenchBroomMenu_OnGUI();
+                    break;
             }
         }
 
@@ -156,6 +167,20 @@ namespace AeternumGames.ShapeEditor
                 window.OpenProject(shapeEditorTarget.project.Clone());
             }
             GUILayout.EndHorizontal();
+        }
+
+        private void TrenchBroomMenu_OnGUI()
+        {
+            if (foldoutExport = EditorGUILayout.BeginFoldoutHeaderGroup(foldoutExport, "Export Brushes", EditorStyles.foldoutHeader))
+            {
+                var shapeEditorTarget = (ShapeEditorTarget)target;
+                GUIStyle createBrushStyle = ShapeEditorResources.toolbarButtonStyle;
+                if (GUILayout.Button(new GUIContent(" Copy TrenchBroom Brushes", ShapeEditorResources.Instance.shapeEditorTrenchBroomExport, "Copy visible mesh to the clipboard as brushes for the TrenchBroom Level Editor."), GUILayout.Height(18f)))
+                {
+                    shapeEditorTarget.CopyBrushesToClipboard(ExternalBrushEditor.TrenchBroom);
+                }
+            }
+            EditorGUILayout.EndFoldoutHeaderGroup();
         }
     }
 }

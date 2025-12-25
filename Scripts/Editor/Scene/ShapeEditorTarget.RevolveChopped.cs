@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -30,6 +31,20 @@ namespace AeternumGames.ShapeEditor
 
             var mesh = MeshGenerator.CreateRevolveChoppedMesh(choppedPolygons2D, revolveChoppedDegrees, revolveChoppedDistance);
             OnShapeEditorMesh(mesh);
+        }
+
+        public bool RevolveChopped_TryGetPolygonMeshes(out List<PolygonMesh> polygonMeshes)
+        {
+            RequireChoppedPolygons2D(revolveChoppedPrecision);
+
+            // clamp the degrees to be at least between -0.1f and 0.1f but never 0.0f.
+            if (revolveChoppedDegrees >= 0.0f && revolveChoppedDegrees < 0.1f)
+                revolveChoppedDegrees = 0.1f;
+            else if (revolveChoppedDegrees < 0.0f && revolveChoppedDegrees > -0.1f)
+                revolveChoppedDegrees = -0.1f;
+
+            polygonMeshes = MeshGenerator.CreateRevolveChoppedMeshes(choppedPolygons2D, revolveChoppedDegrees, revolveChoppedDistance);
+            return true;
         }
     }
 }

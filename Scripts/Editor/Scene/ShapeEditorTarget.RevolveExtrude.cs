@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -38,6 +39,20 @@ namespace AeternumGames.ShapeEditor
 
             var mesh = MeshGenerator.CreateRevolveExtrudedMesh(convexPolygons2D, revolveExtrudePrecision, revolveExtrudeDegrees, revolveExtrudeRadius, revolveExtrudeHeight, revolveExtrudeSloped);
             OnShapeEditorMesh(mesh);
+        }
+
+        public bool RevolveExtrude_TryGetPolygonMeshes(out List<PolygonMesh> polygonMeshes)
+        {
+            RequireConvexPolygons2D();
+
+            // clamp the degrees to be at least between -0.1f and 0.1f but never 0.0f.
+            if (revolveExtrudeDegrees >= 0.0f && revolveExtrudeDegrees < 0.1f)
+                revolveExtrudeDegrees = 0.1f;
+            else if (revolveExtrudeDegrees < 0.0f && revolveExtrudeDegrees > -0.1f)
+                revolveExtrudeDegrees = -0.1f;
+
+            polygonMeshes = MeshGenerator.CreateRevolveExtrudedPolygonMeshes(convexPolygons2D, revolveExtrudePrecision, revolveExtrudeDegrees, revolveExtrudeRadius, revolveExtrudeHeight, revolveExtrudeSloped);
+            return true;
         }
     }
 }

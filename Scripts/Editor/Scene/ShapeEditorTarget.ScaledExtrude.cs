@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AeternumGames.ShapeEditor
@@ -25,6 +26,14 @@ namespace AeternumGames.ShapeEditor
 
             var mesh = MeshGenerator.CreateScaleExtrudedMesh(convexPolygons2D, scaledExtrudeDistance, scaledExtrudeFrontScale, scaledExtrudeBackScale, scaledExtrudeOffset);
             OnShapeEditorMesh(mesh);
+        }
+
+        public bool ScaledExtrude_TryGetPolygonMeshes(out List<PolygonMesh> polygonMeshes)
+        {
+            RequireConvexPolygons2D();
+
+            polygonMeshes = MeshGenerator.CreateScaleExtrudedMeshes(convexPolygons2D, scaledExtrudeDistance, scaledExtrudeFrontScale, scaledExtrudeBackScale, scaledExtrudeOffset);
+            return true;
         }
     }
 }
