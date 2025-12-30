@@ -30,7 +30,7 @@ namespace AeternumGames.ShapeEditor
         private GuiMaterialIndexButton buttonSetBrushMaterial6;
         private GuiMaterialIndexButton buttonSetBrushMaterial7;
         private GuiMaterialIndexButton buttonSetBrushMaterial8;
-        private GuiViewport viewport;
+        private GuiMaterialEditorViewport viewport;
 
         public MaterialEditorWindow() : base(float2.zero, windowSize) { }
 
@@ -44,25 +44,19 @@ namespace AeternumGames.ShapeEditor
 
             Add(new GuiWindowTitle("Material Editor"));
 
+            Add(viewport = new GuiMaterialEditorViewport(new float2(1, 41), new float2(windowSize.x - 2, windowSize.y - 42)));
+
             var horizontalLayout = new GuiHorizontalLayout(this, 1, 21);
             horizontalLayout.Add(new GuiButton(resources.shapeEditorNew, 20, UserResetMaterials));
             horizontalLayout.Space(5);
-            horizontalLayout.Add(buttonSetBrushMaterial1 = new GuiMaterialIndexButton("1", 20, materialIndexToColor[0], UserSetBrushMaterial1));
-            horizontalLayout.Add(buttonSetBrushMaterial2 = new GuiMaterialIndexButton("2", 20, materialIndexToColor[1], UserSetBrushMaterial2));
-            horizontalLayout.Add(buttonSetBrushMaterial3 = new GuiMaterialIndexButton("3", 20, materialIndexToColor[2], UserSetBrushMaterial3));
-            horizontalLayout.Add(buttonSetBrushMaterial4 = new GuiMaterialIndexButton("4", 20, materialIndexToColor[3], UserSetBrushMaterial4));
-            horizontalLayout.Add(buttonSetBrushMaterial5 = new GuiMaterialIndexButton("5", 20, materialIndexToColor[4], UserSetBrushMaterial5));
-            horizontalLayout.Add(buttonSetBrushMaterial6 = new GuiMaterialIndexButton("6", 20, materialIndexToColor[5], UserSetBrushMaterial6));
-            horizontalLayout.Add(buttonSetBrushMaterial7 = new GuiMaterialIndexButton("7", 20, materialIndexToColor[6], UserSetBrushMaterial7));
-            horizontalLayout.Add(buttonSetBrushMaterial8 = new GuiMaterialIndexButton("8", 20, materialIndexToColor[7], UserSetBrushMaterial8));
-
-            Add(viewport = new GuiViewport(new float2(1, 41), new float2(windowSize.x - 2, windowSize.y - 42)));
-            viewport.onPreRender += Viewport_OnPreRender;
-            viewport.onPreRender2D += Viewport_OnPreRender2D;
-            viewport.onRender3D += Viewport_OnRender3D;
-            viewport.onPostRender2D += Viewport_OnPostRender2D;
-            viewport.onPostRender += Viewport_OnPostRender;
-            viewport.onUnusedKeyDown += Viewport_OnUnusedKeyDown;
+            horizontalLayout.Add(buttonSetBrushMaterial1 = new GuiMaterialIndexButton("1", 20, materialIndexToColor[0], viewport.UserSetBrushMaterial1));
+            horizontalLayout.Add(buttonSetBrushMaterial2 = new GuiMaterialIndexButton("2", 20, materialIndexToColor[1], viewport.UserSetBrushMaterial2));
+            horizontalLayout.Add(buttonSetBrushMaterial3 = new GuiMaterialIndexButton("3", 20, materialIndexToColor[2], viewport.UserSetBrushMaterial3));
+            horizontalLayout.Add(buttonSetBrushMaterial4 = new GuiMaterialIndexButton("4", 20, materialIndexToColor[3], viewport.UserSetBrushMaterial4));
+            horizontalLayout.Add(buttonSetBrushMaterial5 = new GuiMaterialIndexButton("5", 20, materialIndexToColor[4], viewport.UserSetBrushMaterial5));
+            horizontalLayout.Add(buttonSetBrushMaterial6 = new GuiMaterialIndexButton("6", 20, materialIndexToColor[5], viewport.UserSetBrushMaterial6));
+            horizontalLayout.Add(buttonSetBrushMaterial7 = new GuiMaterialIndexButton("7", 20, materialIndexToColor[6], viewport.UserSetBrushMaterial7));
+            horizontalLayout.Add(buttonSetBrushMaterial8 = new GuiMaterialIndexButton("8", 20, materialIndexToColor[7], viewport.UserSetBrushMaterial8));
         }
 
         private float2 GetCenterPosition()
@@ -75,24 +69,17 @@ namespace AeternumGames.ShapeEditor
 
         public override void OnRender()
         {
-            buttonSetBrushMaterial1.isChecked = materialIndex == 0;
-            buttonSetBrushMaterial2.isChecked = materialIndex == 1;
-            buttonSetBrushMaterial3.isChecked = materialIndex == 2;
-            buttonSetBrushMaterial4.isChecked = materialIndex == 3;
-            buttonSetBrushMaterial5.isChecked = materialIndex == 4;
-            buttonSetBrushMaterial6.isChecked = materialIndex == 5;
-            buttonSetBrushMaterial7.isChecked = materialIndex == 6;
-            buttonSetBrushMaterial8.isChecked = materialIndex == 7;
+            buttonSetBrushMaterial1.isChecked = viewport.materialIndex == 0;
+            buttonSetBrushMaterial2.isChecked = viewport.materialIndex == 1;
+            buttonSetBrushMaterial3.isChecked = viewport.materialIndex == 2;
+            buttonSetBrushMaterial4.isChecked = viewport.materialIndex == 3;
+            buttonSetBrushMaterial5.isChecked = viewport.materialIndex == 4;
+            buttonSetBrushMaterial6.isChecked = viewport.materialIndex == 5;
+            buttonSetBrushMaterial7.isChecked = viewport.materialIndex == 6;
+            buttonSetBrushMaterial8.isChecked = viewport.materialIndex == 7;
 
             base.OnRender();
         }
-
-        private Mesh mesh;
-        private MeshRaycast meshRaycast;
-        private MeshColors meshColors;
-        private MeshTriangleLookupTable lookupTable;
-        private byte materialIndex;
-        private byte materialIndexUnderMouse;
 
         [Instructions(title: "Reset all surfaces to material index number one.", description: "Resets all materials assignments in the project to the default material slot which appears as white.")]
         private void UserResetMaterials()
@@ -119,260 +106,261 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
-        [Instructions(title: "Draw with material index number one.", shortcut: "1 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).\n\nThis is the default material slot and appears as white.")]
-        private void UserSetBrushMaterial1() => UserSetBrushMaterial(0);
-
-        [Instructions(title: "Draw with material index number two.", shortcut: "2 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
-        private void UserSetBrushMaterial2() => UserSetBrushMaterial(1);
-
-        [Instructions(title: "Draw with material index number three.", shortcut: "3 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
-        private void UserSetBrushMaterial3() => UserSetBrushMaterial(2);
-
-        [Instructions(title: "Draw with material index number four.", shortcut: "4 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
-        private void UserSetBrushMaterial4() => UserSetBrushMaterial(3);
-
-        [Instructions(title: "Draw with material index number five.", shortcut: "5 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
-        private void UserSetBrushMaterial5() => UserSetBrushMaterial(4);
-
-        [Instructions(title: "Draw with material index number six.", shortcut: "6 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
-        private void UserSetBrushMaterial6() => UserSetBrushMaterial(5);
-
-        [Instructions(title: "Draw with material index number seven.", shortcut: "7 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
-        private void UserSetBrushMaterial7() => UserSetBrushMaterial(6);
-
-        [Instructions(title: "Draw with material index number eight.", shortcut: "8 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
-        private void UserSetBrushMaterial8() => UserSetBrushMaterial(7);
-
-        private void UserSetBrushMaterial(byte materialIndex)
+        /// <summary>Represents the 3D viewport of the material editor.</summary>
+        private class GuiMaterialEditorViewport : GuiViewport
         {
-            this.materialIndex = materialIndex;
-        }
+            private CameraFirstPerson firstPersonCamera;
 
-        private void RebuildMesh()
-        {
-            // ensure the project data is ready.
-            editor.project.Validate();
-            var convexPolygons2D = editor.project.GenerateConvexPolygons();
-            convexPolygons2D.CalculateBounds2D();
-            mesh = MeshGenerator.CreateExtrudedPolygonMesh(convexPolygons2D, 0.5f);
-            meshRaycast = new MeshRaycast(mesh);
-            lookupTable = new MeshTriangleLookupTable(meshRaycast.Triangles, meshRaycast.Vertices, editor.project);
-            meshColors = new MeshColors(mesh);
-        }
+            private Mesh mesh;
+            private MeshRaycast meshRaycast;
+            private MeshColors meshColors;
+            private MeshTriangleLookupTable lookupTable;
+            public byte materialIndex { get; private set; }
+            private byte materialIndexUnderMouse;
 
-        public override void OnFocus()
-        {
-            if (viewport.isMouseOver)
+            public GuiMaterialEditorViewport(float2 size) : base(size)
             {
-                RebuildMesh();
             }
-        }
 
-        /// <summary>
-        /// Called at the beginning of the control's OnRender function. This draws on the normal screen.
-        /// </summary>
-        private void Viewport_OnPreRender()
-        {
-            if (mesh == null)
-                RebuildMesh();
-
-            UpdateMeshColors();
-        }
-
-        /// <summary>
-        /// Called before drawing the 3D world on the render texture with a 2D pixel matrix.
-        /// </summary>
-        private void Viewport_OnPreRender2D()
-        {
-        }
-
-        /// <summary>
-        /// Called when the 3D world is to be drawn the render texture with a 3D projection matrix.
-        /// </summary>
-        private void Viewport_OnRender3D()
-        {
-            GLUtilities3D.DrawGuiTextured(ShapeEditorResources.Instance.shapeEditorDefaultMaterial.mainTexture, viewport.camera.transform.position, () =>
+            public GuiMaterialEditorViewport(float2 position, float2 size) : base(position, size)
             {
-                Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
-            });
+            }
 
-            // no need to do raycasting when the mouse isn't over the window.
-            if (viewport.isMouseOver)
+            // use a first-person camera.
+            public override Camera camera => firstPersonCamera ??= new CameraFirstPerson(editor);
+
+            private void RebuildMesh()
             {
-                MeshRaycastHit hit = null;
-                materialIndexUnderMouse = 255;
+                // ensure the project data is ready.
+                editor.project.Validate();
+                var convexPolygons2D = editor.project.GenerateConvexPolygons();
+                convexPolygons2D.CalculateBounds2D();
+                mesh = MeshGenerator.CreateExtrudedPolygonMesh(convexPolygons2D, 0.5f);
+                meshRaycast = new MeshRaycast(mesh);
+                lookupTable = new MeshTriangleLookupTable(meshRaycast.Triangles, meshRaycast.Vertices, editor.project);
+                meshColors = new MeshColors(mesh);
+            }
 
-                GLUtilities3D.DrawGuiLines(() =>
+            public override void OnFocus()
+            {
+                if (isMouseOver)
                 {
-                    var ray = viewport.camera.ScreenPointToRay(viewport.mousePosition);
+                    RebuildMesh();
+                }
+            }
 
-                    if (meshRaycast.Raycast(ray.origin, ray.direction, out hit))
+            protected override void OnPreRender()
+            {
+                if (mesh == null)
+                    RebuildMesh();
+
+                UpdateMeshColors();
+            }
+
+            protected override void OnRender3D()
+            {
+                GLUtilities3D.DrawGuiTextured(ShapeEditorResources.Instance.shapeEditorDefaultMaterial.mainTexture, camera.transform.position, () =>
+                {
+                    Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
+                });
+
+                // no need to do raycasting when the mouse isn't over the window.
+                if (isMouseOver)
+                {
+                    MeshRaycastHit hit = null;
+                    materialIndexUnderMouse = 255;
+
+                    GLUtilities3D.DrawGuiLines(() =>
                     {
-                        if (hit.normal.z.EqualsWithEpsilon5(0.0f))
+                        var ray = camera.ScreenPointToRay(mousePosition);
+
+                        if (meshRaycast.Raycast(ray.origin, ray.direction, out hit))
                         {
-                            GL.Color(materialIndexToColor[materialIndex]);
-
-                            var pos = new float2(hit.point.x, -hit.point.y);
-                            var segment = editor.project.FindSegmentLineAtPosition(pos, 1f);
-                            if (lookupTable.TryGetTrianglesForSegment(segment, out var triangleIndices))
+                            if (hit.normal.z.EqualsWithEpsilon5(0.0f))
                             {
-                                foreach (var triangleIndex in triangleIndices)
-                                {
-                                    var v1 = lookupTable.Vertices[lookupTable.Triangles[triangleIndex]];
-                                    var v2 = lookupTable.Vertices[lookupTable.Triangles[triangleIndex + 1]];
-                                    var v3 = lookupTable.Vertices[lookupTable.Triangles[triangleIndex + 2]];
+                                GL.Color(materialIndexToColor[materialIndex]);
 
-                                    GLUtilities3D.DrawLine(v1, v2);
-                                    GLUtilities3D.DrawLine(v2, v3);
-                                    GLUtilities3D.DrawLine(v3, v1);
+                                var pos = new float2(hit.point.x, -hit.point.y);
+                                var segment = editor.project.FindSegmentLineAtPosition(pos, 1f);
+                                if (lookupTable.TryGetTrianglesForSegment(segment, out var triangleIndices))
+                                {
+                                    foreach (var triangleIndex in triangleIndices)
+                                    {
+                                        var v1 = lookupTable.Vertices[lookupTable.Triangles[triangleIndex]];
+                                        var v2 = lookupTable.Vertices[lookupTable.Triangles[triangleIndex + 1]];
+                                        var v3 = lookupTable.Vertices[lookupTable.Triangles[triangleIndex + 2]];
+
+                                        GLUtilities3D.DrawLine(v1, v2);
+                                        GLUtilities3D.DrawLine(v2, v3);
+                                        GLUtilities3D.DrawLine(v3, v1);
+                                    }
                                 }
                             }
+                            else
+                            {
+                                // todo: triangle based lookup table for shapes:
+
+                                var pos = new float2(hit.point.x, -hit.point.y);
+                                var shape = editor.FindShapeAtGridPosition(pos);
+                                if (shape != null)
+                                {
+                                    GL.Color(materialIndexToColor[materialIndex]);
+                                    GLUtilities3D.DrawLine(hit.vertex1, hit.vertex2);
+                                    GLUtilities3D.DrawLine(hit.vertex2, hit.vertex3);
+                                    GLUtilities3D.DrawLine(hit.vertex3, hit.vertex1);
+                                }
+                            }
+                        }
+                    });
+
+                    if (hit != null)
+                    {
+                        var pos = new float2(hit.point.x, -hit.point.y);
+                        if (hit.normal.z.EqualsWithEpsilon5(0.0f))
+                        {
+                            if (isActive && editor.isLeftMousePressed)
+                            {
+                                if (lookupTable.TryGetSegmentsForTriangleIndex(hit.triangleIndex, out var segments))
+                                {
+                                    foreach (var segment in segments)
+                                    {
+                                        segment.material = materialIndex;
+                                    }
+                                }
+                            }
+
+                            var segmentUnderMouse = editor.project.FindSegmentLineAtPosition(pos, 1f);
+                            materialIndexUnderMouse = 0;
+                            if (segmentUnderMouse != null)
+                                materialIndexUnderMouse = segmentUnderMouse.material;
                         }
                         else
                         {
+                            materialIndexUnderMouse = 0;
+
                             // todo: triangle based lookup table for shapes:
-
-                            var pos = new float2(hit.point.x, -hit.point.y);
                             var shape = editor.FindShapeAtGridPosition(pos);
-                            if (shape != null)
+                            if (isActive && editor.isLeftMousePressed)
                             {
-                                GL.Color(materialIndexToColor[materialIndex]);
-                                GLUtilities3D.DrawLine(hit.vertex1, hit.vertex2);
-                                GLUtilities3D.DrawLine(hit.vertex2, hit.vertex3);
-                                GLUtilities3D.DrawLine(hit.vertex3, hit.vertex1);
-                            }
-                        }
-                    }
-                });
-
-                if (hit != null)
-                {
-                    var pos = new float2(hit.point.x, -hit.point.y);
-                    if (hit.normal.z.EqualsWithEpsilon5(0.0f))
-                    {
-                        if (editor.isLeftMousePressed)
-                        {
-                            if (lookupTable.TryGetSegmentsForTriangleIndex(hit.triangleIndex, out var segments))
-                            {
-                                foreach (var segment in segments)
+                                if (shape != null)
                                 {
-                                    segment.material = materialIndex;
+                                    if (hit.normal.z < 0.5f)
+                                    {
+                                        shape.frontMaterial = materialIndex;
+                                    }
+                                    else if (hit.normal.z > 0.5f)
+                                    {
+                                        shape.backMaterial = materialIndex;
+                                    }
                                 }
                             }
-                        }
 
-                        var segmentUnderMouse = editor.project.FindSegmentLineAtPosition(pos, 1f);
-                        materialIndexUnderMouse = 0;
-                        if (segmentUnderMouse != null)
-                            materialIndexUnderMouse = segmentUnderMouse.material;
-                    }
-                    else
-                    {
-                        materialIndexUnderMouse = 0;
-
-                        // todo: triangle based lookup table for shapes:
-                        var shape = editor.FindShapeAtGridPosition(pos);
-                        if (editor.isLeftMousePressed)
-                        {
                             if (shape != null)
                             {
                                 if (hit.normal.z < 0.5f)
                                 {
-                                    shape.frontMaterial = materialIndex;
+                                    materialIndexUnderMouse = shape.frontMaterial;
                                 }
                                 else if (hit.normal.z > 0.5f)
                                 {
-                                    shape.backMaterial = materialIndex;
+                                    materialIndexUnderMouse = shape.backMaterial;
                                 }
                             }
                         }
+                    }
+                }
+            }
 
-                        if (shape != null)
+            protected override void OnPostRender2D()
+            {
+                if (materialIndexUnderMouse != 255)
+                    GLUtilities.DrawGuiText(ShapeEditorResources.fontSegoeUI14, "Material under mouse: " + materialIndexUnderMouse, new float2(10, 10));
+            }
+
+            public override bool OnKeyDown(KeyCode keyCode)
+            {
+                switch (keyCode)
+                {
+                    case KeyCode.Alpha1: UserSetBrushMaterial1(); return true;
+                    case KeyCode.Alpha2: UserSetBrushMaterial2(); return true;
+                    case KeyCode.Alpha3: UserSetBrushMaterial3(); return true;
+                    case KeyCode.Alpha4: UserSetBrushMaterial4(); return true;
+                    case KeyCode.Alpha5: UserSetBrushMaterial5(); return true;
+                    case KeyCode.Alpha6: UserSetBrushMaterial6(); return true;
+                    case KeyCode.Alpha7: UserSetBrushMaterial7(); return true;
+                    case KeyCode.Alpha8: UserSetBrushMaterial8(); return true;
+                }
+                return base.OnKeyDown(keyCode);
+            }
+
+            private void UpdateMeshColors()
+            {
+                var vertices = meshRaycast.Vertices;
+                var triangles = meshRaycast.Triangles;
+
+                // find all triangles that are part of the edge.
+                for (int k = 0; k < triangles.Length; k += 3)
+                {
+                    Color32 color = new Color32(255, 255, 255, 255);
+
+                    if (lookupTable.TryGetSegmentsForTriangleIndex(k, out var segments))
+                    {
+                        color = materialIndexToColor[segments[0].material];
+                    }
+                    else if (lookupTable.TryGetShapesForTriangleIndex(k, out var shapes))
+                    {
+                        var v1 = vertices[triangles[k]];
+                        var v2 = vertices[triangles[k + 1]];
+                        var v3 = vertices[triangles[k + 2]];
+                        var plane = new Plane(v1, v2, v3);
+
+                        if (plane.normal.z < 0.5f)
                         {
-                            if (hit.normal.z < 0.5f)
-                            {
-                                materialIndexUnderMouse = shape.frontMaterial;
-                            }
-                            else if (hit.normal.z > 0.5f)
-                            {
-                                materialIndexUnderMouse = shape.backMaterial;
-                            }
+                            color = materialIndexToColor[shapes[0].frontMaterial];
+                        }
+                        else if (plane.normal.z > 0.5f)
+                        {
+                            color = materialIndexToColor[shapes[0].backMaterial];
                         }
                     }
+
+                    meshColors[triangles[k]] = color;
+                    meshColors[triangles[k + 1]] = color;
+                    meshColors[triangles[k + 2]] = color;
                 }
+                meshColors.UpdateMesh();
             }
-        }
 
-        /// <summary>
-        /// Called after drawing the 3D world on the render texture with a 2D pixel matrix.
-        /// </summary>
-        private void Viewport_OnPostRender2D()
-        {
-            if (materialIndexUnderMouse != 255)
-                GLUtilities.DrawGuiText(ShapeEditorResources.fontSegoeUI14, "Material under mouse: " + materialIndexUnderMouse, new float2(10, 10));
-        }
+            [Instructions(title: "Draw with material index number one.", shortcut: "1 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).\n\nThis is the default material slot and appears as white.")]
+            public void UserSetBrushMaterial1() => UserSetBrushMaterial(0);
 
-        /// <summary>
-        /// Called at the end of the control's <see cref="OnRender"/> function. This draws on the
-        /// normal screen.
-        /// </summary>
+            [Instructions(title: "Draw with material index number two.", shortcut: "2 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
+            public void UserSetBrushMaterial2() => UserSetBrushMaterial(1);
 
-        private void Viewport_OnPostRender()
-        {
-        }
+            [Instructions(title: "Draw with material index number three.", shortcut: "3 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
+            public void UserSetBrushMaterial3() => UserSetBrushMaterial(2);
 
-        private bool Viewport_OnUnusedKeyDown(KeyCode keyCode)
-        {
-            switch (keyCode)
+            [Instructions(title: "Draw with material index number four.", shortcut: "4 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
+            public void UserSetBrushMaterial4() => UserSetBrushMaterial(3);
+
+            [Instructions(title: "Draw with material index number five.", shortcut: "5 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
+            public void UserSetBrushMaterial5() => UserSetBrushMaterial(4);
+
+            [Instructions(title: "Draw with material index number six.", shortcut: "6 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
+            public void UserSetBrushMaterial6() => UserSetBrushMaterial(5);
+
+            [Instructions(title: "Draw with material index number seven.", shortcut: "7 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
+            public void UserSetBrushMaterial7() => UserSetBrushMaterial(6);
+
+            [Instructions(title: "Draw with material index number eight.", shortcut: "8 key", description: "You can draw this material index with the left mouse button on the mesh in the 3D viewport. Once you have extruded your shape, you can assign materials in the scene to these slots (indicated here by colored areas).")]
+            public void UserSetBrushMaterial8() => UserSetBrushMaterial(7);
+
+            /// <summary>Sets the material index used by the brush.</summary>
+            /// <param name="materialIndex">The material index to be used.</param>
+            private void UserSetBrushMaterial(byte materialIndex)
             {
-                case KeyCode.Alpha1: UserSetBrushMaterial1(); return true;
-                case KeyCode.Alpha2: UserSetBrushMaterial2(); return true;
-                case KeyCode.Alpha3: UserSetBrushMaterial3(); return true;
-                case KeyCode.Alpha4: UserSetBrushMaterial4(); return true;
-                case KeyCode.Alpha5: UserSetBrushMaterial5(); return true;
-                case KeyCode.Alpha6: UserSetBrushMaterial6(); return true;
-                case KeyCode.Alpha7: UserSetBrushMaterial7(); return true;
-                case KeyCode.Alpha8: UserSetBrushMaterial8(); return true;
+                this.materialIndex = materialIndex;
             }
-            return false;
-        }
-
-        private void UpdateMeshColors()
-        {
-            var vertices = meshRaycast.Vertices;
-            var triangles = meshRaycast.Triangles;
-
-            // find all triangles that are part of the edge.
-            for (int k = 0; k < triangles.Length; k += 3)
-            {
-                Color32 color = new Color32(255, 255, 255, 255);
-
-                if (lookupTable.TryGetSegmentsForTriangleIndex(k, out var segments))
-                {
-                    color = materialIndexToColor[segments[0].material];
-                }
-                else if (lookupTable.TryGetShapesForTriangleIndex(k, out var shapes))
-                {
-                    var v1 = vertices[triangles[k]];
-                    var v2 = vertices[triangles[k + 1]];
-                    var v3 = vertices[triangles[k + 2]];
-                    var plane = new Plane(v1, v2, v3);
-
-                    if (plane.normal.z < 0.5f)
-                    {
-                        color = materialIndexToColor[shapes[0].frontMaterial];
-                    }
-                    else if (plane.normal.z > 0.5f)
-                    {
-                        color = materialIndexToColor[shapes[0].backMaterial];
-                    }
-                }
-
-                meshColors[triangles[k]] = color;
-                meshColors[triangles[k + 1]] = color;
-                meshColors[triangles[k + 2]] = color;
-            }
-            meshColors.UpdateMesh();
         }
 
         private class MeshColors
