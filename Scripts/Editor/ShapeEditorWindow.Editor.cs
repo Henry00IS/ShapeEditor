@@ -366,6 +366,35 @@ namespace AeternumGames.ShapeEditor
             desiredMouseCursorTimer = 1;
         }
 
+        /// <summary>While this function is called every repaint, it will set the mouse cursor.</summary>
+        /// <param name="direction">The mouse cursor direction to use for resize arrows.</param>
+        internal void SetMouseCursor(CompassRose direction)
+        {
+            switch (direction)
+            {
+                case CompassRose.N:
+                case CompassRose.S:
+                    desiredMouseCursor = MouseCursor.ResizeVertical;
+                    break;
+
+                case CompassRose.E:
+                case CompassRose.W:
+                    desiredMouseCursor = MouseCursor.ResizeHorizontal;
+                    break;
+
+                case CompassRose.NE:
+                case CompassRose.SW:
+                    desiredMouseCursor = MouseCursor.ResizeUpRight;
+                    break;
+
+                case CompassRose.NW:
+                case CompassRose.SE:
+                    desiredMouseCursor = MouseCursor.ResizeUpLeft;
+                    break;
+            }
+            desiredMouseCursorTimer = 1;
+        }
+
         /// <summary>While this function is called every repaint, it will set the tooltip text.</summary>
         /// <param name="tooltip">The tooltip text to display when the mouse is idling.</param>
         internal void SetTooltipText(string tooltip)

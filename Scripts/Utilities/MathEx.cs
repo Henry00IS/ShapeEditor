@@ -724,6 +724,45 @@ namespace AeternumGames.ShapeEditor
             }
         }
 
+        /// <summary>Determines which border direction a point is hovering over.</summary>
+        /// <param name="rect">The outer rectangle.</param>
+        /// <param name="borderSize">The size of the border (inside <paramref name="rect"/>).</param>
+        /// <param name="point">The point to check whether it's on the border.</param>
+        /// <param name="direction">The direction if found.</param>
+        /// <returns>True when the <paramref name="point"/> is on the border else false.</returns>
+        public static bool GetBorderDirection(Rect rect, float borderSize, Vector2 point, out CompassRose direction)
+        {
+            // clamp border sze to avoid nonsense.
+            borderSize = Mathf.Max(0f, borderSize);
+
+            // define the 4 edge rects.
+            Rect left = new Rect(rect.x, rect.y, borderSize, rect.height);
+            Rect right = new Rect(rect.xMax - borderSize, rect.y, borderSize, rect.height);
+            Rect top = new Rect(rect.x, rect.y, rect.width, borderSize);
+            Rect bottom = new Rect(rect.x, rect.yMax - borderSize, rect.width, borderSize);
+
+            bool onLeft = left.Contains(point);
+            bool onRight = right.Contains(point);
+            bool onTop = top.Contains(point);
+            bool onBottom = bottom.Contains(point);
+
+            // corner cases first:
+            if (onLeft && onTop) { direction = CompassRose.NW; return true; }
+            if (onRight && onTop) { direction = CompassRose.NE; return true; }
+            if (onLeft && onBottom) { direction = CompassRose.SW; return true; }
+            if (onRight && onBottom) { direction = CompassRose.SE; return true; }
+
+            // pure edge cases:
+            if (onLeft) { direction = CompassRose.W; return true; }
+            if (onRight) { direction = CompassRose.E; return true; }
+            if (onTop) { direction = CompassRose.N; return true; }
+            if (onBottom) { direction = CompassRose.S; return true; }
+
+            // not on any border:
+            direction = CompassRose.N;
+            return false;
+        }
+
         /// <summary>Represents a mathematical circle or sphere.</summary>
         [System.Serializable]
         public class Circle

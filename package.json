@@ -21,7 +21,7 @@
 	"CAD"
   ],
   "unity": "2018.3",
-  "version": "1.99.0",
+  "version": "1.100.0",
   "dependencies": {
     "com.unity.mathematics": "1.1.0"
   }

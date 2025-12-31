@@ -15,15 +15,6 @@ namespace AeternumGames.ShapeEditor
             this.position = position;
             this.size = size;
         }
-
-        /// <summary>Gets whether the mouse is hovering over the control and not busy.</summary>
-        public bool isMouseOverNotBusy => isMouseOver && !editor.isMouseBusy;
-
-        /// <summary>
-        /// Returns true when the mouse is not obstructed, hovers over the control and is not busy.
-        /// This check should be used before displaying hover effects.
-        /// </summary>
-        public bool isMouseHoverEffectApplicable => !isMouseObstructed && isMouseOverNotBusy;
     }
 }
 

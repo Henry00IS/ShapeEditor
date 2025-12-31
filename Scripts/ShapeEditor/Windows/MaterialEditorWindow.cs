@@ -8,7 +8,7 @@ using GLUtilities3D = AeternumGames.ShapeEditor.GLUtilities.GLUtilities3D;
 namespace AeternumGames.ShapeEditor
 {
     /// <summary>The 3D material editor window.</summary>
-    public class MaterialEditorWindow : GuiWindow
+    public class MaterialEditorWindow : GuiResizableWindow
     {
         private static readonly Color32[] materialIndexToColor = {
             new Color32(255, 255, 255, 255),
@@ -79,6 +79,11 @@ namespace AeternumGames.ShapeEditor
             buttonSetBrushMaterial8.isChecked = viewport.materialIndex == 7;
 
             base.OnRender();
+        }
+
+        protected override void OnResize()
+        {
+            viewport.size = new float2(size.x - 2, size.y - 42);
         }
 
         [Instructions(title: "Reset all surfaces to material index number one.", description: "Resets all materials assignments in the project to the default material slot which appears as white.")]
