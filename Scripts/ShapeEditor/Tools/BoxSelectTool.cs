@@ -16,6 +16,12 @@ namespace AeternumGames.ShapeEditor
         /// <summary>The last selected shape in face select mode for cycling through shapes.</summary>
         private Shape lastSelectedShape;
 
+        public override bool IsBusy()
+        {
+            // always busy while dragging a marquee.
+            return isMarqueeActive;
+        }
+
         public override void OnActivate()
         {
             isMarqueeActive = false;
