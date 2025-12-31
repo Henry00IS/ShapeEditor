@@ -166,7 +166,7 @@ Shader "Aeternum Games/Shape Editor Gui"
 					float3 viewDir = normalize(_cameraPosition - IN.worldPos);
 					float3 diffuse = max(dot(IN.normal, viewDir), 0.0);
 
-					col = fixed4(ambient + diffuse, 1) /* tex2D(_MainTex, IN.uv0) */ * IN.color * _Color;
+					col = fixed4(ambient + diffuse, 1) * (fixed4(0.5, 0.5, 0.5, 1) + fixed4(tex2D(_MainTex, IN.uv0).rrr * 0.5, 0)) * IN.color * _Color;
 					return col;
 				}
 			ENDCG
