@@ -26,6 +26,14 @@ namespace AeternumGames.ShapeEditor
             this.size = size;
         }
 
+        /// <summary>Adds the window as a child of the current window.</summary>
+        /// <param name="window">The window to be owned by the current window.</param>
+        protected void OpenChildWindow(GuiWindow window)
+        {
+            window.parent = this;
+            editor.OpenWindow(window);
+        }
+
         /// <summary>
         /// Marks the window as ready to be removed, removing it as soon as possible.
         /// </summary>

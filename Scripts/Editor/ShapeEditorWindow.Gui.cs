@@ -111,7 +111,9 @@ namespace AeternumGames.ShapeEditor
                 TrySwitchActiveEventReceiver(window);
         }
 
-        /// <summary>Removes all of the windows that were marked as closed.</summary>
+        /// <summary>
+        /// Removes all of the windows that were marked as closed, along with their child windows.
+        /// </summary>
         private void RemoveClosedWindows()
         {
             // iterate over the windows in reverse.
@@ -122,6 +124,26 @@ namespace AeternumGames.ShapeEditor
                 if (window.closed)
                 {
                     window.OnDeactivate();
+                    windows.RemoveAt(i);
+
+                    // also remove all of the child windows.
+                    RemoveChildWindows(window);
+                }
+            }
+        }
+
+        /// <summary>Removes all of the child windows.</summary>
+        /// <param name="window">The window that needs all child windows removed.</param>
+        private void RemoveChildWindows(GuiWindow window)
+        {
+            // iterate over the windows in reverse.
+            var windowsCount = windows.Count;
+            for (int i = windowsCount; i-- > 0;)
+            {
+                var child = windows[i];
+                if (child.parent == window)
+                {
+                    child.OnDeactivate();
                     windows.RemoveAt(i);
                 }
             }
