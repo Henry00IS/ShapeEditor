@@ -57,6 +57,7 @@ namespace AeternumGames.ShapeEditor
                         // further children of the control.
                         if (eventReceiver is IGuiContainerEventReceiver guiContainerEventReceiver
                             && guiContainerEventReceiver.isMouseOver
+                            && !guiContainerEventReceiver.isMouseObstructed
                             && guiContainerEventReceiver.IsChildOf(window))
                             switchToWindow = false;
                     }

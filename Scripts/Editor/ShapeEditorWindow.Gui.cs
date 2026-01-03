@@ -39,7 +39,7 @@ namespace AeternumGames.ShapeEditor
             if (windows == null) return null;
             var windowsCount = windows.Count;
             for (int i = 0; i < windowsCount; i++)
-                if (windows[i].rect.Contains(position))
+                if (windows[i].drawRect.Contains(position))
                     return windows[i];
             return null;
         }
@@ -48,7 +48,24 @@ namespace AeternumGames.ShapeEditor
         /// <param name="window">The window to be put in front.</param>
         private void MoveWindowToFront(GuiWindow window)
         {
+            // if we are a child window then the owner window must be moved to the front first.
+            if (window.parent != null && window.parent is GuiWindow parent)
+            {
+                MoveWindowToFront(parent);
+                return;
+            }
+
+            // we are a parent (or regular) window and move ourselves to the front.
             windows.MoveItemAtIndexToFront(windows.IndexOf(window));
+
+            // lastly we move all of our child windows to the front.
+            var windowsCount = windows.Count;
+            for (int i = 0; i < windowsCount; i++)
+            {
+                var child = windows[i];
+                if (child.parent == window)
+                    windows.MoveItemAtIndexToFront(windows.IndexOf(child));
+            }
         }
 
         /// <summary>

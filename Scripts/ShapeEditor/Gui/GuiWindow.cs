@@ -40,7 +40,7 @@ namespace AeternumGames.ShapeEditor
             // render the window.
             GLUtilities.DrawGui(() =>
             {
-                GLUtilities.DrawTransparentRectangleWithOutline(position.x, position.y, size.x, size.y, colorWindowBackground, colorWindowBorder);
+                GLUtilities.DrawTransparentRectangleWithOutline(drawPosition.x, drawPosition.y, size.x, size.y, colorWindowBackground, colorWindowBorder);
             });
 
             // render the child containers.
