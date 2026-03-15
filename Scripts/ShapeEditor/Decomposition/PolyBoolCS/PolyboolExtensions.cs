@@ -14,7 +14,11 @@ namespace AeternumGames.ShapeEditor
     {
         // Threshold for detecting "thin" connections (T-Junctions)
         // A connection is considered a singularity if the edge length ratio is below this threshold
-        private const float ThinEdgeRatioThreshold = 0.01f;
+        private const float ThinEdgeRatioThreshold = 0.001f;
+        
+        // Minimum distance threshold for detecting T-Junction points (in screen coordinates)
+        // Used when checking if a vertex lies on an edge
+        private const float TJunctionPointThreshold = 1e-6f;
 
         public static PolyboolPolygon ToPolybool(this Polygon polygon)
         {
@@ -70,6 +74,14 @@ namespace AeternumGames.ShapeEditor
             if (polygon.Count < 3)
                 return new List<Polygon> { polygon };
 
+            // First, try to detect and split at true T-Junctions (vertices lying on edges)
+            var tjunctionResults = SplitAtTrueTJunctions(polygon);
+            if (tjunctionResults != null && tjunctionResults.Count > 1)
+            {
+                return tjunctionResults;
+            }
+
+            // Fallback: try the old thin edge detection
             // Calculate the average edge length
             float totalEdgeLength = 0;
             for (int i = 0; i < polygon.Count; i++)
@@ -106,7 +118,188 @@ namespace AeternumGames.ShapeEditor
                 }
             }
 
+            // Last resort: try geometric split based on bottleneck detection
+            var geometricResult = TryGeometricSplit(polygon);
+            if (geometricResult != null && geometricResult.Count > 1)
+            {
+                return geometricResult;
+            }
+
             return new List<Polygon> { polygon };
+        }
+
+        /// <summary>
+        /// Detects and splits polygons at true T-Junctions where vertices lie on other edges.
+        /// This is the core fix for the T-Junction bug.
+        /// </summary>
+        private static List<Polygon> SplitAtTrueTJunctions(Polygon polygon)
+        {
+            if (polygon.Count < 4)
+                return null;
+
+            // Calculate polygon bounds to normalize our threshold
+            var bounds = polygon.GetAABB();
+            float polygonSize = Mathf.Max(bounds.size.x, bounds.size.y);
+            float threshold = polygonSize * ThinEdgeRatioThreshold;
+            if (threshold < TJunctionPointThreshold)
+                threshold = TJunctionPointThreshold;
+
+            // Find vertices that lie on other edges (T-Junction points)
+            var tjunctionVertices = new List<int>(); // indices of vertices that lie on other edges
+
+            for (int i = 0; i < polygon.Count; i++)
+            {
+                var vi = polygon[i].position;
+                
+                // Check if this vertex lies on any OTHER edge of the polygon
+                for (int edgeStart = 0; edgeStart < polygon.Count; edgeStart++)
+                {
+                    int edgeEnd = (edgeStart + 1) % polygon.Count;
+                    
+                    // Skip edges that are incident to this vertex
+                    if (edgeStart == i || edgeEnd == i)
+                        continue;
+                    
+                    var vStart = polygon[edgeStart].position;
+                    var vEnd = polygon[edgeEnd].position;
+                    
+                    // Check if vertex vi lies on the edge from vStart to vEnd
+                    if (IsPointOnEdge(vi, vStart, vEnd, threshold))
+                    {
+                        // Found a T-Junction! This vertex lies on another edge
+                        tjunctionVertices.Add(i);
+                        break; // Only need to find one T-Junction per vertex
+                    }
+                }
+            }
+
+            // If we found T-Junction vertices, try to split at each one
+            if (tjunctionVertices.Count > 0)
+            {
+                // Sort in descending order to remove from end first (avoid index shifting)
+                tjunctionVertices.Sort((a, b) => b.CompareTo(a));
+                
+                foreach (int tjunctionIndex in tjunctionVertices)
+                {
+                    var result = TrySplitAtTJunctionVertex(polygon, tjunctionIndex);
+                    if (result != null && result.Count > 1)
+                    {
+                        return result;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Checks if a point lies on an edge (within a threshold distance).
+        /// </summary>
+        private static bool IsPointOnEdge(Vector2 point, Vector2 edgeStart, Vector2 edgeEnd, float threshold)
+        {
+            // First check if point is collinear with the edge using cross product (z-component)
+            // Cross product of (edgeEnd - edgeStart) and (point - edgeStart)
+            float crossZ = (edgeEnd.x - edgeStart.x) * (point.y - edgeStart.y) - 
+                           (edgeEnd.y - edgeStart.y) * (point.x - edgeStart.x);
+            float edgeLength = (edgeEnd - edgeStart).magnitude;
+            
+            if (edgeLength < threshold)
+                return false; // Edge is too short
+                
+            // Check if point is collinear (cross product is near zero)
+            if (Mathf.Abs(crossZ) / edgeLength > threshold)
+                return false; // Not collinear
+                
+            // Check if point is within the bounding box of the edge
+            float minX = Mathf.Min(edgeStart.x, edgeEnd.x) - threshold;
+            float maxX = Mathf.Max(edgeStart.x, edgeEnd.x) + threshold;
+            float minY = Mathf.Min(edgeStart.y, edgeEnd.y) - threshold;
+            float maxY = Mathf.Max(edgeStart.y, edgeEnd.y) + threshold;
+            
+            if (point.x < minX || point.x > maxX || point.y < minY || point.y > maxY)
+                return false; // Point is outside edge bounds
+                
+            // Check if point is between the endpoints (not at endpoints)
+            float dotProduct = Vector2.Dot(point - edgeStart, edgeEnd - edgeStart);
+            float squaredLength = (edgeEnd - edgeStart).sqrMagnitude;
+            
+            // Point is on the edge (but not at endpoints) if 0 < dot < squaredLength
+            return dotProduct > threshold && dotProduct < squaredLength - threshold;
+        }
+
+        /// <summary>
+        /// Attempts to split the polygon at a T-Junction vertex.
+        /// </summary>
+        private static List<Polygon> TrySplitAtTJunctionVertex(Polygon polygon, int tjunctionIndex)
+        {
+            int n = polygon.Count;
+            if (n < 5)
+                return null;
+
+            // Split the polygon at the T-Junction vertex
+            // We create two polygons: one going from T-Junction to T-Junction, the other as the rest
+            
+            // Try different split points to find one that works
+            for (int offset = 2; offset < n - 2; offset++)
+            {
+                int splitIndex = (tjunctionIndex + offset) % n;
+                
+                var poly1 = new Polygon();
+                var poly2 = new Polygon();
+                
+                // First polygon: from tjunctionIndex to splitIndex (inclusive)
+                int count1 = 0;
+                for (int i = tjunctionIndex; ; i = (i + 1) % n)
+                {
+                    poly1.Add(polygon[i]);
+                    count1++;
+                    if (i == splitIndex)
+                        break;
+                    if (count1 > n) break; // Safety check
+                }
+                
+                // Second polygon: from splitIndex to tjunctionIndex (inclusive)
+                int count2 = 0;
+                for (int i = splitIndex; ; i = (i + 1) % n)
+                {
+                    poly2.Add(polygon[i]);
+                    count2++;
+                    if (i == tjunctionIndex)
+                        break;
+                    if (count2 > n) break; // Safety check
+                }
+
+                // Verify both are valid polygons with area
+                if (poly1.Count >= 3 && poly2.Count >= 3)
+                {
+                    float area1 = Mathf.Abs(poly1.GetSignedArea2D());
+                    float area2 = Mathf.Abs(poly2.GetSignedArea2D());
+                    
+                    if (area1 > 0.001f && area2 > 0.001f && poly1.IsSimple() && poly2.IsSimple())
+                    {
+                        // Verify the split actually separated the T-Junction
+                        bool stillHasTJunction = false;
+                        for (int i = 0; i < poly1.Count && !stillHasTJunction; i++)
+                        {
+                            var vi = poly1[i].position;
+                            for (int edgeStart = 0; edgeStart < poly1.Count && !stillHasTJunction; edgeStart++)
+                            {
+                                int edgeEnd = (edgeStart + 1) % poly1.Count;
+                                if (edgeStart == i || edgeEnd == i) continue;
+                                if (IsPointOnEdge(vi, poly1[edgeStart].position, poly1[edgeEnd].position, 0.001f))
+                                    stillHasTJunction = true;
+                            }
+                        }
+                        
+                        if (!stillHasTJunction)
+                        {
+                            return new List<Polygon> { poly1, poly2 };
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
