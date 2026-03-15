@@ -2,6 +2,7 @@
 
 using AeternumGames.ShapeEditor.PolyBoolCS;
 using System.Collections.Generic;
+using UnityEngine;
 using PolyboolPolygon = AeternumGames.ShapeEditor.PolyBoolCS.Polygon;
 using Region = AeternumGames.ShapeEditor.PolyBoolCS.PointList;
 
@@ -11,6 +12,10 @@ namespace AeternumGames.ShapeEditor
 
     public static class PolyboolExtensions
     {
+        // Threshold for detecting "thin" connections (T-Junctions)
+        // A connection is considered a singularity if the edge length ratio is below this threshold
+        private const float ThinEdgeRatioThreshold = 0.01f;
+
         public static PolyboolPolygon ToPolybool(this Polygon polygon)
         {
             var count = polygon.Count;
@@ -35,6 +40,255 @@ namespace AeternumGames.ShapeEditor
             {
                 this.region = region;
             }
+        }
+
+        /// <summary>
+        /// Detects and splits polygons that have singularities (T-Junctions) caused by Boolean operations
+        /// incorrectly merging shapes at a single point. This prevents BayazitDecomposer stack overflow.
+        /// </summary>
+        /// <param name="polygons">The list of concave polygons to process.</param>
+        /// <returns>A new list with singularities split into separate polygons.</returns>
+        public static List<Polygon> SplitSingularities(this List<Polygon> polygons)
+        {
+            var result = new List<Polygon>();
+            
+            foreach (var polygon in polygons)
+            {
+                var splitPolygons = SplitPolygonSingularities(polygon);
+                result.AddRange(splitPolygons);
+            }
+            
+            return result;
+        }
+
+        /// <summary>
+        /// Splits a polygon if it contains singularities (T-Junctions) that would cause 
+        /// BayazitDecomposer to fail with stack overflow.
+        /// </summary>
+        private static List<Polygon> SplitPolygonSingularities(Polygon polygon)
+        {
+            if (polygon.Count < 3)
+                return new List<Polygon> { polygon };
+
+            // Calculate the average edge length
+            float totalEdgeLength = 0;
+            for (int i = 0; i < polygon.Count; i++)
+            {
+                var p1 = polygon[i].position;
+                var p2 = polygon.NextVertex(i).position;
+                totalEdgeLength += Vector2.Distance(p1, p2);
+            }
+            float averageEdgeLength = totalEdgeLength / polygon.Count;
+
+            // Find edges that are significantly shorter than the average
+            // These are potential T-Junction connections
+            var thinEdges = new List<int>(); // indices of thin edges
+            
+            for (int i = 0; i < polygon.Count; i++)
+            {
+                var p1 = polygon[i].position;
+                var p2 = polygon.NextVertex(i).position;
+                float edgeLength = Vector2.Distance(p1, p2);
+                
+                if (edgeLength < averageEdgeLength * ThinEdgeRatioThreshold)
+                {
+                    thinEdges.Add(i);
+                }
+            }
+
+            // If we found potential T-Junction edges, try to split the polygon
+            if (thinEdges.Count > 0)
+            {
+                var splitResult = TrySplitAtThinEdges(polygon, thinEdges);
+                if (splitResult != null && splitResult.Count > 0)
+                {
+                    return splitResult;
+                }
+            }
+
+            return new List<Polygon> { polygon };
+        }
+
+        /// <summary>
+        /// Attempts to split the polygon at the thin edges (potential T-Junctions).
+        /// </summary>
+        private static List<Polygon> TrySplitAtThinEdges(Polygon polygon, List<int> thinEdgeIndices)
+        {
+            // Try each thin edge as a potential split point
+            foreach (int thinEdgeIndex in thinEdgeIndices)
+            {
+                var result = TrySplitAtEdge(polygon, thinEdgeIndex);
+                if (result != null && result.Count > 1)
+                {
+                    // Successfully split - recursively check the resulting polygons
+                    var finalResult = new List<Polygon>();
+                    foreach (var subPolygon in result)
+                    {
+                        if (subPolygon.Count >= 3)
+                        {
+                            finalResult.Add(subPolygon);
+                        }
+                    }
+                    if (finalResult.Count > 1)
+                    {
+                        return finalResult;
+                    }
+                }
+            }
+
+            // If simple edge splitting doesn't work, try a more sophisticated approach
+            return TryGeometricSplit(polygon);
+        }
+
+        /// <summary>
+        /// Attempts to split the polygon at the specified edge by dividing it into two polygons.
+        /// </summary>
+        private static List<Polygon> TrySplitAtEdge(Polygon polygon, int edgeIndex)
+        {
+            if (polygon.Count < 4)
+                return null;
+
+            int n = polygon.Count;
+            
+            // Get the vertices around the thin edge
+            int prevIndex = (edgeIndex - 1 + n) % n;
+            int nextIndex = (edgeIndex + 1) % n;
+
+            var v1 = polygon[prevIndex].position;
+            var v2 = polygon[edgeIndex].position;
+            var v3 = polygon[nextIndex].position;
+
+            // Create two polygons by cutting at the thin edge
+            // First polygon: from edgeIndex+1 to edgeIndex (inclusive)
+            var poly1 = new Polygon();
+            for (int i = edgeIndex; i < n; i++)
+            {
+                poly1.Add(polygon[i]);
+            }
+            for (int i = 0; i <= prevIndex; i++)
+            {
+                poly1.Add(polygon[i]);
+            }
+
+            // Second polygon: from prevIndex+1 to prevIndex (the other way around)
+            var poly2 = new Polygon();
+            for (int i = prevIndex; i < n; i++)
+            {
+                poly2.Add(polygon[i]);
+            }
+            for (int i = 0; i <= edgeIndex; i++)
+            {
+                poly2.Add(polygon[i]);
+            }
+
+            // Check if both resulting polygons are valid (have area)
+            if (poly1.Count >= 3 && poly2.Count >= 3 &&
+                Mathf.Abs(poly1.GetSignedArea2D()) > 0.001f &&
+                Mathf.Abs(poly2.GetSignedArea2D()) > 0.001f)
+            {
+                // Verify the split makes geometric sense (both polygons should be simple)
+                if (poly1.IsSimple() && poly2.IsSimple())
+                {
+                    return new List<Polygon> { poly1, poly2 };
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// A more sophisticated geometric approach to split polygons with singularities.
+        /// Uses the fact that T-Junction polygons have a "bottleneck" - a very narrow connection.
+        /// </summary>
+        private static List<Polygon> TryGeometricSplit(Polygon polygon)
+        {
+            if (polygon.Count < 3)
+                return new List<Polygon> { polygon };
+
+            // Find the vertex with the minimum distance to other non-adjacent vertices
+            // This is likely the T-Junction point
+            int bottleneckVertex = -1;
+            float minBottleneckDistance = float.MaxValue;
+
+            for (int i = 0; i < polygon.Count; i++)
+            {
+                var vi = polygon[i].position;
+                
+                for (int j = i + 2; j < polygon.Count; j++)
+                {
+                    // Skip adjacent vertices
+                    if (j == i + 1 || (i == 0 && j == polygon.Count - 1))
+                        continue;
+
+                    var vj = polygon[j].position;
+                    float dist = Vector2.Distance(vi, vj);
+                    
+                    if (dist < minBottleneckDistance)
+                    {
+                        minBottleneckDistance = dist;
+                        bottleneckVertex = i;
+                    }
+                }
+            }
+
+            if (bottleneckVertex >= 0)
+            {
+                // Calculate the polygon dimensions to normalize the threshold
+                var bounds = polygon.GetAABB();
+                float size = Mathf.Max(bounds.size.x, bounds.size.y);
+                float threshold = size * ThinEdgeRatioThreshold;
+
+                if (minBottleneckDistance < threshold)
+                {
+                    // This polygon has a bottleneck - try to split it
+                    return TrySplitAtVertex(polygon, bottleneckVertex);
+                }
+            }
+
+            return new List<Polygon> { polygon };
+        }
+
+        /// <summary>
+        /// Attempts to split the polygon at the specified vertex.
+        /// </summary>
+        private static List<Polygon> TrySplitAtVertex(Polygon polygon, int vertexIndex)
+        {
+            int n = polygon.Count;
+            if (n < 5) // Need at least 5 vertices to have a valid split
+                return new List<Polygon> { polygon };
+
+            // Create two polygons by going around the original polygon
+            // starting from the bottleneck vertex
+            var poly1 = new Polygon();
+            var poly2 = new Polygon();
+
+            // First polygon: vertexIndex to vertexIndex + n/2
+            int splitPoint = n / 2;
+            for (int i = 0; i <= splitPoint; i++)
+            {
+                poly1.Add(polygon[(vertexIndex + i) % n]);
+            }
+
+            // Second polygon: the rest
+            for (int i = splitPoint; i < n; i++)
+            {
+                poly2.Add(polygon[(vertexIndex + i) % n]);
+            }
+
+            // Add the split point to both to close them properly
+            poly1.Add(polygon[(vertexIndex + splitPoint) % n]);
+            poly2.Add(polygon[vertexIndex]);
+
+            // Verify both are valid
+            if (poly1.Count >= 3 && poly2.Count >= 3 &&
+                Mathf.Abs(poly1.GetSignedArea2D()) > 0.001f &&
+                Mathf.Abs(poly2.GetSignedArea2D()) > 0.001f &&
+                poly1.IsSimple() && poly2.IsSimple())
+            {
+                return new List<Polygon> { poly1, poly2 };
+            }
+
+            return new List<Polygon> { polygon };
         }
 
         public static List<Polygon> ToPolygons(this PolyboolPolygon poly, PolyBool polyBool)
@@ -76,6 +330,9 @@ namespace AeternumGames.ShapeEditor
                 }
                 sePolys.Add(sePoly);
             }
+
+            // Apply singularity splitting to prevent BayazitDecomposer stack overflow
+            sePolys = sePolys.SplitSingularities();
 
             return sePolys;
         }
@@ -133,7 +390,6 @@ namespace AeternumGames.ShapeEditor
                     node.children.Add(child);
                     root.children.Splice(i, 1);
                     i--;
-                }
             }
 
             // now we can add ourselves
