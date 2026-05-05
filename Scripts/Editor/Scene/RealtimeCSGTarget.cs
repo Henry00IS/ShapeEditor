@@ -140,6 +140,27 @@ namespace AeternumGames.ShapeEditor
             return result;
         }
 
+        private Material[] GetMaterials(PolygonMesh polygonMesh)
+        {
+            var materialIndices = new int[polygonMesh.Count];
+            for (int i = 0; i < materialIndices.Length; i++)
+                materialIndices[i] = polygonMesh[i].material;
+            return GetMaterials(materialIndices);
+        }
+
+        private MonoBehaviour CreateRealtimeCSGBrush(Transform parent, PolygonMesh polygonMesh)
+        {
+            var brush = ExternalRealtimeCSG.CreateBrushFromPolygonMesh(parent, "Shape Editor Brush", polygonMesh, GetMaterials(polygonMesh));
+            if (brush != null)
+                return brush;
+
+            var planes = polygonMesh.ToMaterialPlanes();
+            brush = ExternalRealtimeCSG.CreateBrushFromPlanes("Shape Editor Brush", planes.planes, GetMaterials(planes.materials), polygonMesh.booleanOperator);
+            if (brush != null)
+                brush.transform.SetParent(parent, false);
+            return brush;
+        }
+
         private void OnDrawGizmosSelected()
         {
             if (targetMode == RealtimeCSGTargetMode.SplineExtrude)
