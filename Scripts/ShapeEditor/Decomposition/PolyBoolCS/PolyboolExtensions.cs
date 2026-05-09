@@ -65,6 +65,8 @@ namespace AeternumGames.ShapeEditor
             for (var i = 0; i < roots.children.Count; i++)
                 addExterior(roots.children[i], geopolys);
 
+            geopolys = splitSingularRegions(geopolys);
+
             var sePolys = new List<Polygon>();
             foreach (var region in geopolys)
             {
@@ -78,6 +80,101 @@ namespace AeternumGames.ShapeEditor
             }
 
             return sePolys;
+        }
+
+        private static List<Region> splitSingularRegions(List<Region> regions)
+        {
+            var result = new List<Region>();
+            foreach (var region in regions)
+                splitSingularRegion(region, result);
+            return result;
+        }
+
+        private static void splitSingularRegion(Region region, List<Region> result)
+        {
+            if (!tryFindSingularity(region, out var vertexIndex, out var edgeStartIndex, out var edgeEndIndex))
+            {
+                result.Add(region);
+                return;
+            }
+
+            var regionA = copyRegionPath(region, edgeEndIndex, vertexIndex);
+            var regionB = copyRegionPath(region, vertexIndex, edgeStartIndex);
+
+            if (isValidRegion(regionA) && isValidRegion(regionB))
+            {
+                splitSingularRegion(regionA, result);
+                splitSingularRegion(regionB, result);
+                return;
+            }
+
+            result.Add(region);
+        }
+
+        private static bool tryFindSingularity(Region region, out int vertexIndex, out int edgeStartIndex, out int edgeEndIndex)
+        {
+            vertexIndex = -1;
+            edgeStartIndex = -1;
+            edgeEndIndex = -1;
+
+            var count = region.Count;
+            if (count < 4)
+                return false;
+
+            for (var i = 0; i < count; i++)
+            {
+                var point = region[i];
+                for (var edgeStart = 0; edgeStart < count; edgeStart++)
+                {
+                    var edgeEnd = (edgeStart + 1) % count;
+                    if (i == edgeStart || i == edgeEnd)
+                        continue;
+
+                    var start = region[edgeStart];
+                    var end = region[edgeEnd];
+                    if (Epsilon.pointsCollinear(start, point, end) && Epsilon.pointBetween(point, start, end))
+                    {
+                        vertexIndex = i;
+                        edgeStartIndex = edgeStart;
+                        edgeEndIndex = edgeEnd;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static Region copyRegionPath(Region region, int startIndex, int endIndex)
+        {
+            var result = new Region();
+            var count = region.Count;
+            for (var i = startIndex; ; i = (i + 1) % count)
+            {
+                var point = region[i];
+                result.Add(new Point(point.x, point.y));
+                if (i == endIndex)
+                    break;
+            }
+            return result;
+        }
+
+        private static bool isValidRegion(Region region)
+        {
+            return region.Count >= 3 && System.Math.Abs(getSignedArea(region)) > 1e-10;
+        }
+
+        private static double getSignedArea(Region region)
+        {
+            var area = 0.0;
+            var previous = region[region.Count - 1];
+            for (var i = 0; i < region.Count; i++)
+            {
+                var current = region[i];
+                area += previous.x * current.y - current.x * previous.y;
+                previous = current;
+            }
+            return area * 0.5;
         }
 
         // test if r1 is inside r2
