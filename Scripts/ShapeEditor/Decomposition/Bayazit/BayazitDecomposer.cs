@@ -22,6 +22,8 @@ namespace AeternumGames.ShapeEditor
     public static class BayazitDecomposer
     {
         private static int MaxPolygonVertices = 1024; // henry: used to be 8, but we want less CSG brushes / meshes.
+        private const float SingularityEpsilon = 1e-4f;
+        private const float SingularityEpsilonSqr = SingularityEpsilon * SingularityEpsilon;
 
         /// <summary>
         /// [2D] Decompose the polygon into several smaller non-concave polygon. If the polygon is
@@ -32,6 +34,14 @@ namespace AeternumGames.ShapeEditor
             Debug.Assert(vertices.Count >= 3);
             Debug.Assert(vertices.IsCounterClockWise2D());
 
+            if (TrySplitAtSingularity(vertices, out var splitPolygons))
+            {
+                var splitResult = new List<Polygon>();
+                for (int i = 0; i < splitPolygons.Count; i++)
+                    splitResult.AddRange(ConvexPartition(splitPolygons[i]));
+                return splitResult;
+            }
+
             var depth = 800;
             var result = TriangulatePolygon(vertices, ref depth);
 
@@ -39,6 +49,164 @@ namespace AeternumGames.ShapeEditor
                 Debug.LogError("Prevented Stack Overflow and Editor Crash in BayazitDecomposer! Try to avoid thin lines (like the middle left side of the character 'B'). Internal Boolean operations have probably mistakenly considered your shapes as a single shape with an infinitely thin point connecting them, causing the convex decomposition to fail. The splitting of this type of polygon at the singularity has yet to be fixed. PR is welcome. It could also be that your shape is too complex with hundreds of vertices.");
 
             return result;
+        }
+
+        private static bool TrySplitAtSingularity(Polygon vertices, out List<Polygon> polygons)
+        {
+            polygons = null;
+
+            if (vertices.Count < 4)
+                return false;
+
+            if (TrySplitAtCoincidentVertex(vertices, out polygons))
+                return true;
+
+            return TrySplitAtVertexOnEdge(vertices, out polygons);
+        }
+
+        private static bool TrySplitAtCoincidentVertex(Polygon vertices, out List<Polygon> polygons)
+        {
+            polygons = null;
+            var count = vertices.Count;
+
+            for (int i = 0; i < count; i++)
+            {
+                for (int j = i + 1; j < count; j++)
+                {
+                    if (AreAdjacent(i, j, count))
+                        continue;
+
+                    if (!SamePosition((Vector2)vertices[i].position, (Vector2)vertices[j].position))
+                        continue;
+
+                    var first = CopyRange(i, j, vertices);
+                    var second = CopyRange(j, i, vertices);
+                    if (TryCreateSplitResult(vertices, first, second, out polygons))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TrySplitAtVertexOnEdge(Polygon vertices, out List<Polygon> polygons)
+        {
+            polygons = null;
+            var count = vertices.Count;
+
+            for (int vertexIndex = 0; vertexIndex < count; vertexIndex++)
+            {
+                var point = (Vector2)vertices[vertexIndex].position;
+
+                for (int edgeStartIndex = 0; edgeStartIndex < count; edgeStartIndex++)
+                {
+                    var edgeEndIndex = (edgeStartIndex + 1) % count;
+                    if (vertexIndex == edgeStartIndex || vertexIndex == edgeEndIndex)
+                        continue;
+
+                    var edgeStart = (Vector2)vertices[edgeStartIndex].position;
+                    var edgeEnd = (Vector2)vertices[edgeEndIndex].position;
+                    if (!PointIsInsideEdge(point, edgeStart, edgeEnd))
+                        continue;
+
+                    var first = CopyRange(vertexIndex, edgeStartIndex, vertices);
+                    first.Add(CreateSplitVertex(vertices[vertexIndex], point));
+
+                    var second = new Polygon();
+                    second.Add(CreateSplitVertex(vertices[vertexIndex], point));
+                    second.AddRange(CopyRange(edgeEndIndex, vertexIndex, vertices));
+
+                    if (TryCreateSplitResult(vertices, first, second, out polygons))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryCreateSplitResult(Polygon source, Polygon first, Polygon second, out List<Polygon> polygons)
+        {
+            polygons = null;
+
+            if (!PrepareSplitPolygon(source, first) || !PrepareSplitPolygon(source, second))
+                return false;
+
+            polygons = new List<Polygon> { first, second };
+            return true;
+        }
+
+        private static bool PrepareSplitPolygon(Polygon source, Polygon polygon)
+        {
+            RemoveDuplicateVertices(polygon);
+            polygon.CollinearSimplify(SingularityEpsilon);
+
+            if (polygon.Count < 3 || Mathf.Abs(polygon.GetSignedArea2D()) <= SingularityEpsilon)
+                return false;
+
+            polygon.ForceCounterClockWise2D();
+            polygon.booleanOperator = source.booleanOperator;
+            return true;
+        }
+
+        private static Polygon CopyRange(int start, int end, Polygon vertices)
+        {
+            var count = vertices.Count;
+            while (end < start)
+                end += count;
+
+            var result = new Polygon(end - start + 1);
+            for (int i = start; i <= end; i++)
+            {
+                var vertex = vertices[i % count];
+                result.Add(new Vertex(vertex.position, vertex.uv0, vertex.hidden, vertex.material));
+            }
+            return result;
+        }
+
+        private static void RemoveDuplicateVertices(Polygon polygon)
+        {
+            for (int i = polygon.Count - 1; i > 0; i--)
+            {
+                if (SamePosition((Vector2)polygon[i].position, (Vector2)polygon[i - 1].position))
+                    polygon.RemoveAt(i);
+            }
+
+            if (polygon.Count > 1 && SamePosition((Vector2)polygon[0].position, (Vector2)polygon[polygon.Count - 1].position))
+                polygon.RemoveAt(polygon.Count - 1);
+        }
+
+        private static Vertex CreateSplitVertex(Vertex template, Vector2 position)
+        {
+            return new Vertex(new Vector3(position.x, position.y, template.position.z), template.uv0, template.hidden, template.material);
+        }
+
+        private static bool AreAdjacent(int first, int second, int count)
+        {
+            return Mathf.Abs(first - second) == 1 || Mathf.Abs(first - second) == count - 1;
+        }
+
+        private static bool SamePosition(Vector2 first, Vector2 second)
+        {
+            return SquareDist(first, second) <= SingularityEpsilonSqr;
+        }
+
+        private static bool PointIsInsideEdge(Vector2 point, Vector2 edgeStart, Vector2 edgeEnd)
+        {
+            if (SquareDist(point, edgeStart) <= SingularityEpsilonSqr || SquareDist(point, edgeEnd) <= SingularityEpsilonSqr)
+                return false;
+
+            var edge = edgeEnd - edgeStart;
+            var pointOffset = point - edgeStart;
+            var edgeLengthSqr = edge.sqrMagnitude;
+            if (edgeLengthSqr <= SingularityEpsilonSqr)
+                return false;
+
+            var t = Vector2.Dot(pointOffset, edge) / edgeLengthSqr;
+            if (t <= 0f || t >= 1f)
+                return false;
+
+            var closestPoint = edgeStart + edge * t;
+            return SquareDist(point, closestPoint) <= SingularityEpsilonSqr;
         }
 
         private static List<Polygon> TriangulatePolygon(Polygon vertices, ref int depth)
