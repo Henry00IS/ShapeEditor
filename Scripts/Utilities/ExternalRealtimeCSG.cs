@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 
 // contains source code from https://github.com/LogicalError/realtime-CSG-for-unity (see Licenses/RealtimeCSG.txt).
 
@@ -111,6 +111,51 @@ namespace AeternumGames.ShapeEditor
         private static PropertyInfo materialUtilityWallMaterialProperty = null;
 
         /// <summary>
+        /// The cached GeometryUtility type after initialization.
+        /// </summary>
+        private static Type geometryUtility = null;
+
+        /// <summary>
+        /// The cached GeometryUtility.CalcPolygonPlane method after initialization.
+        /// </summary>
+        private static MethodInfo calcPolygonPlaneMethod = null;
+
+        /// <summary>
+        /// The cached GeometryUtility.CalculateTangents method after initialization.
+        /// </summary>
+        private static MethodInfo calculateTangentsMethod = null;
+
+        /// <summary>
+        /// The cached ControlMeshUtility type after initialization.
+        /// </summary>
+        private static Type controlMeshUtility = null;
+
+        /// <summary>
+        /// The cached ControlMeshUtility.Validate method after initialization.
+        /// </summary>
+        private static MethodInfo validateControlMeshMethod = null;
+
+        /// <summary>
+        /// The cached ShapeUtility.EnsureInitialized method after initialization.
+        /// </summary>
+        private static MethodInfo ensureInitializedShapeMethod = null;
+
+        /// <summary>
+        /// The cached CSGSettings.DefaultMaterial property after initialization.
+        /// </summary>
+        private static PropertyInfo csgSettingsDefaultMaterialProperty = null;
+
+        /// <summary>
+        /// The cached CSGSettings.DefaultTexGenFlags property after initialization.
+        /// </summary>
+        private static PropertyInfo csgSettingsDefaultTexGenFlagsProperty = null;
+
+        /// <summary>
+        /// The cached MathConstants.oneVector3 field after initialization.
+        /// </summary>
+        private static FieldInfo oneVector3Field = null;
+
+        /// <summary>
         /// Used to store whether an initialization error occured.
         /// </summary>
         private static bool initializationError;
@@ -189,6 +234,42 @@ namespace AeternumGames.ShapeEditor
             materialUtilityWallMaterialProperty = materialUtility.GetProperty("WallMaterial");
             if (materialUtilityWallMaterialProperty == null) { initializationError = true; return false; }
 
+            geometryUtility = GetType("RealtimeCSG.GeometryUtility");
+            if (geometryUtility == null) { initializationError = true; return false; }
+
+            calcPolygonPlaneMethod = geometryUtility.GetMethodByName("CalcPolygonPlane", "controlMesh", "polygonIndex");
+            if (calcPolygonPlaneMethod == null) { initializationError = true; return false; }
+
+            calculateTangentsMethod = geometryUtility.GetMethodByName("CalculateTangents", "normal", out _, out _);
+            if (calculateTangentsMethod == null) { initializationError = true; return false; }
+
+            controlMeshUtility = GetType("RealtimeCSG.ControlMeshUtility");
+            if (controlMeshUtility == null) { initializationError = true; return false; }
+
+            validateControlMeshMethod = controlMeshUtility.GetMethodByName("Validate", "controlMesh", "shape");
+            if (validateControlMeshMethod == null) { initializationError = true; return false; }
+
+            var shapeUtility = GetType("RealtimeCSG.ShapeUtility");
+            if (shapeUtility == null) { initializationError = true; return false; }
+
+            ensureInitializedShapeMethod = shapeUtility.GetMethodByName("EnsureInitialized", "shape");
+            if (ensureInitializedShapeMethod == null) { initializationError = true; return false; }
+
+            var csgSettings = GetType("RealtimeCSG.CSGSettings");
+            if (csgSettings == null) { initializationError = true; return false; }
+
+            csgSettingsDefaultMaterialProperty = csgSettings.GetProperty("DefaultMaterial");
+            if (csgSettingsDefaultMaterialProperty == null) { initializationError = true; return false; }
+
+            csgSettingsDefaultTexGenFlagsProperty = csgSettings.GetProperty("DefaultTexGenFlags");
+            if (csgSettingsDefaultTexGenFlagsProperty == null) { initializationError = true; return false; }
+
+            var mathConstants = GetType("RealtimeCSG.MathConstants");
+            if (mathConstants == null) { initializationError = true; return false; }
+
+            oneVector3Field = mathConstants.GetField("oneVector3");
+            if (oneVector3Field == null) { initializationError = true; return false; }
+
             initializationSuccess = true;
             return true;
         }
@@ -233,7 +314,7 @@ namespace AeternumGames.ShapeEditor
             get
             {
                 if (!IsAvailable()) return null;
-                return (Material)materialUtilityWallMaterialProperty.GetValue(materialUtility);
+                return (Material)csgSettingsDefaultMaterialProperty.GetValue(null);
             }
         }
 
@@ -284,6 +365,188 @@ namespace AeternumGames.ShapeEditor
                 csgBrushOperationType.SetValue(brush, csgOperationTypeSubtractive);
 
             return (MonoBehaviour)brush;
+        }
+
+        /// <summary>
+        /// Creates a RealtimeCSG brush directly from a PolygonMesh by building the half-edge
+        /// connectivity data (ControlMesh) and matching Shape/Surface/TexGen data, bypassing the
+        /// plane-intersection approach which can fail on certain mesh topologies.
+        /// </summary>
+        /// <param name="parent">The parent transform for the created brush.</param>
+        /// <param name="brushName">The name of the brush.</param>
+        /// <param name="mesh">The PolygonMesh to convert.</param>
+        /// <returns>A CSGBrush component on success, or null on failure.</returns>
+        public static MonoBehaviour CreateBrushFromPolygonMesh(Transform parent, string brushName, PolygonMesh mesh)
+        {
+            if (!IsAvailable()) return null;
+
+            // skip degenerate meshes
+            if (mesh == null || mesh.Count == 0) return null;
+
+            // build unique vertex list preserving insertion order
+            var vertexSet = new HashSet<Vector3>();
+            var uniqueVertices = new List<Vector3>();
+            foreach (var polygon in mesh)
+            {
+                foreach (var vertex in polygon)
+                {
+                    if (vertexSet.Add(vertex.position))
+                        uniqueVertices.Add(vertex.position);
+                }
+            }
+
+            // build half-edge index arrays: one edge per polygon vertex
+            var polygonCount = mesh.Count;
+            var edgeIndices = new List<int>();
+            foreach (var polygon in mesh)
+            {
+                for (int j = 0; j < polygon.Count; j++)
+                    edgeIndices.Add(0); // placeholder, filled below
+            }
+
+            // build half-edges with polygon/vertex indices (twin set to -1 for now)
+            var halfEdges = new List<object>();
+            foreach (var polygon in mesh)
+            {
+                for (int j = 0; j < polygon.Count; j++)
+                {
+                    var vertexIndex = uniqueVertices.FindIndex(v => v.EqualsWithEpsilon5(polygon[j].position));
+                    halfEdges.Add(CreateHalfEdge(polygon.Count, j, vertexIndex));
+                }
+            }
+
+            // associate twin edges by finding shared polygon boundaries
+            var edgeCount = halfEdges.Count;
+            for (int i = 0; i < edgeCount; i++)
+            {
+                var hei = GetHalfEdgePolygonIndex(halfEdges[i]);
+                var hej = GetHalfEdgeVertexIndex(halfEdges[i]);
+                var polyI = mesh[hei];
+                var prevInPolyI = polyI.PreviousVertex(hej);
+                var prevPosI = prevInPolyI.position;
+
+                for (int k = 0; k < edgeCount; k++)
+                {
+                    if (k == i) continue;
+                    var hek_poly = GetHalfEdgePolygonIndex(halfEdges[k]);
+                    var hek_vi = GetHalfEdgeVertexIndex(halfEdges[k]);
+                    var polyK = mesh[hek_poly];
+                    var currInPolyK = polyK[hek_vi];
+                    var prevInPolyK = polyK.PreviousVertex(hek_vi);
+
+                    if (prevPosI.EqualsWithEpsilon5(currInPolyK.position) &&
+                        prevInPolyK.position.EqualsWithEpsilon5(polyI[hej].position))
+                    {
+                        SetHalfEdgeTwinIndex(halfEdges[i], k);
+                        break;
+                    }
+                }
+            }
+
+            // build the ControlMesh
+            var controlMeshType = GetType("RealtimeCSG.Legacy.ControlMesh");
+            if (controlMeshType == null) return null;
+
+            var controlMesh = Activator.CreateInstance(controlMeshType);
+            SetField(controlMesh, "Polygons", mesh.Count);
+            SetField(controlMesh, "Vertices", uniqueVertices.ToArray());
+            SetField(controlMesh, "Edges", halfEdges.ToArray());
+            SetField(controlMesh, "Valid", true);
+
+            // build the Shape with per-polygon surfaces
+            var shapeType = GetType("RealtimeCSG.Legacy.Shape");
+            if (shapeType == null) return null;
+
+            var shape = Activator.CreateInstance(shapeType);
+            var surfaces = new object[polygonCount];
+            var texGens = new object[polygonCount];
+            var texGenFlags = new object[polygonCount];
+            var defaultMaterial = WallMaterial ?? UnityEditor.AssetDatabase.GetBuiltinExtraResource<Material>("Default-Diffuse.mat");
+            var oneVector3 = (Vector3)oneVector3Field.GetValue(null);
+            var defaultTexGenFlags = csgSettingsDefaultTexGenFlagsProperty.GetValue(null);
+
+            for (int i = 0; i < polygonCount; i++)
+            {
+                // create Surface
+                var surfaceType = GetType("RealtimeCSG.Legacy.Surface");
+                var surface = Activator.CreateInstance(surfaceType);
+                var plane = (Plane)calcPolygonPlaneMethod.Invoke(null, new object[] { controlMesh, (short)i });
+                SetField(surface, "Plane", plane);
+                var tangentOut = Vector3.zero;
+                var binormalOut = Vector3.zero;
+                calculateTangentsMethod.Invoke(null, new object[] { plane.normal, tangentOut, binormalOut });
+                SetField(surface, "Tangent", tangentOut);
+                SetField(surface, "BiNormal", binormalOut);
+                surfaces[i] = surface;
+
+                // create TexGen
+                var texGenType = GetType("RealtimeCSG.Legacy.TexGen");
+                var texGen = Activator.CreateInstance(texGenType);
+                SetField(texGen, "RenderMaterial", defaultMaterial);
+                SetField(texGen, "Scale", oneVector3);
+                texGens[i] = texGen;
+
+                texGenFlags[i] = defaultTexGenFlags;
+            }
+
+            SetField(shape, "Surfaces", surfaces);
+            SetField(shape, "TexGens", texGens);
+            SetField(shape, "TexGenFlags", texGenFlags);
+
+            // validate the control mesh
+            ensureInitializedShapeMethod.Invoke(null, new object[] { shape });
+            var isValid = (bool)validateControlMeshMethod.Invoke(null, new object[] { controlMesh, shape });
+            SetField(controlMesh, "Valid", isValid);
+
+            if (!isValid)
+            {
+                Debug.LogWarning($"[ShapeEditor] CreateBrushFromPolygonMesh: control mesh validation failed for '{brushName}', falling back to plane-based approach.");
+                return null;
+            }
+
+            // create the brush
+            var brush = (MonoBehaviour)createBrushMethod.Invoke(null, new object[] { parent, brushName, controlMesh, shape });
+            if (brush != null)
+                Debug.Log($"[ShapeEditor] CreateBrushFromPolygonMesh: successfully created brush '{brushName}' with {polygonCount} polygons and {uniqueVertices.Count} vertices.");
+
+            return brush;
+        }
+
+        private static object CreateHalfEdge(int polygonIndex, int vertexIndex, int twinIndex)
+        {
+            var halfEdgeType = GetType("RealtimeCSG.Legacy.HalfEdge");
+            if (halfEdgeType == null) return null;
+            var he = Activator.CreateInstance(halfEdgeType);
+            SetField(he, "PolygonIndex", (short)polygonIndex);
+            SetField(he, "VertexIndex", (short)vertexIndex);
+            SetField(he, "TwinIndex", (short)twinIndex);
+            return he;
+        }
+
+        private static short GetHalfEdgePolygonIndex(object halfEdge)
+        {
+            var t = halfEdge.GetType();
+            return (short)t.GetField("PolygonIndex").GetValue(halfEdge);
+        }
+
+        private static short GetHalfEdgeVertexIndex(object halfEdge)
+        {
+            var t = halfEdge.GetType();
+            return (short)t.GetField("VertexIndex").GetValue(halfEdge);
+        }
+
+        private static void SetHalfEdgeTwinIndex(object halfEdge, int twinIndex)
+        {
+            var t = halfEdge.GetType();
+            t.GetField("TwinIndex").SetValue(halfEdge, (short)twinIndex);
+        }
+
+        private static void SetField(object obj, string fieldName, object value)
+        {
+            var t = obj.GetType();
+            var field = t.GetField(fieldName);
+            if (field != null)
+                field.SetValue(obj, value);
         }
 
         private static void DestroyCSGNodeComponent(GameObject gameObject)
