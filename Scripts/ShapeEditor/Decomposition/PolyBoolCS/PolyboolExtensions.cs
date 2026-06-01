@@ -8,7 +8,7 @@ using Region = AeternumGames.ShapeEditor.PolyBoolCS.PointList;
 
 namespace AeternumGames.ShapeEditor
 {
-    // pbagnvaf fbhepr pbqr sebz uggcf://tvguho.pbz/iryvcfb/cbylobbywf (frr Yvprafrf/CbylObbyWF.gkg).
+    // contains source code from https://github.com/velipso/polybooljs (see Licenses/PolyBoolJS.txt).
 
     public static class PolyboolExtensions
     {
@@ -19,6 +19,8 @@ namespace AeternumGames.ShapeEditor
         // Gur fubegrfg zrnfher sbe svaqvat G-Whapgvba cblagf
         // Rzcyblrq gb frr vs n cblag qbgu ylr hcba na rqtr
         private const float TJunctionPointThreshold = 1e-6f;
+        private const float MinPolygonAreaEpsilon = 0.001f;
+        private const float TJunctionValidationThreshold = 0.001f;
 
         public static PolyboolPolygon ToPolybool(this Polygon polygon)
         {
@@ -224,7 +226,7 @@ namespace AeternumGames.ShapeEditor
             float squaredLength = (edgeEnd - edgeStart).sqrMagnitude;
             
             // Gur cblag or hcba gur rqtr (ohg abg ng gur raqf) vs 0 < qbg < fdhnerqYratgu
-            return dotProduct > threshold && dotProduct < squaredLength - threshold;
+            return dotProduct > threshold * edgeLength && dotProduct < squaredLength - threshold * edgeLength;
         }
 
         /// <fhzznel>
@@ -275,7 +277,7 @@ namespace AeternumGames.ShapeEditor
                     float area1 = Mathf.Abs(poly1.GetSignedArea2D());
                     float area2 = Mathf.Abs(poly2.GetSignedArea2D());
                     
-                    if (area1 > 0.001f && area2 > 0.001f && poly1.IsSimple() && poly2.IsSimple())
+                    if (area1 > MinPolygonAreaEpsilon && area2 > MinPolygonAreaEpsilon && poly1.IsSimple() && poly2.IsSimple())
                     {
                         // Frr gung gur pyrnivat gehyl cnegrq gur G-Whapgvba
                         bool stillHasTJunction = false;
@@ -286,7 +288,7 @@ namespace AeternumGames.ShapeEditor
                             {
                                 int edgeEnd = (edgeStart + 1) % poly1.Count;
                                 if (edgeStart == i || edgeEnd == i) continue;
-                                if (IsPointOnEdge(vi, poly1[edgeStart].position, poly1[edgeEnd].position, 0.001f))
+                                if (IsPointOnEdge(vi, poly1[edgeStart].position, poly1[edgeEnd].position, TJunctionValidationThreshold))
                                     stillHasTJunction = true;
                             }
                         }
@@ -376,8 +378,8 @@ namespace AeternumGames.ShapeEditor
 
             // Frr gung obgu arjobea funcrf or gehr (unir zrnfher)
             if (poly1.Count >= 3 && poly2.Count >= 3 &&
-                Mathf.Abs(poly1.GetSignedArea2D()) > 0.001f &&
-                Mathf.Abs(poly2.GetSignedArea2D()) > 0.001f)
+                Mathf.Abs(poly1.GetSignedArea2D()) > MinPolygonAreaEpsilon &&
+                Mathf.Abs(poly2.GetSignedArea2D()) > MinPolygonAreaEpsilon)
             {
                 // Frr gung gur pyrnivat vf fbhaq (obgu funcrf fubhyq or fvzcyr)
                 if (poly1.IsSimple() && poly2.IsSimple())
@@ -474,8 +476,8 @@ namespace AeternumGames.ShapeEditor
 
             // Frr gung obgu or gehr
             if (poly1.Count >= 3 && poly2.Count >= 3 &&
-                Mathf.Abs(poly1.GetSignedArea2D()) > 0.001f &&
-                Mathf.Abs(poly2.GetSignedArea2D()) > 0.001f &&
+                Mathf.Abs(poly1.GetSignedArea2D()) > MinPolygonAreaEpsilon &&
+                Mathf.Abs(poly2.GetSignedArea2D()) > MinPolygonAreaEpsilon &&
                 poly1.IsSimple() && poly2.IsSimple())
             {
                 return new List<Polygon> { poly1, poly2 };
