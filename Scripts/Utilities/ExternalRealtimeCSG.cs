@@ -110,6 +110,25 @@ namespace AeternumGames.ShapeEditor
         /// </summary>
         private static PropertyInfo materialUtilityWallMaterialProperty = null;
 
+        private static Type legacyControlMesh = null;
+        private static Type legacyPolygon = null;
+        private static Type legacyHalfEdge = null;
+        private static Type legacyShape = null;
+        private static Type legacySurface = null;
+        private static Type legacyTexGen = null;
+        private static Type geometryUtility = null;
+        private static Type controlMeshUtility = null;
+        private static Type shapeUtility = null;
+        private static Type csgSettings = null;
+        private static ConstructorInfo legacyPolygonConstructor = null;
+        private static ConstructorInfo legacyHalfEdgeConstructor = null;
+        private static ConstructorInfo legacyTexGenConstructor = null;
+        private static MethodInfo calcPolygonPlaneMethod = null;
+        private static MethodInfo calculateTangentsMethod = null;
+        private static MethodInfo validateControlMeshMethod = null;
+        private static MethodInfo ensureInitializedShapeMethod = null;
+        private static FieldInfo csgSettingsDefaultTexGenFlagsField = null;
+
         /// <summary>
         /// Used to store whether an initialization error occured.
         /// </summary>
@@ -188,6 +207,60 @@ namespace AeternumGames.ShapeEditor
 
             materialUtilityWallMaterialProperty = materialUtility.GetProperty("WallMaterial");
             if (materialUtilityWallMaterialProperty == null) { initializationError = true; return false; }
+
+            legacyControlMesh = GetType("RealtimeCSG.Legacy.ControlMesh");
+            if (legacyControlMesh == null) { initializationError = true; return false; }
+
+            legacyPolygon = GetType("RealtimeCSG.Legacy.Polygon");
+            if (legacyPolygon == null) { initializationError = true; return false; }
+
+            legacyHalfEdge = GetType("RealtimeCSG.Legacy.HalfEdge");
+            if (legacyHalfEdge == null) { initializationError = true; return false; }
+
+            legacyShape = GetType("RealtimeCSG.Legacy.Shape");
+            if (legacyShape == null) { initializationError = true; return false; }
+
+            legacySurface = GetType("RealtimeCSG.Legacy.Surface");
+            if (legacySurface == null) { initializationError = true; return false; }
+
+            legacyTexGen = GetType("RealtimeCSG.Legacy.TexGen");
+            if (legacyTexGen == null) { initializationError = true; return false; }
+
+            geometryUtility = GetType("RealtimeCSG.GeometryUtility");
+            if (geometryUtility == null) { initializationError = true; return false; }
+
+            controlMeshUtility = GetType("RealtimeCSG.ControlMeshUtility");
+            if (controlMeshUtility == null) { initializationError = true; return false; }
+
+            shapeUtility = GetType("RealtimeCSG.ShapeUtility");
+            if (shapeUtility == null) { initializationError = true; return false; }
+
+            csgSettings = GetType("RealtimeCSG.CSGSettings");
+            if (csgSettings == null) { initializationError = true; return false; }
+
+            legacyPolygonConstructor = legacyPolygon.GetConstructor(new Type[] { typeof(int[]), typeof(int) });
+            if (legacyPolygonConstructor == null) { initializationError = true; return false; }
+
+            legacyHalfEdgeConstructor = legacyHalfEdge.GetConstructor(new Type[] { typeof(short), typeof(int), typeof(short), typeof(bool) });
+            if (legacyHalfEdgeConstructor == null) { initializationError = true; return false; }
+
+            legacyTexGenConstructor = legacyTexGen.GetConstructor(new Type[] { typeof(Material), typeof(PhysicMaterial) });
+            if (legacyTexGenConstructor == null) { initializationError = true; return false; }
+
+            calcPolygonPlaneMethod = geometryUtility.GetMethod("CalcPolygonPlane", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { legacyControlMesh, typeof(short) }, null);
+            if (calcPolygonPlaneMethod == null) { initializationError = true; return false; }
+
+            calculateTangentsMethod = geometryUtility.GetMethod("CalculateTangents", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { typeof(Vector3), typeof(Vector3).MakeByRefType(), typeof(Vector3).MakeByRefType() }, null);
+            if (calculateTangentsMethod == null) { initializationError = true; return false; }
+
+            validateControlMeshMethod = controlMeshUtility.GetMethod("Validate", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { legacyControlMesh, legacyShape }, null);
+            if (validateControlMeshMethod == null) { initializationError = true; return false; }
+
+            ensureInitializedShapeMethod = shapeUtility.GetMethod("EnsureInitialized", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { legacyShape }, null);
+            if (ensureInitializedShapeMethod == null) { initializationError = true; return false; }
+
+            csgSettingsDefaultTexGenFlagsField = csgSettings.GetField("DefaultTexGenFlags");
+            if (csgSettingsDefaultTexGenFlagsField == null) { initializationError = true; return false; }
 
             initializationSuccess = true;
             return true;
@@ -284,6 +357,166 @@ namespace AeternumGames.ShapeEditor
                 csgBrushOperationType.SetValue(brush, csgOperationTypeSubtractive);
 
             return (MonoBehaviour)brush;
+        }
+
+        public static MonoBehaviour CreateBrushFromPolygonMesh(Transform parent, string brushName, PolygonMesh mesh, Material[] materials, PolygonBooleanOperator booleanOperator)
+        {
+            if (!IsAvailable()) return null;
+            if (!TryBuildPolygonMeshBrush(mesh, materials, out var controlMesh, out var shape)) return null;
+
+            ensureInitializedShapeMethod.Invoke(null, new object[] { shape });
+            var valid = (bool)validateControlMeshMethod.Invoke(null, new object[] { controlMesh, shape });
+            legacyControlMesh.GetProperty("Valid").SetValue(controlMesh, valid, null);
+            if (!valid) return null;
+
+            var brush = createBrushMethod.Invoke(null, new object[] { parent, brushName, controlMesh, shape });
+            if (brush == null) return null;
+
+            if (booleanOperator == PolygonBooleanOperator.Difference)
+                csgBrushOperationType.SetValue(brush, csgOperationTypeSubtractive);
+
+            return (MonoBehaviour)brush;
+        }
+
+        private static bool TryBuildPolygonMeshBrush(PolygonMesh mesh, Material[] materials, out object controlMesh, out object shape)
+        {
+            controlMesh = null;
+            shape = null;
+
+            if (mesh == null || mesh.Count < 4) return false;
+
+            var uniqueVertices = new List<Vector3>();
+            var polygonVertexIndices = new int[mesh.Count][];
+            var polygonEdgeIndices = new int[mesh.Count][];
+            var edgeCount = 0;
+
+            for (int polygonIndex = 0; polygonIndex < mesh.Count; polygonIndex++)
+            {
+                var polygon = mesh[polygonIndex];
+                if (polygon == null || polygon.Count < 3) return false;
+
+                polygonVertexIndices[polygonIndex] = new int[polygon.Count];
+                polygonEdgeIndices[polygonIndex] = new int[polygon.Count];
+
+                for (int vertexIndex = 0; vertexIndex < polygon.Count; vertexIndex++)
+                {
+                    var reversedVertex = polygon[polygon.Count - 1 - vertexIndex];
+                    var uniqueVertexIndex = FindOrAddVertex(uniqueVertices, reversedVertex.position);
+                    if (uniqueVertexIndex > short.MaxValue) return false;
+
+                    polygonVertexIndices[polygonIndex][vertexIndex] = uniqueVertexIndex;
+                    polygonEdgeIndices[polygonIndex][vertexIndex] = edgeCount++;
+                }
+            }
+
+            if (mesh.Count > short.MaxValue) return false;
+
+            var polygons = Array.CreateInstance(legacyPolygon, mesh.Count);
+            for (int polygonIndex = 0; polygonIndex < mesh.Count; polygonIndex++)
+                polygons.SetValue(legacyPolygonConstructor.Invoke(new object[] { polygonEdgeIndices[polygonIndex], polygonIndex }), polygonIndex);
+
+            var halfEdges = Array.CreateInstance(legacyHalfEdge, edgeCount);
+            for (int polygonIndex = 0; polygonIndex < mesh.Count; polygonIndex++)
+            {
+                for (int vertexIndex = 0; vertexIndex < polygonVertexIndices[polygonIndex].Length; vertexIndex++)
+                {
+                    var edgeIndex = polygonEdgeIndices[polygonIndex][vertexIndex];
+                    halfEdges.SetValue(legacyHalfEdgeConstructor.Invoke(new object[] { (short)polygonIndex, -1, (short)polygonVertexIndices[polygonIndex][vertexIndex], true }), edgeIndex);
+                }
+            }
+
+            for (int polygonIndex = 0; polygonIndex < polygonVertexIndices.Length; polygonIndex++)
+            {
+                for (int vertexIndex = 0; vertexIndex < polygonVertexIndices[polygonIndex].Length; vertexIndex++)
+                {
+                    var twinIndex = FindTwinEdgeIndex(polygonVertexIndices, polygonEdgeIndices, polygonIndex, vertexIndex);
+                    if (twinIndex < 0) return false;
+                    SetHalfEdgeTwinIndex(halfEdges, polygonEdgeIndices[polygonIndex][vertexIndex], twinIndex);
+                }
+            }
+
+            controlMesh = Activator.CreateInstance(legacyControlMesh);
+            legacyControlMesh.GetField("Vertices").SetValue(controlMesh, uniqueVertices.ToArray());
+            legacyControlMesh.GetField("Edges").SetValue(controlMesh, halfEdges);
+            legacyControlMesh.GetField("Polygons").SetValue(controlMesh, polygons);
+
+            shape = Activator.CreateInstance(legacyShape);
+            var surfaces = Array.CreateInstance(legacySurface, mesh.Count);
+            var texGens = Array.CreateInstance(legacyTexGen, mesh.Count);
+            var texGenFlags = Array.CreateInstance(csgSettingsDefaultTexGenFlagsField.FieldType, mesh.Count);
+            var defaultTexGenFlags = csgSettingsDefaultTexGenFlagsField.GetValue(null);
+
+            for (int polygonIndex = 0; polygonIndex < mesh.Count; polygonIndex++)
+            {
+                var surface = Activator.CreateInstance(legacySurface);
+                var plane = calcPolygonPlaneMethod.Invoke(null, new object[] { controlMesh, (short)polygonIndex });
+                var normal = (Vector3)plane.GetType().GetProperty("normal").GetValue(plane, null);
+                var tangentArgs = new object[] { normal, null, null };
+                calculateTangentsMethod.Invoke(null, tangentArgs);
+
+                legacySurface.GetField("Plane").SetValue(surface, plane);
+                legacySurface.GetField("Tangent").SetValue(surface, tangentArgs[1]);
+                legacySurface.GetField("BiNormal").SetValue(surface, tangentArgs[2]);
+                legacySurface.GetField("TexGenIndex").SetValue(surface, polygonIndex);
+                surfaces.SetValue(surface, polygonIndex);
+
+                var material = materials != null && polygonIndex < materials.Length ? materials[polygonIndex] : WallMaterial;
+                texGens.SetValue(legacyTexGenConstructor.Invoke(new object[] { material, null }), polygonIndex);
+                texGenFlags.SetValue(defaultTexGenFlags, polygonIndex);
+            }
+
+            legacyShape.GetField("Surfaces").SetValue(shape, surfaces);
+            legacyShape.GetField("TexGens").SetValue(shape, texGens);
+            legacyShape.GetField("TexGenFlags").SetValue(shape, texGenFlags);
+
+            return true;
+        }
+
+        private static int FindOrAddVertex(List<Vector3> vertices, Vector3 vertex)
+        {
+            for (int i = 0; i < vertices.Count; i++)
+            {
+                if (vertices[i].EqualsWithEpsilon5(vertex))
+                    return i;
+            }
+
+            vertices.Add(vertex);
+            return vertices.Count - 1;
+        }
+
+        private static int FindTwinEdgeIndex(int[][] polygonVertexIndices, int[][] polygonEdgeIndices, int polygonIndex, int vertexIndex)
+        {
+            var vertices = polygonVertexIndices[polygonIndex];
+            var currentVertexIndex = vertices[vertexIndex];
+            var previousVertexIndex = vertices[PreviousIndex(vertices, vertexIndex)];
+
+            for (int otherPolygonIndex = 0; otherPolygonIndex < polygonVertexIndices.Length; otherPolygonIndex++)
+            {
+                if (otherPolygonIndex == polygonIndex) continue;
+
+                var otherVertices = polygonVertexIndices[otherPolygonIndex];
+                for (int otherVertexIndex = 0; otherVertexIndex < otherVertices.Length; otherVertexIndex++)
+                {
+                    if (otherVertices[otherVertexIndex] != previousVertexIndex) continue;
+                    if (otherVertices[PreviousIndex(otherVertices, otherVertexIndex)] != currentVertexIndex) continue;
+
+                    return polygonEdgeIndices[otherPolygonIndex][otherVertexIndex];
+                }
+            }
+
+            return -1;
+        }
+
+        private static int PreviousIndex<T>(T[] values, int index)
+        {
+            return index == 0 ? values.Length - 1 : index - 1;
+        }
+
+        private static void SetHalfEdgeTwinIndex(Array halfEdges, int edgeIndex, int twinIndex)
+        {
+            var halfEdge = halfEdges.GetValue(edgeIndex);
+            legacyHalfEdge.GetField("TwinIndex").SetValue(halfEdge, twinIndex);
+            halfEdges.SetValue(halfEdge, edgeIndex);
         }
 
         private static void DestroyCSGNodeComponent(GameObject gameObject)
