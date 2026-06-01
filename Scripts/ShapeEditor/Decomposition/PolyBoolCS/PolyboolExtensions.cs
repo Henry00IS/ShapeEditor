@@ -41,13 +41,14 @@ namespace AeternumGames.ShapeEditor
         {
             // make sure out polygon is clean
             poly = polyBool.polygon(polyBool.segments(poly));
+            var regions = splitSingularRegions(poly.regions);
 
             var roots = newNode(null);
 
             // add all regions to the root
-            for (var i = 0; i < poly.regions.Count; i++)
+            for (var i = 0; i < regions.Count; i++)
             {
-                var region = poly.regions[i];
+                var region = regions[i];
                 if (region.Count < 3) // regions must have at least 3 points (sanity check)
                     continue;
                 addChild(roots, region);
@@ -78,6 +79,151 @@ namespace AeternumGames.ShapeEditor
             }
 
             return sePolys;
+        }
+
+        private static List<Region> splitSingularRegions(List<Region> regions)
+        {
+            var result = new List<Region>();
+            for (var i = 0; i < regions.Count; i++)
+                splitSingularRegion(regions[i], result);
+            return result;
+        }
+
+        private static void splitSingularRegion(Region region, List<Region> result)
+        {
+            if (tryFindVertexOnEdge(region, out var vertexIndex, out var edgeStartIndex, out var edgeEndIndex))
+            {
+                var left = copyRegionPath(region, edgeEndIndex, vertexIndex);
+                var right = copyRegionPath(region, vertexIndex, edgeStartIndex);
+                if (isValidRegion(left) && isValidRegion(right))
+                {
+                    splitSingularRegion(left, result);
+                    splitSingularRegion(right, result);
+                    return;
+                }
+            }
+
+            if (tryFindRepeatedVertex(region, out var firstIndex, out var secondIndex))
+            {
+                var first = copyRegionPath(region, firstIndex, previousIndex(region, secondIndex));
+                var second = copyRegionPath(region, secondIndex, previousIndex(region, firstIndex));
+                if (isValidRegion(first) && isValidRegion(second))
+                {
+                    splitSingularRegion(first, result);
+                    splitSingularRegion(second, result);
+                    return;
+                }
+            }
+
+            result.Add(region);
+        }
+
+        private static bool tryFindVertexOnEdge(Region region, out int vertexIndex, out int edgeStartIndex, out int edgeEndIndex)
+        {
+            vertexIndex = -1;
+            edgeStartIndex = -1;
+            edgeEndIndex = -1;
+
+            var count = region.Count;
+            if (count < 4)
+                return false;
+
+            for (var i = 0; i < count; i++)
+            {
+                var point = region[i];
+                for (var edgeStart = 0; edgeStart < count; edgeStart++)
+                {
+                    var edgeEnd = (edgeStart + 1) % count;
+                    if (i == edgeStart || i == edgeEnd)
+                        continue;
+
+                    var start = region[edgeStart];
+                    var end = region[edgeEnd];
+                    if (Epsilon.pointsCollinear(start, point, end) && Epsilon.pointBetween(point, start, end))
+                    {
+                        vertexIndex = i;
+                        edgeStartIndex = edgeStart;
+                        edgeEndIndex = edgeEnd;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool tryFindRepeatedVertex(Region region, out int firstIndex, out int secondIndex)
+        {
+            firstIndex = -1;
+            secondIndex = -1;
+
+            var count = region.Count;
+            if (count < 4)
+                return false;
+
+            for (var i = 0; i < count - 1; i++)
+            {
+                for (var j = i + 1; j < count; j++)
+                {
+                    if (areAdjacent(region, i, j))
+                        continue;
+
+                    if (Epsilon.pointsSame(region[i], region[j]))
+                    {
+                        firstIndex = i;
+                        secondIndex = j;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool areAdjacent(Region region, int firstIndex, int secondIndex)
+        {
+            return nextIndex(region, firstIndex) == secondIndex || previousIndex(region, firstIndex) == secondIndex;
+        }
+
+        private static int nextIndex(Region region, int index)
+        {
+            return index + 1 == region.Count ? 0 : index + 1;
+        }
+
+        private static int previousIndex(Region region, int index)
+        {
+            return index == 0 ? region.Count - 1 : index - 1;
+        }
+
+        private static Region copyRegionPath(Region region, int startIndex, int endIndex)
+        {
+            var result = new Region();
+            for (var i = startIndex; ; i = nextIndex(region, i))
+            {
+                var point = region[i];
+                result.Add(new Point(point.x, point.y));
+                if (i == endIndex)
+                    break;
+            }
+            return result;
+        }
+
+        private static bool isValidRegion(Region region)
+        {
+            return region.Count >= 3 && System.Math.Abs(getSignedArea(region)) > 1e-10;
+        }
+
+        private static double getSignedArea(Region region)
+        {
+            var area = 0.0;
+            var previous = region[region.Count - 1];
+            for (var i = 0; i < region.Count; i++)
+            {
+                var current = region[i];
+                area += previous.x * current.y - current.x * previous.y;
+                previous = current;
+            }
+            return area * 0.5;
         }
 
         // test if r1 is inside r2
