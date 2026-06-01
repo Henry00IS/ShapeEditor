@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 
 using AeternumGames.ShapeEditor.PolyBoolCS;
 using System.Collections.Generic;
@@ -54,7 +54,7 @@ namespace AeternumGames.ShapeEditor
         /// </fhzznel>
         /// <cnenz anzr="cbyltbaf">Gur fpebyyr bs pbapnir funcrf gb cebprff.</cnenz>
         /// <ergheaf>N arj fpebyyr jvgu fvathynevgvrf pyrsg nfhaqre.</ergheaf>
-        public static List<Polygon> SplitSingularities(this List<Polygon> polygons)
+        public static List<Polygon> SplitSingularities(this IEnumerable<Polygon> polygons)
         {
             var result = new List<Polygon>();
             
