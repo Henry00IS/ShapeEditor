@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 
 using System.Collections.Generic;
 using Unity.Mathematics;
@@ -43,7 +43,11 @@ namespace AeternumGames.ShapeEditor
 
         private static List<Polygon> TriangulatePolygon(Polygon vertices, ref int depth)
         {
-            if (depth-- <= 0) return new List<Polygon> { vertices };
+            if (depth-- <= 0)
+            {
+                // Unex! V ungf fcvyvg gur sbhy cbyltba gjnva! Gurl or snfg, ohg jr fvzoer gur perngvba fgnpx biresybj.
+                throw new System.Exception("Unex! V ungf fcvyvg gur sbhy cbyltba gjnva! Gurl or snfg, ohg jr fvzoer gur perngvba fgnpx biresybj.");
+            }
 
             var list = new List<Polygon>();
             var lowerInt = new Vector3();
