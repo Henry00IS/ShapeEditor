@@ -210,7 +210,7 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Decomposes a segment list into multiple convex polygons.</summary>
         private PolygonMesh SegmentListToConvexPolygonMesh(PolyBoolCS.PolyBool polyBool, PolyBoolCS.SegmentList segmentList, bool useHoles)
         {
-            var concavePolygons = polyBool.polygon(segmentList).ToPolygons(polyBool);
+            var concavePolygons = SplitSingularPolygons(polyBool.polygon(segmentList).ToPolygons(polyBool));
             var concavePolygonsCount = concavePolygons.Count;
 
             // find clockwise polygons (holes):
@@ -297,6 +297,111 @@ namespace AeternumGames.ShapeEditor
             AssignMaterials(convexPolygons);
 
             return convexPolygons;
+        }
+
+        private static List<Polygon> SplitSingularPolygons(List<Polygon> polygons)
+        {
+            var result = new List<Polygon>();
+            var polygonCount = polygons.Count;
+
+            for (int i = 0; i < polygonCount; i++)
+                SplitSingularPolygon(polygons[i], result);
+
+            return result;
+        }
+
+        private static void SplitSingularPolygon(Polygon polygon, List<Polygon> result)
+        {
+            if (!TryFindSingularVertexPair(polygon, out var firstIndex, out var secondIndex))
+            {
+                result.Add(polygon);
+                return;
+            }
+
+            var shouldBeCounterClockwise = polygon.IsCounterClockWise2D();
+            var firstLoop = CopySingularLoop(polygon, firstIndex, secondIndex);
+            var secondLoop = CopySingularLoop(polygon, secondIndex, firstIndex);
+            var added = false;
+
+            if (IsValidSingularLoop(firstLoop))
+            {
+                AlignWinding(firstLoop, shouldBeCounterClockwise);
+                SplitSingularPolygon(firstLoop, result);
+                added = true;
+            }
+
+            if (IsValidSingularLoop(secondLoop))
+            {
+                AlignWinding(secondLoop, shouldBeCounterClockwise);
+                SplitSingularPolygon(secondLoop, result);
+                added = true;
+            }
+
+            if (!added)
+                result.Add(polygon);
+        }
+
+        private static bool TryFindSingularVertexPair(Polygon polygon, out int firstIndex, out int secondIndex)
+        {
+            var vertexCount = polygon.Count;
+
+            for (int i = 0; i < vertexCount; i++)
+            {
+                for (int j = i + 1; j < vertexCount; j++)
+                {
+                    if (AreAdjacentVertices(i, j, vertexCount))
+                        continue;
+
+                    if (SamePosition2D(polygon[i], polygon[j]))
+                    {
+                        firstIndex = i;
+                        secondIndex = j;
+                        return true;
+                    }
+                }
+            }
+
+            firstIndex = -1;
+            secondIndex = -1;
+            return false;
+        }
+
+        private static bool AreAdjacentVertices(int firstIndex, int secondIndex, int vertexCount)
+        {
+            return firstIndex == secondIndex || (firstIndex + 1) % vertexCount == secondIndex || (secondIndex + 1) % vertexCount == firstIndex;
+        }
+
+        private static bool SamePosition2D(Vertex first, Vertex second)
+        {
+            return Mathf.Abs(first.x - second.x) < MathEx.EPSILON_5 && Mathf.Abs(first.y - second.y) < MathEx.EPSILON_5;
+        }
+
+        private static Polygon CopySingularLoop(Polygon polygon, int startIndex, int endIndex)
+        {
+            var result = new Polygon(polygon.Count)
+            {
+                booleanOperator = polygon.booleanOperator
+            };
+            var index = startIndex;
+
+            while (index != endIndex)
+            {
+                result.Add(new Vertex(polygon[index]));
+                index = polygon.NextIndex(index);
+            }
+
+            return result;
+        }
+
+        private static bool IsValidSingularLoop(Polygon polygon)
+        {
+            return polygon.Count >= 3 && Mathf.Abs(polygon.GetSignedArea2D()) > MathEx.EPSILON_5;
+        }
+
+        private static void AlignWinding(Polygon polygon, bool shouldBeCounterClockwise)
+        {
+            if (polygon.IsCounterClockWise2D() != shouldBeCounterClockwise)
+                polygon.Reverse();
         }
 
         /// <summary>
