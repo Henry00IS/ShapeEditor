@@ -1,0 +1,18 @@
+{
+    "name": "com.aeternumgames.shapeeditor.Tests.Editor",
+    "references": [
+        "com.aeternumgames.shapeeditor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 
 using AeternumGames.ShapeEditor.PolyBoolCS;
 using System.Collections.Generic;
@@ -42,6 +42,8 @@ namespace AeternumGames.ShapeEditor
             // make sure out polygon is clean
             poly = polyBool.polygon(polyBool.segments(poly));
 
+            poly.regions = splitSingularRegions(poly.regions);
+
             var roots = newNode(null);
 
             // add all regions to the root
@@ -78,6 +80,138 @@ namespace AeternumGames.ShapeEditor
             }
 
             return sePolys;
+        }
+
+        private static List<Region> splitSingularRegions(List<Region> regions)
+        {
+            var result = new List<Region>();
+            for (var i = 0; i < regions.Count; i++)
+                splitRepeatedVertices(insertTouchingVertices(regions[i]), result);
+            return result;
+        }
+
+        private static Region insertTouchingVertices(Region region)
+        {
+            var result = new Region();
+            var count = region.Count;
+            for (var edgeStart = 0; edgeStart < count; edgeStart++)
+            {
+                var edgeEnd = (edgeStart + 1) % count;
+                var start = region[edgeStart];
+                var end = region[edgeEnd];
+                addPoint(result, start);
+
+                var points = new List<Point>();
+                for (var vertex = 0; vertex < count; vertex++)
+                {
+                    if (vertex == edgeStart || vertex == edgeEnd)
+                        continue;
+
+                    var point = region[vertex];
+                    if (!Epsilon.pointsCollinear(start, point, end) ||
+                        !Epsilon.pointBetween(point, start, end))
+                        continue;
+
+                    var duplicate = false;
+                    for (var i = 0; i < points.Count; i++)
+                    {
+                        if (!Epsilon.pointsSame(points[i], point))
+                            continue;
+                        duplicate = true;
+                        break;
+                    }
+                    if (!duplicate)
+                        points.Add(point);
+                }
+
+                points.Sort(delegate(Point left, Point right)
+                {
+                    return squaredDistance(start, left).CompareTo(squaredDistance(start, right));
+                });
+                for (var i = 0; i < points.Count; i++)
+                    addPoint(result, points[i]);
+            }
+
+            if (result.Count > 1 && Epsilon.pointsSame(result[0], result[result.Count - 1]))
+                result.RemoveAt(result.Count - 1);
+            return result;
+        }
+
+        private static void splitRepeatedVertices(Region region, List<Region> result)
+        {
+            var pending = new Stack<Region>();
+            pending.Push(region);
+            while (pending.Count > 0)
+            {
+                var current = pending.Pop();
+                var firstIndex = -1;
+                var secondIndex = -1;
+                for (var i = 0; i < current.Count - 1 && firstIndex < 0; i++)
+                {
+                    for (var j = i + 1; j < current.Count; j++)
+                    {
+                        if (j == i + 1 || (i == 0 && j == current.Count - 1) ||
+                            !Epsilon.pointsSame(current[i], current[j]))
+                            continue;
+                        firstIndex = i;
+                        secondIndex = j;
+                        break;
+                    }
+                }
+
+                if (firstIndex < 0)
+                {
+                    if (validCycle(current))
+                        result.Add(current);
+                    continue;
+                }
+
+                var first = copyArc(current, firstIndex, secondIndex);
+                var second = copyArc(current, secondIndex, firstIndex);
+                if (first.Count > 0 && second.Count > 0)
+                    second[0] = first[0];
+                if (validCycle(second))
+                    pending.Push(second);
+                if (validCycle(first))
+                    pending.Push(first);
+            }
+        }
+
+        private static Region copyArc(Region region, int start, int end)
+        {
+            var result = new Region();
+            for (var i = start; i != end; i = (i + 1) % region.Count)
+                addPoint(result, region[i]);
+            if (result.Count > 1 && Epsilon.pointsSame(result[0], result[result.Count - 1]))
+                result.RemoveAt(result.Count - 1);
+            return result;
+        }
+
+        private static bool validCycle(Region region)
+        {
+            if (region.Count < 3)
+                return false;
+            for (var i = 0; i < region.Count; i++)
+            {
+                var previous = region[(i + region.Count - 1) % region.Count];
+                var next = region[(i + 1) % region.Count];
+                if (!Epsilon.pointsCollinear(previous, region[i], next))
+                    return true;
+            }
+            return false;
+        }
+
+        private static void addPoint(Region region, Point point)
+        {
+            if (region.Count == 0 || !Epsilon.pointsSame(region[region.Count - 1], point))
+                region.Add(new Point(point.x, point.y));
+        }
+
+        private static double squaredDistance(Point first, Point second)
+        {
+            var x = first.x - second.x;
+            var y = first.y - second.y;
+            return x * x + y * y;
         }
 
         // test if r1 is inside r2
