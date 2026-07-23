@@ -44,13 +44,18 @@ namespace AeternumGames.ShapeEditor
 
             var roots = newNode(null);
 
-            // add all regions to the root
+            // add all regions to the root. PolyBool can return a weakly-simple
+            // region when two filled areas touch at a single point. Split those
+            // regions before building the hierarchy so convex decomposition only
+            // receives simple polygons.
             for (var i = 0; i < poly.regions.Count; i++)
             {
                 var region = poly.regions[i];
                 if (region.Count < 3) // regions must have at least 3 points (sanity check)
                     continue;
-                addChild(roots, region);
+
+                foreach (var simpleRegion in splitSingularities(region))
+                    addChild(roots, simpleRegion);
             }
 
             // with our heirarchy, we can distinguish between exterior borders, and interior holes
@@ -78,6 +83,93 @@ namespace AeternumGames.ShapeEditor
             }
 
             return sePolys;
+        }
+
+        private static List<Region> splitSingularities(Region region)
+        {
+            var regions = new List<Region>() { region };
+
+            for (var i = 0; i < regions.Count;)
+            {
+                if (trySplitSingularity(regions[i], out var first, out var second))
+                {
+                    regions[i] = first;
+                    regions.Insert(i + 1, second);
+                    continue;
+                }
+
+                i++;
+            }
+
+            return regions;
+        }
+
+        private static bool trySplitSingularity(Region region, out Region first, out Region second)
+        {
+            first = null;
+            second = null;
+
+            var count = region.Count;
+            for (var singularityIndex = 0; singularityIndex < count; singularityIndex++)
+            {
+                var singularity = region[singularityIndex];
+
+                for (var edgeStartIndex = 0; edgeStartIndex < count; edgeStartIndex++)
+                {
+                    var edgeEndIndex = (edgeStartIndex + 1) % count;
+                    if (edgeStartIndex == singularityIndex || edgeEndIndex == singularityIndex)
+                        continue;
+
+                    var edgeStart = region[edgeStartIndex];
+                    var edgeEnd = region[edgeEndIndex];
+                    if (!Epsilon.pointsCollinear(edgeStart, singularity, edgeEnd) ||
+                        !Epsilon.pointBetween(singularity, edgeStart, edgeEnd))
+                    {
+                        continue;
+                    }
+
+                    var firstCount = 2 + CountPathVertices(singularityIndex, edgeStartIndex, count);
+                    var secondCount = 2 + CountPathVertices(edgeEndIndex, singularityIndex, count);
+                    if (firstCount < 3 || secondCount < 3)
+                        continue;
+
+                    first = new Region(firstCount);
+                    first.Add(singularity);
+                    AddPathVertices(first, region, singularityIndex, edgeStartIndex);
+
+                    second = new Region(secondCount);
+                    second.Add(singularity);
+                    second.Add(edgeEnd);
+                    AddPathVerticesBeforeEnd(second, region, edgeEndIndex, singularityIndex);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static int CountPathVertices(int startIndex, int endIndex, int count)
+        {
+            var result = 0;
+            for (var index = (startIndex + 1) % count; index != endIndex; index = (index + 1) % count)
+                result++;
+            return result;
+        }
+
+        private static void AddPathVertices(Region destination, Region source, int startIndex, int endIndex)
+        {
+            var count = source.Count;
+            for (var index = (startIndex + 1) % count; index != endIndex; index = (index + 1) % count)
+                destination.Add(source[index]);
+
+            destination.Add(source[endIndex]);
+        }
+
+        private static void AddPathVerticesBeforeEnd(Region destination, Region source, int startIndex, int endIndex)
+        {
+            var count = source.Count;
+            for (var index = (startIndex + 1) % count; index != endIndex; index = (index + 1) % count)
+                destination.Add(source[index]);
         }
 
         // test if r1 is inside r2
