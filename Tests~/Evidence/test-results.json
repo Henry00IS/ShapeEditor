@@ -1,0 +1,48 @@
+{
+  "editor": "2022.3.62f1 (4af31df58517)",
+  "platform": "Windows x64",
+  "realtimecsg_commit": "8ea1d81e917c538d8f4563327c2c657b50a355f0",
+  "result": "Passed",
+  "total": 9,
+  "passed": 9,
+  "failed": 0,
+  "start_utc": "2026-09-15 02:26:02Z",
+  "tests": [
+    {
+      "name": "CubeRetainsLocalGeometryAndDoesNotMutateInput",
+      "result": "Passed"
+    },
+    {
+      "name": "MaterialSlotsAndSubtractionSurviveConversion",
+      "result": "Passed"
+    },
+    {
+      "name": "MissingFaceCannotCreatePartialSceneObject",
+      "result": "Passed"
+    },
+    {
+      "name": "NativeModelProducesTheExpectedSolid(False,False,8.0f)",
+      "result": "Passed"
+    },
+    {
+      "name": "NativeModelProducesTheExpectedSolid(True,False,2.666667f)",
+      "result": "Passed"
+    },
+    {
+      "name": "NativeModelProducesTheExpectedSolid(False,True,7.0f)",
+      "result": "Passed"
+    },
+    {
+      "name": "RepeatedFaceCannotCreateNonManifoldBrush",
+      "result": "Passed"
+    },
+    {
+      "name": "ZeroScaleCapBecomesAPyramid(False)",
+      "result": "Passed"
+    },
+    {
+      "name": "ZeroScaleCapBecomesAPyramid(True)",
+      "result": "Passed"
+    }
+  ]
+}

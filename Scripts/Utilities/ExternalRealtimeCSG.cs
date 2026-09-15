@@ -13,7 +13,7 @@ namespace AeternumGames.ShapeEditor
     /// <summary>
     /// Provides communication with RealtimeCSG through reflection.
     /// </summary>
-    public class ExternalRealtimeCSG
+    public partial class ExternalRealtimeCSG
     {
         /// <summary>
         /// The cached RealtimeCSG.Legacy.BrushFactory type after initialization.
