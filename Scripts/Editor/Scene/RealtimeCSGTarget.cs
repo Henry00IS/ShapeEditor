@@ -110,6 +110,20 @@ namespace AeternumGames.ShapeEditor
             return parent;
         }
 
+        private void CreatePolygonBrush(Transform parent, PolygonMesh mesh)
+        {
+            var slots = new int[mesh.Count];
+            for (int i = 0; i < slots.Length; i++) slots[i] = mesh[i].material;
+            try
+            {
+                ExternalRealtimeCSG.CreateBrushFromPolygonMesh(parent, "Shape Editor Brush", mesh, GetMaterials(slots));
+            }
+            catch (System.ArgumentException error)
+            {
+                Debug.LogWarning("Cannot create RealtimeCSG brush: " + error.Message, this);
+            }
+        }
+
         private Material[] GetMaterials(int[] materialIndices)
         {
             // if there are no materials in the inspector then return null so that realtimecsg uses
