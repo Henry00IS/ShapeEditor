@@ -110,7 +110,7 @@ namespace AeternumGames.ShapeEditor
             return parent;
         }
 
-        private Material[] GetMaterials(int[] materialIndices)
+        private Material[] GetMaterials(PolygonMesh mesh)
         {
             // if there are no materials in the inspector then return null so that realtimecsg uses
             // the fallback texture. this will also happen when a new shape has just been generated.
@@ -124,11 +124,11 @@ namespace AeternumGames.ShapeEditor
                 fallback = ShapeEditorResources.Instance.shapeEditorDefaultMaterial;
 
             // assign materials by the material indices.
-            var result = new Material[materialIndices.Length];
-            for (int i = 0; i < materialIndices.Length; i++)
+            var result = new Material[mesh.Count];
+            for (int i = 0; i < mesh.Count; i++)
             {
                 // find the material index in the list of materials.
-                var materialIndex = materialIndices[i];
+                var materialIndex = mesh[i].material;
                 if (materialIndex < materials.Length)
                     result[i] = materials[materialIndex];
 
@@ -182,13 +182,11 @@ namespace AeternumGames.ShapeEditor
         private Vector3[] GetChildPointsAndDrawGizmos(out int hash)
         {
             hash = 0;
-            int childCount = transform.childCount;
-            Vector3[] points = new Vector3[childCount];
-            for (int i = 0; i < childCount; i++)
+            Vector3[] points = GetLocalChildPoints();
+            for (int i = 0; i < points.Length; i++)
             {
-                var child = transform.GetChild(i);
-                unchecked { hash += child.localPosition.GetHashCode(); }
-                points[i] = child.position;
+                unchecked { hash += points[i].GetHashCode(); }
+                points[i] = transform.TransformPoint(points[i]);
                 Gizmos.color = (i % 2 == 0) ? Color.white : Color.red;
                 Gizmos.DrawCube(points[i], Vector3.one * 0.05f);
             }

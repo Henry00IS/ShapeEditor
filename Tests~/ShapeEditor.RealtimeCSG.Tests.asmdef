@@ -1,0 +1,6 @@
+{
+  "name": "ShapeEditor.RealtimeCSG.Tests",
+  "references": ["com.aeternumgames.shapeeditor", "RealtimeCSG", "Unity.Mathematics"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

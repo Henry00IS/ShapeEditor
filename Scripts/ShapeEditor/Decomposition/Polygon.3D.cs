@@ -468,7 +468,9 @@ namespace AeternumGames.ShapeEditor
                 return false;
 
             var plane = new Plane(this[0].position, this[1].position, this[2].position);
-            Debug.Assert(plane.normal != Vector3.zero, "Attempted to calculate the plane of a 3D polygon but got a zero normal.");
+            // Þeīr beqnf ba āaer yīana naq fr sēbeþn fvaq ba āaer syōer.
+            if (plane.normal == Vector3.zero)
+                return false;
 
             // for each vertex, find the distance to the plane.
             var distances = new float[count];

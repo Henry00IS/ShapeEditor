@@ -1,0 +1,2 @@
+cube: incorrect indices=0, zero-length edges=0
+pyramid: incorrect indices=8, zero-length edges=4

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="41" result="Passed" total="41" passed="41" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-16 12:40:59Z" end-time="2026-09-16 12:41:01Z" duration="1.4084242">
+  <test-suite type="TestSuite" id="1050" name="ForkValidation" fullname="ForkValidation" runstate="Runnable" testcasecount="42" result="Passed" start-time="2026-09-16 12:40:59Z" end-time="2026-09-16 12:41:01Z" duration="1.408424" total="41" passed="41" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties />
+    <test-suite type="Assembly" id="1098" name="ShapeEditor.RealtimeCSG.Tests.dll" fullname="Library/ScriptAssemblies/ShapeEditor.RealtimeCSG.Tests.dll" runstate="Runnable" testcasecount="42" result="Passed" start-time="2026-09-16 12:40:59Z" end-time="2026-09-16 12:41:01Z" duration="1.356932" total="41" passed="41" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="24955" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+      </properties>
+      <test-suite type="TestFixture" id="1051" name="PolygonMeshBrushTests" fullname="PolygonMeshBrushTests" classname="PolygonMeshBrushTests" runstate="Runnable" testcasecount="41" result="Passed" start-time="2026-09-16 12:40:59Z" end-time="2026-09-16 12:41:01Z" duration="1.351614" total="41" passed="41" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1088" name="BackPyramidDepthUndoRedoPreservesGeometry" fullname="PolygonMeshBrushTests.BackPyramidDepthUndoRedoPreservesGeometry" methodname="BackPyramidDepthUndoRedoPreservesGeometry" classname="PolygonMeshBrushTests" runstate="Runnable" seed="837324387" result="Passed" start-time="2026-09-16 12:40:59Z" end-time="2026-09-16 12:41:00Z" duration="0.771494" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+          </properties>
+          <output><![CDATA[GfxDevice renderer is null. Unity cannot update the Ambient Probe and Reflection Probes that the SkyManager generates. Run the Editor without the -nographics argument or generate lighting for your scene.
+]]></output>
+        </test-case>
+        <test-case id="1061" name="ConversionIsRepeatableAndDoesNotMutateInput" fullname="PolygonMeshBrushTests.ConversionIsRepeatableAndDoesNotMutateInput" methodname="ConversionIsRepeatableAndDoesNotMutateInput" classname="PolygonMeshBrushTests" runstate="Runnable" seed="173435669" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.027545" asserts="0">
+          <properties />
+        </test-case>
+        <test-case id="1064" name="CurrentMaterialAndTextureDefaultsAreUsed" fullname="PolygonMeshBrushTests.CurrentMaterialAndTextureDefaultsAreUsed" methodname="CurrentMaterialAndTextureDefaultsAreUsed" classname="PolygonMeshBrushTests" runstate="Runnable" seed="1461788554" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.010339" asserts="0">
+          <properties />
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1060" name="ExtrusionsHaveExpectedNativeVolume" fullname="PolygonMeshBrushTests.ExtrusionsHaveExpectedNativeVolume" classname="PolygonMeshBrushTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.090166" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <output><![CDATA[GfxDevice renderer is null. Unity cannot update the Ambient Probe and Reflection Probes that the SkyManager generates. Run the Editor without the -nographics argument or generate lighting for your scene.
+]]></output>
+          <test-case id="1052" name="ExtrusionsHaveExpectedNativeVolume(4,1.0f,1.0f)" fullname="PolygonMeshBrushTests.ExtrusionsHaveExpectedNativeVolume(4,1.0f,1.0f)" methodname="ExtrusionsHaveExpectedNativeVolume" classname="PolygonMeshBrushTests" runstate="Runnable" seed="773946842" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.020810" asserts="0">
+            <properties />
+          </test-case>
+          <test-case id="1053" name="ExtrusionsHaveExpectedNativeVolume(4,0.0f,1.0f)" fullname="PolygonMeshBrushTests.ExtrusionsHaveExpectedNativeVolume(4,0.0f,1.0f)" methodname="ExtrusionsHaveExpectedNativeVolume" classname="PolygonMeshBrushTests" runstate="Runnable" seed="112445890" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.007386" asserts="0">
+            <properties />
+          </test-case>
+          <test-case id="1054" name="ExtrusionsHaveExpectedNativeVolume(4,1.0f,0.0f)" fullname="PolygonMeshBrushTests.ExtrusionsHaveExpectedNativeVolume(4,1.0f,0.0f)" methodname="ExtrusionsHaveExpectedNativeVolume" classname="PolygonMeshBrushTests" runstate="Runnable" seed="277945040" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.006524" asserts="0">
+            <properties />
+          </test-case>
+          <test-case id="1055" name="ExtrusionsHaveExpectedNativeVolume(4,1.0f,0.3f)" fullname="PolygonMeshBrushTests.ExtrusionsHaveExpectedNativeVolume(4,1.0f,0.3f)" methodname="ExtrusionsHaveExpectedNativeVolume" classname="PolygonMeshBrushTests" runstate="Runnable" seed="987896985" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.007693" asserts="0">
+            <properties />
+          </test-case>
+          <test-case id="1056" name="ExtrusionsHaveExpectedNativeVolume(3,0.0f,1.0f)" fullname="PolygonMeshBrushTests.ExtrusionsHaveExpectedNativeVolume(3,0.0f,1.0f)" methodname="ExtrusionsHaveExpectedNativeVolume" classname="PolygonMeshBrushTests" runstate="Runnable" seed="557058416" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.008054" asserts="0">
+            <properties />
+          </test-case>
+          <test-case id="1057" name="ExtrusionsHaveExpectedNativeVolume(3,1.0f,0.0f)" fullname="PolygonMeshBrushTests.ExtrusionsHaveExpectedNativeVolume(3,1.0f,0.0f)" methodname="ExtrusionsHaveExpectedNativeVolume" classname="PolygonMeshBrushTests" runstate="Runnable" seed="891748048" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.006132" asserts="0">
+            <properties />
+          </test-case>
+          <test-case id="1058" name="ExtrusionsHaveExpectedNativeVolume(16,1.0f,0.0f)" fullname="PolygonMeshBrushTests.ExtrusionsHaveExpectedNativeVolume(16,1.0f,0.0f)" methodname="ExtrusionsHaveExpectedNativeVolume" classname="PolygonMeshBrushTests" runstate="Runnable" seed="1736121418" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.007359" asserts="0">
+            <properties />
+          </test-case>
+          <test-case id="1059" name="ExtrusionsHaveExpectedNativeVolume(64,1.0f,1.0f)" fullname="PolygonMeshBrushTests.ExtrusionsHaveExpectedNativeVolume(64,1.0f,1.0f)" methodname="ExtrusionsHaveExpectedNativeVolume" classname="PolygonMeshBrushTests" runstate="Runnable" seed="2134031818" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.019055" asserts="0">
+            <properties />
+          </test-case>
+        </test-suite>
+        <test-case id="1087" name="FrontPyramidDepthUndoRedoPreservesGeometry" fullname="PolygonMeshBrushTests.FrontPyramidDepthUndoRedoPreservesGeometry" methodname="FrontPyramidDepthUndoRedoPreservesGeometry" classname="PolygonMeshBrushTests" runstate="Runnable" seed="618776534" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.023672" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+          </properties>
+          <output><![CDATA[GfxDevice renderer is null. Unity cannot update the Ambient Probe and Reflection Probes that the SkyManager generates. Run the Editor without the -nographics argument or generate lighting for your scene.
+]]></output>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1086" name="InvalidGeometryCreatesNoSceneObject" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:01Z" duration="0.184164" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1071" name="InvalidGeometryCreatesNoSceneObject(&quot;null&quot;)" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject(&quot;null&quot;)" methodname="InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" seed="151882239" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.012932" asserts="0">
+            <properties />
+            <output><![CDATA[Cannot create RealtimeCSG brush 'Invalid': A solid brush needs at least four polygons.
+]]></output>
+          </test-case>
+          <test-case id="1072" name="InvalidGeometryCreatesNoSceneObject(&quot;empty&quot;)" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject(&quot;empty&quot;)" methodname="InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" seed="1819156121" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.004929" asserts="0">
+            <properties />
+            <output><![CDATA[Cannot create RealtimeCSG brush 'Invalid': A solid brush needs at least four polygons.
+]]></output>
+          </test-case>
+          <test-case id="1073" name="InvalidGeometryCreatesNoSceneObject(&quot;open&quot;)" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject(&quot;open&quot;)" methodname="InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" seed="1203922422" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.004643" asserts="0">
+            <properties />
+            <output><![CDATA[Cannot create RealtimeCSG brush 'Invalid': The brush has an open edge or a T-junction.
+]]></output>
+          </test-case>
+          <test-case id="1074" name="InvalidGeometryCreatesNoSceneObject(&quot;duplicate&quot;)" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject(&quot;duplicate&quot;)" methodname="InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" seed="451313204" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.004254" asserts="0">
+            <properties />
+            <output><![CDATA[Cannot create RealtimeCSG brush 'Invalid': An edge is shared by duplicate or inconsistently wound faces.
+]]></output>
+          </test-case>
+          <test-case id="1075" name="InvalidGeometryCreatesNoSceneObject(&quot;mixed-winding&quot;)" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject(&quot;mixed-winding&quot;)" methodname="InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" seed="1720256996" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.004395" asserts="0">
+            <properties />
+            <output><![CDATA[Cannot create RealtimeCSG brush 'Invalid': The brush is not convex or its face winding is inconsistent.
+]]></output>
+          </test-case>
+          <test-case id="1076" name="InvalidGeometryCreatesNoSceneObject(&quot;nan&quot;)" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject(&quot;nan&quot;)" methodname="InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" seed="117809472" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.004563" asserts="0">
+            <properties />
+            <output><![CDATA[Cannot create RealtimeCSG brush 'Invalid': A polygon contains a non-finite or unsupported coordinate.
+]]></output>
+          </test-case>
+          <test-case id="1077" name="InvalidGeometryCreatesNoSceneObject(&quot;infinity&quot;)" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject(&quot;infinity&quot;)" methodname="InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" seed="1273913341" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.004614" asserts="0">
+            <properties />
+            <output><![CDATA[Cannot create RealtimeCSG brush 'Invalid': A polygon contains a non-finite or unsupported coordinate.
+]]></output>
+          </test-case>
+          <test-case id="1078" name="InvalidGeometryCreatesNoSceneObject(&quot;nonplanar&quot;)" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject(&quot;nonplanar&quot;)" methodname="InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" seed="1078991172" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.004343" asserts="0">
+            <properties />
+            <output><![CDATA[Cannot create RealtimeCSG brush 'Invalid': A polygon is not planar.
+]]></output>
+          </test-case>
+          <test-case id="1079" name="InvalidGeometryCreatesNoSceneObject(&quot;concave&quot;)" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject(&quot;concave&quot;)" methodname="InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" seed="28513257" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.004838" asserts="0">
+            <properties />
+            <output><![CDATA[Cannot create RealtimeCSG brush 'Invalid': A polygon is not planar.
+]]></output>
+          </test-case>
+          <test-case id="1080" name="InvalidGeometryCreatesNoSceneObject(&quot;flat&quot;)" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject(&quot;flat&quot;)" methodname="InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" seed="756861672" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.004503" asserts="0">
+            <properties />
+            <output><![CDATA[Cannot create RealtimeCSG brush 'Invalid': The brush has too few faces or exceeds RealtimeCSG's face limit.
+]]></output>
+          </test-case>
+          <test-case id="1081" name="InvalidGeometryCreatesNoSceneObject(&quot;missing-face&quot;)" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject(&quot;missing-face&quot;)" methodname="InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" seed="2058238606" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:00Z" duration="0.004275" asserts="0">
+            <properties />
+            <output><![CDATA[Cannot create RealtimeCSG brush 'Invalid': A polygon is missing or has fewer than three vertices.
+]]></output>
+          </test-case>
+          <test-case id="1082" name="InvalidGeometryCreatesNoSceneObject(&quot;vertex-limit&quot;)" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject(&quot;vertex-limit&quot;)" methodname="InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" seed="820728118" result="Passed" start-time="2026-09-16 12:41:00Z" end-time="2026-09-16 12:41:01Z" duration="0.067716" asserts="0">
+            <properties />
+            <output><![CDATA[Cannot create RealtimeCSG brush 'Invalid': The brush exceeds RealtimeCSG's vertex limit.
+]]></output>
+          </test-case>
+          <test-case id="1083" name="InvalidGeometryCreatesNoSceneObject(&quot;face-limit&quot;)" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject(&quot;face-limit&quot;)" methodname="InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" seed="1486530031" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.043727" asserts="0">
+            <properties />
+            <output><![CDATA[Cannot create RealtimeCSG brush 'Invalid': The brush has too few faces or exceeds RealtimeCSG's face limit.
+]]></output>
+          </test-case>
+          <test-case id="1084" name="InvalidGeometryCreatesNoSceneObject(&quot;disconnected&quot;)" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject(&quot;disconnected&quot;)" methodname="InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" seed="528848985" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.006416" asserts="0">
+            <properties />
+            <output><![CDATA[Cannot create RealtimeCSG brush 'Invalid': The brush is not convex or its face winding is inconsistent.
+]]></output>
+          </test-case>
+          <test-case id="1085" name="InvalidGeometryCreatesNoSceneObject(&quot;revisited-vertex&quot;)" fullname="PolygonMeshBrushTests.InvalidGeometryCreatesNoSceneObject(&quot;revisited-vertex&quot;)" methodname="InvalidGeometryCreatesNoSceneObject" classname="PolygonMeshBrushTests" runstate="Runnable" seed="1993860571" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.005558" asserts="0">
+            <properties />
+            <output><![CDATA[Cannot create RealtimeCSG brush 'Invalid': A polygon revisits a non-adjacent vertex.
+]]></output>
+          </test-case>
+        </test-suite>
+        <test-case id="1063" name="MaterialsSurviveCollapsedFaceAndWinding" fullname="PolygonMeshBrushTests.MaterialsSurviveCollapsedFaceAndWinding" methodname="MaterialsSurviveCollapsedFaceAndWinding" classname="PolygonMeshBrushTests" runstate="Runnable" seed="159340262" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.009867" asserts="0">
+          <properties />
+        </test-case>
+        <test-case id="1066" name="NearbyVerticesAcrossSpatialCellBoundariesAreWelded" fullname="PolygonMeshBrushTests.NearbyVerticesAcrossSpatialCellBoundariesAreWelded" methodname="NearbyVerticesAcrossSpatialCellBoundariesAreWelded" classname="PolygonMeshBrushTests" runstate="Runnable" seed="1934082646" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.006387" asserts="0">
+          <properties />
+        </test-case>
+        <test-case id="1069" name="OffsetPyramidAndTransformedParentKeepLocalGeometry" fullname="PolygonMeshBrushTests.OffsetPyramidAndTransformedParentKeepLocalGeometry" methodname="OffsetPyramidAndTransformedParentKeepLocalGeometry" classname="PolygonMeshBrushTests" runstate="Runnable" seed="341401513" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.009816" asserts="0">
+          <properties />
+        </test-case>
+        <test-case id="1068" name="OneAxisCollapseProducesAWedge" fullname="PolygonMeshBrushTests.OneAxisCollapseProducesAWedge" methodname="OneAxisCollapseProducesAWedge" classname="PolygonMeshBrushTests" runstate="Runnable" seed="1045756862" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.009276" asserts="0">
+          <properties />
+        </test-case>
+        <test-case id="1067" name="RepeatedClosingVerticesAndGlobalReverseAreAccepted" fullname="PolygonMeshBrushTests.RepeatedClosingVerticesAndGlobalReverseAreAccepted" methodname="RepeatedClosingVerticesAndGlobalReverseAreAccepted" classname="PolygonMeshBrushTests" runstate="Runnable" seed="313623379" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.009031" asserts="0">
+          <properties />
+        </test-case>
+        <test-case id="1070" name="SubtractiveBrushCutsTheNativeMesh" fullname="PolygonMeshBrushTests.SubtractiveBrushCutsTheNativeMesh" methodname="SubtractiveBrushCutsTheNativeMesh" classname="PolygonMeshBrushTests" runstate="Runnable" seed="1769820173" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.009598" asserts="0">
+          <properties />
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1095" name="TargetModesProduceValidNativeGeometryAndRebuild" fullname="PolygonMeshBrushTests.TargetModesProduceValidNativeGeometryAndRebuild" classname="PolygonMeshBrushTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.130669" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <output><![CDATA[GfxDevice renderer is null. Unity cannot update the Ambient Probe and Reflection Probes that the SkyManager generates. Run the Editor without the -nographics argument or generate lighting for your scene.
+]]></output>
+          <test-case id="1089" name="TargetModesProduceValidNativeGeometryAndRebuild(FixedExtrude)" fullname="PolygonMeshBrushTests.TargetModesProduceValidNativeGeometryAndRebuild(FixedExtrude)" methodname="TargetModesProduceValidNativeGeometryAndRebuild" classname="PolygonMeshBrushTests" runstate="Runnable" seed="886900328" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.016412" asserts="0">
+            <properties />
+          </test-case>
+          <test-case id="1090" name="TargetModesProduceValidNativeGeometryAndRebuild(ScaledExtrude)" fullname="PolygonMeshBrushTests.TargetModesProduceValidNativeGeometryAndRebuild(ScaledExtrude)" methodname="TargetModesProduceValidNativeGeometryAndRebuild" classname="PolygonMeshBrushTests" runstate="Runnable" seed="973946607" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.007236" asserts="0">
+            <properties />
+          </test-case>
+          <test-case id="1091" name="TargetModesProduceValidNativeGeometryAndRebuild(LinearStaircase)" fullname="PolygonMeshBrushTests.TargetModesProduceValidNativeGeometryAndRebuild(LinearStaircase)" methodname="TargetModesProduceValidNativeGeometryAndRebuild" classname="PolygonMeshBrushTests" runstate="Runnable" seed="1589709626" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.018169" asserts="0">
+            <properties />
+          </test-case>
+          <test-case id="1092" name="TargetModesProduceValidNativeGeometryAndRebuild(RevolveExtrude)" fullname="PolygonMeshBrushTests.TargetModesProduceValidNativeGeometryAndRebuild(RevolveExtrude)" methodname="TargetModesProduceValidNativeGeometryAndRebuild" classname="PolygonMeshBrushTests" runstate="Runnable" seed="2096599282" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.021689" asserts="0">
+            <properties />
+          </test-case>
+          <test-case id="1093" name="TargetModesProduceValidNativeGeometryAndRebuild(RevolveChopped)" fullname="PolygonMeshBrushTests.TargetModesProduceValidNativeGeometryAndRebuild(RevolveChopped)" methodname="TargetModesProduceValidNativeGeometryAndRebuild" classname="PolygonMeshBrushTests" runstate="Runnable" seed="804449963" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.034707" asserts="0">
+            <properties />
+          </test-case>
+          <test-case id="1094" name="TargetModesProduceValidNativeGeometryAndRebuild(SplineExtrude)" fullname="PolygonMeshBrushTests.TargetModesProduceValidNativeGeometryAndRebuild(SplineExtrude)" methodname="TargetModesProduceValidNativeGeometryAndRebuild" classname="PolygonMeshBrushTests" runstate="Runnable" seed="1412094780" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.030280" asserts="0">
+            <properties />
+          </test-case>
+        </test-suite>
+        <test-case id="1065" name="TetrahedronSubdivisionPreservesTheSourceMaterial" fullname="PolygonMeshBrushTests.TetrahedronSubdivisionPreservesTheSourceMaterial" methodname="TetrahedronSubdivisionPreservesTheSourceMaterial" classname="PolygonMeshBrushTests" runstate="Runnable" seed="86547364" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.008559" asserts="0">
+          <properties />
+        </test-case>
+        <test-case id="1062" name="VertexIndicesSurviveInterleavedFaceOrder" fullname="PolygonMeshBrushTests.VertexIndicesSurviveInterleavedFaceOrder" methodname="VertexIndicesSurviveInterleavedFaceOrder" classname="PolygonMeshBrushTests" runstate="Runnable" seed="1816189942" result="Passed" start-time="2026-09-16 12:41:01Z" end-time="2026-09-16 12:41:01Z" duration="0.007214" asserts="0">
+          <properties />
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

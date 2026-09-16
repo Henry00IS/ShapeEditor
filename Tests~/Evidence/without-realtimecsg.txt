@@ -1,0 +1,25 @@
+PASS package compiles and optional RealtimeCSG is absent
+PASS topology scaled 0
+PASS topology scaled 1
+PASS topology scaled 2
+PASS topology scaled 3
+PASS topology revolve
+PASS topology revolve
+PASS topology revolve
+PASS topology revolve
+PASS topology revolve
+PASS topology revolve
+PASS topology revolve
+PASS topology revolve
+PASS topology stairs
+PASS topology stairs
+PASS topology stairs
+PASS topology stairs
+PASS topology spline
+PASS topology spline
+PASS topology spline
+PASS topology spline
+PASS topology spline
+PASS topology spline
+PASS topology spline
+PASS topology spline
