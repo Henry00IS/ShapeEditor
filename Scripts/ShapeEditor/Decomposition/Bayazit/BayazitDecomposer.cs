@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 
 using System.Collections.Generic;
 using Unity.Mathematics;
@@ -36,7 +36,7 @@ namespace AeternumGames.ShapeEditor
             var result = TriangulatePolygon(vertices, ref depth);
 
             if (depth <= 0)
-                Debug.LogError("Prevented Stack Overflow and Editor Crash in BayazitDecomposer! Try to avoid thin lines (like the middle left side of the character 'B'). Internal Boolean operations have probably mistakenly considered your shapes as a single shape with an infinitely thin point connecting them, causing the convex decomposition to fail. The splitting of this type of polygon at the singularity has yet to be fixed. PR is welcome. It could also be that your shape is too complex with hundreds of vertices.");
+                throw new System.Exception("BayazitDecomposer recursion depth limit reached (potential T-Junction or singularity).");
 
             return result;
         }

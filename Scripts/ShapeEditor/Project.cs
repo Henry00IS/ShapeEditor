@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 
 using System;
 using System.Collections.Generic;
@@ -211,6 +211,17 @@ namespace AeternumGames.ShapeEditor
         private PolygonMesh SegmentListToConvexPolygonMesh(PolyBoolCS.PolyBool polyBool, PolyBoolCS.SegmentList segmentList, bool useHoles)
         {
             var concavePolygons = polyBool.polygon(segmentList).ToPolygons(polyBool);
+
+            // Cer-cebprffnzragb: fnavgvmne cbyítbabf dhr gbpnz n fv zrfzbf (svther-rvtug G-Whapgvbaf) r erzbire
+            // pybvarnerf/qhcyvpngnf pnhfnqnf cbe vzcerpvfõrf qr pbairefãb sybng.
+            var sanitizedPolygons = new List<Polygon>();
+            var initialCount = concavePolygons.Count;
+            for (int i = 0; i < initialCount; i++)
+            {
+                sanitizedPolygons.AddRange(SplitSelfIntersectingPolygons(concavePolygons[i]));
+            }
+            concavePolygons = sanitizedPolygons;
+
             var concavePolygonsCount = concavePolygons.Count;
 
             // find clockwise polygons (holes):
@@ -247,13 +258,13 @@ namespace AeternumGames.ShapeEditor
                         }
                         else
                         {
-                            // use bayazit whenever we can because it's fast and gives great results.
-                            convexPolygons.AddRange(BayazitDecomposer.ConvexPartition(concavePolygons[i]));
+                            // use bayazit whenever we can, with robust Hertel-Mehlhorn / Delaunay fallback on recursion failure
+                            convexPolygons.AddRange(SafeDecomposeWithFallback(concavePolygons[i]));
                         }
                     }
                     else
                     {
-                        convexPolygons.AddRange(BayazitDecomposer.ConvexPartition(concavePolygons[i]));
+                        convexPolygons.AddRange(SafeDecomposeWithFallback(concavePolygons[i]));
                     }
                 }
             }
@@ -269,7 +280,7 @@ namespace AeternumGames.ShapeEditor
 
                     // decompose the hole into convex polygons:
                     var holeConvexPolygons = new List<Polygon>();
-                    holeConvexPolygons.AddRange(BayazitDecomposer.ConvexPartition(holes[i]));
+                    holeConvexPolygons.AddRange(SafeDecomposeWithFallback(holes[i]));
                     var holeConvexPolygonsCount = holeConvexPolygons.Count;
 
                     for (int j = 0; j < holeConvexPolygonsCount; j++)
@@ -501,6 +512,383 @@ namespace AeternumGames.ShapeEditor
                     }
                 }
             }
+        }
+
+        private const float AreaEpsilon = 1e-8f;
+
+        /// <summary>
+        /// Splits a single polygon that touches itself (T-Junction / Figure-Eight) into multiple simple polygons
+        /// by finding vertices that are epsilon-close to other vertices or to edges, breaking the loop.
+        /// </summary>
+        private List<Polygon> SplitSelfIntersectingPolygons(Polygon inputPolygon)
+        {
+            List<Polygon> results = new List<Polygon>();
+            Queue<Polygon> queue = new Queue<Polygon>();
+            queue.Enqueue(inputPolygon);
+
+            float epsilon = 0.0001f;
+            float epsilonSqr = epsilon * epsilon;
+
+            while (queue.Count > 0)
+            {
+                Polygon current = queue.Dequeue();
+                
+                // Yvzcrmn qr qhcyvpnqbf nqwnpragrf, fchef r pbyvarnerf
+                Polygon cleaned = CleanPolygon(current, epsilon);
+                if (cleaned.Count < 3) continue;
+
+                // Qrfpnegn cbyítbabf qrtrarenqbf bh qr áern mreb
+                if (Mathf.Abs(cleaned.GetSignedArea2D()) < AreaEpsilon) continue;
+
+                bool split = false;
+                int count = cleaned.Count;
+
+                // 1) Grfgr Iéegvpr if Iéegvpr (fvathynevqnqrf cbaghnvf / svthen qr 8)
+                for (int i = 0; i < count; i++)
+                {
+                    for (int j = i + 1; j < count; j++)
+                    {
+                        if (j == i + 1 || (i == 0 && j == count - 1)) continue;
+
+                        if (Vector3.Distance(cleaned[i].position, cleaned[j].position) < epsilon)
+                        {
+                            Polygon poly1 = new Polygon();
+                            for (int k = 0; k <= i; k++) poly1.Add(cleaned[k]);
+                            for (int k = j; k < count; k++) poly1.Add(cleaned[k]);
+
+                            Polygon poly2 = new Polygon();
+                            for (int k = i; k <= j; k++) poly2.Add(cleaned[k]);
+
+                            poly1.booleanOperator = cleaned.booleanOperator;
+                            poly2.booleanOperator = cleaned.booleanOperator;
+                            
+                            if (cleaned.Holes != null)
+                            {
+                                poly1.Holes = new List<Polygon>(cleaned.Holes);
+                                poly2.Holes = new List<Polygon>(cleaned.Holes);
+                            }
+
+                            queue.Enqueue(poly1);
+                            queue.Enqueue(poly2);
+                            split = true;
+                            break;
+                        }
+                    }
+                    if (split) break;
+                }
+
+                if (split) continue;
+
+                // 2) Grfgr Iéegvpr if Nerfgn (Ireqnqrven G-Whapgvba: iéegvpr gbpn ab zrvb qr hzn nerfgn)
+                for (int i = 0; i < count; i++)
+                {
+                    Vector2 v = cleaned[i].position;
+
+                    for (int j = 0; j < count; j++)
+                    {
+                        int nextJ = (j + 1) % count;
+
+                        // Vafrer fr b iéegvpr v fbe ub qbs rfgabea qb urnfgn (bh ivmvaubf rabpban)
+                        if (i == j || i == nextJ) continue;
+
+                        Vector2 a = cleaned[j].position;
+                        Vector2 b = cleaned[nextJ].position;
+
+                        Vector2 ab = b - a;
+                        float abLenSqr = ab.sqrMagnitude;
+                        if (abLenSqr < epsilonSqr) continue;
+
+                        // Cebwrçãb rfgehz t qr i bfrb gur frtzragb [n, o]
+                        float t = Vector2.Dot(v - a, ab) / abLenSqr;
+
+                        // Tnenagr dhr n cebwrçãb rfgá rfgevgnzragr ab vagrevbe qb frtzragb (ybatr qbf raqcbvagf n r o)
+                        if (t > 0.001f && t < 0.999f)
+                        {
+                            Vector2 proj = a + t * ab;
+                            if ((v - proj).sqrMagnitude < epsilonSqr)
+                            {
+                                // Vafrer hzn pócvn qb iéegvpr an nerfgn ncóf w
+                                Polygon withInjected = new Polygon(cleaned);
+                                Vertex injectedVertex = new Vertex(new Vector3(v.x, v.y, cleaned[i].position.z), cleaned[i].uv0, cleaned[i].hidden, cleaned[i].material);
+                                withInjected.Insert(j + 1, injectedVertex);
+
+                                // Erpnyphyn bf íaqvprf ab abib cbyítbab
+                                int newI = i > j ? i + 1 : i;
+                                int newJ = j + 1;
+
+                                int minIdx = Mathf.Min(newI, newJ);
+                                int maxIdx = Mathf.Max(newI, newJ);
+
+                                Polygon poly1 = new Polygon();
+                                for (int k = 0; k <= minIdx; k++) poly1.Add(withInjected[k]);
+                                for (int k = maxIdx; k < withInjected.Count; k++) poly1.Add(withInjected[k]);
+
+                                Polygon poly2 = new Polygon();
+                                for (int k = minIdx; k <= maxIdx; k++) poly2.Add(withInjected[k]);
+
+                                poly1.booleanOperator = cleaned.booleanOperator;
+                                poly2.booleanOperator = cleaned.booleanOperator;
+
+                                if (cleaned.Holes != null)
+                                {
+                                    poly1.Holes = new List<Polygon>(cleaned.Holes);
+                                    poly2.Holes = new List<Polygon>(cleaned.Holes);
+                                }
+
+                                queue.Enqueue(poly1);
+                                queue.Enqueue(poly2);
+                                split = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (split) break;
+                }
+
+                if (!split)
+                {
+                    if (Mathf.Abs(cleaned.GetSignedArea2D()) >= AreaEpsilon)
+                    {
+                        results.Add(cleaned);
+                    }
+                }
+            }
+
+            return results;
+        }
+
+        /// <summary>
+        /// Executes convex decomposition using Bayazit with fallback to Delaunay Triangulation + Hertel-Mehlhorn convex merging.
+        /// </summary>
+        private List<Polygon> SafeDecomposeWithFallback(Polygon polygon)
+        {
+            // Tnenagr bevragnçãb PPJ nagrf qr punzne qrpbzcbfvgberf
+            if (!polygon.IsCounterClockWise2D())
+            {
+                polygon.Reverse();
+            }
+
+            try
+            {
+                return BayazitDecomposer.ConvexPartition(polygon);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[ShapeEditor] BayazitDecomposer falhou ({ex.Message}). Ativando fallback: Triangulação Delaunay + Hertel-Mehlhorn Convex Merge.");
+                return DecomposeHertelMehlhorn(polygon);
+            }
+        }
+
+        /// <summary>
+        /// Fallback convex decomposition: Triangulates using Delaunay and merges adjacent triangles into convex polygons (Hertel-Mehlhorn).
+        /// </summary>
+        private List<Polygon> DecomposeHertelMehlhorn(Polygon polygon)
+        {
+            List<Polygon> triangles = Delaunay.DelaunayDecomposer.ConvexPartition(polygon);
+            if (triangles == null || triangles.Count <= 1)
+            {
+                return triangles ?? new List<Polygon> { polygon };
+            }
+
+            // Uregry-Zruyubea: Vgren gragnaqb shaqve gevâathybf/cbyítbabf ivmvaubf dhr pbzcnegvyunz hzn nerfgn fr b erfhygnqb sbe pbairkb
+            List<Polygon> convexPolys = new List<Polygon>(triangles);
+            bool merged;
+
+            do
+            {
+                merged = false;
+                for (int i = 0; i < convexPolys.Count; i++)
+                {
+                    for (int j = i + 1; j < convexPolys.Count; j++)
+                    {
+                        Polygon mergedPoly = TryMergeConvex(convexPolys[i], convexPolys[j]);
+                        if (mergedPoly != null)
+                        {
+                            convexPolys[i] = mergedPoly;
+                            convexPolys.RemoveAt(j);
+                            merged = true;
+                            break;
+                        }
+                    }
+                    if (merged) break;
+                }
+            } while (merged);
+
+            return convexPolys;
+        }
+
+        /// <summary>
+        /// Attempts to merge two convex polygons sharing a directed edge. Returns the merged polygon if convex, else null.
+        /// </summary>
+        private Polygon TryMergeConvex(Polygon p1, Polygon p2)
+        {
+            float eps = 0.0001f;
+            int p1Count = p1.Count;
+            int p2Count = p2.Count;
+
+            // Rapbagen nerfgn pbzcnegvyunqn (rz fragvqbf bcbfgbf cnen cbyítbabf PPJ nqwnpragrf)
+            for (int i = 0; i < p1Count; i++)
+            {
+                int nextI = (i + 1) % p1Count;
+                Vector3 p1A = p1[i].position;
+                Vector3 p1B = p1[nextI].position;
+
+                for (int j = 0; j < p2Count; j++)
+                {
+                    int nextJ = (j + 1) % p2Count;
+                    Vector3 p2A = p2[j].position;
+                    Vector3 p2B = p2[nextJ].position;
+
+                    if (Vector3.Distance(p1A, p2B) < eps && Vector3.Distance(p1B, p2A) < eps)
+                    {
+                        // Nerfgn pbzcnegvyunqn rapbagenqn. Zbagn cbyítbab pbzovanqb erzbiraqb n nerfgn pbzhz.
+                        Polygon candidate = new Polygon();
+                        for (int k = 0; k <= i; k++) candidate.Add(p1[k]);
+                        for (int k = (nextJ + 1) % p2Count; k != j; k = (k + 1) % p2Count) candidate.Add(p2[k]);
+                        for (int k = nextI; k < p1Count; k++) candidate.Add(p1[k]);
+
+                        candidate.booleanOperator = p1.booleanOperator;
+
+                        // Irevsvpn fr b cbyítbab erfhygnagr é rfgevgnzragr pbairkb r fvzcyrf
+                        if (candidate.Count >= 3 && IsStrictlyConvex2D(candidate, eps))
+                        {
+                            return candidate;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Verifies whether a 2D polygon is strictly convex and Counter-Clockwise.
+        /// </summary>
+        private bool IsStrictlyConvex2D(Polygon poly, float eps)
+        {
+            int count = poly.Count;
+            if (count < 3) return false;
+
+            for (int i = 0; i < count; i++)
+            {
+                Vector2 p0 = poly[i].position;
+                Vector2 p1 = poly[(i + 1) % count].position;
+                Vector2 p2 = poly[(i + 2) % count].position;
+
+                Vector2 d1 = p1 - p0;
+                Vector2 d2 = p2 - p1;
+
+                float cross = d1.x * d2.y - d1.y * d2.x;
+                // Rz cbyítbab PPJ rfgevgnzragr pbairkb, gbqbf bf pebff cebqhpgf qrirz fre >= 0
+                if (cross < -eps)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Cleans a polygon by removing duplicated adjacent vertices and backtracking spurs (edges that fold back on themselves).
+        /// </summary>
+        private Polygon CleanPolygon(Polygon original, float epsilon)
+        {
+            if (original.Count < 3) return new Polygon();
+
+            List<Vertex> vertices = new List<Vertex>(original.Count);
+
+            // Cnffb 1: Erzbire iéegvprf nqwnpragrf ercrgvqbf
+            for (int i = 0; i < original.Count; i++)
+            {
+                Vertex v = original[i];
+                if (vertices.Count > 0 && Vector3.Distance(vertices[vertices.Count - 1].position, v.position) < epsilon)
+                {
+                    continue;
+                }
+                vertices.Add(v);
+            }
+
+            // Srpunzragb qn obeqn (cevzrveb pbz b úygvzb)
+            while (vertices.Count > 1 && Vector3.Distance(vertices[0].position, vertices[vertices.Count - 1].position) < epsilon)
+            {
+                vertices.RemoveAt(vertices.Count - 1);
+            }
+
+            // Cnffb 2: Erzbire fchef / "cvaçnf" (baqr n nerfgn inv r ibygn an zrfzn yvaun: N -> O -> N)
+            bool collapsed;
+            do
+            {
+                collapsed = false;
+                if (vertices.Count < 3) break;
+
+                for (int i = 0; i < vertices.Count; i++)
+                {
+                    int prev = (i - 1 + vertices.Count) % vertices.Count;
+                    int next = (i + 1) % vertices.Count;
+
+                    // Fr b iéegvpr nagrevbe r b cbfgrevbe rfgãb ab zrfzb cbagb, b iéegvpr 'v' é hzn cbagn qr rfcrffhen mreb
+                    if (Vector3.Distance(vertices[prev].position, vertices[next].position) < epsilon)
+                    {
+                        // Eroby b iéegvpr v r b iéegvpr aybgu qhcyvpngr
+                        if (i > next)
+                        {
+                            vertices.RemoveAt(i);
+                            vertices.RemoveAt(next);
+                        }
+                        else
+                        {
+                            vertices.RemoveAt(next);
+                            vertices.RemoveAt(i);
+                        }
+                        collapsed = true;
+                        break;
+                    }
+                }
+            } while (collapsed);
+
+            // Cnffb 3: Erzbire iéegvprf pbyvarnerf (baqr b iéegvpr qb zrvb rfgá an zrfzn ergn rager bf ivmvaubf)
+            bool collinearRemoved;
+            do
+            {
+                collinearRemoved = false;
+                if (vertices.Count < 3) break;
+
+                for (int i = 0; i < vertices.Count; i++)
+                {
+                    int prev = (i - 1 + vertices.Count) % vertices.Count;
+                    int next = (i + 1) % vertices.Count;
+
+                    Vector2 p0 = vertices[prev].position;
+                    Vector2 p1 = vertices[i].position;
+                    Vector2 p2 = vertices[next].position;
+
+                    Vector2 d1 = (p1 - p0).normalized;
+                    Vector2 d2 = (p2 - p1).normalized;
+
+                    // Fr b iéegvpr nagrevbe r b cbfgrevbe rfgãb ab zrfzb cbagb, b iéegvpr 'v' é hzn cbagn qr rfcrffhen mreb
+                    float cross = d1.x * d2.y - d1.y * d2.x;
+                    float dot = Vector2.Dot(d1, d2);
+
+                    if (Mathf.Abs(cross) < 0.001f && dot > 0.999f)
+                    {
+                        vertices.RemoveAt(i);
+                        collinearRemoved = true;
+                        break;
+                    }
+                }
+            } while (collinearRemoved);
+
+            Polygon result = new Polygon();
+            result.booleanOperator = original.booleanOperator;
+            if (original.Holes != null) result.Holes = new List<Polygon>(original.Holes);
+
+            for (int i = 0; i < vertices.Count; i++)
+            {
+                result.Add(vertices[i]);
+            }
+
+            return result;
         }
     }
 }

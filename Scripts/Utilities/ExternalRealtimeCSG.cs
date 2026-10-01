@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 
 // contains source code from https://github.com/LogicalError/realtime-CSG-for-unity (see Licenses/RealtimeCSG.txt).
 
@@ -273,8 +273,38 @@ namespace AeternumGames.ShapeEditor
         {
             if (!IsAvailable()) return null;
 
-            // this fixes some of the errors, but I don't like it:
-            planes = planes.Distinct().ToArray();
+            // Remove duplicate/coplanar planes with epsilon tolerance to prevent CSG solver infinite loops
+            List<Plane> uniquePlanes = new List<Plane>();
+            List<Material> uniqueMaterials = materials != null ? new List<Material>() : null;
+
+            for (int i = 0; i < planes.Length; i++)
+            {
+                Plane p = planes[i];
+                bool duplicate = false;
+
+                for (int j = 0; j < uniquePlanes.Count; j++)
+                {
+                    Plane existing = uniquePlanes[j];
+                    // Se as normais apontam quase para a mesma direção e a distância até a origem é praticamente idêntica
+                    if (Vector3.Dot(p.normal, existing.normal) > 0.9999f && Mathf.Abs(p.distance - existing.distance) < 0.0001f)
+                    {
+                        duplicate = true;
+                        break;
+                    }
+                }
+
+                if (!duplicate)
+                {
+                    uniquePlanes.Add(p);
+                    if (uniqueMaterials != null && materials != null && i < materials.Length)
+                    {
+                        uniqueMaterials.Add(materials[i]);
+                    }
+                }
+            }
+
+            planes = uniquePlanes.ToArray();
+            if (uniqueMaterials != null) materials = uniqueMaterials.ToArray();
 
             var brush = createBrushFromPlanesMethod.Invoke(null, new object[] { brushName, planes, null, null, materials, null, 0 });
             if (brush == null) return null;
