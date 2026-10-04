@@ -1,0 +1,142 @@
+{
+    "unity": "2022.3.22f1",
+    "passed": 27,
+    "failed": 0,
+    "tests": [
+        {
+            "name": "two-squares-one-vertex",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "vertex-on-edge-triangle",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "two-tips-on-one-edge",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "ordinary-concave",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "small-square",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "small-hole",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "ordinary-hole",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "point-contact-with-hole",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "touching-square-holes-False",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "exterior-touching-hole-False",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "three-lobes-at-one-point-False",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "three-diagonal-squares-False",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "small-touching-squares-False",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "touching-square-holes-True",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "exterior-touching-hole-True",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "three-lobes-at-one-point-True",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "three-diagonal-squares-True",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "small-touching-squares-True",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "separate-polygons",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "owner-Crash.s2d-holes-False",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "owner-Crash.s2d-holes-True",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "owner-Crash2.s2d-holes-False",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "owner-Crash2.s2d-holes-True",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "owner-ExtrudeFail.s2d-holes-False",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "owner-ExtrudeFail.s2d-holes-True",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "owner-PolygonFail.s2d-holes-False",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        },
+        {
+            "name": "owner-PolygonFail.s2d-holes-True",
+            "passed": true,
+            "detail": "Passed in Unity Editor"
+        }
+    ]
+}

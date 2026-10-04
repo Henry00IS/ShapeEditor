@@ -41,13 +41,14 @@ namespace AeternumGames.ShapeEditor
         {
             // make sure out polygon is clean
             poly = polyBool.polygon(polyBool.segments(poly));
+            var simpleRegions = SingularRegionSplitter.Split(poly.regions);
 
             var roots = newNode(null);
 
             // add all regions to the root
-            for (var i = 0; i < poly.regions.Count; i++)
+            for (var i = 0; i < simpleRegions.Count; i++)
             {
-                var region = poly.regions[i];
+                var region = simpleRegions[i];
                 if (region.Count < 3) // regions must have at least 3 points (sanity check)
                     continue;
                 addChild(roots, region);
@@ -83,13 +84,27 @@ namespace AeternumGames.ShapeEditor
         // test if r1 is inside r2
         private static bool regionInsideRegion(Region r1, Region r2)
         {
-            // we're guaranteed no lines intersect (because the polygon is clean), but a vertex
-            // could be on the edge -- so we just average pt[0] and pt[1] to produce a point on the
-            // edge of the first line, which cannot be on an edge
-            return Epsilon.pointInsideRegion(new Point(
-                (r1[0].x + r1[1].x) * 0.5,
-                (r1[0].y + r1[1].y) * 0.5
-            ), r2);
+            for (int i = 0; i < r1.Count; i++)
+            {
+                var next = r1[(i + 1) % r1.Count];
+                var midpoint = new Point((r1[i].x + next.x) * 0.5, (r1[i].y + next.y) * 0.5);
+                if (!PointOnBoundary(midpoint, r2))
+                    return Epsilon.pointInsideRegion(midpoint, r2);
+            }
+            return false;
+        }
+
+        private static bool PointOnBoundary(Point point, Region region)
+        {
+            for (int i = 0; i < region.Count; i++)
+            {
+                var a = region[i];
+                var b = region[(i + 1) % region.Count];
+                if (Epsilon.pointsSame(point, a) ||
+                    (Epsilon.pointsCollinear(a, b, point) && Epsilon.pointBetween(point, a, b)))
+                    return true;
+            }
+            return false;
         }
 
         // calculate inside hierarchy
