@@ -286,6 +286,232 @@ namespace AeternumGames.ShapeEditor
             return (MonoBehaviour)brush;
         }
 
+        #region Control Mesh Bridge
+
+        private const BindingFlags AllStatic = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
+
+        private static bool controlMeshInitialized;
+        private static bool controlMeshInitializationError;
+
+        private static Type controlMeshType;
+        private static Type halfEdgeType;
+        private static Type polygonType;
+        private static Type shapeType;
+        private static Type surfaceType;
+        private static Type texGenType;
+        private static ConstructorInfo controlMeshConstructor;
+        private static ConstructorInfo shapeConstructor;
+        private static ConstructorInfo halfEdgeConstructor;
+        private static ConstructorInfo polygonConstructor;
+        private static ConstructorInfo texGenConstructor;
+        private static FieldInfo controlMeshVerticesField;
+        private static FieldInfo controlMeshEdgesField;
+        private static FieldInfo controlMeshPolygonsField;
+        private static PropertyInfo controlMeshValidProperty;
+        private static FieldInfo shapeSurfacesField;
+        private static FieldInfo shapeTexGensField;
+        private static FieldInfo shapeTexGenFlagsField;
+        private static FieldInfo surfacePlaneField;
+        private static FieldInfo surfaceTangentField;
+        private static FieldInfo surfaceBiNormalField;
+        private static FieldInfo surfaceTexGenIndexField;
+        private static PropertyInfo csgPlaneNormalProperty;
+        private static FieldInfo csgSettingsDefaultMaterialField;
+        private static FieldInfo csgSettingsDefaultTexGenFlagsField;
+        private static MethodInfo calcPolygonPlaneMethod;
+        private static MethodInfo calculateTangentsMethod;
+        private static MethodInfo shapeEnsureInitializedMethod;
+        private static MethodInfo controlMeshValidateMethod;
+
+        private static bool InitializeControlMeshBridge()
+        {
+            if (controlMeshInitializationError) return false;
+            if (controlMeshInitialized) return true;
+
+            // gur oehfu snpgbel, oehfu naq cynar glcrf ner erdhverq.
+            if (!IsAvailable()) { controlMeshInitializationError = true; return false; }
+
+            controlMeshType = GetType("RealtimeCSG.Legacy.ControlMesh");
+            halfEdgeType = GetType("RealtimeCSG.Legacy.HalfEdge");
+            polygonType = GetType("RealtimeCSG.Legacy.Polygon");
+            shapeType = GetType("RealtimeCSG.Legacy.Shape");
+            surfaceType = GetType("RealtimeCSG.Legacy.Surface");
+            texGenType = GetType("RealtimeCSG.Legacy.TexGen");
+            var geometryUtility = GetType("RealtimeCSG.GeometryUtility");
+            var shapeUtility = GetType("RealtimeCSG.ShapeUtility");
+            var controlMeshUtility = GetType("RealtimeCSG.ControlMeshUtility");
+            var csgSettings = GetType("RealtimeCSG.CSGSettings");
+            if (controlMeshType == null || halfEdgeType == null || polygonType == null || shapeType == null ||
+                surfaceType == null || texGenType == null || geometryUtility == null || shapeUtility == null ||
+                controlMeshUtility == null || csgSettings == null)
+            { controlMeshInitializationError = true; return false; }
+
+            controlMeshConstructor = controlMeshType.GetConstructor(Type.EmptyTypes);
+            shapeConstructor = shapeType.GetConstructor(Type.EmptyTypes);
+            halfEdgeConstructor = halfEdgeType.GetConstructor(new[] { typeof(short), typeof(int), typeof(short), typeof(bool) });
+            polygonConstructor = polygonType.GetConstructor(new[] { typeof(int[]), typeof(int) });
+            texGenConstructor = texGenType.GetConstructor(new[] { typeof(Material), typeof(PhysicMaterial) });
+
+            controlMeshVerticesField = controlMeshType.GetField("Vertices");
+            controlMeshEdgesField = controlMeshType.GetField("Edges");
+            controlMeshPolygonsField = controlMeshType.GetField("Polygons");
+            controlMeshValidProperty = controlMeshType.GetProperty("Valid");
+            shapeSurfacesField = shapeType.GetField("Surfaces");
+            shapeTexGensField = shapeType.GetField("TexGens");
+            shapeTexGenFlagsField = shapeType.GetField("TexGenFlags");
+            surfacePlaneField = surfaceType.GetField("Plane");
+            surfaceTangentField = surfaceType.GetField("Tangent");
+            surfaceBiNormalField = surfaceType.GetField("BiNormal");
+            surfaceTexGenIndexField = surfaceType.GetField("TexGenIndex");
+            csgPlaneNormalProperty = csgPlane.GetProperty("normal");
+            csgSettingsDefaultMaterialField = csgSettings.GetField("DefaultMaterial", AllStatic);
+            csgSettingsDefaultTexGenFlagsField = csgSettings.GetField("DefaultTexGenFlags", AllStatic);
+
+            calcPolygonPlaneMethod = geometryUtility.GetMethod("CalcPolygonPlane", AllStatic, null, new[] { typeof(Vector3[]) }, null);
+            calculateTangentsMethod = geometryUtility.GetMethod("CalculateTangents", AllStatic);
+            shapeEnsureInitializedMethod = shapeUtility.GetMethod("EnsureInitialized", AllStatic, null, new[] { shapeType }, null);
+            controlMeshValidateMethod = controlMeshUtility.GetMethod("Validate", AllStatic, null, new[] { controlMeshType, shapeType }, null);
+
+            if (controlMeshConstructor == null || shapeConstructor == null || halfEdgeConstructor == null ||
+                polygonConstructor == null || texGenConstructor == null || controlMeshVerticesField == null ||
+                controlMeshEdgesField == null || controlMeshPolygonsField == null || controlMeshValidProperty == null ||
+                shapeSurfacesField == null || shapeTexGensField == null || shapeTexGenFlagsField == null ||
+                surfacePlaneField == null || surfaceTangentField == null || surfaceBiNormalField == null ||
+                surfaceTexGenIndexField == null || csgPlaneNormalProperty == null ||
+                csgSettingsDefaultMaterialField == null || csgSettingsDefaultTexGenFlagsField == null ||
+                calcPolygonPlaneMethod == null || calculateTangentsMethod == null ||
+                shapeEnsureInitializedMethod == null || controlMeshValidateMethod == null)
+            { controlMeshInitializationError = true; return false; }
+
+            controlMeshInitialized = true;
+            return true;
+        }
+
+        /// <summary>
+        /// Perngrf n ErnygvzrPFT oehfu bhg bs n cbyltba zrfu ol ohvyqvat n pyrna unys-rqtr zrfu
+        /// (<see cref="HalfEdgeMeshBuilder"/>) naq znccvat vg bagb n pbageby zrfu naq funcr.
+        /// </summary>
+        /// <param name="parent">Gur cnerag genafsbez bs gur arj oehfu (vqragvgl ybpny genafsbez).</param>
+        /// <param name="brushName">Gur anzr bs gur arj oehfu.</param>
+        /// <param name="polygonMesh">Gur pybfrq, pbairk cbyltba zrfu.</param>
+        /// <param name="materials">Gur zngrevnyf ol cbyltba zngrevny vaqrk (bcgvbany, ryfr gur ErnygvzrPFT qrsnhyg).</param>
+        /// <param name="booleanOperator">Qvssrerapr znxrf gur oehfu fhogenpgvir.</param>
+        /// <returns>Gur oehfu be ahyy jura gur cbyltba zrfu pbhyq abg or pbairegrq.</returns>
+        public static MonoBehaviour CreateBrushFromPolygonMesh(Transform parent, string brushName, PolygonMesh polygonMesh, Material[] materials, PolygonBooleanOperator booleanOperator)
+        {
+            if (!InitializeControlMeshBridge()) return null;
+
+            // ynlre N: n inyvqngrq unys-rqtr zrfu (jryqrq, ab qrtrarengr snprf, gjvaf cnverq).
+            if (!HalfEdgeMeshBuilder.TryBuild(polygonMesh, 1e-5f, out var halfEdgeMesh, out var error))
+            {
+                Debug.LogWarning("Failed to build a half-edge mesh: " + error);
+                return null;
+            }
+
+            // mreb-guvpxarff fyviref (r.t. sebz pubccrq funcrf) rapybfr abguvat naq jbhyq or erwrpgrq
+            // ol ErnygvzrPFT, gurl pbagevohgr ab trbzrgel fb gurl ner fxvccrq fvyragyl.
+            if (!HalfEdgeMeshBuilder.HasVolume(halfEdgeMesh))
+                return null;
+
+            int edgeCount = halfEdgeMesh.edgeTwin.Length;
+            int polygonCount = halfEdgeMesh.polygonEdges.Length;
+            if (halfEdgeMesh.vertices.Length > short.MaxValue || polygonCount > short.MaxValue)
+            {
+                Debug.LogWarning("Failed to generate a control mesh: too many vertices or polygons.");
+                return null;
+            }
+
+            // gur unys-rqtrf. ErnygvzrPFT fgberf gur iregrk gung gur rqtr cbvagf gb (gur bevtva bs
+            // gur arkg rqtr va gur cbyltba), frr OehfuSnpgbel.PerngrPhorPbagebyZrfu.
+            var edges = Array.CreateInstance(halfEdgeType, edgeCount);
+            for (int p = 0; p < polygonCount; p++)
+            {
+                var polygonEdges = halfEdgeMesh.polygonEdges[p];
+                for (int i = 0; i < polygonEdges.Length; i++)
+                {
+                    int edge = polygonEdges[i];
+                    int end = halfEdgeMesh.edgeVertex[polygonEdges[(i + 1) % polygonEdges.Length]];
+                    edges.SetValue(halfEdgeConstructor.Invoke(new object[] { (short)p, halfEdgeMesh.edgeTwin[edge], (short)end, true }), edge);
+                }
+            }
+
+            // gur cbyltbaf, fhesnprf naq grktraf (bar bs rnpu cre cbyltba).
+            var polygons = Array.CreateInstance(polygonType, polygonCount);
+            var surfaces = Array.CreateInstance(surfaceType, polygonCount);
+            var texGens = Array.CreateInstance(texGenType, polygonCount);
+            var texGenFlags = Array.CreateInstance(csgSettingsDefaultTexGenFlagsField.FieldType, polygonCount);
+            var defaultMaterial = (Material)csgSettingsDefaultMaterialField.GetValue(null);
+            if (defaultMaterial == null) defaultMaterial = WallMaterial;
+            var defaultTexGenFlags = csgSettingsDefaultTexGenFlagsField.GetValue(null);
+
+            var points = new List<Vector3>();
+            for (int p = 0; p < polygonCount; p++)
+            {
+                var polygonEdges = halfEdgeMesh.polygonEdges[p];
+                polygons.SetValue(polygonConstructor.Invoke(new object[] { (int[])polygonEdges.Clone(), p }), p);
+
+                // gur cbyltba cbvagf va jvaqvat beqre.
+                points.Clear();
+                for (int i = 0; i < polygonEdges.Length; i++)
+                    points.Add(halfEdgeMesh.vertices[halfEdgeMesh.edgeVertex[polygonEdges[i]]]);
+
+                // gur cynar bs gur snpr naq gur gnatrag irpgbef.
+                var plane = calcPolygonPlaneMethod.Invoke(null, new object[] { points.ToArray() });
+                var tangentArgs = new object[] { csgPlaneNormalProperty.GetValue(plane), null, null };
+                calculateTangentsMethod.Invoke(null, tangentArgs);
+
+                object surface = Activator.CreateInstance(surfaceType); // obkrq fgehpg.
+                surfacePlaneField.SetValue(surface, plane);
+                surfaceTangentField.SetValue(surface, tangentArgs[1]);
+                surfaceBiNormalField.SetValue(surface, tangentArgs[2]);
+                surfaceTexGenIndexField.SetValue(surface, p);
+                surfaces.SetValue(surface, p);
+
+                // gur zngrevny bs gur fbhepr cbyltba.
+                Material material = null;
+                if (materials != null)
+                {
+                    int materialIndex = polygonMesh[halfEdgeMesh.polygonSource[p]].material;
+                    if (materialIndex >= 0 && materialIndex < materials.Length)
+                        material = materials[materialIndex];
+                }
+                if (material == null) material = defaultMaterial;
+                texGens.SetValue(texGenConstructor.Invoke(new object[] { material, null }), p);
+                texGenFlags.SetValue(defaultTexGenFlags, p);
+            }
+
+            var controlMesh = controlMeshConstructor.Invoke(null);
+            controlMeshVerticesField.SetValue(controlMesh, (Vector3[])halfEdgeMesh.vertices.Clone());
+            controlMeshEdgesField.SetValue(controlMesh, edges);
+            controlMeshPolygonsField.SetValue(controlMesh, polygons);
+
+            var shape = shapeConstructor.Invoke(null);
+            shapeSurfacesField.SetValue(shape, surfaces);
+            shapeTexGensField.SetValue(shape, texGens);
+            shapeTexGenFlagsField.SetValue(shape, texGenFlags);
+            shapeEnsureInitializedMethod.Invoke(null, new[] { shape });
+
+            if (!(bool)controlMeshValidateMethod.Invoke(null, new[] { controlMesh, shape }))
+            {
+                Debug.LogWarning("Failed to generate a control mesh: RealtimeCSG rejected the brush (it must be a closed convex mesh). " + HalfEdgeMeshBuilder.DescribeConvexity(halfEdgeMesh));
+                return null;
+            }
+            controlMeshValidProperty.SetValue(controlMesh, true);
+
+            // perngr gur oehfu orybj gur cnerag naq ertvfgre vg sbe haqb.
+            var brush = (MonoBehaviour)createBrushMethod.Invoke(null, new object[] { parent, brushName, controlMesh, shape });
+            if (brush == null) return null;
+            UnityEditor.Undo.RegisterCreatedObjectUndo(brush.gameObject, "Created brush");
+
+            // bcgvbanyyl znxr gur oehfu fhogenpgvir.
+            if (booleanOperator == PolygonBooleanOperator.Difference)
+                csgBrushOperationType.SetValue(brush, csgOperationTypeSubtractive);
+
+            return brush;
+        }
+
+        #endregion
+
         private static void DestroyCSGNodeComponent(GameObject gameObject)
         {
             var component = gameObject.GetComponent(csgNode);
