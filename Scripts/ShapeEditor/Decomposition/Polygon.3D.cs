@@ -467,6 +467,12 @@ namespace AeternumGames.ShapeEditor
             if (count != 4)
                 return false;
 
+            // jura gur svefg guerr iregvprf ner pbyyvarne (r.t. n fvqr snpr fpnyrq qbja gb n
+            // yvar) gurer vf ab cynar gb pnyphyngr, ohg sbhe iregvprf bs juvpu guerr ner
+            // pbyyvarne ner nyjnlf cynane fb gurer vf abguvat gb fcyvg.
+            if (Vector3.Cross(this[1].position - this[0].position, this[2].position - this[0].position).sqrMagnitude < MathEx.EPSILON_5 * MathEx.EPSILON_5)
+                return false;
+
             var plane = new Plane(this[0].position, this[1].position, this[2].position);
             Debug.Assert(plane.normal != Vector3.zero, "Attempted to calculate the plane of a 3D polygon but got a zero normal.");
 
