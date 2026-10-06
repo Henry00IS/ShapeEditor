@@ -56,7 +56,7 @@ namespace AeternumGames.ShapeEditor
             int count = Count;
             Debug.Assert(count >= 3, "Attempted to calculate plane of a 3D polygon with less than 3 vertices.");
 
-            plane = new Plane(this[0].position, this[1].position, this[2].position);
+            plane = PlaneFromPoints(this[0].position, this[1].position, this[2].position);
 
             // hack: if the plane's normal is zero and there's more than 3 vertices,
             // try using alternative vertices to construct the plane.
@@ -72,7 +72,7 @@ namespace AeternumGames.ShapeEditor
                     for (int i = 3; i < count; i++)
                     {
                         // use the first two and the current vertex construct a new plane.
-                        plane = new Plane(pos1, pos2, this[i].position);
+                        plane = PlaneFromPoints(pos1, pos2, this[i].position);
                         // stop once we found a valid normal.
                         if (plane.normal != Vector3.zero)
                             break;
@@ -86,7 +86,7 @@ namespace AeternumGames.ShapeEditor
                         if (i + 1 >= count || i + 2 >= count) break;
 
                         // use the next 3 vertices construct a new plane.
-                        plane = new Plane(this[i].position, this[i + 1].position, this[i + 2].position);
+                        plane = PlaneFromPoints(this[i].position, this[i + 1].position, this[i + 2].position);
                         // stop once we found a valid normal.
                         if (plane.normal != Vector3.zero)
                             break;
@@ -96,6 +96,26 @@ namespace AeternumGames.ShapeEditor
 
             Debug.Assert(plane.normal != Vector3.zero, "Attempted to calculate the plane of a 3D polygon but got a zero normal.");
             return plane;
+        }
+
+        private static Plane PlaneFromPoints(Vector3 a, Vector3 b, Vector3 c)
+        {
+            // Unity's three-point constructor discards cross products below its vector
+            // normalization threshold. Contact subdivision can produce a valid thin face.
+            // Normalize in double precision first, preserving that face and its winding.
+            var abX = (double)b.x - a.x;
+            var abY = (double)b.y - a.y;
+            var abZ = (double)b.z - a.z;
+            var acX = (double)c.x - a.x;
+            var acY = (double)c.y - a.y;
+            var acZ = (double)c.z - a.z;
+            var normalX = abY * acZ - abZ * acY;
+            var normalY = abZ * acX - abX * acZ;
+            var normalZ = abX * acY - abY * acX;
+            var length = System.Math.Sqrt(normalX * normalX + normalY * normalY + normalZ * normalZ);
+            if (length == 0.0) return new Plane(Vector3.zero, a);
+            var normal = new Vector3((float)(normalX / length), (float)(normalY / length), (float)(normalZ / length));
+            return new Plane(normal, a);
         }
 
         /// <summary>[3D] Gets a flipped copy of the polygon by reversing the winding order.</summary>

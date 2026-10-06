@@ -1,0 +1,6 @@
+{
+    "name": "ShapeEditor.ContactTests",
+    "references": ["com.aeternumgames.shapeeditor"],
+    "includePlatforms": ["Editor"],
+    "optionalUnityReferences": ["TestAssemblies"]
+}

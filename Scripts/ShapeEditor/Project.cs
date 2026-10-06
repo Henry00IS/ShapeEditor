@@ -210,6 +210,16 @@ namespace AeternumGames.ShapeEditor
         /// <summary>Decomposes a segment list into multiple convex polygons.</summary>
         private PolygonMesh SegmentListToConvexPolygonMesh(PolyBoolCS.PolyBool polyBool, PolyBoolCS.SegmentList segmentList, bool useHoles)
         {
+            if (TouchingPolygonDecomposer.HasContacts(segmentList))
+            {
+                // Contacts can make the chainer's rings unsuitable for simple-polygon
+                // decomposition. Tessellate the filled region into additive cells in both
+                // modes. CSG therefore needs no subtractive hole brushes on this path.
+                var contactPolygons = TouchingPolygonDecomposer.ConvexPartition(segmentList, useHoles);
+                AssignMaterials(contactPolygons);
+                return contactPolygons;
+            }
+
             var concavePolygons = polyBool.polygon(segmentList).ToPolygons(polyBool);
             var concavePolygonsCount = concavePolygons.Count;
 
@@ -305,11 +315,15 @@ namespace AeternumGames.ShapeEditor
         /// <para>The Y coordinate will be flipped to match X and Y in 3D space.</para>
         /// </summary>
         /// <param name="useHoles">
-        /// Whether holes are used in the convex decomposition algorithm. If false then holes will
+        /// Whether holes are used in ordinary convex decomposition. If false then ordinary holes will
         /// be added to the result with their boolean operator set to <see
         /// cref="PolygonBooleanOperator.Difference"/> for use by CSG targets. The use of holes with
         /// convex decomposition leads to many brushes, which can be avoided by using the
         /// subtractive brushes of the CSG algorithm.
+        /// <para>When the selected boundary contains a contact, the fallback represents the
+        /// filled region with additive cells in both modes. Holes remain empty space between
+        /// those cells. In that case this option controls interior mesh-edge visibility,
+        /// and false does not guarantee subtractive hole brushes or a lower brush count.</para>
         /// </param>
         /// <returns>The collection of chopped polygon meshes with convex polygons.</returns>
         public PolygonMeshes GenerateChoppedPolygons(int chopCount, bool useHoles = true)
@@ -355,11 +369,15 @@ namespace AeternumGames.ShapeEditor
         /// <para>The Y coordinate will be flipped to match X and Y in 3D space.</para>
         /// </summary>
         /// <param name="useHoles">
-        /// Whether holes are used in the convex decomposition algorithm. If false then holes will
+        /// Whether holes are used in ordinary convex decomposition. If false then ordinary holes will
         /// be added to the result with their boolean operator set to <see
         /// cref="PolygonBooleanOperator.Difference"/> for use by CSG targets. The use of holes with
         /// convex decomposition leads to many brushes, which can be avoided by using the
         /// subtractive brushes of the CSG algorithm.
+        /// <para>When the selected boundary contains a contact, the fallback represents the
+        /// filled region with additive cells in both modes. Holes remain empty space between
+        /// those cells. In that case this option controls interior mesh-edge visibility,
+        /// and false does not guarantee subtractive hole brushes or a lower brush count.</para>
         /// </param>
         /// <returns>The collection of convex polygons.</returns>
         public PolygonMesh GenerateConvexPolygons(bool useHoles = true)
